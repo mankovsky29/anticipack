@@ -1,0 +1,6 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/Anticipack/Anticipack/bin/Debug
+/Anticipack/Anticipack/obj

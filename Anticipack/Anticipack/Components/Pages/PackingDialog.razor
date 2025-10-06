@@ -1,0 +1,241 @@
+﻿@page "/packing-dialog"
+@using Microsoft.JSInterop
+@implements IAsyncDisposable
+
+<h3>PackingDialog</h3>
+
+<div class="chat-container">
+    <div class="messages" @ref="messagesContainer">
+        @foreach (var msg in messages)
+        {
+            <div class="message @(msg.IsSent ? "sent" : "received")">
+                <div class="bubble">@msg.Text</div>
+                <div class="meta">@msg.Timestamp.ToString("HH:mm")</div>
+            </div>
+        }
+    </div>
+
+    <div class="chat-input">
+        <textarea @bind="currentMessage" @bind:event="oninput" placeholder="Type a message..."
+                  rows="2" @ref="messageInput"></textarea>
+        <button class="send-btn" @onclick="Send">
+            <!-- simple send SVG icon -->
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+                <path d="M2 21L23 12L2 3V10L17 12L2 14V21Z" fill="currentColor"/>
+            </svg>
+            <span class="sr-only">Send</span>
+        </button>
+    </div>
+</div>
+
+<style>
+.chat-container {
+    display: flex;
+    flex-direction: column;
+    height: 60vh;
+    max-height: 720px;
+    border: 1px solid rgba(0,0,0,0.08);
+    border-radius: 8px;
+    overflow: hidden;
+    background: #fff;
+}
+
+/* messages area */
+.messages {
+    flex: 1 1 auto;
+    padding: 12px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
+}
+
+/* message bubble */
+.message {
+    display: flex;
+    flex-direction: column;
+    max-width: 75%;
+}
+
+.message.sent {
+    align-self: flex-end;
+    text-align: right;
+}
+
+.message.received {
+    align-self: flex-start;
+    text-align: left;
+}
+
+.bubble {
+    padding: 10px 12px;
+    border-radius: 14px;
+    background: #e9f2ff;
+    color: #0b1220;
+    box-shadow: 0 1px 0 rgba(0,0,0,0.03);
+    word-wrap: break-word;
+}
+
+.message.sent .bubble {
+    background: #0b84ff;
+    color: white;
+}
+
+.meta {
+    margin-top: 4px;
+    font-size: 11px;
+    color: rgba(0,0,0,0.45);
+}
+
+/* input area */
+.chat-input {
+    display: flex;
+    gap: 8px;
+    padding: 8px;
+    border-top: 1px solid rgba(0,0,0,0.06);
+    align-items: flex-end;
+    background: #fafafa;
+}
+
+.chat-input textarea {
+    flex: 1 1 auto;
+    resize: none;
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px solid rgba(0,0,0,0.08);
+    font: inherit;
+    min-height: 44px;
+    max-height: 140px;
+    overflow: auto;
+}
+
+.send-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 12px;
+    border: none;
+    background: #0b84ff;
+    color: white;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.send-btn svg { fill: currentColor; }
+
+.send-btn:active { transform: translateY(1px); }
+
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
+</style>
+
+@code {
+    [Inject] private IJSRuntime JS { get; set; } = default!;
+
+    private ElementReference messageInput;
+    private ElementReference messagesContainer;
+    private DotNetObjectReference<PackingDialog>? _dotNetRef;
+
+    private string currentMessage = string.Empty;
+
+    private List<ChatMessage> messages = new();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            // create a DotNet reference so JS can call back when Enter is pressed
+            _dotNetRef = DotNetObjectReference.Create(this);
+            await JS.InvokeVoidAsync("packingDialog.attach", messageInput, _dotNetRef, messagesContainer);
+            await messageInput.FocusAsync();
+        }
+    }
+
+    private async Task Send()
+    {
+        var text = currentMessage?.TrimEnd();
+        if (string.IsNullOrWhiteSpace(text))
+            return;
+
+        messages.Add(new ChatMessage
+        {
+            Text = text,
+            Timestamp = DateTime.Now,
+            IsSent = true
+        });
+
+        currentMessage = string.Empty;
+
+        // allow UI to update then scroll to bottom and restore focus
+        await InvokeAsync(async () =>
+        {
+            await Task.Yield();
+            await JS.InvokeVoidAsync("packingDialog.scrollToBottom", messagesContainer);
+            await messageInput.FocusAsync();
+        });
+    }
+
+    [JSInvokable]
+    public Task SubmitFromJs() => Send();
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_dotNetRef is not null)
+        {
+            _dotNetRef.Dispose();
+            _dotNetRef = null;
+        }
+
+        try
+        {
+            await JS.InvokeVoidAsync("packingDialog.detach", messageInput);
+        }
+        catch
+        {
+            // ignore if JS side not present
+        }
+    }
+
+    private sealed class ChatMessage
+    {
+        public string Text { get; set; } = string.Empty;
+        public DateTime Timestamp { get; set; }
+        public bool IsSent { get; set; }
+    }
+}
+
+<script>
+    window.packingDialog = {
+        attach: function (inputEl, dotNetRef, messagesEl) {
+            if (!inputEl) return;
+            // store the handler so detach can remove it later
+            const handler = function (e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    dotNetRef.invokeMethodAsync('SubmitFromJs');
+                }
+            };
+            inputEl.__packingDialogHandler = handler;
+            inputEl.addEventListener('keydown', handler);
+            // also store messagesEl for scroll helper
+            inputEl.__messagesEl = messagesEl;
+        },
+        detach: function (inputEl) {
+            if (!inputEl) return;
+            const handler = inputEl.__packingDialogHandler;
+            if (handler) {
+                inputEl.removeEventListener('keydown', handler);
+                delete inputEl.__packingDialogHandler;
+                delete inputEl.__messagesEl;
+            }
+        },
+        scrollToBottom: function (messagesEl) {
+            try {
+                if (!messagesEl) return;
+                messagesEl.scrollTop = messagesEl.scrollHeight;
+            } catch (e) {
+                // ignore
+            }
+        }
+    };
+</script>

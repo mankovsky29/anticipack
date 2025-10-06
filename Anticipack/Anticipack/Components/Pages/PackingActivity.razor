@@ -1,0 +1,771 @@
+﻿@page "/packing-activity"
+@using Anticipack.Packing
+@using System.Threading
+@using Microsoft.AspNetCore.Components.Web
+
+@* 
+Pseudocode / Plan (detailed):
+- Problem: Razor parsing errors can occur with inline, untyped lambda expressions in attributes that include event modifiers (e.g. @ondragover:preventDefault="e => ...").
+- Solution:
+  1. Replace untyped short lambdas in event attributes with explicitly typed lambdas and prefix them with '@' so Razor parses them correctly.
+     - For drag events use '@((DragEventArgs e) => Method(e, item))'
+     - For change events use '@((ChangeEventArgs e) => Method(...))'
+     - For click handlers that take no args use '@(() => Method(item))'
+  2. Keep event modifiers (e.g. :preventDefault, :stopPropagation) as separate attributes where used.
+  3. Preserve existing behavior and UI: drag & drop, add dialog, delete confirmation, toast, etc.
+- Implementation: update the <li> and relevant input/span/button event attributes with typed lambdas. No behavior changes otherwise.
+*@
+
+<h3>PackingActivity</h3>
+
+<div class="packing-list">
+    @* iterate categories in insertion order (so new categories are appended to the end) *@
+    @foreach (var category in _categoryOrder)
+    {
+        var groupItems = Items.Where(i => string.Equals(i.Item.Category, category, StringComparison.OrdinalIgnoreCase)).ToList();
+        if (!groupItems.Any())
+            continue;
+
+        var allChecked = IsAllChecked(category);
+        var collapsed = IsCollapsed(category);
+
+        <section class="category" aria-labelledby="@($"cat-{category}")">
+            <div class="category-header" role="button" @onclick="() => ToggleCategory(category)" aria-expanded="@(!collapsed)">
+                <span class="@($"chev {(collapsed ? "collapsed" : "")}")" aria-hidden="true">▾</span>
+                <h4 id="@($"cat-{category}")" class="@($"category-title {(allChecked ? "checked" : "")}")">@category</h4>
+                <span class="count">(@groupItems.Count)</span>
+            </div>
+
+            <ul class="@($"category-content {(collapsed ? "hidden" : "")}")">
+                @foreach (var item in groupItems)
+                {
+                    <li draggable="true"
+                        class="@GetPackingRowClass(item)"
+                        @ondragstart="@((DragEventArgs e) => OnDragStart(e, item))"
+                        @ondragover:preventDefault
+                        @ondragover="@((DragEventArgs e) => OnDragOver(e, item))"
+                        @ondragenter:preventDefault
+                        @ondragenter="@((DragEventArgs e) => OnDragEnter(e, item))"
+                        @ondragleave="@((DragEventArgs e) => OnDragLeave(e, item))"
+                        @ondrop:preventDefault
+                        @ondrop="@((DragEventArgs e) => OnDrop(e, item))">
+                        <div class="item-main" @onclick:stopPropagation>
+                            <input class="item-checkbox" type="checkbox" checked="@item.IsChecked"
+                                   @onchange="@((ChangeEventArgs e) => SetItemChecked(item, Convert.ToBoolean(e.Value)))"
+                                   @onclick:stopPropagation />
+
+                            <span class="@($"item-text {(item.IsChecked ? "checked" : "")}")"
+                                  role="button"
+                                  @onclick="@(() => ToggleItemChecked(item))"
+                                  @onclick:stopPropagation>
+                                @item.Item.Name
+                            </span>
+                        </div>
+
+                        @if (!string.IsNullOrWhiteSpace(item.Item.Notes))
+                        {
+                            <div class="notes" @onclick:stopPropagation>@item.Item.Notes</div>
+                        }
+
+                        <button class="delete-btn" title="Delete item" @onclick:stopPropagation @onclick="@(() => PromptDelete(item))">✕</button>
+                    </li>
+                }
+            </ul>
+        </section>
+    }
+
+    <div class="add-area">
+        <button class="add-btn" @onclick="OpenAddDialog">+ Add item</button>
+    </div>
+</div>
+
+@* simple dialog popup for adding an item *@
+@if (_showDialog)
+{
+    <div class="modal-overlay" @onclick="CloseAddDialog">
+        <div class="custom-modal" @onclick:stopPropagation>
+            <h4>Add Packing Item</h4>
+
+            <div class="form-row">
+                <label for="name">Name</label>
+                <input id="name" @bind="_newName" />
+            </div>
+
+            <div class="form-row">
+                <label for="category">Category</label>
+                <input id="category" list="categories" @bind="_newCategory" />
+                <datalist id="categories">
+                    @foreach (var c in _categoryOrder)
+                    {
+                        <option value="@c" />
+                    }
+                </datalist>
+            </div>
+
+            <div class="form-row">
+                <label for="notes">Notes</label>
+                <textarea id="notes" rows="4" @bind="_newNotes"></textarea>
+            </div>
+
+            <div class="dialog-actions">
+                <button class="btn cancel" @onclick="CancelAdd">Cancel</button>
+                <button class="btn ok" @onclick="ConfirmAdd">OK</button>
+            </div>
+        </div>
+    </div>
+}
+
+@* delete confirmation dialog *@
+@if (_showDeleteConfirm)
+{
+    <div class="modal-overlay" @onclick="CancelDelete">
+        <div class="confirm-modal" @onclick:stopPropagation>
+            <h4>Delete item?</h4>
+            <p class="confirm-text">@(_pendingDeleteItem?.Item.Name ?? "")</p>
+
+            <div class="dialog-actions">
+                <button class="btn cancel" @onclick="CancelDelete">Cancel</button>
+                <button class="btn ok" @onclick="ConfirmDelete">OK</button>
+            </div>
+        </div>
+    </div>
+}
+
+@* toast container *@
+<div class="toast-container" aria-live="polite" aria-atomic="true">
+    <div class="@($"toast {(_showToast ? "show" : "")}")">@_toastMessage</div>
+</div>
+
+<style>
+    .packing-list {
+        max-width: 760px;
+        margin: 12px 0;
+        padding: 8px;
+    }
+
+    /* Category container */
+    .category {
+        margin-bottom: 12px;
+        border-radius: 8px;
+        padding: 8px;
+        background: #ffffff;
+        border: 1px solid rgba(0,0,0,0.04);
+    }
+
+    /* Header acts as toggle */
+    .category-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        padding: 6px 8px;
+        user-select: none;
+    }
+
+    .chev {
+        width: 18px;
+        display: inline-block;
+        transform: rotate(0deg);
+        transition: transform 140ms ease;
+        color: #6b7280;
+        font-size: 0.9rem;
+        line-height: 1;
+    }
+
+        .chev.collapsed {
+            transform: rotate(-90deg);
+        }
+
+    .category-title {
+        margin: 0;
+        font-size: 1rem;
+        color: #0b1220;
+        flex: 1 1 auto;
+    }
+
+        .category-title.checked {
+            text-decoration: line-through;
+            color: #6b7280;
+            opacity: 0.9;
+        }
+
+    .count {
+        color: rgba(0,0,0,0.45);
+        font-size: 0.9rem;
+    }
+
+    .category-content.hidden {
+        display: none;
+    }
+
+    /* Each item looks like a separate card */
+    .packing-row {
+        list-style: none;
+        display: flex;
+        gap: 12px;
+        padding: 10px 12px;
+        border-radius: 8px;
+        background: #fafafa;
+        border: 1px solid rgba(0,0,0,0.04);
+        align-items: flex-start;
+        box-shadow: 0 1px 0 rgba(0,0,0,0.03);
+        margin-bottom: 8px;
+    }
+
+    /* main area containing checkbox + text only (clickable area for checkbox) */
+    .item-main {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        cursor: default;
+        user-select: none;
+        flex: 1 1 auto;
+    }
+
+    .item-checkbox {
+        width: 18px;
+        height: 18px;
+        margin: 0;
+        accent-color: #0b84ff;
+        cursor: pointer;
+    }
+
+    .item-text {
+        font-size: 0.95rem;
+        color: #0b1220;
+        line-height: 1.2;
+        cursor: pointer; /* only text (and checkbox) toggles state */
+    }
+
+        .item-text.checked {
+            text-decoration: line-through;
+            color: #6b7280;
+            opacity: 0.9;
+        }
+
+    .notes {
+        font-size: 0.85rem;
+        color: rgba(0,0,0,0.55);
+        margin-top: 4px;
+        margin-left: calc(12px + 18px + 10px);
+    }
+
+    /* delete button placed at the right side of the row */
+    .delete-btn {
+        background: transparent;
+        border: none;
+        color: #ef4444;
+        font-size: 16px;
+        width: 36px;
+        height: 36px;
+        border-radius: 6px;
+        cursor: pointer;
+        align-self: flex-start;
+        margin-left: auto;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .delete-btn:hover {
+            background: rgba(239,68,68,0.08);
+        }
+
+    /* drag visual cues */
+    .packing-row.dragging {
+        opacity: 0.5;
+    }
+
+    .packing-row.drag-over {
+        outline: 2px dashed rgba(11,132,255,0.6);
+    }
+
+    /* toast styles - top center and green */
+    .toast-container {
+        position: fixed;
+        top: 16px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 10002;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        align-items: center;
+        pointer-events: none;
+        width: auto;
+        max-width: calc(100% - 32px);
+        padding: 0 8px;
+    }
+
+    .toast {
+        background: #16a34a; /* green */
+        color: #fff;
+        padding: 10px 16px;
+        border-radius: 8px;
+        box-shadow: 0 6px 20px rgba(2,6,23,0.12);
+        opacity: 0;
+        transform: translateY(-8px);
+        transition: opacity 300ms ease, transform 300ms ease;
+        pointer-events: auto;
+        max-width: 720px;
+        text-align: center;
+        font-weight: 600;
+    }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+    /* modal / forms kept unchanged */
+    .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.35);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+    }
+
+    .custom-modal {
+        width: 420px;
+        background: #fff;
+        border-radius: 8px;
+        padding: 16px;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+        z-index: 10000;
+    }
+
+    .confirm-modal {
+        width: 360px;
+        background: #fff;
+        border-radius: 8px;
+        padding: 16px;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+        z-index: 10001;
+    }
+
+    .form-row {
+        margin-bottom: 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+        .form-row input, .form-row textarea, .form-row select {
+            padding: 8px 10px;
+            border-radius: 6px;
+            border: 1px solid rgba(0,0,0,0.08);
+            font: inherit;
+            resize: vertical;
+        }
+
+    .dialog-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+        margin-top: 8px;
+    }
+
+    .btn {
+        padding: 8px 12px;
+        border-radius: 6px;
+        border: none;
+        cursor: pointer;
+    }
+
+        .btn.cancel {
+            background: #f3f4f6;
+            color: #111827;
+        }
+
+        .btn.ok {
+            background: #0b84ff;
+            color: #fff;
+        }
+</style>
+
+@code {
+    private sealed class PackingItemView
+    {
+        public PackingItemView(PackingItem item) => Item = item;
+        public PackingItem Item { get; }
+        public bool IsChecked { get; set; }
+    }
+
+    private List<PackingItemView> Items { get; set; } = new();
+
+    // keep category order explicitly so new categories append to the end
+    private List<string> _categoryOrder = new();
+
+    // manual override: null = follow auto (auto = collapse when all checked)
+    // true = force collapsed, false = force expanded
+    private readonly Dictionary<string, bool?> _manualOverride = new(StringComparer.OrdinalIgnoreCase);
+
+    // dialog state for Add
+    private bool _showDialog;
+    private string _newName = string.Empty;
+    private string _newCategory = string.Empty;
+    private string _newNotes = string.Empty;
+
+    // delete confirmation state
+    private bool _showDeleteConfirm;
+    private PackingItemView? _pendingDeleteItem;
+
+    // toast state
+    private bool _showToast;
+    private string _toastMessage = string.Empty;
+    private CancellationTokenSource? _toastCts;
+
+    // drag & drop state
+    private PackingItemView? _draggedItem;
+    private PackingItemView? _dragOverItem;
+
+    protected override void OnInitialized()
+    {
+        Items = new List<PackingItemView>
+        {
+            // new PackingItemView(new PackingItem { Name = "T-Shirts (3)", Category = PackingCategory.Clothing.ToString(), Notes = "Lightweight, quick-dry" }),
+            // new PackingItemView(new PackingItem { Name = "Jeans", Category = PackingCategory.Clothing.ToString(), Notes = "" }),
+            // new PackingItemView(new PackingItem { Name = "Socks (4 pairs)", Category = PackingCategory.Clothing.ToString(), Notes = "Extra pair" }),
+            // new PackingItemView(new PackingItem { Name = "Walking Shoes", Category = PackingCategory.Shoes.ToString(), Notes = "Comfortable for hiking" }),
+            // new PackingItemView(new PackingItem { Name = "Toothbrush & Paste", Category = PackingCategory.Toiletries.ToString(), Notes = "" }),
+            // new PackingItemView(new PackingItem { Name = "Phone + Charger", Category = PackingCategory.Electronics.ToString(), Notes = "USB-C" }),
+            // new PackingItemView(new PackingItem { Name = "Passport", Category = PackingCategory.Documents.ToString(), Notes = "In travel wallet" }),
+            // new PackingItemView(new PackingItem { Name = "First Aid Kit", Category = PackingCategory.Health.ToString(), Notes = "Band-aids, pain reliever" }),
+            // new PackingItemView(new PackingItem { Name = "Sunglasses", Category = PackingCategory.Accessories.ToString(), Notes = "" }),
+            // new PackingItemView(new PackingItem { Name = "Reusable Water Bottle", Category = PackingCategory.Outdoor.ToString(), Notes = "" }),
+            // new PackingItemView(new PackingItem { Name = "Snacks", Category = PackingCategory.Food.ToString(), Notes = "Trail mix" }),
+            // new PackingItemView(new PackingItem { Name = "Book / E-reader", Category = PackingCategory.Entertainment.ToString(), Notes = "" }),
+
+            new PackingItemView(new PackingItem { Name = "Шорты", Category = PackingCategory.Clothing.ToString(), Notes = "" }),
+            new PackingItemView(new PackingItem { Name = "Майка", Category = PackingCategory.Clothing.ToString(), Notes = "" }),
+            new PackingItemView(new PackingItem { Name = "Трусы", Category = PackingCategory.Clothing.ToString(), Notes = "" }),
+            new PackingItemView(new PackingItem { Name = "Носки", Category = PackingCategory.Clothing.ToString(), Notes = "" }),
+            new PackingItemView(new PackingItem { Name = "Полотенце", Category = PackingCategory.Toiletries.ToString(), Notes = "" }),
+            new PackingItemView(new PackingItem { Name = "Кроссовки", Category = PackingCategory.Shoes.ToString(), Notes = "" }),
+            new PackingItemView(new PackingItem { Name = "Шлёпки", Category = PackingCategory.Shoes.ToString(), Notes = "" }),
+            new PackingItemView(new PackingItem { Name = "Шампунь", Category = PackingCategory.Toiletries.ToString(), Notes = "" }),
+            new PackingItemView(new PackingItem { Name = "Шейкер", Category = PackingCategory.Food.ToString(), Notes = "" }),
+            new PackingItemView(new PackingItem { Name = "Замок", Category = PackingCategory.Electronics.ToString(), Notes = "" }),
+            new PackingItemView(new PackingItem { Name = "Пакеты в магаз", Category = PackingCategory.Miscellaneous.ToString(), Notes = "" }),
+        };
+
+        // initialize category order preserving insertion order
+        _categoryOrder = Items.Select(i => i.Item.Category).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
+
+        // initialize manual override map (no overrides by default)
+        foreach (var cat in _categoryOrder)
+            _manualOverride[cat] = null;
+    }
+
+    private void ToggleCategory(string category)
+    {
+        var currentlyCollapsed = IsCollapsed(category);
+        // set manual override to opposite of current effective collapsed state
+        _manualOverride[category] = !currentlyCollapsed;
+    }
+
+    private void SetItemChecked(PackingItemView item, bool isChecked)
+    {
+        item.IsChecked = isChecked;
+        UpdateCategoryStateAfterItemChange(item.Item.Category);
+    }
+
+    private void ToggleItemChecked(PackingItemView item)
+    {
+        item.IsChecked = !item.IsChecked;
+        UpdateCategoryStateAfterItemChange(item.Item.Category);
+    }
+
+    private void UpdateCategoryStateAfterItemChange(string category)
+    {
+        var allChecked = IsAllChecked(category);
+
+        if (allChecked)
+        {
+            // last checkbox was checked -> follow auto-collapse behavior
+            _manualOverride[category] = null;
+        }
+        else
+        {
+            // keep expanded when any unchecked
+            _manualOverride[category] = false;
+        }
+
+        StateHasChanged();
+    }
+
+    private bool IsAllChecked(string category)
+    {
+        var group = Items.Where(i => string.Equals(i.Item.Category, category, StringComparison.OrdinalIgnoreCase));
+        return group.Any() && group.All(i => i.IsChecked);
+    }
+
+    // effective collapsed:
+    // - if manual override present -> use it
+    // - otherwise -> auto collapse when all items are checked
+    private bool IsCollapsed(string category)
+    {
+        if (_manualOverride.TryGetValue(category, out var manual) && manual.HasValue)
+            return manual.Value;
+
+        return IsAllChecked(category);
+    }
+
+    // dialog helpers for Add
+    private void OpenAddDialog()
+    {
+        _newName = string.Empty;
+        _newCategory = string.Empty;
+        _newNotes = string.Empty;
+        _showDialog = true;
+    }
+
+    private void CloseAddDialog() => _showDialog = false;
+
+    private void CancelAdd(MouseEventArgs e)
+    {
+        //e.PreventDefault();
+        CloseAddDialog();
+    }
+
+    private void ConfirmAdd()
+    {
+        var name = (_newName ?? string.Empty).Trim();
+        var category = string.IsNullOrWhiteSpace(_newCategory) ? "Uncategorized" : _newCategory.Trim();
+        var notes = _newNotes ?? string.Empty;
+
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            // nothing to add
+            return;
+        }
+
+        var newItem = new PackingItem { Name = name, Category = category, Notes = notes };
+
+        // if category is new, append it to the category order
+        if (!_categoryOrder.Any(c => string.Equals(c, category, StringComparison.OrdinalIgnoreCase)))
+        {
+            _categoryOrder.Add(category);
+            _manualOverride[category] = null;
+        }
+
+        // ensure category override expands so user sees newly added item
+        _manualOverride[category] = false;
+
+        // add item to the end of Items (will appear at end of that category)
+        Items.Add(new PackingItemView(newItem));
+
+        CloseAddDialog();
+        StateHasChanged();
+    }
+
+    // delete helpers
+    private void PromptDelete(PackingItemView item)
+    {
+        _pendingDeleteItem = item;
+        _showDeleteConfirm = true;
+    }
+
+    private void CancelDelete()
+    {
+        _pendingDeleteItem = null;
+        _showDeleteConfirm = false;
+    }
+
+    private void ConfirmDelete()
+    {
+        if (_pendingDeleteItem is null)
+            return;
+
+        var toRemove = _pendingDeleteItem;
+        var category = toRemove.Item.Category;
+
+        Items.Remove(toRemove);
+
+        // if no items left in that category, remove the category
+        if (!Items.Any(i => string.Equals(i.Item.Category, category, StringComparison.OrdinalIgnoreCase)))
+        {
+            _categoryOrder.RemoveAll(c => string.Equals(c, category, StringComparison.OrdinalIgnoreCase));
+            _manualOverride.Remove(category);
+        }
+
+        // show toast informing user
+        ShowToast($"Deleted \"{toRemove.Item.Name}\"");
+
+        _pendingDeleteItem = null;
+        _showDeleteConfirm = false;
+
+        StateHasChanged();
+    }
+
+    private void ShowToast(string message)
+    {
+        // cancel previous toast hide if any
+        try
+        {
+            _toastCts?.Cancel();
+            _toastCts?.Dispose();
+        }
+        catch { }
+
+        _toastCts = new CancellationTokenSource();
+
+        _toastMessage = message;
+        _showToast = true;
+        StateHasChanged();
+
+        _ = HideToastAfterDelayAsync(_toastCts.Token);
+    }
+
+    private async Task HideToastAfterDelayAsync(CancellationToken token)
+    {
+        try
+        {
+            // show for 2 seconds
+            await Task.Delay(2000, token);
+            // then hide (CSS transition will animate)
+            _showToast = false;
+            await InvokeAsync(StateHasChanged);
+        }
+        catch (OperationCanceledException)
+        {
+            // ignore cancellation
+        }
+    }
+
+    // Drag & drop handlers
+    private void OnDragStart(DragEventArgs e, PackingItemView item)
+    {
+        // mark dragging item and clear any previous hover state so UI updates immediately
+        _draggedItem = item;
+        _dragOverItem = null;
+        StateHasChanged();
+
+        // set visual cue (drop effect) when available — do not call SetData because Blazor's DataTransfer
+        // type does not expose SetData and that causes a compile error.
+        try
+        {
+            if (e.DataTransfer is not null)
+            {
+                e.DataTransfer.DropEffect = "move";
+                // optional: hint the allowed effect (some browsers use this)
+                // e.DataTransfer.EffectAllowed = "move"; // uncomment if DataTransfer exposes it in your runtime
+            }
+        }
+        catch
+        {
+            // ignore if DataTransfer not supported in this environment
+        }
+    }
+
+    private void OnDragOver(DragEventArgs e, PackingItemView item)
+    {
+        // do not call PreventDefault here — markup uses @ondragover:preventDefault to allow drop
+        try
+        {
+            if (e.DataTransfer is not null)
+                e.DataTransfer.DropEffect = "move";
+        }
+        catch { }
+    }
+
+    private void OnDragEnter(DragEventArgs e, PackingItemView item)
+    {
+        // do not call PreventDefault here — markup uses @ondragenter:preventDefault to allow drop
+        _dragOverItem = item;
+        StateHasChanged();
+    }
+
+    private void OnDragLeave(DragEventArgs e, PackingItemView item)
+    {
+        _dragOverItem = null;
+        StateHasChanged();
+    }
+
+    private string GetPackingRowClass(PackingItemView item)
+    {
+        // build class without nested inline double-quoted expressions to avoid Razor parsing issues
+        var baseClass = "packing-row";
+        if (ReferenceEquals(item, _draggedItem))
+            return $"{baseClass} dragging";
+        if (ReferenceEquals(item, _dragOverItem))
+            return $"{baseClass} drag-over";
+        return baseClass;
+    }
+
+    private void OnDrop(DragEventArgs e, PackingItemView target)
+    {
+        // do not call PreventDefault here — markup uses @ondrop:preventDefault
+        if (_draggedItem is null)
+            return;
+
+        var dragged = _draggedItem;
+        if (ReferenceEquals(dragged, target))
+        {
+            _draggedItem = null;
+            _dragOverItem = null;
+            return;
+        }
+
+        // remove dragged from current list
+        var removed = Items.Remove(dragged);
+
+        // if same category, insert before target
+        if (string.Equals(dragged.Item.Category, target.Item.Category, StringComparison.OrdinalIgnoreCase))
+        {
+            var targetIndex = Items.IndexOf(target);
+            if (targetIndex < 0)
+            {
+                // fallback: append
+                Items.Add(dragged);
+            }
+            else
+            {
+                Items.Insert(targetIndex, dragged);
+            }
+        }
+        else
+        {
+            // different category: change category of dragged and insert after last item of target category
+            var oldCategory = dragged.Item.Category;
+            dragged.Item.Category = target.Item.Category;
+
+            // find last index of target category
+            var lastIndex = Items.FindLastIndex(i => string.Equals(i.Item.Category, target.Item.Category, StringComparison.OrdinalIgnoreCase));
+            if (lastIndex < 0)
+            {
+                // if target category items were not present in Items (shouldn't happen), append
+                Items.Add(dragged);
+            }
+            else
+            {
+                Items.Insert(lastIndex + 1, dragged);
+            }
+
+            // if old category is now empty, remove it from the order
+            if (!Items.Any(i => string.Equals(i.Item.Category, oldCategory, StringComparison.OrdinalIgnoreCase)))
+            {
+                _categoryOrder.RemoveAll(c => string.Equals(c, oldCategory, StringComparison.OrdinalIgnoreCase));
+                _manualOverride.Remove(oldCategory);
+            }
+
+            // ensure target category present in category order
+            if (!_categoryOrder.Any(c => string.Equals(c, target.Item.Category, StringComparison.OrdinalIgnoreCase)))
+            {
+                _categoryOrder.Add(target.Item.Category);
+                _manualOverride[target.Item.Category] = null;
+            }
+        }
+
+        // make sure target category is expanded to see result
+        _manualOverride[target.Item.Category] = false;
+
+        _draggedItem = null;
+        _dragOverItem = null;
+
+        StateHasChanged();
+    }
+}

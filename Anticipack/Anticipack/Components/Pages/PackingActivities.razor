@@ -1,0 +1,332 @@
+﻿@page "/packing-activities"
+@using Anticipack.Packing
+@inject NavigationManager Navigation
+
+<h3>Packings</h3>
+
+<div class="activities-list">
+    <ul>
+        @foreach (var p in Packings.OrderByDescending(x => x.LastPacked))
+        {
+            <li class="packing-row activity-row" title="@($"{p.Name} — last packed {p.LastPacked:g}")">
+                <div class="item-main" role="button" @onclick="@(() => OpenPacking(p))" tabindex="0">
+                    <span class="category-icon" aria-hidden="true">@GetCategoryIcon(p.Category)</span>
+
+                    <div class="activity-body">
+                        <span class="item-text">@p.Name</span>
+                        <div class="notes small muted">Last packed: @p.LastPacked.ToString("g")</div>
+                    </div>
+                </div>
+
+                <div class="activity-meta">
+                    <div class="run-count" title="Times executed">@p.RunCount</div>
+
+                    <button class="delete-btn" title="Delete packing" @onclick:stopPropagation @onclick="@(() => PromptDelete(p))">✕</button>
+                </div>
+            </li>
+        }
+    </ul>
+</div>
+
+<hr />
+
+@* Delete confirmation dialog *@
+@if (_showDeleteConfirm)
+{
+    <div class="modal-overlay" @onclick="CancelDelete">
+        <div class="confirm-modal" @onclick:stopPropagation>
+            <h4>Delete packing?</h4>
+            <p class="confirm-text">@(_pendingDelete?.Name ?? "")</p>
+
+            <div class="dialog-actions">
+                <button class="btn cancel" @onclick="CancelDelete">Cancel</button>
+                <button class="btn ok" @onclick="ConfirmDelete">OK</button>
+            </div>
+        </div>
+    </div>
+}
+
+@* toast container *@
+<div class="toast-container" aria-live="polite" aria-atomic="true">
+    <div class="@($"toast {(_showToast ? "show" : "")}")">@_toastMessage</div>
+</div>
+
+<style>
+.activities-list ul {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 12px 0;
+}
+
+.activity-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    background: #fafafa;
+    border: 1px solid rgba(0,0,0,0.04);
+    box-shadow: 0 1px 0 rgba(0,0,0,0.03);
+    margin-bottom: 8px;
+}
+
+.category-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    background: #f3f4f6;
+    margin-right: 10px;
+    font-size: 1.2rem;
+}
+
+.activity-body {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.activity-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: 12px;
+}
+
+.run-count {
+    background: #0b84ff;
+    color: white;
+    padding: 6px 10px;
+    border-radius: 12px;
+    font-weight: 600;
+    min-width: 36px;
+    text-align: center;
+}
+
+.notes.small.muted {
+    color: rgba(0,0,0,0.45);
+    font-size: 0.85rem;
+    margin-top: 2px;
+}
+
+/* Ensure the left area expands and text truncates when needed */
+.item-main {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1 1 auto;
+    min-width: 0;
+    cursor: pointer; /* clickable area */
+}
+
+.item-text {
+    font-size: 0.95rem;
+    color: #0b1220;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* delete button (copied from PackingActivity for consistent look) */
+.delete-btn {
+    background: transparent;
+    border: none;
+    color: #ef4444;
+    font-size: 16px;
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.delete-btn:hover {
+    background: rgba(239,68,68,0.08);
+}
+
+/* modal / toast styles (minimal, reuse patterns from PackingActivity) */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.confirm-modal {
+    width: 360px;
+    background: #fff;
+    border-radius: 8px;
+    padding: 16px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+    z-index: 10001;
+}
+
+/* toast */
+.toast-container {
+    position: fixed;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10002;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: center;
+    pointer-events: none;
+    width: auto;
+    max-width: calc(100% - 32px);
+    padding: 0 16px;
+}
+
+.toast {
+    background: #16a34a; /* green */
+    color: #fff;
+    padding: 10px 16px;
+    border-radius: 8px;
+    box-shadow: 0 6px 20px rgba(2,6,23,0.12);
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 300ms ease, transform 300ms ease;
+    pointer-events: auto;
+    max-width: 720px;
+    text-align: center;
+    font-weight: 600;
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+</style>
+
+@code {
+    // Lightweight model for a past packing instance
+    private sealed class PackingInstance
+    {
+        // Unique identifier (used to navigate to PackingActivity)
+        public string Id { get; init; } = Guid.NewGuid().ToString();
+        public string Name { get; init; } = string.Empty;
+        public DateTime LastPacked { get; init; }
+        public PackingCategory Category { get; init; }
+        public int RunCount { get; init; }
+    }
+
+    // Replace this in the future with real persisted data or an injected provider/service.
+    private List<PackingInstance> Packings { get; set; } = new();
+
+    // delete confirmation state
+    private bool _showDeleteConfirm;
+    private PackingInstance? _pendingDelete;
+
+    // toast state
+    private bool _showToast;
+    private string _toastMessage = string.Empty;
+    private CancellationTokenSource? _toastCts;
+
+    protected override void OnInitialized()
+    {
+        // sample data — ordered in the UI by LastPacked descending
+        Packings = new List<PackingInstance>
+        {
+            new() { Id = Guid.NewGuid().ToString(), Name = "Weekend Trip", LastPacked = DateTime.Now.AddDays(-1), Category = PackingCategory.Clothing, RunCount = 7 },
+            new() { Id = Guid.NewGuid().ToString(), Name = "Gym Bag", LastPacked = DateTime.Now.AddDays(-10), Category = PackingCategory.Accessories, RunCount = 3 },
+            new() { Id = Guid.NewGuid().ToString(), Name = "Business Trip", LastPacked = DateTime.Now.AddDays(-30), Category = PackingCategory.Documents, RunCount = 12 },
+            new() { Id = Guid.NewGuid().ToString(), Name = "Beach Day", LastPacked = DateTime.Now.AddDays(-60), Category = PackingCategory.Accessories, RunCount = 2 },
+        };
+    }
+
+    private void OpenPacking(PackingInstance p)
+    {
+        // Navigate to the packing activity page and pass the packing id as a query parameter.
+        var url = $"/packing-activity?id={Uri.EscapeDataString(p.Id)}";
+        Navigation.NavigateTo(url);
+    }
+
+    private void PromptDelete(PackingInstance p)
+    {
+        _pendingDelete = p;
+        _showDeleteConfirm = true;
+    }
+
+    private void CancelDelete()
+    {
+        _pendingDelete = null;
+        _showDeleteConfirm = false;
+    }
+
+    private void ConfirmDelete()
+    {
+        if (_pendingDelete is null)
+            return;
+
+        var id = _pendingDelete.Id;
+        var name = _pendingDelete.Name;
+        Packings.RemoveAll(x => string.Equals(x.Id, id, StringComparison.Ordinal));
+        _pendingDelete = null;
+        _showDeleteConfirm = false;
+
+        ShowToast($"Deleted \"{name}\"");
+
+        StateHasChanged();
+    }
+
+    private void ShowToast(string message)
+    {
+        try
+        {
+            _toastCts?.Cancel();
+            _toastCts?.Dispose();
+        }
+        catch { }
+
+        _toastCts = new CancellationTokenSource();
+
+        _toastMessage = message;
+        _showToast = true;
+        StateHasChanged();
+
+        _ = HideToastAfterDelayAsync(_toastCts.Token);
+    }
+
+    private async Task HideToastAfterDelayAsync(CancellationToken token)
+    {
+        try
+        {
+            await Task.Delay(2000, token);
+            _showToast = false;
+            await InvokeAsync(StateHasChanged);
+        }
+        catch (OperationCanceledException)
+        {
+            // ignore
+        }
+    }
+
+    private string GetCategoryIcon(PackingCategory cat)
+    {
+        // Simple emoji icons to keep visuals lightweight.
+        // Swap for SVG or image assets later if you want consistent iconography.
+        return cat switch
+        {
+            PackingCategory.Clothing => "👕",
+            PackingCategory.Shoes => "👟",
+            PackingCategory.Toiletries => "🧴",
+            PackingCategory.Electronics => "🔌",
+            PackingCategory.Documents => "📄",
+            PackingCategory.Health => "💊",
+            PackingCategory.Accessories => "👜",
+            PackingCategory.Outdoor => "🎒",
+            PackingCategory.Food => "🍱",
+            PackingCategory.Entertainment => "🎵",
+            _ => "📦",
+        };
+    }
+}

@@ -1,6 +1,19 @@
-﻿<Router AppAssembly="@typeof(MauiProgram).Assembly">
+﻿@inject NavigationManager Navigation
+
+<Router AppAssembly="@typeof(MauiProgram).Assembly">
     <Found Context="routeData">
         <RouteView RouteData="@routeData" DefaultLayout="@typeof(Layout.MainLayout)" />
         <FocusOnNavigate RouteData="@routeData" Selector="h1" />
     </Found>
 </Router>
+
+@code {
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            // Navigate to the desired route when the Blazor UI finishes its first render.
+            Navigation.NavigateTo("/packing-activity");
+        }
+    }
+}

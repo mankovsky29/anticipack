@@ -18,8 +18,6 @@ namespace Anticipack
             var dbPath = Path.Combine(FileSystem.AppDataDirectory, "packing.db3");
             builder.Services.AddMauiBlazorWebView();
 
-            
-
             builder.Services.AddSingleton<IPackingRepository>(s => 
             {
                 var repo = new PackingRepository(dbPath);
@@ -30,22 +28,10 @@ namespace Anticipack
             builder.Services.AddBlazorWebViewDeveloperTools();
             builder.Logging.AddDebug();
 #endif
-            AsyncOperations().Wait();
-            return builder.Build();
-        }
 
-        public static async Task AsyncOperations()
-        {
-            var status = await Permissions.CheckStatusAsync<Permissions.StorageWrite>();
-            if (status != PermissionStatus.Granted)
-            {
-                status = await Permissions.RequestAsync<Permissions.StorageWrite>();
-            }
+            var app = builder.Build();
 
-            if (status != PermissionStatus.Granted)
-            {
-                throw new Exception("Storage permission is required to use this feature.");
-            }
+            return app;
         }
     }
 }

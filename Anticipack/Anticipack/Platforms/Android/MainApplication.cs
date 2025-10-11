@@ -11,6 +11,6 @@ namespace Anticipack
         {
         }
 
-        protected override MauiApp CreateMauiApp() => MauiProgram.CreateMauiApp().Result;
+        protected override MauiApp CreateMauiApp() => MauiProgram.CreateMauiApp();
     }
 }

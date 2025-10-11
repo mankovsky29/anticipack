@@ -19,7 +19,7 @@ namespace Anticipack.WinUI
             this.InitializeComponent();
         }
 
-        protected override MauiApp CreateMauiApp() => MauiProgram.CreateMauiApp().Result;
+        protected override MauiApp CreateMauiApp() => MauiProgram.CreateMauiApp();
     }
 
 }

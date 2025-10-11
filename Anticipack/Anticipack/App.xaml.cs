@@ -1,5 +1,5 @@
-﻿using Microsoft.Maui;
-using Microsoft.Maui.Controls;
+﻿using Anticipack.Storage;
+
 #if WINDOWS
 using Microsoft.UI;
 using Microsoft.UI.Windowing;
@@ -11,9 +11,12 @@ namespace Anticipack
 {
     public partial class App : Application
     {
-        public App()
+        private readonly IPackingRepository _packingRepository;
+
+        public App(IPackingRepository packingRepository)
         {
             InitializeComponent();
+            _packingRepository = packingRepository;
         }
 
         protected override Window CreateWindow(IActivationState? activationState)
@@ -56,6 +59,23 @@ namespace Anticipack
 #endif
 
             return window;
+        }
+
+        protected override async void OnStart()
+        {
+            var status = await Permissions.CheckStatusAsync<Permissions.StorageWrite>();
+            if (status != PermissionStatus.Granted)
+            {
+                status = await Permissions.RequestAsync<Permissions.StorageWrite>();
+            }
+
+            if (status != PermissionStatus.Granted)
+            {
+                throw new Exception("Storage permission is required to use this feature.");
+            }
+
+            await _packingRepository.InitializeAsync();
+
         }
     }
 }

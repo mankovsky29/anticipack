@@ -14,6 +14,10 @@
                 <span class="filter-count">@Packings.Count</span>
             </button>
         </div>
+
+        <div class="top-right-actions">
+            <button class="action-btn add-btn" @onclick="AddNewActivity">+ New Activity</button>
+        </div>
     </header>
 
     <main class="content-area">
@@ -57,191 +61,323 @@
     </footer>
 </div>
 
+@if (_showDeleteConfirm)
+{
+    <div class="modal-overlay" @onclick="CancelDelete">
+        <div class="confirm-modal" @onclick:stopPropagation>
+            <h4>Delete activity?</h4>
+            <p class="confirm-text">@(_pendingDelete?.Name ?? "")</p>
+
+            <div class="dialog-actions">
+                <button class="btn cancel" @onclick="CancelDelete">Cancel</button>
+                <button class="btn ok" @onclick="ConfirmDeleteAsync">OK</button>
+            </div>
+        </div>
+    </div>
+}
+
 <style>
-:root{
-    --bg-top:#6677c8;
-    --bg-bottom:#7b8be0;
-    --card-bg:#f6f8ff;
-    --muted:rgba(0,0,0,0.45);
-}
+    :root {
+        --bg-top: #6677c8;
+        --bg-bottom: #7b8be0;
+        --card-bg: #f6f8ff;
+        --muted: rgba(0,0,0,0.45);
+    }
 
-/* page layout */
-.page-shell {
-    min-height: 100vh;
-    background: linear-gradient(180deg,var(--bg-top),var(--bg-bottom));
-    padding: 18px;
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
-}
+    /* page layout */
+    .page-shell {
+        min-height: 100vh;
+        background: linear-gradient(180deg,var(--bg-top),var(--bg-bottom));
+        padding: 18px;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+    }
 
-/* header */
-.top-header {
-    display:flex;
-    align-items:center;
-    margin-bottom: 12px;
-}
-.filter-btn {
-    display:inline-flex;
-    align-items:center;
-    gap:8px;
-    background:#eef2ff;
-    color:#25336d;
-    border:none;
-    padding:8px 12px;
-    border-radius:8px;
-    box-shadow: 0 1px 0 rgba(11,18,32,0.03);
-    font-weight:600;
-    cursor:pointer;
-}
-.filter-btn .chev { font-size:12px; opacity:0.9; }
+    /* header */
+    .top-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 12px;
+    }
 
-/* main list */
-.content-area {
-    flex:1 1 auto;
-}
+    .filter-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: #eef2ff;
+        color: #25336d;
+        border: none;
+        padding: 8px 12px;
+        border-radius: 8px;
+        box-shadow: 0 1px 0 rgba(11,18,32,0.03);
+        font-weight: 600;
+        cursor: pointer;
+    }
 
-/* list reset */
-.activities-list {
-    list-style:none;
-    padding:0;
-    margin:0;
-    max-width:760px;
-}
+        .filter-btn .chev {
+            font-size: 12px;
+            opacity: 0.9;
+        }
 
-/* card look */
-.activity-card {
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    background: var(--card-bg);
-    border-radius:8px;
-    padding:12px 14px;
-    margin-bottom:10px;
-    box-shadow: 0 1px 0 rgba(11,18,32,0.03);
-    border:1px solid rgba(11,18,32,0.04);
-}
+    .top-right-actions {
+        margin-left: auto;
+    }
 
-/* left area clickable */
-.card-left {
-    display:flex;
-    align-items:center;
-    gap:12px;
-    cursor:pointer;
-    flex:1 1 auto;
-    min-width:0;
-}
+    .action-btn {
+        background: #6677c8;
+        color: white;
+        border: none;
+        padding: 10px 16px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
 
-/* category icon (replaced circles with icon/emoji) */
-.category-icon {
-    width:34px;
-    height:34px;
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-    font-size:18px;
-    background: linear-gradient(180deg,#ffffff,#f0f4ff);
-    border-radius:8px;
-    box-shadow: inset 0 -1px 0 rgba(0,0,0,0.02);
-    flex:0 0 34px;
-}
+        .action-btn:hover {
+            background: #5560a1;
+        }
 
-/* body text */
-.card-body { min-width:0; }
-.card-title {
-    font-size:15px;
-    color:#0b1220;
-    white-space:nowrap;
-    overflow:hidden;
-    text-overflow:ellipsis;
-}
-.card-sub {
-    font-size:12px;
-    color:var(--muted);
-    margin-top:4px;
-}
+    /* main list */
+    .content-area {
+        flex: 1 1 auto;
+    }
 
-/* right actions */
-.card-right {
-    display:flex;
-    align-items:center;
-    gap:8px;
-    margin-left:12px;
-}
+    /* list reset */
+    .activities-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        max-width: 760px;
+    }
 
-/* menu trigger */
-.menu-container { position: relative; display:inline-block; }
-.menu-trigger {
-    width:36px;
-    height:36px;
-    border-radius:6px;
-    border:none;
-    background:transparent;
-    font-size:18px;
-    cursor:pointer;
-    color:#4b5563;
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-}
-.menu-popover {
-    position:absolute;
-    right:0;
-    top:44px;
-    background:white;
-    border-radius:6px;
-    box-shadow:0 6px 20px rgba(2,6,23,0.12);
-    overflow:hidden;
-    min-width:120px;
-    z-index:1000;
-}
-.menu-item {
-    display:block;
-    width:100%;
-    text-align:left;
-    padding:8px 12px;
-    border:none;
-    background:transparent;
-    cursor:pointer;
-    font-size:14px;
-}
-.menu-item:hover { background: #f3f5ff; }
+    /* card look */
+    .activity-card {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: var(--card-bg);
+        border-radius: 8px;
+        padding: 12px 14px;
+        margin-bottom: 10px;
+        box-shadow: 0 1px 0 rgba(11,18,32,0.03);
+        border: 1px solid rgba(11,18,32,0.04);
+    }
 
-/* delete button fallback (hidden) */
-.delete-btn { display:none; }
+    /* left area clickable */
+    .card-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        cursor: pointer;
+        flex: 1 1 auto;
+        min-width: 0;
+    }
 
-/* bottom input */
-.bottom-input {
-    margin-top: 20px;
-    display:flex;
-    justify-content:flex-start;
-}
-.hint-row {
-    background: #eef2ff;
-    padding:10px 12px;
-    border-radius:8px;
-    max-width:760px;
-    display:flex;
-    align-items:center;
-    gap:10px;
-    box-shadow: 0 6px 20px rgba(2,6,23,0.06);
-}
-.hint-circle {
-    width:20px;
-    height:20px;
-    border-radius:50%;
-    border:2px solid rgba(11,18,32,0.2);
-    background:transparent;
-    flex:0 0 20px;
-}
-.hint-input {
-    border: none;
-    background: transparent;
-    outline: none;
-    color: #0b1220;
-    font-size:14px;
-    width:100%;
-}
+    /* category icon (replaced circles with icon/emoji) */
+    .category-icon {
+        width: 34px;
+        height: 34px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        background: linear-gradient(180deg,#ffffff,#f0f4ff);
+        border-radius: 8px;
+        box-shadow: inset 0 -1px 0 rgba(0,0,0,0.02);
+        flex: 0 0 34px;
+    }
+
+    /* body text */
+    .card-body {
+        min-width: 0;
+    }
+
+    .card-title {
+        font-size: 15px;
+        color: #0b1220;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .card-sub {
+        font-size: 12px;
+        color: var(--muted);
+        margin-top: 4px;
+    }
+
+    /* right actions */
+    .card-right {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-left: 12px;
+    }
+
+    /* menu trigger */
+    .menu-container {
+        position: relative;
+        display: inline-block;
+    }
+
+    .menu-trigger {
+        width: 36px;
+        height: 36px;
+        border-radius: 6px;
+        border: none;
+        background: transparent;
+        font-size: 18px;
+        cursor: pointer;
+        color: #4b5563;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .menu-popover {
+        position: absolute;
+        right: 0;
+        top: 44px;
+        background: white;
+        border-radius: 6px;
+        box-shadow: 0 6px 20px rgba(2,6,23,0.12);
+        overflow: hidden;
+        min-width: 120px;
+        z-index: 1000;
+    }
+
+    .menu-item {
+        display: block;
+        width: 100%;
+        text-align: left;
+        padding: 8px 12px;
+        border: none;
+        background: transparent;
+        cursor: pointer;
+        font-size: 14px;
+    }
+
+        .menu-item:hover {
+            background: #f3f5ff;
+        }
+
+    /* delete button fallback (hidden) */
+    .delete-btn {
+        display: none;
+    }
+
+    /* bottom input */
+    .bottom-input {
+        margin-top: 20px;
+        display: flex;
+        justify-content: flex-start;
+    }
+
+    .hint-row {
+        background: #eef2ff;
+        padding: 10px 12px;
+        border-radius: 8px;
+        max-width: 760px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        box-shadow: 0 6px 20px rgba(2,6,23,0.06);
+    }
+
+    .hint-circle {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        border: 2px solid rgba(11,18,32,0.2);
+        background: transparent;
+        flex: 0 0 20px;
+    }
+
+    .hint-input {
+        border: none;
+        background: transparent;
+        outline: none;
+        color: #0b1220;
+        font-size: 14px;
+        width: 100%;
+    }
+
+    /* modal styles */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.6);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 2000;
+    }
+
+    .confirm-modal {
+        background: white;
+        padding: 24px;
+        border-radius: 8px;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        max-width: 400px;
+        width: 90%;
+    }
+
+        .confirm-modal h4 {
+            margin: 0 0 12px 0;
+            font-size: 18px;
+            color: #0b1220;
+        }
+
+    .confirm-text {
+        font-size: 14px;
+        color: var(--muted);
+        margin-bottom: 24px;
+    }
+
+    .dialog-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+    }
+
+    .btn {
+        padding: 10px 16px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+    }
+
+        .btn.cancel {
+            background: #f0f4ff;
+            color: #0b1220;
+        }
+
+        .btn.ok {
+            background: #6677c8;
+            color: white;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+    .add-btn {
+        background-color: #10b981; /* Green */
+    }
+
+        .add-btn:hover {
+            background-color: #059669; /* Darker green */
+        }
+
 </style>
 
 @code {
@@ -259,21 +395,6 @@
     protected override async Task OnInitializedAsync()
     {
         Packings = await PackingRepository.GetAllAsync();
-        if (Packings.Count == 0)
-        {
-            // Add sample data if none loaded
-            var samples = new List<Storage.PackingActivity>
-            {
-                new() { Id = Guid.NewGuid().ToString(), Name = "Weekend Trip", LastPacked = DateTime.Now.AddDays(-1), Category = PackingCategory.Clothing, RunCount = 7 },
-                new() { Id = Guid.NewGuid().ToString(), Name = "Gym Bag", LastPacked = DateTime.Now.AddDays(-10), Category = PackingCategory.Accessories, RunCount = 3 },
-                new() { Id = Guid.NewGuid().ToString(), Name = "Business Trip", LastPacked = DateTime.Now.AddDays(-30), Category = PackingCategory.Documents, RunCount = 12 },
-                new() { Id = Guid.NewGuid().ToString(), Name = "Beach Day", LastPacked = DateTime.Now.AddDays(-60), Category = PackingCategory.Accessories, RunCount = 2 },
-            };
-            foreach (var s in samples)
-                await PackingRepository.AddOrUpdateAsync(s);
-
-            Packings = await PackingRepository.GetAllAsync();
-        }
     }
 
     private void OpenPacking(Storage.PackingActivity p)
@@ -300,15 +421,34 @@
         if (_pendingDelete is null)
             return;
 
-        var id = _pendingDelete.Id;
-        var name = _pendingDelete.Name;
-        await PackingRepository.DeleteAsync(id);
-        Packings = await PackingRepository.GetAllAsync();
-        _pendingDelete = null;
-        _showDeleteConfirm = false;
+        try
+        {
+            var id = _pendingDelete.Id;
+            var name = _pendingDelete.Name;
 
-        ShowToast($"Deleted \"{name}\"");
-        StateHasChanged();
+            // Call the repository to delete the packing activity
+            await PackingRepository.DeleteAsync(id);
+
+            // Refresh the list of packings
+            Packings = await PackingRepository.GetAllAsync();
+
+            // Clear the pending delete state
+            _pendingDelete = null;
+            _showDeleteConfirm = false;
+
+            // Show a toast message
+            ShowToast($"Deleted \"{name}\"");
+        }
+        catch (Exception ex)
+        {
+            // Log the error and show a toast message
+            Console.WriteLine($"Error deleting packing activity: {ex.Message}");
+            ShowToast("Failed to delete the packing activity.");
+        }
+        finally
+        {
+            StateHasChanged();
+        }
     }
 
     private void ShowToast(string message)
@@ -353,18 +493,13 @@
 
     private async Task CopyPackingAsync(Storage.PackingActivity p)
     {
-        var copy = new Storage.PackingActivity
-        {
-            Id = Guid.NewGuid().ToString(),
-            Name = p.Name + " (Copy)",
-            LastPacked = DateTime.Now,
-            Category = p.Category,
-            RunCount = 0
-        };
+        await PackingRepository.CopyPackingAsync(p.Id.ToString());
+        Navigation.NavigateTo($"/packing-activity?id={Uri.EscapeDataString(p.Id)}");
+    }
 
-        await PackingRepository.AddOrUpdateAsync(copy);
-        Packings = await PackingRepository.GetAllAsync();
-        Navigation.NavigateTo($"/packing-activity?id={Uri.EscapeDataString(copy.Id)}");
+    private void AddNewActivity()
+    {
+        Navigation.NavigateTo($"/packing-activity?id={Uri.EscapeDataString(Guid.NewGuid().ToString())}");
     }
 
     private string GetCategoryIcon(PackingCategory cat)

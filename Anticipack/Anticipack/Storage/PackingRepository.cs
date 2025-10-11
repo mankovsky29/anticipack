@@ -13,8 +13,9 @@ namespace Anticipack.Storage
 
         public async Task InitializeAsync()
         {
-            await _db.CreateTableAsync<PackingItem>();
-            await _db.CreateTableAsync<PackingActivity>();
+            //await _db.CreateTableAsync<PackingItem>();
+            //await _db.CreateTableAsync<PackingActivity>();
+            await _db.CreateTablesAsync(CreateFlags.None, typeof(PackingItem), typeof(PackingActivity));
         }
 
         public async Task<List<PackingActivity>> GetAllAsync()
@@ -36,7 +37,15 @@ namespace Anticipack.Storage
         {
             var packing = await GetByIdAsync(id);
             if (packing != null)
+            {
+                var items = await GetItemsForActivityAsync(id);
+                foreach (var item in items)
+                {
+                    await _db.DeleteAsync(item);
+                }
+
                 await _db.DeleteAsync(packing);
+            }
         }
 
         public async Task<List<PackingItem>> GetItemsForActivityAsync(string activityId)
@@ -53,6 +62,41 @@ namespace Anticipack.Storage
         public Task DeleteItemAsync(string itemId)
         {
             return _db.DeleteAsync(new PackingItem { Id = itemId });
+        }
+
+        public async Task CopyPackingAsync(string packingId)
+        {
+            var packingActivity = await _db.Table<PackingActivity>().Where(packing => packingId == packing.Id).FirstAsync();
+
+            var newPackingActivity = new PackingActivity
+            {
+                Id = Guid.NewGuid().ToString(),
+                Name = packingActivity.Name + " (Copy)",
+                LastPacked = DateTime.Now,
+                Category = packingActivity.Category,
+                RunCount = 0
+            };
+
+            var packingItems = await _db.Table<PackingItem>().Where(packing => packingId == packing.ActivityId).ToListAsync();
+
+            foreach (var item in packingItems)
+            {
+                //var newItem = new PackingItem
+                //{
+                //    Id = Guid.NewGuid().ToString(),
+                //    ActivityId = newPackingActivity.Id,
+                //    Name = item.Name,
+                //    IsPacked = false,
+                //    Category = item.Category,
+                //    Notes = item.Notes
+                //};
+                item.Id = Guid.NewGuid().ToString();
+                item.ActivityId = newPackingActivity.Id;
+
+                await _db.InsertAsync(item);
+            }
+
+            await _db.InsertAsync(newPackingActivity);
         }
     }
 }

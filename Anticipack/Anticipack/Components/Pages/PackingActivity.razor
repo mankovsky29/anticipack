@@ -4,15 +4,37 @@
 @using System.Threading
 @using Microsoft.AspNetCore.Components.Web
 @using Microsoft.AspNetCore.Components
-
+@inject NavigationManager Navigation
 @inject IPackingRepository PackingRepository
+@implements IComponent
 
-<h3>PackingActivity</h3>
+<h3>
+    <input type="text" @bind="_currentActivity.Name" @bind:event="oninput" class="packing-name-input visible-input" placeholder="Enter activity name..." />
+</h3>
+
+<div class="category-input-container">
+    <label for="category-select">Category:</label>
+    <select id="category-select" @bind="_currentActivity.Category" class="category-select">
+        @foreach (var category in Enum.GetValues<PackingCategory>())
+        {
+            <option value="@category">@category</option>
+        }
+    </select>
+</div>
 
 @if (_isLoading)
 {
     <div class="loading">Loading packing…</div>
 }
+
+<div class="top-right-actions">
+    <button class="action-btn copy-btn" title="Copy" @onclick="CopyPacking">
+        <i class="fa fa-copy"></i>
+    </button>
+    <button class="action-btn delete-btn" title="Delete" @onclick="PromptDeleteActivity">
+        <i class="fa fa-trash"></i>
+    </button>
+</div>
 
 <div class="packing-list">
     @foreach (var category in _categoryOrder)
@@ -113,12 +135,12 @@
 {
     <div class="modal-overlay" @onclick="CancelDelete">
         <div class="confirm-modal" @onclick:stopPropagation>
-            <h4>Delete item?</h4>
-            <p class="confirm-text">@(_pendingDeleteItem?.Item.Name ?? "")</p>
+            <h4>Delete activity?</h4>
+            <p class="confirm-text">Are you sure you want to delete this packing activity?</p>
 
             <div class="dialog-actions">
                 <button class="btn cancel" @onclick="CancelDelete">Cancel</button>
-                <button class="btn ok" @onclick="ConfirmDeleteAsync">OK</button>
+                <button class="btn ok" @onclick="ConfirmDeleteActivityAsync">OK</button>
             </div>
         </div>
     </div>
@@ -261,9 +283,9 @@
 
     /* delete button placed at the right side of the row */
     .delete-btn {
-        background: transparent;
+        background-color: #ef4444;
         border: none;
-        color: #ef4444;
+        color: #fff;
         font-size: 16px;
         width: 36px;
         height: 36px;
@@ -277,7 +299,7 @@
     }
 
     .delete-btn:hover {
-        background: rgba(239,68,68,0.08);
+        background-color: #dc2626;
     }
 
     /* drag visual cues */
@@ -397,11 +419,53 @@
         color: #fff;
     }
 
+    .packing-name-input {
+       font-size: 1.5rem;
+       font-weight: bold;
+       border: none;
+       background: transparent;
+       outline: none;
+       width: 100%;
+   }
+
     .loading {
         padding: 8px 10px;
         color: rgba(0,0,0,0.6);
         font-style: italic;
         margin-bottom: 6px;
+    }
+
+    .top-right-actions {
+        top: 16px;
+        right: 16px;
+        display: flex;
+        gap: 8px;
+    }
+
+    .action-btn {
+        padding: 8px 12px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 600;
+        color: #fff;
+    }
+
+    .copy-btn {
+        background-color: #0b84ff;
+    }
+
+    .copy-btn:hover {
+        background-color: #0967d2;
+    }
+
+    .delete-btn {
+        background-color: #ef4444;
+    }
+
+    .delete-btn:hover {
+        background-color: #dc2626;
     }
 </style>
 
@@ -415,6 +479,8 @@
     private string? _processedPackingId;
 
     private bool _isLoading;
+
+    private Storage.PackingActivity _currentActivity = new Storage.PackingActivity();
 
     private sealed class PackingItemView
     {
@@ -504,6 +570,7 @@
 
         try
         {
+            _currentActivity = await PackingRepository.GetByIdAsync(id) ?? new Storage.PackingActivity();
             var itemsFromRepo = await PackingRepository.GetItemsForActivityAsync(id);
             Items = itemsFromRepo.Select(pi => new PackingItemView(pi)).ToList();
             _categoryOrder = Items.Select(i => i.Item.Category).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
@@ -662,6 +729,48 @@
         _showDeleteConfirm = false;
 
         StateHasChanged();
+    }
+
+    private async Task CopyPacking()
+    {
+        if (string.IsNullOrWhiteSpace(PackingId))
+            return;
+
+        try
+        {
+            await PackingRepository.CopyPackingAsync(PackingId);
+            ShowToast("Packing activity copied successfully.");
+        }
+        catch (Exception ex)
+        {
+            ShowToast($"Failed to copy packing activity: {ex.Message}");
+        }
+    }
+
+    private void PromptDeleteActivity()
+    {
+        _showDeleteConfirm = true;
+    }
+
+    private async Task ConfirmDeleteActivityAsync()
+    {
+        if (string.IsNullOrWhiteSpace(PackingId))
+            return;
+
+        try
+        {
+            await PackingRepository.DeleteAsync(PackingId);
+            ShowToast("Packing activity deleted successfully.");
+            Navigation.NavigateTo("/packing-activities");
+        }
+        catch (Exception ex)
+        {
+            ShowToast($"Failed to delete packing activity: {ex.Message}");
+        }
+        finally
+        {
+            _showDeleteConfirm = false;
+        }
     }
 
     private void ShowToast(string message)
@@ -830,5 +939,48 @@
         _dragOverItem = null;
 
         StateHasChanged();
+    }
+
+    private async Task OnNavigatedFrom()
+    {
+        if (!string.IsNullOrWhiteSpace(PackingId))
+        {
+            try
+            {
+                // Save the current activity to the repository
+                await PackingRepository.AddOrUpdateAsync(_currentActivity);
+                Console.WriteLine($"Packing activity '{_currentActivity.Name}' saved successfully.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Failed to save packing activity: {ex.Message}");
+            }
+        }
+    }
+
+    private bool _isSubscribedToNavigation = false;
+
+    protected override void OnInitialized()
+    {
+        if (!_isSubscribedToNavigation)
+        {
+            Navigation.LocationChanged += HandleLocationChanged;
+            _isSubscribedToNavigation = true;
+        }
+    }
+
+    private async void HandleLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        // Save the activity when the user navigates away
+        await OnNavigatedFrom();
+    }
+
+    public void Dispose()
+    {
+        if (_isSubscribedToNavigation)
+        {
+            Navigation.LocationChanged -= HandleLocationChanged;
+            _isSubscribedToNavigation = false;
+        }
     }
 }

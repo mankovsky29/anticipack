@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Anticipack.Packing
+﻿namespace Anticipack.Packing
 {
-    internal enum PackingCategory
+    public enum PackingCategory
     {
         Clothing,
         Shoes,

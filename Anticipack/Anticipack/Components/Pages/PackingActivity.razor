@@ -1,8 +1,11 @@
 ﻿@page "/packing-activity"
 @using Anticipack.Packing
+@using Anticipack.Storage
 @using System.Threading
 @using Microsoft.AspNetCore.Components.Web
 @using Microsoft.AspNetCore.Components
+
+@inject IPackingRepository PackingRepository
 
 <h3>PackingActivity</h3>
 
@@ -12,7 +15,6 @@
 }
 
 <div class="packing-list">
-    @* iterate categories in insertion order (so new categories are appended to the end) *@
     @foreach (var category in _categoryOrder)
     {
         var groupItems = Items.Where(i => string.Equals(i.Item.Category, category, StringComparison.OrdinalIgnoreCase)).ToList();
@@ -72,7 +74,6 @@
     </div>
 </div>
 
-@* simple dialog popup for adding an item *@
 @if (_showDialog)
 {
     <div class="modal-overlay" @onclick="CloseAddDialog">
@@ -102,13 +103,12 @@
 
             <div class="dialog-actions">
                 <button class="btn cancel" @onclick="CancelAdd">Cancel</button>
-                <button class="btn ok" @onclick="ConfirmAdd">OK</button>
+                <button class="btn ok" @onclick="ConfirmAddAsync">OK</button>
             </div>
         </div>
     </div>
 }
 
-@* delete confirmation dialog *@
 @if (_showDeleteConfirm)
 {
     <div class="modal-overlay" @onclick="CancelDelete">
@@ -118,13 +118,12 @@
 
             <div class="dialog-actions">
                 <button class="btn cancel" @onclick="CancelDelete">Cancel</button>
-                <button class="btn ok" @onclick="ConfirmDelete">OK</button>
+                <button class="btn ok" @onclick="ConfirmDeleteAsync">OK</button>
             </div>
         </div>
     </div>
 }
 
-@* toast container *@
 <div class="toast-container" aria-live="polite" aria-atomic="true">
     <div class="@($"toast {(_showToast ? "show" : "")}")">@_toastMessage</div>
 </div>
@@ -420,7 +419,7 @@
     private sealed class PackingItemView
     {
         public PackingItemView(PackingItem item) => Item = item;
-        public PackingItem Item { get; }
+        public Storage.PackingItem Item { get; }
         public bool IsChecked { get; set; }
     }
 
@@ -505,12 +504,7 @@
 
         try
         {
-            // Simulate repository/network latency
-            await Task.Delay(300);
-
-            var itemsFromRepo = await FetchPackingItemsFromRepositoryAsync(id);
-
-            // Map to view model and preserve insertion order & categories
+            var itemsFromRepo = await PackingRepository.GetItemsForActivityAsync(id);
             Items = itemsFromRepo.Select(pi => new PackingItemView(pi)).ToList();
             _categoryOrder = Items.Select(i => i.Item.Category).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
 
@@ -530,31 +524,6 @@
             _isLoading = false;
             await InvokeAsync(StateHasChanged);
         }
-    }
-
-    // Fake repository: generate deterministic items based on id
-    private Task<List<PackingItem>> FetchPackingItemsFromRepositoryAsync(string id)
-    {
-        // Use hash to create deterministic but varied result per id
-        var hash = id.GetHashCode();
-        var rnd = new Random(hash);
-
-        var categories = Enum.GetValues<PackingCategory>();
-        var count = 4 + (Math.Abs(hash) % 5); // 4..8 items
-
-        var result = new List<PackingItem>(count);
-        for (var i = 0; i < count; i++)
-        {
-            var cat = categories[rnd.Next(categories.Length)];
-            result.Add(new PackingItem
-            {
-                Name = $"{cat} item {i + 1}",
-                Category = cat.ToString(),
-                Notes = rnd.NextDouble() < 0.3 ? "Remember charger" : string.Empty
-            });
-        }
-
-        return Task.FromResult(result);
     }
 
     private string ShortId(string id) => id.Length > 8 ? id[..8] : id;
@@ -630,32 +599,27 @@
         CloseAddDialog();
     }
 
-    private void ConfirmAdd()
+    private async Task ConfirmAddAsync()
     {
         var name = (_newName ?? string.Empty).Trim();
         var category = string.IsNullOrWhiteSpace(_newCategory) ? "Uncategorized" : _newCategory.Trim();
         var notes = _newNotes ?? string.Empty;
 
-        if (string.IsNullOrWhiteSpace(name))
+        if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(PackingId))
         {
             // nothing to add
             return;
         }
 
-        var newItem = new PackingItem { Name = name, Category = category, Notes = notes };
+        var newItem = new PackingItem { Name = name, Category = category, Notes = notes, ActivityId = PackingId };
 
-        // if category is new, append it to the category order
-        if (!_categoryOrder.Any(c => string.Equals(c, category, StringComparison.OrdinalIgnoreCase)))
-        {
-            _categoryOrder.Add(category);
-            _manualOverride[category] = null;
-        }
+        await PackingRepository.AddItemToActivityAsync(PackingId, newItem);
+
+        // reload items from repository
+        await LoadItemsForPackingAsync(PackingId);
 
         // ensure category override expands so user sees newly added item
         _manualOverride[category] = false;
-
-        // add item to the end of Items (will appear at end of that category)
-        Items.Add(new PackingItemView(newItem));
 
         CloseAddDialog();
         StateHasChanged();
@@ -674,24 +638,24 @@
         _showDeleteConfirm = false;
     }
 
-    private void ConfirmDelete()
+    private async Task ConfirmDeleteAsync()
     {
-        if (_pendingDeleteItem is null)
+        if (_pendingDeleteItem is null || string.IsNullOrWhiteSpace(PackingId))
             return;
 
         var toRemove = _pendingDeleteItem;
-        var category = toRemove.Item.Category;
 
-        Items.Remove(toRemove);
-
-        // if no items left in that category, remove the category
-        if (!Items.Any(i => string.Equals(i.Item.Category, category, StringComparison.OrdinalIgnoreCase)))
+        try
         {
-            _categoryOrder.RemoveAll(c => string.Equals(c, category, StringComparison.OrdinalIgnoreCase));
-            _manualOverride.Remove(category);
+            await PackingRepository.DeleteItemAsync(toRemove.Item.Id);
+        }
+        catch (Exception ex)
+        {
+            ShowToast($"Failed to delete item: {ex.Message}");
         }
 
-        // show toast informing user
+        await LoadItemsForPackingAsync(PackingId);
+
         ShowToast($"Deleted \"{toRemove.Item.Name}\"");
 
         _pendingDeleteItem = null;

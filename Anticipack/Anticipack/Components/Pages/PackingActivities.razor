@@ -1,259 +1,292 @@
 ﻿@page "/packing-activities"
 @using Anticipack.Packing
+@using Anticipack.Storage
+@using System.IO
 @inject NavigationManager Navigation
+@inject IPackingRepository PackingRepository
 
-<h3>Packings</h3>
-
-<div class="activities-list">
-    <ul>
-        @foreach (var p in Packings.OrderByDescending(x => x.LastPacked))
-        {
-            <li class="packing-row activity-row" title="@($"{p.Name} — last packed {p.LastPacked:g}")">
-                <div class="item-main" role="button" @onclick="@(() => OpenPacking(p))" tabindex="0">
-                    <span class="category-icon" aria-hidden="true">@GetCategoryIcon(p.Category)</span>
-
-                    <div class="activity-body">
-                        <span class="item-text">@p.Name</span>
-                        <div class="notes small muted">Last packed: @p.LastPacked.ToString("g")</div>
-                    </div>
-                </div>
-
-                <div class="activity-meta">
-                    <div class="run-count" title="Times executed">@p.RunCount</div>
-
-                    <button class="delete-btn" title="Delete packing" @onclick:stopPropagation @onclick="@(() => PromptDelete(p))">✕</button>
-                </div>
-            </li>
-        }
-    </ul>
-</div>
-
-<hr />
-
-@* Delete confirmation dialog *@
-@if (_showDeleteConfirm)
-{
-    <div class="modal-overlay" @onclick="CancelDelete">
-        <div class="confirm-modal" @onclick:stopPropagation>
-            <h4>Delete packing?</h4>
-            <p class="confirm-text">@(_pendingDelete?.Name ?? "")</p>
-
-            <div class="dialog-actions">
-                <button class="btn cancel" @onclick="CancelDelete">Cancel</button>
-                <button class="btn ok" @onclick="ConfirmDelete">OK</button>
-            </div>
+<div class="page-shell">
+    <header class="top-header">
+        <div class="header-left">
+            <button class="filter-btn" aria-expanded="false" title="Filter">
+                <span class="chev">▾</span>
+                <span class="filter-label">Completed</span>
+                <span class="filter-count">@Packings.Count</span>
+            </button>
         </div>
-    </div>
-}
+    </header>
 
-@* toast container *@
-<div class="toast-container" aria-live="polite" aria-atomic="true">
-    <div class="@($"toast {(_showToast ? "show" : "")}")">@_toastMessage</div>
+    <main class="content-area">
+        <ul class="activities-list">
+            @foreach (var p in Packings.OrderByDescending(x => x.LastPacked))
+            {
+                var pack = p;
+
+                <li class="activity-card" title="@($"{pack.Name} — last packed {pack.LastPacked:g}")">
+                    <div class="card-left" role="button" @onclick="@(() => OpenPacking(pack))" tabindex="0" @onclick:stopPropagation>
+                        <span class="category-icon" aria-hidden="true">@GetCategoryIcon(pack.Category)</span>
+                        <div class="card-body">
+                            <div class="card-title">@pack.Name</div>
+                            <div class="card-sub">Last packed: @pack.LastPacked.ToString("g")</div>
+                        </div>
+                    </div>
+
+                    <div class="card-right" @onclick:stopPropagation>
+                        <div class="menu-container">
+                            <button class="menu-trigger" title="More" @onclick="@(() => ToggleMenu(pack.Id))" @onclick:stopPropagation>⋮</button>
+
+                            @if (_openMenuId == pack.Id)
+                            {
+                                <div class="menu-popover" @onclick:stopPropagation>
+                                    <button class="menu-item" @onclick="@(() => { CloseMenu(); PromptDelete(pack); })">Delete</button>
+                                    <button class="menu-item" @onclick="@(() => { CloseMenu(); CopyPackingAsync(pack); })">Copy</button>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </li>
+            }
+        </ul>
+    </main>
+
+    <footer class="bottom-input">
+        <div class="hint-row">
+            <span class="hint-circle" aria-hidden="true"></span>
+            <input class="hint-input" placeholder="Try typing 'Pay utilities bill by Friday 6pm'" />
+        </div>
+    </footer>
 </div>
 
 <style>
-.activities-list ul {
-    list-style: none;
-    padding: 0;
-    margin: 0 0 12px 0;
+:root{
+    --bg-top:#6677c8;
+    --bg-bottom:#7b8be0;
+    --card-bg:#f6f8ff;
+    --muted:rgba(0,0,0,0.45);
 }
 
-.activity-row {
+/* page layout */
+.page-shell {
+    min-height: 100vh;
+    background: linear-gradient(180deg,var(--bg-top),var(--bg-bottom));
+    padding: 18px;
+    box-sizing: border-box;
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    padding: 8px 10px;
-    border-radius: 8px;
-    background: #fafafa;
-    border: 1px solid rgba(0,0,0,0.04);
-    box-shadow: 0 1px 0 rgba(0,0,0,0.03);
-    margin-bottom: 8px;
+    flex-direction: column;
 }
 
+/* header */
+.top-header {
+    display:flex;
+    align-items:center;
+    margin-bottom: 12px;
+}
+.filter-btn {
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    background:#eef2ff;
+    color:#25336d;
+    border:none;
+    padding:8px 12px;
+    border-radius:8px;
+    box-shadow: 0 1px 0 rgba(11,18,32,0.03);
+    font-weight:600;
+    cursor:pointer;
+}
+.filter-btn .chev { font-size:12px; opacity:0.9; }
+
+/* main list */
+.content-area {
+    flex:1 1 auto;
+}
+
+/* list reset */
+.activities-list {
+    list-style:none;
+    padding:0;
+    margin:0;
+    max-width:760px;
+}
+
+/* card look */
+.activity-card {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    background: var(--card-bg);
+    border-radius:8px;
+    padding:12px 14px;
+    margin-bottom:10px;
+    box-shadow: 0 1px 0 rgba(11,18,32,0.03);
+    border:1px solid rgba(11,18,32,0.04);
+}
+
+/* left area clickable */
+.card-left {
+    display:flex;
+    align-items:center;
+    gap:12px;
+    cursor:pointer;
+    flex:1 1 auto;
+    min-width:0;
+}
+
+/* category icon (replaced circles with icon/emoji) */
 .category-icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 40px;
-    height: 40px;
-    border-radius: 8px;
-    background: #f3f4f6;
-    margin-right: 10px;
-    font-size: 1.2rem;
+    width:34px;
+    height:34px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    font-size:18px;
+    background: linear-gradient(180deg,#ffffff,#f0f4ff);
+    border-radius:8px;
+    box-shadow: inset 0 -1px 0 rgba(0,0,0,0.02);
+    flex:0 0 34px;
 }
 
-.activity-body {
-    display: flex;
-    flex-direction: column;
-    min-width: 0;
+/* body text */
+.card-body { min-width:0; }
+.card-title {
+    font-size:15px;
+    color:#0b1220;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+.card-sub {
+    font-size:12px;
+    color:var(--muted);
+    margin-top:4px;
 }
 
-.activity-meta {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-left: 12px;
+/* right actions */
+.card-right {
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-left:12px;
 }
 
-.run-count {
-    background: #0b84ff;
-    color: white;
-    padding: 6px 10px;
-    border-radius: 12px;
-    font-weight: 600;
-    min-width: 36px;
-    text-align: center;
+/* menu trigger */
+.menu-container { position: relative; display:inline-block; }
+.menu-trigger {
+    width:36px;
+    height:36px;
+    border-radius:6px;
+    border:none;
+    background:transparent;
+    font-size:18px;
+    cursor:pointer;
+    color:#4b5563;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
 }
-
-.notes.small.muted {
-    color: rgba(0,0,0,0.45);
-    font-size: 0.85rem;
-    margin-top: 2px;
+.menu-popover {
+    position:absolute;
+    right:0;
+    top:44px;
+    background:white;
+    border-radius:6px;
+    box-shadow:0 6px 20px rgba(2,6,23,0.12);
+    overflow:hidden;
+    min-width:120px;
+    z-index:1000;
 }
-
-/* Ensure the left area expands and text truncates when needed */
-.item-main {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex: 1 1 auto;
-    min-width: 0;
-    cursor: pointer; /* clickable area */
+.menu-item {
+    display:block;
+    width:100%;
+    text-align:left;
+    padding:8px 12px;
+    border:none;
+    background:transparent;
+    cursor:pointer;
+    font-size:14px;
 }
+.menu-item:hover { background: #f3f5ff; }
 
-.item-text {
-    font-size: 0.95rem;
-    color: #0b1220;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+/* delete button fallback (hidden) */
+.delete-btn { display:none; }
+
+/* bottom input */
+.bottom-input {
+    margin-top: 20px;
+    display:flex;
+    justify-content:flex-start;
 }
-
-/* delete button (copied from PackingActivity for consistent look) */
-.delete-btn {
-    background: transparent;
+.hint-row {
+    background: #eef2ff;
+    padding:10px 12px;
+    border-radius:8px;
+    max-width:760px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    box-shadow: 0 6px 20px rgba(2,6,23,0.06);
+}
+.hint-circle {
+    width:20px;
+    height:20px;
+    border-radius:50%;
+    border:2px solid rgba(11,18,32,0.2);
+    background:transparent;
+    flex:0 0 20px;
+}
+.hint-input {
     border: none;
-    color: #ef4444;
-    font-size: 16px;
-    width: 36px;
-    height: 36px;
-    border-radius: 6px;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.delete-btn:hover {
-    background: rgba(239,68,68,0.08);
-}
-
-/* modal / toast styles (minimal, reuse patterns from PackingActivity) */
-.modal-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.35);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 9999;
-}
-
-.confirm-modal {
-    width: 360px;
-    background: #fff;
-    border-radius: 8px;
-    padding: 16px;
-    box-shadow: 0 8px 30px rgba(0,0,0,0.2);
-    z-index: 10001;
-}
-
-/* toast */
-.toast-container {
-    position: fixed;
-    bottom: 16px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 10002;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    align-items: center;
-    pointer-events: none;
-    width: auto;
-    max-width: calc(100% - 32px);
-    padding: 0 16px;
-}
-
-.toast {
-    background: #16a34a; /* green */
-    color: #fff;
-    padding: 10px 16px;
-    border-radius: 8px;
-    box-shadow: 0 6px 20px rgba(2,6,23,0.12);
-    opacity: 0;
-    transform: translateY(8px);
-    transition: opacity 300ms ease, transform 300ms ease;
-    pointer-events: auto;
-    max-width: 720px;
-    text-align: center;
-    font-weight: 600;
-}
-
-.toast.show {
-    opacity: 1;
-    transform: translateY(0);
+    background: transparent;
+    outline: none;
+    color: #0b1220;
+    font-size:14px;
+    width:100%;
 }
 </style>
 
 @code {
-    // Lightweight model for a past packing instance
-    private sealed class PackingInstance
-    {
-        // Unique identifier (used to navigate to PackingActivity)
-        public string Id { get; init; } = Guid.NewGuid().ToString();
-        public string Name { get; init; } = string.Empty;
-        public DateTime LastPacked { get; init; }
-        public PackingCategory Category { get; init; }
-        public int RunCount { get; init; }
-    }
+    private List<Storage.PackingActivity> Packings { get; set; } = new();
 
-    // Replace this in the future with real persisted data or an injected provider/service.
-    private List<PackingInstance> Packings { get; set; } = new();
-
-    // delete confirmation state
     private bool _showDeleteConfirm;
-    private PackingInstance? _pendingDelete;
+    private Storage.PackingActivity? _pendingDelete;
 
-    // toast state
     private bool _showToast;
     private string _toastMessage = string.Empty;
     private CancellationTokenSource? _toastCts;
 
-    protected override void OnInitialized()
+    private string? _openMenuId;
+
+    protected override async Task OnInitializedAsync()
     {
-        // sample data — ordered in the UI by LastPacked descending
-        Packings = new List<PackingInstance>
+        Packings = await PackingRepository.GetAllAsync();
+        if (Packings.Count == 0)
         {
-            new() { Id = Guid.NewGuid().ToString(), Name = "Weekend Trip", LastPacked = DateTime.Now.AddDays(-1), Category = PackingCategory.Clothing, RunCount = 7 },
-            new() { Id = Guid.NewGuid().ToString(), Name = "Gym Bag", LastPacked = DateTime.Now.AddDays(-10), Category = PackingCategory.Accessories, RunCount = 3 },
-            new() { Id = Guid.NewGuid().ToString(), Name = "Business Trip", LastPacked = DateTime.Now.AddDays(-30), Category = PackingCategory.Documents, RunCount = 12 },
-            new() { Id = Guid.NewGuid().ToString(), Name = "Beach Day", LastPacked = DateTime.Now.AddDays(-60), Category = PackingCategory.Accessories, RunCount = 2 },
-        };
+            // Add sample data if none loaded
+            var samples = new List<Storage.PackingActivity>
+            {
+                new() { Id = Guid.NewGuid().ToString(), Name = "Weekend Trip", LastPacked = DateTime.Now.AddDays(-1), Category = PackingCategory.Clothing, RunCount = 7 },
+                new() { Id = Guid.NewGuid().ToString(), Name = "Gym Bag", LastPacked = DateTime.Now.AddDays(-10), Category = PackingCategory.Accessories, RunCount = 3 },
+                new() { Id = Guid.NewGuid().ToString(), Name = "Business Trip", LastPacked = DateTime.Now.AddDays(-30), Category = PackingCategory.Documents, RunCount = 12 },
+                new() { Id = Guid.NewGuid().ToString(), Name = "Beach Day", LastPacked = DateTime.Now.AddDays(-60), Category = PackingCategory.Accessories, RunCount = 2 },
+            };
+            foreach (var s in samples)
+                await PackingRepository.AddOrUpdateAsync(s);
+
+            Packings = await PackingRepository.GetAllAsync();
+        }
     }
 
-    private void OpenPacking(PackingInstance p)
+    private void OpenPacking(Storage.PackingActivity p)
     {
-        // Navigate to the packing activity page and pass the packing id as a query parameter.
         var url = $"/packing-activity?id={Uri.EscapeDataString(p.Id)}";
         Navigation.NavigateTo(url);
     }
 
-    private void PromptDelete(PackingInstance p)
+    private void PromptDelete(Storage.PackingActivity p)
     {
         _pendingDelete = p;
         _showDeleteConfirm = true;
+        CloseMenu();
     }
 
     private void CancelDelete()
@@ -262,19 +295,19 @@
         _showDeleteConfirm = false;
     }
 
-    private void ConfirmDelete()
+    private async Task ConfirmDeleteAsync()
     {
         if (_pendingDelete is null)
             return;
 
         var id = _pendingDelete.Id;
         var name = _pendingDelete.Name;
-        Packings.RemoveAll(x => string.Equals(x.Id, id, StringComparison.Ordinal));
+        await PackingRepository.DeleteAsync(id);
+        Packings = await PackingRepository.GetAllAsync();
         _pendingDelete = null;
         _showDeleteConfirm = false;
 
         ShowToast($"Deleted \"{name}\"");
-
         StateHasChanged();
     }
 
@@ -310,10 +343,32 @@
         }
     }
 
+    private void ToggleMenu(string id)
+    {
+        if (_openMenuId == id) _openMenuId = null;
+        else _openMenuId = id;
+    }
+
+    private void CloseMenu() => _openMenuId = null;
+
+    private async Task CopyPackingAsync(Storage.PackingActivity p)
+    {
+        var copy = new Storage.PackingActivity
+        {
+            Id = Guid.NewGuid().ToString(),
+            Name = p.Name + " (Copy)",
+            LastPacked = DateTime.Now,
+            Category = p.Category,
+            RunCount = 0
+        };
+
+        await PackingRepository.AddOrUpdateAsync(copy);
+        Packings = await PackingRepository.GetAllAsync();
+        Navigation.NavigateTo($"/packing-activity?id={Uri.EscapeDataString(copy.Id)}");
+    }
+
     private string GetCategoryIcon(PackingCategory cat)
     {
-        // Simple emoji icons to keep visuals lightweight.
-        // Swap for SVG or image assets later if you want consistent iconography.
         return cat switch
         {
             PackingCategory.Clothing => "👕",

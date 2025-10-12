@@ -11,6 +11,8 @@
 @inject IJSRuntime JSRuntime
 @implements IDisposable
 
+<NavigationLock OnBeforeInternalNavigation="OnBeforeInternalNavigation" />
+
 <div class="page-shell">
     <header class="top-header">
         <h3>
@@ -1080,46 +1082,33 @@ padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 8px);
         StateHasChanged();
     }
 
-    private async Task OnNavigatedFrom()
+    // Save-before-navigation using NavigationLock (runs before the component is torn down)
+    private bool _isSavingBeforeNav;
+
+    private async Task OnBeforeInternalNavigation(LocationChangingContext context)
     {
-        if (!string.IsNullOrWhiteSpace(PackingId))
+        if (_isSavingBeforeNav)
+            return;
+
+        if (string.IsNullOrWhiteSpace(PackingId))
+            return;
+
+        _isSavingBeforeNav = true;
+        try
         {
-            try
-            {
-                // Save the current activity to the repository
-                await PackingRepository.AddOrUpdateAsync(_currentActivity);
-                Console.WriteLine($"Packing activity '{_currentActivity.Name}' saved successfully.");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Failed to save packing activity: {ex.Message}");
-            }
+            context.PreventNavigation();
+            await PackingRepository.AddOrUpdateAsync(_currentActivity);
+            Navigation.NavigateTo(context.TargetLocation);
+        }
+        finally
+        {
+            _isSavingBeforeNav = false;
         }
     }
 
-    private bool _isSubscribedToNavigation = false;
-
-    protected override void OnInitialized()
-    {
-        if (!_isSubscribedToNavigation)
-        {
-            Navigation.LocationChanged += HandleLocationChanged;
-            _isSubscribedToNavigation = true;
-        }
-    }
-
-    private async void HandleLocationChanged(object? sender, LocationChangedEventArgs e)
-    {
-        // Save the activity when the user navigates away
-        await OnNavigatedFrom();
-    }
-
+    // No LocationChanged subscription needed; NavigationLock handles pre-navigation
     public void Dispose()
     {
-        if (_isSubscribedToNavigation)
-        {
-            Navigation.LocationChanged -= HandleLocationChanged;
-            _isSubscribedToNavigation = false;
-        }
+        // nothing to dispose currently
     }
 }

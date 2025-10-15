@@ -1,37 +1,62 @@
-/* container so input checkbox and nav-scrollable are siblings and toggler can be positioned */
 .nav-container {
     position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
 }
 
 /* hamburger button */
 .navbar-toggler {
-    appearance: none;
-    cursor: pointer;
-    width: 3.5rem;
-    height: 2.5rem;
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
     color: white;
-    position: absolute;
-    top: 0.5rem;
-    left: 1rem; /* left side as requested */
-    right: auto;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    background: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.55%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") no-repeat center/1.75rem rgba(255, 255, 255, 0.1);
+    padding: 0.5rem;
+    border-radius: var(--border-radius-sm);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    order: -1; /* This places the button on the left */
+}
+
+.navbar-toggler:hover {
+    background-color: rgba(255, 255, 255, 0.2);
 }
 
 .navbar-toggler:checked {
     background-color: rgba(255, 255, 255, 0.5);
 }
 
+.navbar-toggler-icon {
+    display: inline-block;
+    width: 1.5em;
+    height: 1.5em;
+    vertical-align: middle;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.75%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 100%;
+}
+
 /* top row visuals */
 .top-row {
     height: 3.5rem;
-    background-color: rgba(0,0,0,0.4);
+    background-color: var(--primary-dark);
+    display: flex;
+    align-items: center;
 }
 
 /* leave some space so brand isn't overlapped by toggler */
 .navbar-brand {
-    font-size: 1.1rem;
-    margin-left: 2.25rem;
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: white;
+    margin: 0 auto;
+    text-decoration: none;
+    text-align: center;
+}
+
+.navbar-brand:hover {
+    color: rgba(255, 255, 255, 0.9);
+    text-decoration: none;
 }
 
 /* basic icon container */
@@ -59,90 +84,90 @@
 }
 
 .nav-item {
-    font-size: 0.9rem;
-    padding-bottom: 0.5rem;
+    font-size: 1rem;
+    padding: 0.25rem 0;
 }
 
 .nav-item:first-of-type {
-    padding-top: 1rem;
+    margin-top: 0.5rem;
 }
 
-.nav-item:last-of-type {
-    padding-bottom: 1rem;
-}
-
-.nav-item ::deep a {
-    color: #d7d7d7;
+.nav-item ::deep .nav-link {
+    color: #f7f7f7;
     border-radius: 4px;
-    height: 3rem;
+    height: 3.5rem;
     display: flex;
     align-items: center;
-    line-height: 3rem;
-    padding-left: 0.75rem;
+    padding: 0 1.5rem;
+    text-decoration: none;
+    transition: background-color var(--transition-fast);
+    font-weight: 500;
 }
 
-.nav-item ::deep a.active {
-    background-color: rgba(255,255,255,0.37);
+.nav-item ::deep .nav-link.active {
+    background-color: rgba(255, 255, 255, 0.25);
     color: white;
 }
 
-.nav-item ::deep a:hover {
-    background-color: rgba(255,255,255,0.1);
+.nav-item ::deep .nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.1);
     color: white;
 }
 
-/* By placing the checkbox and .nav-scrollable as siblings inside .nav-container
-   the following selector works: when toggler is checked, show the nav */
-.nav-scrollable {
+/* Mobile Navigation Menu */
+.nav-menu-collapsed {
     display: none;
 }
 
-/* show slide-out when checked */
-.navbar-toggler:checked ~ .nav-scrollable {
+.nav-menu-expanded {
     display: block;
+    position: fixed;
+    top: 3.5rem;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--primary);
+    z-index: 1000;
+    padding-top: 1rem;
+    animation: slideIn 0.3s ease-out;
 }
 
-/* Mobile: slide-out menu from left */
-@media (max-width: 640.98px) {
-    .nav-scrollable {
-        position: absolute;
-        top: 3.5rem;
-        left: 0;
-        width: 250px;
-        height: calc(100vh - 3.5rem);
-        overflow-y: auto;
-        z-index: 9999;
-        padding: 0.5rem 0;
-        background-image: linear-gradient(180deg, rgb(5, 39, 103) 0%, #3a0647 70%);
-    }
-
-    .nav-item ::deep a {
-        width: 100%;
-        padding-left: 1rem;
-    }
+@keyframes slideIn {
+    from { opacity: 0; transform: translateX(-20px); }
+    to { opacity: 1; transform: translateX(0); }
 }
 
-/* Desktop: persistent left sidebar */
+.flex-column {
+    display: flex;
+    flex-direction: column;
+}
+
+.oi {
+    width: 2rem;
+    font-size: 1.1rem;
+    margin-right: 0.75rem;
+}
+
 @media (min-width: 641px) {
+    .nav-container {
+        width: 250px;
+        height: 100vh;
+    }
+    
     .navbar-toggler {
         display: none;
     }
-
-    .nav-scrollable {
+    
+    .nav-menu-collapsed,
+    .nav-menu-expanded {
+        /* Always show sidebar on larger screens */
         display: block;
-        position: static;
+        position: relative;
+        top: unset;
+        bottom: unset;
+        left: unset;
+        right: unset;
         height: calc(100vh - 3.5rem);
         overflow-y: auto;
-        background: transparent;
-    }
-
-    /* make sidebar full height */
-    .nav-container { /* ensure desktop layout aligns with MainLayout */
-        width: 250px;
-    }
-
-    .top-row {
-        position: sticky;
-        top: 0;
     }
 }

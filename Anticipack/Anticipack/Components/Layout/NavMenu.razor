@@ -1,29 +1,36 @@
 ﻿<div class="nav-container">
-    <div class="top-row ps-3 navbar navbar-dark">
+    <div class="top-row navbar navbar-dark">
         <div class="container-fluid">
-            <a class="navbar-brand" href="/packing-activities">Anticipack</a>
+            <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <a class="navbar-brand" href="">Anticipack</a>
         </div>
     </div>
 
-    <input type="checkbox" title="Navigation menu" class="navbar-toggler" id="nav-toggler" />
-
-    <div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
+    <div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
         <nav class="flex-column">
             <div class="nav-item px-3">
-                <NavLink class="nav-link" href="/packing-activities">
-                    <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Packing Activities
+                <NavLink class="nav-link" href="packing-activities">
+                    <span class="oi oi-list" aria-hidden="true"></span> Packing Activities
                 </NavLink>
             </div>
             <div class="nav-item px-3">
-                <NavLink class="nav-link" href="/packing-activity">
-                    <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Packing
-                </NavLink>
-            </div>
-            <div class="nav-item px-3">
-                <NavLink class="nav-link" href="/packing-dialog">
-                    <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Packing Dialog
+                <NavLink class="nav-link" href="packing-dialog">
+                    <span class="oi oi-chat" aria-hidden="true"></span> Packing Dialog
                 </NavLink>
             </div>
         </nav>
     </div>
 </div>
+
+@code {
+    private bool collapseNavMenu = true;
+
+    private string NavMenuCssClass => collapseNavMenu ? "nav-menu-collapsed" : "nav-menu-expanded";
+
+    private void ToggleNavMenu()
+    {
+        collapseNavMenu = !collapseNavMenu;
+    }
+}

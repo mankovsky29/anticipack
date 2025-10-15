@@ -1,454 +1,297 @@
 ﻿@page "/packing-activities"
-@using Anticipack.Packing
 @using Anticipack.Storage
-@using System.IO
-@inject NavigationManager Navigation
+@using Anticipack.Packing
 @inject IPackingRepository PackingRepository
+@inject NavigationManager Navigation
 
-<div class="page-shell">
-    <header class="top-header">
-        <div class="header-left">
-            <button class="filter-btn" aria-expanded="false" title="Filter">
-                <span class="chev">▾</span>
-                <span class="filter-label">Completed</span>
-                <span class="filter-count">@Packings.Count</span>
-            </button>
-        </div>
-
-        <div class="top-right-actions">
-            <button class="action-btn add-btn" @onclick="AddNewActivity">+ New Activity</button>
-        </div>
+<div class="page-container">
+    <header class="page-header">
+        <h1 class="page-title">Packing Activities</h1>
+        <button class="add-activity-btn" @onclick="AddNewActivity">
+            <i class="fa fa-plus"></i> New Activity
+        </button>
     </header>
 
-    <main class="content-area">
-        <ul class="activities-list">
-            @foreach (var p in Packings.OrderByDescending(x => x.LastPacked))
-            {
-                var pack = p;
+    @if (_isLoading)
+    {
+        <div class="loading">
+            <div class="loading-spinner"></div>
+            <span>Loading activities...</span>
+        </div>
+    }
+    else
+    {
+        @if (_activities.Any())
+        {
+            <div class="search-bar">
+                <input type="text" class="search-input" placeholder="Search activities..." @bind="_searchTerm" @bind:event="oninput" />
+                <select class="filter-dropdown" @bind="_selectedCategory">
+                    <option value="">All Categories</option>
+                    @foreach (var category in Enum.GetValues<PackingCategory>())
+                    {
+                        <option value="@category">@category</option>
+                    }
+                </select>
+            </div>
 
-                <li class="activity-card" title="@($"{pack.Name} — last packed {pack.LastPacked:g}")">
-                    <div class="card-left" role="button" @onclick="@(() => OpenPacking(pack))" tabindex="0" @onclick:stopPropagation>
-                        <span class="category-icon" aria-hidden="true">@GetCategoryIcon(pack.Category)</span>
-                        <div class="card-body">
-                            <div class="card-title">@pack.Name</div>
-                            <div class="card-sub">Last packed: @pack.LastPacked.ToString("g")</div>
+            <div class="activities-grid">
+                @foreach (var activity in FilteredActivities)
+                {
+                    <div class="activity-card">
+                        <div class="activity-card-header">
+                            <h3 class="activity-name">@activity.Name</h3>
                         </div>
-                    </div>
-
-                    <div class="card-right" @onclick:stopPropagation>
-                        <div class="menu-container">
-                            <button class="menu-trigger" title="More" @onclick="@(() => ToggleMenu(pack.Id))" @onclick:stopPropagation>⋮</button>
-
-                            @if (_openMenuId == pack.Id)
+                        <div class="activity-content">
+                            <div class="activity-meta">
+                                <i class="fa fa-calendar"></i> Last packed: @activity.LastPacked.ToString("MMM d, yyyy")
+                            </div>
+                            @if (activity.Category != default)
                             {
-                                <div class="menu-popover" @onclick:stopPropagation>
-                                    <button class="menu-item" @onclick="@(() => { CloseMenu(); PromptDelete(pack); })">Delete</button>
-                                    <button class="menu-item" @onclick="@(() => { CloseMenu(); CopyPackingAsync(pack); })">Copy</button>
+                                <div class="activity-category">
+                                    @activity.Category
                                 </div>
                             }
+                            <div class="activity-stats">
+                                <span>Packed @activity.RunCount time@(activity.RunCount != 1 ? "s" : "")</span>
+                                <span>@(activity.Items?.Count ?? 0) items</span>
+                            </div>
+                        </div>
+                        <div class="activity-footer">
+                            <button class="card-btn" title="Copy" @onclick="() => CopyActivity(activity.Id)">
+                                <i class="fa fa-copy"></i>
+                            </button>
+                            <button class="card-btn danger" title="Delete" @onclick="() => PromptDeleteActivity(activity)">
+                                <i class="fa fa-trash"></i>
+                            </button>
+                            <button class="card-btn primary" title="Open" @onclick="() => OpenActivity(activity.Id)">
+                                <i class="fa fa-arrow-right"></i>
+                            </button>
                         </div>
                     </div>
-                </li>
-            }
-        </ul>
-    </main>
-
-    <footer class="bottom-input">
-        <div class="hint-row">
-            <span class="hint-circle" aria-hidden="true"></span>
-            <input class="hint-input" placeholder="Try typing 'Pay utilities bill by Friday 6pm'" />
-        </div>
-    </footer>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="no-activities">
+                <div class="empty-icon">
+                    <i class="fa fa-luggage-cart"></i>
+                </div>
+                <h3>No Packing Activities</h3>
+                <p>Create your first packing activity to get started.</p>
+                <button class="btn primary" @onclick="AddNewActivity">
+                    <i class="fa fa-plus"></i> Create Packing Activity
+                </button>
+            </div>
+        }
+    }
 </div>
 
-@if (_showDeleteConfirm)
+@if (_showAddDialog)
 {
-    <div class="modal-overlay" @onclick="CancelDelete">
-        <div class="confirm-modal" @onclick:stopPropagation>
-            <h4>Delete activity?</h4>
-            <p class="confirm-text">@(_pendingDelete?.Name ?? "")</p>
+    <div class="modal-overlay" @onclick="CancelAddActivity">
+        <div class="modal-content" @onclick:stopPropagation>
+            <h4 class="modal-header">New Packing Activity</h4>
+            
+            <div class="form-row">
+                <label for="activity-name">Name</label>
+                <input id="activity-name" @bind="_newActivityName" />
+            </div>
 
-            <div class="dialog-actions">
-                <button class="btn cancel" @onclick="CancelDelete">Cancel</button>
-                <button class="btn ok" @onclick="ConfirmDeleteAsync">OK</button>
+            <div class="form-row">
+                <label for="activity-category">Category</label>
+                <select id="activity-category" @bind="_newActivityCategory">
+                    @foreach (var category in Enum.GetValues<PackingCategory>())
+                    {
+                        <option value="@category">@category</option>
+                    }
+                </select>
+            </div>
+
+            <div class="form-actions">
+                <button class="btn cancel" @onclick="CancelAddActivity">Cancel</button>
+                <button class="btn primary" @onclick="ConfirmAddActivityAsync">Create</button>
             </div>
         </div>
     </div>
 }
 
-<style>
-    :root {
-        --bg-top: #6677c8;
-        --bg-bottom: #7b8be0;
-        --card-bg: #f6f8ff;
-        --muted: rgba(0,0,0,0.45);
-    }
+@if (_showDeleteConfirm)
+{
+    <div class="modal-overlay" @onclick="CancelDelete">
+        <div class="modal-content" @onclick:stopPropagation>
+            <h4 class="modal-header">Delete Activity?</h4>
+            <p>Are you sure you want to delete "@_activityToDelete?.Name"?</p>
+            <p>This action cannot be undone.</p>
+            
+            <div class="form-actions">
+                <button class="btn cancel" @onclick="CancelDelete">Cancel</button>
+                <button class="btn danger" @onclick="ConfirmDeleteActivityAsync">Delete</button>
+            </div>
+        </div>
+    </div>
+}
 
-    /* page layout */
-    .page-shell {
-        min-height: 100vh;
-        background: linear-gradient(180deg,var(--bg-top),var(--bg-bottom));
-        padding: 18px;
-        box-sizing: border-box;
-        display: flex;
-        flex-direction: column;
-    }
-
-    /* header */
-    .top-header {
-        display: flex;
-        align-items: center;
-        margin-bottom: 12px;
-    }
-
-    .filter-btn {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        background: #eef2ff;
-        color: #25336d;
-        border: none;
-        padding: 8px 12px;
-        border-radius: 8px;
-        box-shadow: 0 1px 0 rgba(11,18,32,0.03);
-        font-weight: 600;
-        cursor: pointer;
-    }
-
-        .filter-btn .chev {
-            font-size: 12px;
-            opacity: 0.9;
-        }
-
-    .top-right-actions {
-        margin-left: auto;
-    }
-
-    .action-btn {
-        background: #6677c8;
-        color: white;
-        border: none;
-        padding: 10px 16px;
-        border-radius: 6px;
-        cursor: pointer;
-        font-size: 14px;
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
-
-        .action-btn:hover {
-            background: #5560a1;
-        }
-
-    /* main list */
-    .content-area {
-        flex: 1 1 auto;
-    }
-
-    /* list reset */
-    .activities-list {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-        max-width: 760px;
-    }
-
-    /* card look */
-    .activity-card {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        background: var(--card-bg);
-        border-radius: 8px;
-        padding: 12px 14px;
-        margin-bottom: 10px;
-        box-shadow: 0 1px 0 rgba(11,18,32,0.03);
-        border: 1px solid rgba(11,18,32,0.04);
-    }
-
-    /* left area clickable */
-    .card-left {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        cursor: pointer;
-        flex: 1 1 auto;
-        min-width: 0;
-    }
-
-    /* category icon (replaced circles with icon/emoji) */
-    .category-icon {
-        width: 34px;
-        height: 34px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 18px;
-        background: linear-gradient(180deg,#ffffff,#f0f4ff);
-        border-radius: 8px;
-        box-shadow: inset 0 -1px 0 rgba(0,0,0,0.02);
-        flex: 0 0 34px;
-    }
-
-    /* body text */
-    .card-body {
-        min-width: 0;
-    }
-
-    .card-title {
-        font-size: 15px;
-        color: #0b1220;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-    .card-sub {
-        font-size: 12px;
-        color: var(--muted);
-        margin-top: 4px;
-    }
-
-    /* right actions */
-    .card-right {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        margin-left: 12px;
-    }
-
-    /* menu trigger */
-    .menu-container {
-        position: relative;
-        display: inline-block;
-    }
-
-    .menu-trigger {
-        width: 36px;
-        height: 36px;
-        border-radius: 6px;
-        border: none;
-        background: transparent;
-        font-size: 18px;
-        cursor: pointer;
-        color: #4b5563;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .menu-popover {
-        position: absolute;
-        right: 0;
-        top: 44px;
-        background: white;
-        border-radius: 6px;
-        box-shadow: 0 6px 20px rgba(2,6,23,0.12);
-        overflow: hidden;
-        min-width: 120px;
-        z-index: 1000;
-    }
-
-    .menu-item {
-        display: block;
-        width: 100%;
-        text-align: left;
-        padding: 8px 12px;
-        border: none;
-        background: transparent;
-        cursor: pointer;
-        font-size: 14px;
-    }
-
-        .menu-item:hover {
-            background: #f3f5ff;
-        }
-
-    /* delete button fallback (hidden) */
-    .delete-btn {
-        display: none;
-    }
-
-    /* bottom input */
-    .bottom-input {
-        margin-top: 20px;
-        display: flex;
-        justify-content: flex-start;
-    }
-
-    .hint-row {
-        background: #eef2ff;
-        padding: 10px 12px;
-        border-radius: 8px;
-        max-width: 760px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        box-shadow: 0 6px 20px rgba(2,6,23,0.06);
-    }
-
-    .hint-circle {
-        width: 20px;
-        height: 20px;
-        border-radius: 50%;
-        border: 2px solid rgba(11,18,32,0.2);
-        background: transparent;
-        flex: 0 0 20px;
-    }
-
-    .hint-input {
-        border: none;
-        background: transparent;
-        outline: none;
-        color: #0b1220;
-        font-size: 14px;
-        width: 100%;
-    }
-
-    /* modal styles */
-    .modal-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(0,0,0,0.6);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 2000;
-    }
-
-    .confirm-modal {
-        background: white;
-        padding: 24px;
-        border-radius: 8px;
-        box-shadow: 0 6px 20px rgba(0,0,0,0.15);
-        max-width: 400px;
-        width: 90%;
-    }
-
-        .confirm-modal h4 {
-            margin: 0 0 12px 0;
-            font-size: 18px;
-            color: #0b1220;
-        }
-
-    .confirm-text {
-        font-size: 14px;
-        color: var(--muted);
-        margin-bottom: 24px;
-    }
-
-    .dialog-actions {
-        display: flex;
-        justify-content: flex-end;
-        gap: 10px;
-    }
-
-    .btn {
-        padding: 10px 16px;
-        border: none;
-        border-radius: 6px;
-        cursor: pointer;
-        font-size: 14px;
-    }
-
-        .btn.cancel {
-            background: #f0f4ff;
-            color: #0b1220;
-        }
-
-        .btn.ok {
-            background: #6677c8;
-            color: white;
-        }
-
-        .btn:hover {
-            opacity: 0.9;
-        }
-
-    .add-btn {
-        background-color: #10b981; /* Green */
-    }
-
-        .add-btn:hover {
-            background-color: #059669; /* Darker green */
-        }
-
-</style>
+<div class="toast-container" aria-live="polite" aria-atomic="true">
+    <div class="@($"toast {(_showToast ? "show" : "")}")">@_toastMessage</div>
+</div>
 
 @code {
-    private List<Storage.PackingActivity> Packings { get; set; } = new();
-
+    private List<Storage.PackingActivity> _activities = new();
+    private bool _isLoading = true;
+    private string _searchTerm = string.Empty;
+    private string _selectedCategory = string.Empty;
+    
+    // Add dialog
+    private bool _showAddDialog;
+    private string _newActivityName = string.Empty;
+    private PackingCategory _newActivityCategory = PackingCategory.Miscellaneous;
+    
+    // Delete confirmation
     private bool _showDeleteConfirm;
-    private Storage.PackingActivity? _pendingDelete;
-
+    private Storage.PackingActivity? _activityToDelete;
+    
+    // Toast
     private bool _showToast;
     private string _toastMessage = string.Empty;
-    private CancellationTokenSource? _toastCts;
-
-    private string? _openMenuId;
+    private System.Threading.CancellationTokenSource? _toastCts;
 
     protected override async Task OnInitializedAsync()
     {
-        Packings = await PackingRepository.GetAllAsync();
+        await LoadActivitiesAsync();
     }
 
-    private void OpenPacking(Storage.PackingActivity p)
+    private async Task LoadActivitiesAsync()
     {
-        var url = $"/packing-activity?id={Uri.EscapeDataString(p.Id)}";
-        Navigation.NavigateTo(url);
+        _isLoading = true;
+        StateHasChanged();
+
+        try
+        {
+            _activities = await PackingRepository.GetAllAsync();
+        }
+        catch
+        {
+            ShowToast("Failed to load activities");
+        }
+        finally
+        {
+            _isLoading = false;
+            StateHasChanged();
+        }
     }
 
-    private void PromptDelete(Storage.PackingActivity p)
+    private IEnumerable<Storage.PackingActivity> FilteredActivities
     {
-        _pendingDelete = p;
+        get
+        {
+            var filtered = _activities.AsEnumerable();
+            
+            if (!string.IsNullOrWhiteSpace(_searchTerm))
+            {
+                filtered = filtered.Where(a => a.Name.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase));
+            }
+            
+            if (!string.IsNullOrWhiteSpace(_selectedCategory))
+            {
+                filtered = filtered.Where(a => a.Category.ToString().Equals(_selectedCategory, StringComparison.OrdinalIgnoreCase));
+            }
+            
+            return filtered;
+        }
+    }
+
+    private void AddNewActivity()
+    {
+        _newActivityName = "New Packing Activity";
+        _newActivityCategory = PackingCategory.Miscellaneous;
+        _showAddDialog = true;
+    }
+
+    private void CancelAddActivity()
+    {
+        _showAddDialog = false;
+    }
+
+    private async Task ConfirmAddActivityAsync()
+    {
+        if (string.IsNullOrWhiteSpace(_newActivityName))
+            return;
+
+        var newActivity = new Storage.PackingActivity
+        {
+            Name = _newActivityName,
+            Category = _newActivityCategory,
+            LastPacked = DateTime.Now
+        };
+
+        try
+        {
+            await PackingRepository.AddOrUpdateAsync(newActivity);
+            ShowToast("Activity created successfully");
+            await LoadActivitiesAsync();
+        }
+        catch
+        {
+            ShowToast("Failed to create activity");
+        }
+        finally
+        {
+            _showAddDialog = false;
+        }
+    }
+
+    private void PromptDeleteActivity(Storage.PackingActivity activity)
+    {
+        _activityToDelete = activity;
         _showDeleteConfirm = true;
-        CloseMenu();
     }
 
     private void CancelDelete()
     {
-        _pendingDelete = null;
+        _activityToDelete = null;
         _showDeleteConfirm = false;
     }
 
-    private async Task ConfirmDeleteAsync()
+    private async Task ConfirmDeleteActivityAsync()
     {
-        if (_pendingDelete is null)
+        if (_activityToDelete == null)
             return;
 
         try
         {
-            var id = _pendingDelete.Id;
-            var name = _pendingDelete.Name;
-
-            // Call the repository to delete the packing activity
-            await PackingRepository.DeleteAsync(id);
-
-            // Refresh the list of packings
-            Packings = await PackingRepository.GetAllAsync();
-
-            // Clear the pending delete state
-            _pendingDelete = null;
-            _showDeleteConfirm = false;
-
-            // Show a toast message
-            ShowToast($"Deleted \"{name}\"");
+            await PackingRepository.DeleteAsync(_activityToDelete.Id);
+            ShowToast("Activity deleted successfully");
+            await LoadActivitiesAsync();
         }
-        catch (Exception ex)
+        catch
         {
-            // Log the error and show a toast message
-            Console.WriteLine($"Error deleting packing activity: {ex.Message}");
-            ShowToast("Failed to delete the packing activity.");
+            ShowToast("Failed to delete activity");
         }
         finally
         {
-            StateHasChanged();
+            _activityToDelete = null;
+            _showDeleteConfirm = false;
         }
+    }
+
+    private async Task CopyActivity(string id)
+    {
+        try
+        {
+            await PackingRepository.CopyPackingAsync(id);
+            ShowToast("Activity copied successfully");
+            await LoadActivitiesAsync();
+        }
+        catch
+        {
+            ShowToast("Failed to copy activity");
+        }
+    }
+
+    private void OpenActivity(string id)
+    {
+        Navigation.NavigateTo($"/packing-activity?id={id}");
     }
 
     private void ShowToast(string message)
@@ -460,7 +303,7 @@
         }
         catch { }
 
-        _toastCts = new CancellationTokenSource();
+        _toastCts = new System.Threading.CancellationTokenSource();
 
         _toastMessage = message;
         _showToast = true;
@@ -469,7 +312,7 @@
         _ = HideToastAfterDelayAsync(_toastCts.Token);
     }
 
-    private async Task HideToastAfterDelayAsync(CancellationToken token)
+    private async Task HideToastAfterDelayAsync(System.Threading.CancellationToken token)
     {
         try
         {
@@ -477,46 +320,14 @@
             _showToast = false;
             await InvokeAsync(StateHasChanged);
         }
-        catch (OperationCanceledException)
+        catch (System.Threading.Tasks.TaskCanceledException)
         {
-            // ignore
         }
     }
 
-    private void ToggleMenu(string id)
+    public void Dispose()
     {
-        if (_openMenuId == id) _openMenuId = null;
-        else _openMenuId = id;
-    }
-
-    private void CloseMenu() => _openMenuId = null;
-
-    private async Task CopyPackingAsync(Storage.PackingActivity p)
-    {
-        await PackingRepository.CopyPackingAsync(p.Id.ToString());
-        Navigation.NavigateTo($"/packing-activity?id={Uri.EscapeDataString(p.Id)}");
-    }
-
-    private void AddNewActivity()
-    {
-        Navigation.NavigateTo($"/packing-activity?id={Uri.EscapeDataString(Guid.NewGuid().ToString())}");
-    }
-
-    private string GetCategoryIcon(PackingCategory cat)
-    {
-        return cat switch
-        {
-            PackingCategory.Clothing => "👕",
-            PackingCategory.Shoes => "👟",
-            PackingCategory.Toiletries => "🧴",
-            PackingCategory.Electronics => "🔌",
-            PackingCategory.Documents => "📄",
-            PackingCategory.Health => "💊",
-            PackingCategory.Accessories => "👜",
-            PackingCategory.Outdoor => "🎒",
-            PackingCategory.Food => "🍱",
-            PackingCategory.Entertainment => "🎵",
-            _ => "📦",
-        };
+        _toastCts?.Cancel();
+        _toastCts?.Dispose();
     }
 }

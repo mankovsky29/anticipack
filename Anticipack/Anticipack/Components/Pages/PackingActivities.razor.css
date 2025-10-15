@@ -1,0 +1,305 @@
+/* Page Layout */
+.page-container {
+    min-height: 100vh;
+    background: linear-gradient(180deg, var(--primary-light), var(--primary));
+    padding: var(--space-lg);
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Header */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-lg);
+    color: white;
+}
+
+.page-title {
+    font-size: 1.75rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+/* Action button */
+.add-activity-btn {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    background-color: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    border-radius: var(--border-radius);
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color var(--transition-fast);
+}
+
+.add-activity-btn:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+}
+
+.add-activity-btn i {
+    font-size: 0.9rem;
+}
+
+/* Activities Grid */
+.activities-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: var(--space-md);
+    margin-bottom: var(--space-lg);
+}
+
+/* Activity Card */
+.activity-card {
+    background-color: var(--surface);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    transition: transform var(--transition), box-shadow var(--transition);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.activity-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+}
+
+.activity-card-header {
+    padding: var(--space-md);
+    background-color: var(--primary-dark);
+    color: white;
+}
+
+.activity-name {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.activity-content {
+    padding: var(--space-md);
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.activity-meta {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+}
+
+.activity-category {
+    background-color: rgba(75, 137, 220, 0.1);
+    color: var(--primary-dark);
+    padding: 4px 8px;
+    border-radius: var(--border-radius-sm);
+    font-size: 0.85rem;
+    font-weight: 500;
+    display: inline-block;
+    margin-top: var(--space-sm);
+}
+
+.activity-stats {
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.activity-footer {
+    padding: var(--space-md);
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--space-sm);
+    border-top: 1px solid rgba(0,0,0,0.05);
+}
+
+.card-btn {
+    background: transparent;
+    color: var(--text-secondary);
+    border: none;
+    padding: 8px;
+    border-radius: var(--border-radius-sm);
+    cursor: pointer;
+    transition: background-color var(--transition-fast), color var(--transition-fast);
+}
+
+.card-btn:hover {
+    background-color: rgba(0,0,0,0.05);
+    color: var(--text-primary);
+}
+
+.card-btn.primary {
+    color: var(--primary);
+}
+
+.card-btn.danger {
+    color: var(--danger);
+}
+
+.card-btn i {
+    font-size: 1rem;
+}
+
+/* No activities message */
+.no-activities {
+    background-color: var(--surface);
+    border-radius: var(--border-radius);
+    padding: var(--space-lg);
+    text-align: center;
+    color: var(--text-secondary);
+    box-shadow: var(--shadow);
+}
+
+.no-activities h3 {
+    margin-top: 0;
+    color: var(--text-primary);
+}
+
+.no-activities p {
+    margin-bottom: var(--space-lg);
+}
+
+.empty-icon {
+    font-size: 4rem;
+    color: var(--text-light);
+    margin-bottom: var(--space-md);
+}
+
+/* Search and filter */
+.search-bar {
+    margin-bottom: var(--space-md);
+    display: flex;
+    gap: var(--space-sm);
+}
+
+.search-input {
+    flex-grow: 1;
+    padding: var(--space-md);
+    border: none;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-sm);
+    font-size: 1rem;
+}
+
+.filter-dropdown {
+    padding: var(--space-md);
+    border: none;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-sm);
+    min-width: 150px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .page-container {
+        padding: var(--space-md);
+    }
+    
+    .activities-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .search-bar {
+        flex-direction: column;
+    }
+}
+
+/* Modals */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    backdrop-filter: blur(4px);
+}
+
+.modal-content {
+    background: var(--surface);
+    border-radius: var(--border-radius);
+    padding: var(--space-lg);
+    box-shadow: var(--shadow-lg);
+    width: 90%;
+    max-width: 450px;
+    animation: modal-in 0.3s ease;
+}
+
+@keyframes modal-in {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.modal-header {
+    margin-top: 0;
+    margin-bottom: var(--space-lg);
+    font-size: 1.25rem;
+    padding-bottom: var(--space-sm);
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+}
+
+.form-row {
+    margin-bottom: var(--space-lg);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-row label {
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--space-sm);
+    margin-top: var(--space-lg);
+}
+
+/* Toast notifications */
+.toast-container {
+    position: fixed;
+    bottom: var(--space-lg);
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1001;
+    width: auto;
+    max-width: 90%;
+}
+
+.toast {
+    background-color: var(--success);
+    color: white;
+    padding: var(--space-md) var(--space-lg);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    opacity: 0;
+    transform: translateY(var(--space-md));
+    transition: opacity var(--transition), transform var(--transition);
+    text-align: center;
+    font-weight: 500;
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translateY(0);
+}

@@ -74,56 +74,89 @@
 /* Activity Header (consistent with PackingActivities) */
 .activity-header {
     display: flex;
-    justify-content: space-between;
     align-items: center;
     margin-bottom: var(--space-lg);
-    padding: var(--space-md) var(--space-lg);
-    background: linear-gradient(90deg, var(--primary-dark), var(--primary));
+    padding: 8px 12px;
+    background: #4285f4; /* Google-style blue color matching checkbox */
     color: white;
-    border-radius: var(--border-radius);
-    box-shadow: var(--shadow);
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    justify-content: space-between; /* Ensure proper spacing */
 }
 
-.activity-title {
-    margin: 0;
-    font-size: 1.5rem;
-    font-weight: 600;
-}
-
-.activity-actions {
+/* Left side with icon and title */
+.header-left-section {
     display: flex;
-    gap: 8px;
+    align-items: center;
+    flex: 1;
+    min-width: 0; /* Allow content to shrink below intrinsic width */
+    overflow: hidden;
+}
+
+/* Category icon container */
+.category-icon-container {
+    flex-shrink: 0;
+    margin-right: 8px;
+    display: flex;
     align-items: center;
 }
 
+/* Title and input container */
+.activity-title {
+    flex: 1;
+    min-width: 0; /* Important for flex items to allow shrinking below content size */
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 500;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    padding: 0;
+}
+
+/* Stretch the input to fill available space */
+.activity-name-input {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.activity-name-input::placeholder {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* Action buttons container - now properly aligned to right */
+.activity-actions {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    flex-shrink: 0;
+    margin-left: 8px; /* Small margin for spacing */
+    justify-content: flex-end; /* Ensure buttons align to the right */
+}
+
+/* Button styling */
 .activity-actions .icon-btn,
 .activity-actions .add-btn {
     width: 36px;
     height: 36px;
     border-radius: 4px;
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    font-size: 16px;
+    transition: background-color 0.2s;
+    border: none;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: white;
-    font-size: 18px;
     cursor: pointer;
+    flex-shrink: 0;
     padding: 0;
-    background: rgba(255, 255, 255, 0.2);
-    transition: background-color 0.2s;
-}
-
-.activity-actions .icon-btn:hover,
-.activity-actions .add-btn:hover {
-    background-color: rgba(255, 255, 255, 0.3);
-}
-
-.activity-actions .add-btn {
-    background-color: rgba(255, 255, 255, 0.25);
-    border: 1px solid rgba(255, 255, 255, 0.5);
-}
-
-.activity-actions .icon-btn.danger:hover {
-    background-color: rgba(255, 0, 0, 0.2);
 }
 
 /* Override existing button styles to ensure consistency */
@@ -171,10 +204,12 @@
 
 /* Editable title */
 .packing-name-display {
+    display: block;
+    width: 100%;
     cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .packing-name-display .edit-icon {
@@ -578,5 +613,23 @@ ul.category-content {
     .item-delete-btn {
         width: 40px;
         height: 40px;
+    }
+}
+
+/* Make sure we handle long titles properly */
+@media (max-width: 576px) {
+    .activity-header {
+        padding: 10px 12px;
+    }
+    
+    .activity-title {
+        font-size: 1rem;
+        max-width: 60%;
+    }
+    
+    .activity-actions .icon-btn,
+    .activity-actions .add-btn {
+        width: 32px;
+        height: 32px;
     }
 }

@@ -15,33 +15,35 @@
 
 <div class="page-container with-fixed-navbar">
     <div class="activity-header">
-        <div class="category-icon-container" @onclick="ToggleCategorySelector">
-            <div class="category-icon" title="@_currentActivity.Category">
-                <i class="fa @GetCategoryIcon(_currentActivity.Category)" aria-hidden="true"></i>
+        <div class="header-left-section">
+            <div class="category-icon-container" @onclick="ToggleCategorySelector">
+                <div class="category-icon" title="@_currentActivity.Category">
+                    <i class="fa @GetCategoryIcon(_currentActivity.Category)" aria-hidden="true"></i>
+                </div>
             </div>
-        </div>
-        <h3 class="activity-title">
-            @if (_isEditingName)
-            {
-                <input type="text" @bind="_currentActivity.Name" @bind:event="oninput"
-                       class="activity-name-input"
-                       @onblur="() => _isEditingName = false"
-                       @onfocus="async () => await SelectAllText(inputElement)"
-                       @ref="inputElement"
-                       placeholder="Enter activity name..." />
-            }
-            else
-            {
-                @if (string.IsNullOrWhiteSpace(_currentActivity.Name))
+            <h3 class="activity-title">
+                @if (_isEditingName)
                 {
-                    _isEditingName = true;
+                    <input type="text" @bind="_currentActivity.Name" @bind:event="oninput"
+                           class="activity-name-input"
+                           @onblur="() => _isEditingName = false"
+                           @onfocus="async () => await SelectAllText(inputElement)"
+                           @ref="inputElement"
+                           placeholder="Enter activity name..." />
                 }
-                <span class="packing-name-display" @onclick="() => _isEditingName = true">
-                    @_currentActivity.Name
-                    <i class="edit-icon fa fa-pencil" aria-hidden="true"></i>
-                </span>
-            }
-        </h3>
+                else
+                {
+                    @if (string.IsNullOrWhiteSpace(_currentActivity.Name))
+                    {
+                        _isEditingName = true;
+                    }
+                    <span class="packing-name-display" @onclick="() => _isEditingName = true">
+                        @_currentActivity.Name
+                        <i class="edit-icon fa fa-pencil" aria-hidden="true"></i>
+                    </span>
+                }
+            </h3>
+        </div>
         <div class="activity-actions">
             <button class="icon-btn danger" title="Delete" @onclick="PromptDeleteActivity">
                 <i class="fa fa-trash"></i>

@@ -4,7 +4,7 @@
 @inject IPackingRepository PackingRepository
 @inject NavigationManager Navigation
 
-<div class="page-container">
+<div class="page-container with-fixed-navbar">
     @if (_isLoading)
     {
         <div class="loading">
@@ -14,26 +14,22 @@
     }
     else
     {
-        @if (_activities.Any())
-        {
-            <div class="search-bar">
-                <input type="text" class="search-input" placeholder="Search activities..." @bind="_searchTerm" @bind:event="oninput" />
-                <select class="filter-dropdown" @bind="_selectedCategory">
-                    <option value="">All Categories</option>
-                    @foreach (var category in Enum.GetValues<PackingCategory>())
-                    {
-                        <option value="@category">@category</option>
-                    }
-                </select>
-            </div>
-        }
+        <div class="search-bar @(_isSearchVisible ? "visible" : "hidden")">
+            <input type="text" class="search-input" placeholder="Search activities..." @bind="_searchTerm" @bind:event="oninput" />
+        </div>
+        
         <div class="add-activity-container">
-            <button class="add-activity-btn" @onclick="AddNewActivity">
-                <i class="fa fa-plus"></i> New Activity
+            <button class="add-activity-btn" @onclick="AddNewActivity" title="Add New Activity">
+                <i class="fa fa-plus"></i>
+            </button>
+            <button class="icon-btn search-toggle-btn" @onclick="ToggleSearchBar" title="Search">
+                <i class="fa fa-search"></i>
             </button>
         </div>
+        
         @if (_activities.Any())
         {
+
             <div class="activities-grid">
                 @foreach (var activity in FilteredActivities)
                 {
@@ -141,6 +137,7 @@
     private bool _isLoading = true;
     private string _searchTerm = string.Empty;
     private string _selectedCategory = string.Empty;
+    private bool _isSearchVisible = false;
 
     // Add dialog
     private bool _showAddDialog;
@@ -159,6 +156,11 @@
     protected override async Task OnInitializedAsync()
     {
         await LoadActivitiesAsync();
+    }
+
+    private void ToggleSearchBar()
+    {
+        _isSearchVisible = !_isSearchVisible;
     }
 
     private async Task LoadActivitiesAsync()

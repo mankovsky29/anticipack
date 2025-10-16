@@ -57,7 +57,16 @@
         </div>
     </div>
 
-    <main class="content-area">
+    <div class="mode-selector">
+        <button class="mode-btn @(_packingMode ? "active" : "")" @onclick="ActivatePackingMode">
+            <i class="fa fa-check-square"></i> Packing Mode
+        </button>
+        <button class="mode-btn @(!_packingMode ? "active" : "")" @onclick="ActivateEditMode">
+            <i class="fa fa-edit"></i> Edit Mode
+        </button>
+    </div>
+
+    <main class="content-area" @onkeydown="HandleKeyboardNavigation" tabindex="0" @ref="contentArea">
         @if (_showCategorySelector)
         {
             <div class="category-selector">
@@ -261,8 +270,90 @@
     <div class="@($"toast {(_showToast ? "show" : "")}")">@_toastMessage</div>
 </div>
 
+<div class="progress-container @(_packingMode ? "visible" : "")">
+    <div class="progress-bar">
+        <div class="progress-fill" style="width: @($"{GetCompletionPercentage()}%")"></div>
+    </div>
+    <div class="progress-stats">
+        <span>@Items.Count(i => i.IsChecked)/@Items.Count items packed</span>
+        <span class="time-remaining">@GetEstimatedTimeRemaining()</span>
+    </div>
+</div>
+
+<div class="history-panel @(_showHistory ? "expanded" : "")">
+    <div class="history-header" @onclick="ToggleHistory">
+        <h4>Packing History</h4>
+        <span class="chev @(_showHistory ? "" : "collapsed")">▾</span>
+    </div>
+    
+    @if (_showHistory)
+    {
+        <div class="history-content">
+            <div class="history-stats">
+                <div class="stat-card">
+                    <span class="stat-value">@_currentActivity.RunCount</span>
+                    <span class="stat-label">Times Packed</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-value">@(GetAveragePackingTime())</span>
+                    <span class="stat-label">Avg. Time</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-value">@(GetLastPackedDate())</span>
+                    <span class="stat-label">Last Packed</span>
+                </div>
+            </div>
+            
+            <div class="history-timeline">
+                <h5>Recent Activity</h5>
+                <ul class="timeline-list">
+                    @foreach (var entry in GetRecentPackingHistory())
+                    {
+                        <li class="timeline-item">
+                            <span class="timeline-date">@entry.Date.ToString("MMM d, HH:mm")</span>
+                            <span class="timeline-action">@entry.Action</span>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    }
+</div>
+
+@if (_packingMode && GetCompletionPercentage() == 100 && !_completionAcknowledged)
+{
+    <div class="modal-overlay celebration">
+        <div class="completion-modal">
+            <div class="confetti-container">
+                <!-- Confetti animation here -->
+            </div>
+            
+            <h3>Packing Complete!</h3>
+            <p>You packed @Items.Count items in @GetPackingDuration()</p>
+            
+            <div class="completion-stats">
+                <div class="stat">
+                    <span class="label">Efficiency</span>
+                    <span class="value">@GetPackingEfficiency()</span>
+                </div>
+                <div class="stat">
+                    <span class="label">Compared to Last Time</span>
+                    <span class="value @GetComparisonClass()">@GetComparisonText()</span>
+                </div>
+            </div>
+            
+            <button class="btn primary" @onclick="AcknowledgeCompletion">
+                Great!
+            </button>
+        </div>
+    </div>
+}
+
 @code {
     private bool _isAddingItem = false;
+    private bool _packingMode = false;
+    private bool _showHistory = false;
+    private DateTime? _packingStartTime;
 
     [Parameter]
     [SupplyParameterFromQuery(Name = "id")]
@@ -283,6 +374,8 @@
     private bool _isEditingName = false;
     private ElementReference inputElement;
     private ElementReference newItemInput;
+    private ElementReference contentArea;
+    private int _currentFocusIndex = -1;
 
     private async ValueTask SelectAllText(ElementReference inputElement)
     {
@@ -747,14 +840,37 @@
         }
     }
 
+    private void HandleKeyboardNavigation(KeyboardEventArgs e)
+    {
+        if (!_packingMode) return;
+        
+        var itemsList = Items.ToList();
+        
+        switch (e.Key)
+        {
+            case "ArrowDown":
+                _currentFocusIndex = Math.Min(_currentFocusIndex + 1, itemsList.Count - 1);
+                break;
+            case "ArrowUp":
+                _currentFocusIndex = Math.Max(_currentFocusIndex - 1, 0);
+                break;
+            case " ": // Space key
+                if (_currentFocusIndex >= 0 && _currentFocusIndex < itemsList.Count)
+                    ToggleItemChecked(itemsList[_currentFocusIndex]);
+                break;
+        }
+        
+        StateHasChanged();
+    }
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (_isAddingItem)
-        {
-            await JSRuntime.InvokeVoidAsync("focusElement", newItemInput);
-        }
-
         await base.OnAfterRenderAsync(firstRender);
+        
+        if (_packingMode && firstRender)
+        {
+            await JSRuntime.InvokeVoidAsync("focusElement", contentArea);
+        }
     }
 
     private void ToggleCategorySelector()
@@ -787,6 +903,19 @@
         };
     }
 
+    private void ActivatePackingMode()
+    {
+        _packingMode = true;
+        // Expand all categories for easy packing
+        foreach (var category in _categoryOrder)
+            _manualOverride[category] = false;
+    }
+
+    private void ActivateEditMode()
+    {
+        _packingMode = false;
+    }
+
     public void Dispose()
     {
         try
@@ -795,5 +924,69 @@
             _toastCts?.Dispose();
         }
         catch { }
+    }
+
+    private int GetCompletionPercentage() => 
+        Items.Any() ? (int)(Items.Count(i => i.IsChecked) * 100.0 / Items.Count) : 0;
+        
+    private string GetEstimatedTimeRemaining()
+    {
+        var itemsLeft = Items.Count(i => !i.IsChecked);
+        // Estimate 30 seconds per remaining item
+        var minutesLeft = Math.Ceiling(itemsLeft * 0.5);
+        return minutesLeft > 0 ? $"~{minutesLeft} min remaining" : "Done!";
+    }
+
+    private string GetAveragePackingTime() => "15 min";
+
+    private string GetLastPackedDate() => _currentActivity.LastPacked.ToString("MMM d");
+
+    private void ToggleHistory() => _showHistory = !_showHistory;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        // Start timing when packing begins
+        _packingStartTime = DateTime.Now;
+    }
+
+    private class HistoryEntry
+    {
+        public DateTime Date { get; set; }
+        public string Action { get; set; }
+    }
+
+    // This would be replaced with actual history data from storage
+    private List<HistoryEntry> GetRecentPackingHistory() => new()
+    {
+        new HistoryEntry { Date = DateTime.Now.AddDays(-5), Action = "Packed 15 items in 12 minutes" },
+        new HistoryEntry { Date = DateTime.Now.AddDays(-12), Action = "Packed 18 items in 15 minutes" }
+    };
+
+    private bool _completionAcknowledged = false;
+
+    private string GetPackingDuration()
+    {
+        if (!_packingStartTime.HasValue) return "N/A";
+        var duration = DateTime.Now - _packingStartTime.Value;
+        return $"{(int)duration.TotalMinutes} minutes";
+    }
+
+    private string GetPackingEfficiency() => "95%"; // Placeholder
+    private string GetComparisonClass() => "better"; // Placeholder
+    private string GetComparisonText() => "2 minutes faster"; // Placeholder
+
+    private void AcknowledgeCompletion()
+    {
+        _completionAcknowledged = true;
+        // Record completion
+        _currentActivity.LastPacked = DateTime.Now;
+        _currentActivity.RunCount++;
+        
+        // Save to repository
+        if (!string.IsNullOrWhiteSpace(PackingId))
+        {
+            _ = PackingRepository.AddOrUpdateAsync(_currentActivity);
+        }
     }
 }

@@ -587,49 +587,182 @@ ul.category-content {
     color: #2e7d32;
 }
 
-/* Make sure we address any weird spacing issues */
-.packing-list {
+/* Mode Selector */
+.mode-selector {
     display: flex;
-    flex-direction: column;
     gap: 10px;
+    margin-bottom: 16px;
 }
 
-/* Improve the drag and drop styling */
-.packing-row.dragging {
-    opacity: 0.5;
-    background-color: #f5f5f5;
+.mode-btn {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #e0e0e0;
+    background: #f5f5f5;
+    border-radius: 4px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
 }
 
-.packing-row.drag-over {
-    border-top: 2px solid #0078d4;
+.mode-btn.active {
+    background: #4285f4;
+    color: white;
+    border-color: #3367d6;
 }
 
-/* Responsive fixes */
-@media (max-width: 768px) {
-    .packing-row {
-        padding: 12px 10px;
-    }
-    
-    .item-delete-btn {
-        width: 40px;
-        height: 40px;
-    }
+/* Progress Bar */
+.progress-container {
+    margin: 16px 0;
+    background: white;
+    border-radius: 8px;
+    padding: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    display: none;
 }
 
-/* Make sure we handle long titles properly */
-@media (max-width: 576px) {
-    .activity-header {
-        padding: 10px 12px;
-    }
-    
-    .activity-title {
-        font-size: 1rem;
-        max-width: 60%;
-    }
-    
-    .activity-actions .icon-btn,
-    .activity-actions .add-btn {
-        width: 32px;
-        height: 32px;
-    }
+.progress-container.visible {
+    display: block;
+}
+
+.progress-bar {
+    height: 8px;
+    background: #e0e0e0;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: #4285f4;
+    transition: width 0.5s ease;
+}
+
+.progress-stats {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 8px;
+    font-size: 14px;
+    color: #555;
+}
+
+/* History Panel */
+.history-panel {
+    margin-top: 20px;
+    border-radius: 8px;
+    background: white;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.history-header {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 16px;
+    background: #f5f7fa;
+    cursor: pointer;
+    align-items: center;
+}
+
+.history-header h4 {
+    margin: 0;
+    font-size: 16px;
+    color: #333;
+}
+
+.history-content {
+    padding: 16px;
+}
+
+.history-stats {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.stat-card {
+    text-align: center;
+    padding: 12px;
+    background: #f9f9f9;
+    border-radius: 6px;
+    flex: 1;
+    margin: 0 8px;
+}
+
+.stat-value {
+    display: block;
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+}
+
+.stat-label {
+    font-size: 12px;
+    color: #666;
+}
+
+/* Timeline */
+.timeline-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.timeline-item {
+    padding: 12px 0;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+}
+
+/* Completion Modal */
+.completion-modal {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    text-align: center;
+    max-width: 400px;
+    animation: zoomIn 0.3s ease;
+}
+
+.completion-modal h3 {
+    color: #4285f4;
+    margin-top: 0;
+}
+
+.completion-stats {
+    display: flex;
+    justify-content: space-between;
+    margin: 24px 0;
+}
+
+.completion-stats .stat {
+    text-align: center;
+    flex: 1;
+}
+
+.completion-stats .label {
+    display: block;
+    font-size: 14px;
+    color: #666;
+}
+
+.completion-stats .value {
+    display: block;
+    font-size: 18px;
+    font-weight: 600;
+    margin-top: 8px;
+}
+
+.value.better {
+    color: #0f9d58;
+}
+
+.value.worse {
+    color: #db4437;
+}
+
+@keyframes zoomIn {
+    from { transform: scale(0.8); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
 }

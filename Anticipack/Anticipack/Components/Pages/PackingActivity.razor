@@ -15,6 +15,11 @@
 
 <div class="page-container with-fixed-navbar">
     <div class="activity-header">
+        <div class="category-icon-container" @onclick="ToggleCategorySelector">
+            <div class="category-icon" title="@_currentActivity.Category">
+                <i class="fa @GetCategoryIcon(_currentActivity.Category)" aria-hidden="true"></i>
+            </div>
+        </div>
         <h3 class="activity-title">
             @if (_isEditingName)
             {
@@ -23,7 +28,7 @@
                        @onblur="() => _isEditingName = false"
                        @onfocus="async () => await SelectAllText(inputElement)"
                        @ref="inputElement"
-                placeholder="Enter activity name..." />
+                       placeholder="Enter activity name..." />
             }
             else
             {
@@ -36,7 +41,6 @@
                     <i class="edit-icon fa fa-pencil" aria-hidden="true"></i>
                 </span>
             }
-
         </h3>
         <div class="activity-actions">
             <button class="icon-btn danger" title="Delete" @onclick="PromptDeleteActivity">
@@ -52,15 +56,19 @@
     </div>
 
     <main class="content-area">
-        <div class="category-input-container">
-            <label for="category-select">Category:</label>
-            <select id="category-select" @bind="_currentActivity.Category" class="category-select">
+        @if (_showCategorySelector)
+        {
+            <div class="category-selector">
                 @foreach (var category in Enum.GetValues<PackingCategory>())
                 {
-                    <option value="@category">@category</option>
+                    <div class="category-option @(_currentActivity.Category == category ? "selected" : "")" 
+                         @onclick="() => SelectCategory(category)">
+                        <i class="fa @GetCategoryIcon(category)" aria-hidden="true"></i>
+                        <span>@category</span>
+                    </div>
                 }
-            </select>
-        </div>
+            </div>
+        }
 
         @if (_isLoading)
         {
@@ -74,25 +82,48 @@
             @if (_isAddingItem)
             {
                 <div class="add-item-form">
-                    <input class="item-name-input" 
-                           placeholder="Enter item name..." 
-                           @bind="_newName" 
-                           @bind:event="oninput"
-                           @keyup="@HandleKeyUp" />
+                    <div class="form-header">
+                        <h4>Add New Item</h4>
+                    </div>
                     
-                    <div class="category-dropdown">
-                        <select @bind="_newCategory">
-                            @foreach (var category in _categoryOrder)
-                            {
-                                <option value="@category">@category</option>
-                            }
-                            <option value="New">+ New Category</option>
-                        </select>
+                    <div class="form-body">
+                        <div class="input-group">
+                            <input class="item-name-input" 
+                                   placeholder="Enter item name..." 
+                                   @bind="_newName" 
+                                   @bind:event="oninput"
+                                   @keyup="@HandleKeyUp" 
+                                   @ref="newItemInput" />
+                        </div>
+                        
+                        <div class="category-selector-container">
+                            <label>Select Category:</label>
+                            <div class="category-icons">
+                                @foreach (var category in Enum.GetValues<PackingCategory>())
+                                {
+                                    <div class="category-icon-option @(_newCategory == category.ToString() ? "selected" : "")" 
+                                         @onclick="() => _newCategory = category.ToString()"
+                                         title="@category">
+                                        <i class="fa @GetCategoryIcon(category)" aria-hidden="true"></i>
+                                        <span class="category-label">@category</span>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                        
+                        <div class="notes-input">
+                            <label>Notes (optional):</label>
+                            <textarea placeholder="Add notes about this item..." 
+                                      rows="2"
+                                      @bind="_newNotes"></textarea>
+                        </div>
                     </div>
                     
                     <div class="add-form-actions">
                         <button class="btn cancel" @onclick="CancelAdd">Cancel</button>
-                        <button class="btn primary" @onclick="ConfirmAddAsync">Add</button>
+                        <button class="btn primary" @onclick="ConfirmAddAsync">
+                            <i class="fa fa-plus-circle"></i> Add Item
+                        </button>
                     </div>
                 </div>
             }
@@ -228,6 +259,174 @@
     <div class="@($"toast {(_showToast ? "show" : "")}")">@_toastMessage</div>
 </div>
 
+<style>
+    .category-icon-container {
+        display: flex;
+        align-items: center;
+        margin-right: 10px;
+        cursor: pointer;
+    }
+
+    .category-icon {
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 6px;
+        background-color: var(--color-primary-light, #e6f7ff);
+        color: var(--color-primary, #0078d4);
+        transition: all 0.2s ease;
+    }
+
+    .category-icon:hover {
+        background-color: var(--color-primary, #0078d4);
+        color: white;
+    }
+
+    .category-icon i {
+        font-size: 18px;
+    }
+
+    .category-selector {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 10px;
+        margin-bottom: 20px;
+        padding: 10px;
+        background-color: var(--color-background-light, #f5f5f5);
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .category-option {
+        display: flex;
+        align-items: center;
+        padding: 8px;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .category-option i {
+        margin-right: 8px;
+        font-size: 16px;
+    }
+
+    .category-option:hover {
+        background-color: var(--color-background, #e8e8e8);
+    }
+
+    .category-option.selected {
+        background-color: var(--color-primary-light, #e6f7ff);
+        color: var(--color-primary, #0078d4);
+    }
+
+    .add-item-form {
+        border: 1px solid #0078d4;
+        border-radius: 8px;
+        background-color: #fff;
+        padding: 16px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .form-header {
+        margin-bottom: 12px;
+    }
+
+    .form-header h4 {
+        margin: 0;
+        font-size: 18px;
+        color: #0078d4;
+    }
+
+    .form-body {
+        margin-bottom: 12px;
+    }
+
+    .input-group {
+        margin-bottom: 12px;
+    }
+
+    .input-group input {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 16px;
+    }
+
+    .category-selector-container {
+        margin-bottom: 12px;
+    }
+
+    .category-label {
+        margin-left: 8px;
+        font-size: 14px;
+        color: #333;
+    }
+
+    .notes-input {
+        margin-bottom: 12px;
+    }
+
+    .notes-input label {
+        margin-bottom: 4px;
+        font-size: 14px;
+        color: #333;
+    }
+
+    .notes-input textarea {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 16px;
+        resize: vertical;
+    }
+
+    .add-form-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+    }
+
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px 16px;
+        border: none;
+        border-radius: 4px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+    }
+
+    .btn.primary {
+        background-color: #0078d4;
+        color: white;
+    }
+
+    .btn.primary:hover {
+        background-color: #005999;
+    }
+
+    .btn.cancel {
+        background-color: #f0f0f0;
+        color: #333;
+    }
+
+    .btn.cancel:hover {
+        background-color: #e0e0e0;
+    }
+
+    .fa-plus-circle {
+        margin-right: 4px;
+    }
+</style>
+
 @code {
     private bool _isAddingItem = false;
 
@@ -249,6 +448,7 @@
 
     private bool _isEditingName = false;
     private ElementReference inputElement;
+    private ElementReference newItemInput;
 
     private async ValueTask SelectAllText(ElementReference inputElement)
     {
@@ -276,6 +476,7 @@
     private PackingItemView? _dragOverItem;
 
     private bool _processedPackingIdPresent;
+    private bool _showCategorySelector = false;
 
     protected override async Task OnParametersSetAsync()
     {
@@ -706,10 +907,50 @@
 
     private void HandleKeyUp(KeyboardEventArgs e)
     {
-        if (e.Key == "Enter")
+        if(e.Key == "Enter")
         {
             _ = ConfirmAddAsync();
         }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (_isAddingItem)
+        {
+            await JSRuntime.InvokeVoidAsync("focusElement", newItemInput);
+        }
+
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+    private void ToggleCategorySelector()
+    {
+        _showCategorySelector = !_showCategorySelector;
+    }
+
+    private void SelectCategory(PackingCategory category)
+    {
+        _currentActivity.Category = category;
+        _showCategorySelector = false;
+    }
+
+    private string GetCategoryIcon(PackingCategory category)
+    {
+        return category switch
+        {
+            PackingCategory.Clothing => "fa-tshirt",
+            PackingCategory.Shoes => "fa-shoe-prints",
+            PackingCategory.Toiletries => "fa-toothbrush",
+            PackingCategory.Electronics => "fa-laptop",
+            PackingCategory.Documents => "fa-passport",
+            PackingCategory.Health => "fa-medkit",
+            PackingCategory.Accessories => "fa-glasses",
+            PackingCategory.Outdoor => "fa-hiking",
+            PackingCategory.Food => "fa-utensils",
+            PackingCategory.Entertainment => "fa-gamepad",
+            PackingCategory.Miscellaneous => "fa-box",
+            _ => "fa-box"
+        };
     }
 
     public void Dispose()

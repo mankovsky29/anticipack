@@ -92,7 +92,47 @@
 
 .activity-actions {
     display: flex;
-    gap: var(--space-sm);
+    gap: 8px;
+    align-items: center;
+}
+
+.activity-actions .icon-btn,
+.activity-actions .add-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+    padding: 0;
+    background: rgba(255, 255, 255, 0.2);
+    transition: background-color 0.2s;
+}
+
+.activity-actions .icon-btn:hover,
+.activity-actions .add-btn:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+}
+
+.activity-actions .add-btn {
+    background-color: rgba(255, 255, 255, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.activity-actions .icon-btn.danger:hover {
+    background-color: rgba(255, 0, 0, 0.2);
+}
+
+/* Override existing button styles to ensure consistency */
+.add-btn {
+    border-radius: 4px; /* Square with rounded corners instead of circle */
+}
+
+.icon-btn {
+    border-radius: 4px; /* Square with rounded corners instead of circle */
 }
 
 /* Icon button styling (consistent with PackingActivities) */

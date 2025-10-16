@@ -23,10 +23,14 @@
                        @onblur="() => _isEditingName = false"
                        @onfocus="async () => await SelectAllText(inputElement)"
                        @ref="inputElement"
-                       placeholder="Enter activity name..." />
+                placeholder="Enter activity name..." />
             }
             else
             {
+                @if (string.IsNullOrWhiteSpace(_currentActivity.Name))
+                {
+                    _isEditingName = true;
+                }
                 <span class="packing-name-display" @onclick="() => _isEditingName = true">
                     @_currentActivity.Name
                     <i class="edit-icon fa fa-pencil" aria-hidden="true"></i>
@@ -295,7 +299,7 @@
             foreach (var cat in _categoryOrder)
                 _manualOverride[cat] = null;
 
-            ShowToast($"Loaded {Items.Count} items for packing {ShortId(id)}");
+            ShowToast($"Loaded {Items.Count} items");
         }
         catch
         {

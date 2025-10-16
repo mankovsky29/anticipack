@@ -303,3 +303,9 @@
     opacity: 1;
     transform: translateY(0);
 }
+
+.add-activity-container {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 20px;
+}

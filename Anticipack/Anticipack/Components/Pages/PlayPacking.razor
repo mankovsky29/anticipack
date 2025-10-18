@@ -75,16 +75,17 @@
                         {
                             <li class="packing-row">
                                 <div class="item-main">
-                                    <input class="item-checkbox" type="checkbox" checked="@item.IsChecked"
-                                           @onchange="@((ChangeEventArgs e) => SetItemChecked(item, Convert.ToBoolean(e.Value)))" />
-
-                                    <span class="@($"item-text {(item.IsChecked ? "checked" : "")}")"
-                                          role="button"
-                                          @onclick="@(() => ToggleItemChecked(item))">
+                                    <div class="round-checkbox">
+                                        <input id="@($"checkbox-{item.Item.Id}")" class="item-checkbox" type="checkbox" 
+                                               checked="@item.IsChecked"
+                                               @onchange="@((ChangeEventArgs e) => SetItemChecked(item, Convert.ToBoolean(e.Value)))" />
+                                        <label for="@($"checkbox-{item.Item.Id}")"></label>
+                                    </div>
+                                    <span class="@($"item-text {(item.IsChecked ? "checked" : "")}")">
                                         @item.Item.Name
                                     </span>
                                 </div>
-
+                                
                                 @if (!string.IsNullOrWhiteSpace(item.Item.Notes))
                                 {
                                     <div class="notes">@item.Item.Notes</div>

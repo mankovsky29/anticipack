@@ -941,3 +941,13 @@ ul.category-content {
 .content-area {
     padding-bottom: 72px;
 }
+
+/* Add this rule to make trash icons blue */
+.icon-btn .fa-trash {
+    color: #4285f4; /* Google-style blue color */
+}
+
+/* Optional - you might want to adjust the hover state too */
+.icon-btn:hover .fa-trash {
+    color: #3367d6; /* Slightly darker blue on hover */
+}

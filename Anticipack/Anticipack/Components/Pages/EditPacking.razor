@@ -1,0 +1,866 @@
+﻿@page "/edit-packing/{id}"
+@using Anticipack.Packing
+@using Anticipack.Storage
+@using System.Threading
+@using Microsoft.AspNetCore.Components.Web
+@using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components.Routing
+@using Microsoft.JSInterop
+@inject NavigationManager Navigation
+@inject IPackingRepository PackingRepository
+@inject IJSRuntime JSRuntime
+@implements IDisposable
+
+<NavigationLock OnBeforeInternalNavigation="OnBeforeInternalNavigation" />
+
+<div class="page-container with-fixed-navbar">
+    <div class="activity-header">
+        <div class="header-left-section">
+            <div class="category-icon-container" @onclick="ToggleCategorySelector">
+                <div class="category-icon" title="@_currentActivity.Category">
+                    <i class="fa @GetCategoryIcon(_currentActivity.Category)" aria-hidden="true"></i>
+                </div>
+            </div>
+            <h3 class="activity-title">
+                @if (_isEditingName)
+                {
+                    <input type="text" @bind="_currentActivity.Name" @bind:event="oninput"
+                           class="activity-name-input"
+                           @onblur="() => _isEditingName = false"
+                           @onfocus="async () => await SelectAllText(inputElement)"
+                           @ref="inputElement"
+                           placeholder="Enter activity name..." />
+                }
+                else
+                {
+                    @if (string.IsNullOrWhiteSpace(_currentActivity.Name))
+                    {
+                        _isEditingName = true;
+                    }
+                    <span class="packing-name-display" @onclick="() => _isEditingName = true">
+                        @_currentActivity.Name
+                        <i class="edit-icon fa fa-pencil" aria-hidden="true"></i>
+                    </span>
+                }
+            </h3>
+        </div>
+        <div class="activity-actions">
+            <button class="icon-btn danger" title="Delete" @onclick="PromptDeleteActivity">
+                <i class="fa fa-trash"></i>
+            </button>
+            <button class="icon-btn" title="Copy" @onclick="CopyPacking">
+                <i class="fa fa-copy"></i>
+            </button>
+            <button class="icon-btn" title="Start Packing" @onclick="SwitchToPackingMode">
+                <i class="fa fa-play"></i>
+            </button>
+            <button class="add-btn" @onclick="ShowAddItemForm" title="Add Item">
+                <i class="fa fa-plus"></i>
+            </button>
+        </div>
+    </div>
+
+    <main class="content-area">
+        @if (_showCategorySelector)
+        {
+            <div class="category-selector">
+                @foreach (var category in Enum.GetValues<PackingCategory>())
+                {
+                    <div class="category-option @(_currentActivity.Category == category ? "selected" : "")" 
+                         @onclick="() => SelectCategory(category)">
+                        <i class="fa @GetCategoryIcon(category)" aria-hidden="true"></i>
+                        <span>@category</span>
+                    </div>
+                }
+            </div>
+        }
+
+        @if (_isLoading)
+        {
+            <div class="loading">
+                <div class="loading-spinner"></div>
+                <span>Loading packing…</span>
+            </div>
+        }
+
+        <div class="packing-list">
+            @if (_isAddingItem)
+            {
+                <div class="add-item-form">
+                    <div class="form-header">
+                        <h4>Add New Item</h4>
+                    </div>
+                    
+                    <div class="form-body">
+                        <div class="input-group">
+                            <input class="item-name-input" 
+                                   placeholder="Enter item name..." 
+                                   @bind="_newName" 
+                                   @bind:event="oninput"
+                                   @keyup="@HandleKeyUp" 
+                                   @ref="newItemInput" />
+                        </div>
+                        
+                        <div class="category-selector-container">
+                            <label>Select Category:</label>
+                            <div class="category-icons">
+                                @foreach (var category in Enum.GetValues<PackingCategory>())
+                                {
+                                    <div class="category-icon-option @(_newCategory == category.ToString() ? "selected" : "")" 
+                                         @onclick="() => _newCategory = category.ToString()"
+                                         title="@category">
+                                        <i class="fa @GetCategoryIcon(category)" aria-hidden="true"></i>
+                                        <span class="category-label">@category</span>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                        
+                        <div class="notes-input">
+                            <label>Notes (optional):</label>
+                            <textarea placeholder="Add notes about this item..." 
+                                      rows="2"
+                                      @bind="_newNotes"></textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="add-form-actions">
+                        <button class="btn cancel" @onclick="CancelAdd">Cancel</button>
+                        <button class="btn primary" @onclick="ConfirmAddAsync">
+                            <i class="fa fa-plus-circle"></i> Add Item
+                        </button>
+                    </div>
+                </div>
+            }
+
+            @foreach (var category in _categoryOrder)
+            {
+                var groupItems = Items.Where(i => string.Equals(i.Item.Category, category, StringComparison.OrdinalIgnoreCase)).ToList();
+                if (!groupItems.Any())
+                    continue;
+
+                var allChecked = IsAllChecked(category);
+                var collapsed = IsCollapsed(category);
+                var categoryId = $"cat-{category}";
+
+                <section class="category @(allChecked ? "category-completed" : "")" aria-labelledby="@categoryId">
+                    <div class="category-header" role="button" @onclick="() => ToggleCategory(category)" aria-expanded="@(!collapsed)">
+                        <span class="chev @(collapsed ? "collapsed" : "")" aria-hidden="true">▾</span>
+                        <h4 id="@categoryId" class="category-title @(allChecked ? "checked" : "")">@category</h4>
+                        <span class="count">(@groupItems.Count)</span>
+                    </div>
+
+                    <ul class="category-content @(collapsed ? "hidden" : "")">
+                        @foreach (var item in groupItems)
+                        {
+                            <li draggable="true"
+                                class="@GetPackingRowClass(item)"
+                                @ondragstart="@((DragEventArgs e) => OnDragStart(e, item))"
+                                @ondragover:preventDefault
+                                @ondragover="@((DragEventArgs e) => OnDragOver(e, item))"
+                                @ondragenter:preventDefault
+                                @ondragenter="@((DragEventArgs e) => OnDragEnter(e, item))"
+                                @ondragleave="@((DragEventArgs e) => OnDragLeave(e, item))"
+                                @ondrop:preventDefault
+                                @ondrop="@((DragEventArgs e) => OnDrop(e, item))">
+                                <div class="item-main" @onclick:stopPropagation>
+                                    @if (_editingItem == item)
+                                    {
+                                        <input type="text" 
+                                               value="@item.Item.Name" 
+                                               @oninput="@((e) => UpdateItemName(item, e.Value?.ToString()))"
+                                               @onblur="() => SaveItemChanges(item)"
+                                               @onfocus="@(e => SelectAllInputText(e))"
+                                               @ref="itemEditInputElement"
+                                               class="edit-item-input"
+                                               @onclick:stopPropagation />
+                                    }
+                                    else
+                                    {
+                                        <span class="item-text"
+                                              role="button"
+                                              @onclick="() => StartEditingItem(item)"
+                                              @onclick:stopPropagation>
+                                            @item.Item.Name
+                                        </span>
+                                    }
+                                </div>
+
+                                @if (_editingItem == item)
+                                {
+                                    <div class="edit-notes">
+                                        <textarea placeholder="Add notes about this item..." 
+                                                  @bind="item.Item.Notes"
+                                                  @bind:event="oninput"
+                                                  @onblur="() => SaveItemChanges(item)"
+                                                  rows="2"
+                                                  class="edit-notes-textarea"></textarea>
+                                    </div>
+                                }
+                                else if (!string.IsNullOrWhiteSpace(item.Item.Notes))
+                                {
+                                    <div class="notes" 
+                                         @onclick="() => StartEditingItem(item)"
+                                         @onclick:stopPropagation>@item.Item.Notes</div>
+                                }
+
+                                <button class="icon-btn danger item-delete-btn" title="Delete item" @onclick:stopPropagation @onclick="@(() => PromptDelete(item))">
+                                    <i class="fa fa-trash"></i>
+                                </button>
+                            </li>
+                        }
+                    </ul>
+                </section>
+            }
+        </div>
+    </main>
+</div>
+
+@if (_showDialog)
+{
+    <div class="modal-overlay" @onclick="CloseAddDialog">
+        <div class="modal-content" @onclick:stopPropagation>
+            <h4 class="modal-header">Add Packing Item</h4>
+
+            <div class="form-row">
+                <label for="name">Name</label>
+                <input id="name" @bind="_newName" />
+            </div>
+
+            <div class="form-row">
+                <label for="category">Category</label>
+                <input id="category" list="categories" @bind="_newCategory" />
+                <datalist id="categories">
+                    @foreach (var c in _categoryOrder)
+                    {
+                        <option value="@c" />
+                    }
+                </datalist>
+            </div>
+
+            <div class="form-row">
+                <label for="notes">Notes</label>
+                <textarea id="notes" rows="4" @bind="_newNotes"></textarea>
+            </div>
+
+            <div class="form-actions">
+                <button class="btn cancel" @onclick="CancelAdd">Cancel</button>
+                <button class="btn primary" @onclick="ConfirmAddAsync">Add Item</button>
+            </div>
+        </div>
+    </div>
+}
+
+@if (_showDeleteConfirm)
+{
+    <div class="modal-overlay" @onclick="CancelDelete">
+        <div class="modal-content" @onclick:stopPropagation>
+            <h4 class="modal-header">Delete Activity?</h4>
+            <p>Are you sure you want to delete this packing activity?</p>
+            <p>This action cannot be undone.</p>
+
+            <div class="form-actions">
+                <button class="btn cancel" @onclick="CancelDelete">Cancel</button>
+                <button class="btn danger" @onclick="ConfirmDeleteActivityAsync">Delete</button>
+            </div>
+        </div>
+    </div>
+}
+
+@if (_showItemDeleteConfirm)
+{
+    <div class="modal-overlay" @onclick="CancelDelete">
+        <div class="modal-content" @onclick:stopPropagation>
+            <h4 class="modal-header">Delete Item?</h4>
+            <p>Are you sure you want to delete "@_pendingDeleteItem?.Item.Name"?</p>
+            <p>This action cannot be undone.</p>
+
+            <div class="form-actions">
+                <button class="btn cancel" @onclick="CancelDelete">Cancel</button>
+                <button class="btn danger" @onclick="ConfirmDeleteAsync">Delete</button>
+            </div>
+        </div>
+    </div>
+}
+
+<div class="toast-container" aria-live="polite" aria-atomic="true">
+    <div class="@($"toast {(_showToast ? "show" : "")}")">@_toastMessage</div>
+</div>
+
+@code {
+    [Parameter]
+    public string Id { get; set; } = string.Empty;
+
+    private bool _isAddingItem = false;
+    private bool _isLoading;
+    private Storage.PackingActivity _currentActivity = new Storage.PackingActivity();
+
+    private sealed class PackingItemView
+    {
+        public PackingItemView(Storage.PackingItem item) => Item = item;
+        public Storage.PackingItem Item { get; }
+        public bool IsChecked { get; set; }
+    }
+
+    private bool _isEditingName = false;
+    private ElementReference inputElement;
+    private ElementReference newItemInput;
+    private PackingItemView? _editingItem = null;
+    private ElementReference itemEditInputElement;
+
+    private async ValueTask SelectAllText(ElementReference inputElement)
+    {
+        await JSRuntime.InvokeVoidAsync("selectAllText", inputElement);
+    } 
+
+    private List<PackingItemView> Items { get; set; } = new();
+    private List<string> _categoryOrder = new();
+    private readonly Dictionary<string, bool?> _manualOverride = new(StringComparer.OrdinalIgnoreCase);
+
+    private bool _showDialog;
+    private string _newName = string.Empty;
+    private string _newCategory = string.Empty;
+    private string _newNotes = string.Empty;
+
+    private bool _showDeleteConfirm;
+    private bool _showItemDeleteConfirm;
+    private PackingItemView? _pendingDeleteItem;
+
+    private bool _showToast;
+    private string _toastMessage = string.Empty;
+    private CancellationTokenSource? _toastCts;
+
+    private PackingItemView? _draggedItem;
+    private PackingItemView? _dragOverItem;
+
+    private bool _showCategorySelector = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!string.IsNullOrEmpty(Id))
+        {
+            await LoadItemsForPackingAsync(Id);
+        }
+        else
+        {
+            InitializeDefaultItems();
+        }
+
+        await base.OnInitializedAsync();
+    }
+
+    private void InitializeDefaultItems()
+    {
+        _currentActivity = new Storage.PackingActivity { Name = "New Packing Activity" };
+        
+        Items = new List<PackingItemView>
+        {
+            new(new Storage.PackingItem { Name = "Шорты", Category = PackingCategory.Clothing.ToString(), Notes = "" }),
+            new(new Storage.PackingItem { Name = "Майка", Category = PackingCategory.Clothing.ToString(), Notes = "" }),
+            new(new Storage.PackingItem { Name = "Трусы", Category = PackingCategory.Clothing.ToString(), Notes = "" }),
+            new(new Storage.PackingItem { Name = "Носки", Category = PackingCategory.Clothing.ToString(), Notes = "" }),
+            new(new Storage.PackingItem { Name = "Полотенце", Category = PackingCategory.Toiletries.ToString(), Notes = "" }),
+            new(new Storage.PackingItem { Name = "Кроссовки", Category = PackingCategory.Shoes.ToString(), Notes = "" }),
+            new(new Storage.PackingItem { Name = "Шлёпки", Category = PackingCategory.Shoes.ToString(), Notes = "" }),
+            new(new Storage.PackingItem { Name = "Шампунь", Category = PackingCategory.Toiletries.ToString(), Notes = "" }),
+            new(new Storage.PackingItem { Name = "Шейкер", Category = PackingCategory.Food.ToString(), Notes = "" }),
+            new(new Storage.PackingItem { Name = "Замок", Category = PackingCategory.Electronics.ToString(), Notes = "" }),
+            new(new Storage.PackingItem { Name = "Пакеты в магаз", Category = PackingCategory.Miscellaneous.ToString(), Notes = "" }),
+        };
+
+        _categoryOrder = Items.Select(i => i.Item.Category).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
+        foreach (var cat in _categoryOrder)
+            _manualOverride[cat] = null;
+    }
+
+    private async Task LoadItemsForPackingAsync(string id)
+    {
+        _isLoading = true;
+        StateHasChanged();
+
+        try
+        {
+            _currentActivity = await PackingRepository.GetByIdAsync(id) ?? new Storage.PackingActivity(){ Name = "New Packing Activity" };
+            var itemsFromRepo = await PackingRepository.GetItemsForActivityAsync(id);
+            Items = itemsFromRepo.Select(pi => new PackingItemView(pi)).ToList();
+            _categoryOrder = Items.Select(i => i.Item.Category).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
+
+            if (!_categoryOrder.Any())
+            {
+                _categoryOrder.Add(PackingCategory.Miscellaneous.ToString());
+            }
+
+            _manualOverride.Clear();
+            foreach (var cat in _categoryOrder)
+                _manualOverride[cat] = null;
+
+            ShowToast($"Loaded {Items.Count} items");
+        }
+        catch
+        {
+            ShowToast("Failed to load items");
+        }
+        finally
+        {
+            _isLoading = false;
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private void ToggleCategory(string category)
+    {
+        var currentlyCollapsed = IsCollapsed(category);
+        _manualOverride[category] = !currentlyCollapsed;
+    }
+
+    private void SetItemChecked(PackingItemView item, bool isChecked)
+    {
+        item.IsChecked = isChecked;
+        UpdateCategoryStateAfterItemChange(item.Item.Category);
+    }
+
+    private void UpdateCategoryStateAfterItemChange(string category)
+    {
+        var allChecked = IsAllChecked(category);
+
+        if (allChecked)
+            _manualOverride[category] = null;
+        else
+            _manualOverride[category] = false;
+
+        StateHasChanged();
+    }
+
+    private bool IsAllChecked(string category)
+    {
+        var group = Items.Where(i => string.Equals(i.Item.Category, category, StringComparison.OrdinalIgnoreCase));
+        return group.Any() && group.All(i => i.IsChecked);
+    }
+
+    private bool IsCollapsed(string category)
+    {
+        if (_manualOverride.TryGetValue(category, out var manual) && manual.HasValue)
+            return manual.Value;
+
+        return IsAllChecked(category);
+    }
+
+    private void ShowAddItemForm()
+    {
+        _isAddingItem = true;
+        if (_categoryOrder.Any())
+        {
+            _newCategory = _categoryOrder.First();
+        }
+        else
+        {
+            _newCategory = PackingCategory.Miscellaneous.ToString();
+        }
+    }
+
+    private void OpenAddDialog()
+    {
+        _newName = string.Empty;
+        _newCategory = string.Empty;
+        _newNotes = string.Empty;
+        _showDialog = true;
+    }
+
+    private void CloseAddDialog() => _showDialog = false;
+
+    private void CancelAdd()
+    {
+        _isAddingItem = false;
+        CloseAddDialog();
+    }
+
+    private async Task ConfirmAddAsync()
+    {
+        var name = (_newName ?? string.Empty).Trim();
+        var category = string.IsNullOrWhiteSpace(_newCategory) ? "Uncategorized" : _newCategory.Trim();
+        
+        // Handle the "New" category option
+        if (category == "New")
+        {
+            // Here you could open a dialog to enter a new category name
+            // For simplicity, we'll use Miscellaneous
+            category = PackingCategory.Miscellaneous.ToString();
+        }
+        
+        var notes = _newNotes ?? string.Empty;
+
+        if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(Id))
+            return;
+
+        var newItem = new Storage.PackingItem { Name = name, Category = category, Notes = notes, ActivityId = Id };
+
+        try {
+            await PackingRepository.AddItemToActivityAsync(Id, newItem);
+            await LoadItemsForPackingAsync(Id);
+            _manualOverride[category] = false;
+        }
+        catch (Exception ex) {
+            ShowToast($"Error adding item: {ex.Message}");
+        }
+
+        _isAddingItem = false;
+        _newName = string.Empty;
+        CloseAddDialog();
+        StateHasChanged();
+    }
+
+    private void PromptDelete(PackingItemView item)
+    {
+        _pendingDeleteItem = item;
+        _showItemDeleteConfirm = true;
+    }
+
+    private void CancelDelete()
+    {
+        _pendingDeleteItem = null;
+        _showDeleteConfirm = false;
+        _showItemDeleteConfirm = false;
+    }
+
+    private async Task ConfirmDeleteAsync()
+    {
+        if (_pendingDeleteItem is null || string.IsNullOrWhiteSpace(Id))
+            return;
+
+        var toRemove = _pendingDeleteItem;
+
+        try
+        {
+            await PackingRepository.DeleteItemAsync(toRemove.Item.Id);
+            await LoadItemsForPackingAsync(Id);
+            ShowToast($"Deleted \"{toRemove.Item.Name}\"");
+        }
+        catch (Exception ex)
+        {
+            ShowToast($"Failed to delete item: {ex.Message}");
+        }
+
+        _pendingDeleteItem = null;
+        _showItemDeleteConfirm = false;
+    }
+
+    private async Task CopyPacking()
+    {
+        if (string.IsNullOrWhiteSpace(Id))
+            return;
+
+        try
+        {
+            var newId = await PackingRepository.CopyPackingAsync(Id);
+            ShowToast("Packing activity copied successfully.");
+            // Optionally navigate to the new copy
+            Navigation.NavigateTo($"/edit-packing/{newId}");
+        }
+        catch (Exception ex)
+        {
+            ShowToast($"Failed to copy packing activity: {ex.Message}");
+        }
+    }
+
+    private void PromptDeleteActivity()
+    {
+        _showDeleteConfirm = true;
+    }
+
+    private async Task ConfirmDeleteActivityAsync()
+    {
+        if (string.IsNullOrWhiteSpace(Id))
+            return;
+
+        try
+        {
+            await PackingRepository.DeleteAsync(Id);
+            ShowToast("Packing activity deleted successfully.");
+            Navigation.NavigateTo("/packing-activities");
+        }
+        catch (Exception ex)
+        {
+            ShowToast($"Failed to delete packing activity: {ex.Message}");
+        }
+        finally
+        {
+            _showDeleteConfirm = false;
+        }
+    }
+
+    private void ShowToast(string message)
+    {
+        try
+        {
+            _toastCts?.Cancel();
+            _toastCts?.Dispose();
+        }
+        catch { }
+
+        _toastCts = new CancellationTokenSource();
+
+        _toastMessage = message;
+        _showToast = true;
+        StateHasChanged();
+
+        _ = HideToastAfterDelayAsync(_toastCts.Token);
+    }
+
+    private async Task HideToastAfterDelayAsync(CancellationToken token)
+    {
+        try
+        {
+            await Task.Delay(2000, token);
+            _showToast = false;
+            await InvokeAsync(StateHasChanged);
+        }
+        catch (OperationCanceledException)
+        {
+        }
+    }
+
+    // Drag & drop handlers
+    private void OnDragStart(DragEventArgs e, PackingItemView item)
+    {
+        _draggedItem = item;
+        _dragOverItem = null;
+        StateHasChanged();
+
+        try
+        {
+            if (e.DataTransfer is not null)
+            {
+                e.DataTransfer.DropEffect = "move";
+            }
+        }
+        catch
+        {
+        }
+    }
+
+    private void OnDragOver(DragEventArgs e, PackingItemView item)
+    {
+        try
+        {
+            if (e.DataTransfer is not null)
+                e.DataTransfer.DropEffect = "move";
+        }
+        catch { }
+    }
+
+    private void OnDragEnter(DragEventArgs e, PackingItemView item)
+    {
+        _dragOverItem = item;
+        StateHasChanged();
+    }
+
+    private void OnDragLeave(DragEventArgs e, PackingItemView item)
+    {
+        _dragOverItem = null;
+        StateHasChanged();
+    }
+
+    private string GetPackingRowClass(PackingItemView item)
+    {
+        var baseClass = "packing-row";
+        if (ReferenceEquals(item, _draggedItem))
+            return $"{baseClass} dragging";
+        if (ReferenceEquals(item, _dragOverItem))
+            return $"{baseClass} drag-over";
+        if (ReferenceEquals(item, _editingItem))
+            return $"{baseClass} editing";
+        return baseClass;
+    }
+
+    private void OnDrop(DragEventArgs e, PackingItemView target)
+    {
+        if (_draggedItem is null)
+            return;
+
+        var dragged = _draggedItem;
+        if (ReferenceEquals(dragged, target))
+        {
+            _draggedItem = null;
+            _dragOverItem = null;
+            return;
+        }
+
+        Items.Remove(dragged);
+
+        if (string.Equals(dragged.Item.Category, target.Item.Category, StringComparison.OrdinalIgnoreCase))
+        {
+            var targetIndex = Items.IndexOf(target);
+            if (targetIndex < 0)
+            {
+                Items.Add(dragged);
+            }
+            else
+            {
+                Items.Insert(targetIndex, dragged);
+            }
+        }
+        else
+        {
+            var oldCategory = dragged.Item.Category;
+            dragged.Item.Category = target.Item.Category;
+
+            var lastIndex = Items.FindLastIndex(i => string.Equals(i.Item.Category, target.Item.Category, StringComparison.OrdinalIgnoreCase));
+            if (lastIndex < 0)
+            {
+                Items.Add(dragged);
+            }
+            else
+            {
+                Items.Insert(lastIndex + 1, dragged);
+            }
+
+            if (!Items.Any(i => string.Equals(i.Item.Category, oldCategory, StringComparison.OrdinalIgnoreCase)))
+            {
+                _categoryOrder.RemoveAll(c => string.Equals(c, oldCategory, StringComparison.OrdinalIgnoreCase));
+                _manualOverride.Remove(oldCategory);
+            }
+
+            if (!_categoryOrder.Any(c => string.Equals(c, target.Item.Category, StringComparison.OrdinalIgnoreCase)))
+            {
+                _categoryOrder.Add(target.Item.Category);
+                _manualOverride[target.Item.Category] = null;
+            }
+        }
+
+        _manualOverride[target.Item.Category] = false;
+
+        _draggedItem = null;
+        _dragOverItem = null;
+
+        StateHasChanged();
+    }
+
+    // Save-before-navigation using NavigationLock
+    private bool _isSavingBeforeNav;
+
+    private async Task OnBeforeInternalNavigation(LocationChangingContext context)
+    {
+        if (_isSavingBeforeNav)
+            return;
+
+        if (string.IsNullOrWhiteSpace(Id))
+            return;
+
+        _isSavingBeforeNav = true;
+        try
+        {
+            context.PreventNavigation();
+            await PackingRepository.AddOrUpdateAsync(_currentActivity);
+            Navigation.NavigateTo(context.TargetLocation);
+        }
+        finally
+        {
+            _isSavingBeforeNav = false;
+        }
+    }
+
+    private void HandleKeyUp(KeyboardEventArgs e)
+    {
+        if(e.Key == "Enter")
+        {
+            _ = ConfirmAddAsync();
+        }
+    }
+
+    private void ToggleCategorySelector()
+    {
+        _showCategorySelector = !_showCategorySelector;
+    }
+
+    private void SelectCategory(PackingCategory category)
+    {
+        _currentActivity.Category = category;
+        _showCategorySelector = false;
+    }
+
+    private string GetCategoryIcon(PackingCategory category)
+    {
+        return category switch
+        {
+            PackingCategory.Clothing => "fa-tshirt",
+            PackingCategory.Shoes => "fa-shoe-prints",
+            PackingCategory.Toiletries => "fa-toothbrush",
+            PackingCategory.Electronics => "fa-laptop",
+            PackingCategory.Documents => "fa-passport",
+            PackingCategory.Health => "fa-medkit",
+            PackingCategory.Accessories => "fa-glasses",
+            PackingCategory.Outdoor => "fa-hiking",
+            PackingCategory.Food => "fa-utensils",
+            PackingCategory.Entertainment => "fa-gamepad",
+            PackingCategory.Miscellaneous => "fa-box",
+            _ => "fa-box"
+        };
+    }
+
+    private void StartEditingItem(PackingItemView item)
+    {
+        _editingItem = item;
+        StateHasChanged();
+    }
+    
+    private async Task SelectAllInputText(FocusEventArgs e)
+    {
+        if (itemEditInputElement.Id != null)
+        {
+            await JSRuntime.InvokeVoidAsync("selectAllText", itemEditInputElement);
+        }
+    }
+    
+    private void UpdateItemName(PackingItemView item, string? newName)
+    {
+        if (newName != null)
+        {
+            item.Item.Name = newName;
+        }
+    }
+    
+    private async Task SaveItemChanges(PackingItemView item)
+    {
+        if (string.IsNullOrWhiteSpace(Id))
+            return;
+            
+        try
+        {
+            // Validate item name isn't empty
+            if (string.IsNullOrWhiteSpace(item.Item.Name))
+            {
+                item.Item.Name = "Unnamed Item";
+            }
+            
+            await PackingRepository.AddOrUpdateItemAsync(item.Item);
+            ShowToast("Item updated");
+        }
+        catch (Exception ex)
+        {
+            ShowToast($"Failed to update item: {ex.Message}");
+        }
+        finally
+        {
+            _editingItem = null;
+            StateHasChanged();
+        }
+    }
+
+    private void SwitchToPackingMode()
+    {
+        if (!string.IsNullOrEmpty(Id))
+        {
+            Navigation.NavigateTo($"/play-packing/{Id}");
+        }
+    }
+
+    public void Dispose()
+    {
+        try
+        {
+            _toastCts?.Cancel();
+            _toastCts?.Dispose();
+        }
+        catch { }
+    }
+}

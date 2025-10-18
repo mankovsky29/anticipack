@@ -64,7 +64,7 @@ namespace Anticipack.Storage
             return _db.DeleteAsync(new PackingItem { Id = itemId });
         }
 
-        public async Task CopyPackingAsync(string packingId)
+        public async Task<string> CopyPackingAsync(string packingId)
         {
             var packingActivity = await _db.Table<PackingActivity>().Where(packing => packingId == packing.Id).FirstAsync();
 
@@ -97,6 +97,7 @@ namespace Anticipack.Storage
             }
 
             await _db.InsertAsync(newPackingActivity);
+            return newPackingActivity.Id.ToString();
         }
 
         public Task AddOrUpdateItemAsync(PackingItem item)

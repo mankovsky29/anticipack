@@ -1,0 +1,465 @@
+﻿@page "/play-packing/{id}"
+@using Anticipack.Packing
+@using Anticipack.Storage
+@using System.Threading
+@using Microsoft.AspNetCore.Components.Web
+@using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components.Routing
+@using Microsoft.JSInterop
+@inject NavigationManager Navigation
+@inject IPackingRepository PackingRepository
+@inject IJSRuntime JSRuntime
+@implements IDisposable
+
+<div class="page-container with-fixed-navbar">
+    <div class="activity-header">
+        <div class="header-left-section">
+            <div class="category-icon-container">
+                <div class="category-icon" title="@_currentActivity.Category">
+                    <i class="fa @GetCategoryIcon(_currentActivity.Category)" aria-hidden="true"></i>
+                </div>
+            </div>
+            <h3 class="activity-title">
+                @_currentActivity.Name
+            </h3>
+        </div>
+        <div class="activity-actions">
+            <button class="icon-btn" title="Edit Activity" @onclick="SwitchToEditMode">
+                <i class="fa fa-edit"></i>
+            </button>
+            <button class="icon-btn" @onclick="ToggleHistory" title="@(_showHistory ? "Hide History" : "Show History")">
+                <i class="fa @(_showHistory ? "fa-chevron-down" : "fa-history")"></i>
+            </button>
+        </div>
+    </div>
+
+    <div class="progress-container">
+        <div class="progress-bar">
+            <div class="progress-fill" style="width: @($"{GetCompletionPercentage()}%")"></div>
+        </div>
+        <div class="progress-stats">
+            <span>@Items.Count(i => i.IsChecked)/@Items.Count items packed</span>
+            <span class="time-remaining">@GetEstimatedTimeRemaining()</span>
+        </div>
+    </div>
+
+    <main class="content-area" @onkeydown="HandleKeyboardNavigation" tabindex="0" @ref="contentArea">
+        @if (_isLoading)
+        {
+            <div class="loading">
+                <div class="loading-spinner"></div>
+                <span>Loading packing…</span>
+            </div>
+        }
+        else
+        {
+            @foreach (var category in _categoryOrder)
+            {
+                var groupItems = Items.Where(i => string.Equals(i.Item.Category, category, StringComparison.OrdinalIgnoreCase)).ToList();
+                if (!groupItems.Any())
+                    continue;
+
+                var allChecked = IsAllChecked(category);
+                var collapsed = IsCollapsed(category);
+                var categoryId = $"cat-{category}";
+
+                <section class="category @(allChecked ? "category-completed" : "")" aria-labelledby="@categoryId">
+                    <div class="category-header" role="button" @onclick="() => ToggleCategory(category)" aria-expanded="@(!collapsed)">
+                        <span class="chev @(collapsed ? "collapsed" : "")" aria-hidden="true">▾</span>
+                        <h4 id="@categoryId" class="category-title @(allChecked ? "checked" : "")">@category</h4>
+                        <span class="count">(@groupItems.Count(i => i.IsChecked)/@groupItems.Count)</span>
+                    </div>
+
+                    <ul class="category-content @(collapsed ? "hidden" : "")">
+                        @foreach (var item in groupItems)
+                        {
+                            <li class="packing-row">
+                                <div class="item-main">
+                                    <input class="item-checkbox" type="checkbox" checked="@item.IsChecked"
+                                           @onchange="@((ChangeEventArgs e) => SetItemChecked(item, Convert.ToBoolean(e.Value)))" />
+
+                                    <span class="@($"item-text {(item.IsChecked ? "checked" : "")}")"
+                                          role="button"
+                                          @onclick="@(() => ToggleItemChecked(item))">
+                                        @item.Item.Name
+                                    </span>
+                                </div>
+
+                                @if (!string.IsNullOrWhiteSpace(item.Item.Notes))
+                                {
+                                    <div class="notes">@item.Item.Notes</div>
+                                }
+                            </li>
+                        }
+                    </ul>
+                </section>
+            }
+        }
+    </main>
+</div>
+
+<div class="history-panel @(_showHistory ? "expanded" : "")">
+    <div class="history-header" @onclick="ToggleHistory">
+        <h4>Packing History</h4>
+        <span class="chev @(_showHistory ? "" : "collapsed")">▾</span>
+    </div>
+    
+    @if (_showHistory)
+    {
+        <div class="history-content">
+            <div class="history-stats">
+                <div class="stat-card">
+                    <span class="stat-value">@_currentActivity.RunCount</span>
+                    <span class="stat-label">Times Packed</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-value">@(GetAveragePackingTime())</span>
+                    <span class="stat-label">Avg. Time</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-value">@(GetLastPackedDate())</span>
+                    <span class="stat-label">Last Packed</span>
+                </div>
+            </div>
+            
+            <div class="history-timeline">
+                <h5>Recent Activity</h5>
+                <ul class="timeline-list">
+                    @foreach (var entry in GetRecentPackingHistory())
+                    {
+                        <li class="timeline-item">
+                            <span class="timeline-date">@entry.Date.ToString("MMM d, HH:mm")</span>
+                            <span class="timeline-action">@entry.Action</span>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    }
+</div>
+
+@if (GetCompletionPercentage() == 100 && !_completionAcknowledged)
+{
+    <div class="modal-overlay celebration">
+        <div class="completion-modal">
+            <div class="confetti-container">
+                <!-- Confetti animation here -->
+            </div>
+            
+            <h3>Packing Complete!</h3>
+            <p>You packed @Items.Count items in @GetPackingDuration()</p>
+            
+            <div class="completion-stats">
+                <div class="stat">
+                    <span class="label">Efficiency</span>
+                    <span class="value">@GetPackingEfficiency()</span>
+                </div>
+                <div class="stat">
+                    <span class="label">Compared to Last Time</span>
+                    <span class="value @GetComparisonClass()">@GetComparisonText()</span>
+                </div>
+            </div>
+            
+            <button class="btn primary" @onclick="AcknowledgeCompletion">
+                Great!
+            </button>
+        </div>
+    </div>
+}
+
+<div class="toast-container" aria-live="polite" aria-atomic="true">
+    <div class="@($"toast {(_showToast ? "show" : "")}")">@_toastMessage</div>
+</div>
+
+@code {
+    [Parameter]
+    public string Id { get; set; } = string.Empty;
+
+    private bool _isLoading;
+    private DateTime _packingStartTime;
+    private bool _showHistory = false;
+    private bool _completionAcknowledged = false;
+
+    private Storage.PackingActivity _currentActivity = new Storage.PackingActivity();
+
+    private sealed class PackingItemView
+    {
+        public PackingItemView(Storage.PackingItem item) => Item = item;
+        public Storage.PackingItem Item { get; }
+        public bool IsChecked { get; set; }
+    }
+
+    private ElementReference contentArea;
+    private int _currentFocusIndex = -1;
+
+    private List<PackingItemView> Items { get; set; } = new();
+    private List<string> _categoryOrder = new();
+    private readonly Dictionary<string, bool?> _manualOverride = new(StringComparer.OrdinalIgnoreCase);
+
+    private bool _showToast;
+    private string _toastMessage = string.Empty;
+    private CancellationTokenSource? _toastCts;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _packingStartTime = DateTime.Now;
+        
+        if (!string.IsNullOrEmpty(Id))
+        {
+            await LoadItemsForPackingAsync(Id);
+        }
+        
+        await base.OnInitializedAsync();
+    }
+
+    private async Task LoadItemsForPackingAsync(string id)
+    {
+        _isLoading = true;
+        StateHasChanged();
+
+        try
+        {
+            _currentActivity = await PackingRepository.GetByIdAsync(id) ?? new Storage.PackingActivity(){ Name = "Packing Activity" };
+            var itemsFromRepo = await PackingRepository.GetItemsForActivityAsync(id);
+            Items = itemsFromRepo.Select(pi => new PackingItemView(pi)).ToList();
+            _categoryOrder = Items.Select(i => i.Item.Category).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
+
+            if (!_categoryOrder.Any())
+            {
+                _categoryOrder.Add(PackingCategory.Miscellaneous.ToString());
+            }
+
+            _manualOverride.Clear();
+            foreach (var cat in _categoryOrder)
+                _manualOverride[cat] = false; // Expand all categories in packing mode
+        }
+        catch
+        {
+            ShowToast("Failed to load items");
+        }
+        finally
+        {
+            _isLoading = false;
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private void ToggleCategory(string category)
+    {
+        var currentlyCollapsed = IsCollapsed(category);
+        _manualOverride[category] = !currentlyCollapsed;
+    }
+
+    private void SetItemChecked(PackingItemView item, bool isChecked)
+    {
+        item.IsChecked = isChecked;
+        UpdateCategoryStateAfterItemChange(item.Item.Category);
+        SaveCheckState(item);
+    }
+
+    private void ToggleItemChecked(PackingItemView item)
+    {
+        item.IsChecked = !item.IsChecked;
+        UpdateCategoryStateAfterItemChange(item.Item.Category);
+        SaveCheckState(item);
+    }
+
+    private async void SaveCheckState(PackingItemView item)
+    {
+        if (!string.IsNullOrEmpty(Id))
+        {
+            try
+            {
+                item.Item.IsPacked = item.IsChecked;
+                await PackingRepository.AddOrUpdateItemAsync(item.Item);
+            }
+            catch (Exception ex)
+            {
+                ShowToast($"Error saving item state: {ex.Message}");
+            }
+        }
+    }
+
+    private void UpdateCategoryStateAfterItemChange(string category)
+    {
+        var allChecked = IsAllChecked(category);
+
+        if (allChecked)
+            _manualOverride[category] = true; // Auto-collapse when all items checked
+        
+        StateHasChanged();
+        
+        if (GetCompletionPercentage() == 100 && !_completionAcknowledged)
+        {
+            StateHasChanged(); // Trigger completion modal
+        }
+    }
+
+    private bool IsAllChecked(string category)
+    {
+        var group = Items.Where(i => string.Equals(i.Item.Category, category, StringComparison.OrdinalIgnoreCase));
+        return group.Any() && group.All(i => i.IsChecked);
+    }
+
+    private bool IsCollapsed(string category)
+    {
+        if (_manualOverride.TryGetValue(category, out var manual) && manual.HasValue)
+            return manual.Value;
+
+        return IsAllChecked(category);
+    }
+
+    private string GetCategoryIcon(PackingCategory category)
+    {
+        return category switch
+        {
+            PackingCategory.Clothing => "fa-tshirt",
+            PackingCategory.Shoes => "fa-shoe-prints",
+            PackingCategory.Toiletries => "fa-toothbrush",
+            PackingCategory.Electronics => "fa-laptop",
+            PackingCategory.Documents => "fa-passport",
+            PackingCategory.Health => "fa-medkit",
+            PackingCategory.Accessories => "fa-glasses",
+            PackingCategory.Outdoor => "fa-hiking",
+            PackingCategory.Food => "fa-utensils",
+            PackingCategory.Entertainment => "fa-gamepad",
+            PackingCategory.Miscellaneous => "fa-box",
+            _ => "fa-box"
+        };
+    }
+
+    private void ShowToast(string message)
+    {
+        try
+        {
+            _toastCts?.Cancel();
+            _toastCts?.Dispose();
+        }
+        catch { }
+
+        _toastCts = new CancellationTokenSource();
+
+        _toastMessage = message;
+        _showToast = true;
+        StateHasChanged();
+
+        _ = HideToastAfterDelayAsync(_toastCts.Token);
+    }
+
+    private async Task HideToastAfterDelayAsync(CancellationToken token)
+    {
+        try
+        {
+            await Task.Delay(2000, token);
+            _showToast = false;
+            await InvokeAsync(StateHasChanged);
+        }
+        catch (OperationCanceledException)
+        {
+        }
+    }
+
+    private void HandleKeyboardNavigation(KeyboardEventArgs e)
+    {
+        var itemsList = Items.ToList();
+        
+        switch (e.Key)
+        {
+            case "ArrowDown":
+                _currentFocusIndex = Math.Min(_currentFocusIndex + 1, itemsList.Count - 1);
+                break;
+            case "ArrowUp":
+                _currentFocusIndex = Math.Max(_currentFocusIndex - 1, 0);
+                break;
+            case " ": // Space key
+                if (_currentFocusIndex >= 0 && _currentFocusIndex < itemsList.Count)
+                    ToggleItemChecked(itemsList[_currentFocusIndex]);
+                break;
+        }
+        
+        StateHasChanged();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        
+        if (firstRender)
+        {
+            await JSRuntime.InvokeVoidAsync("focusElement", contentArea);
+        }
+    }
+
+    private void ToggleHistory() => _showHistory = !_showHistory;
+
+    private int GetCompletionPercentage() => 
+        Items.Any() ? (int)(Items.Count(i => i.IsChecked) * 100.0 / Items.Count) : 0;
+        
+    private string GetEstimatedTimeRemaining()
+    {
+        var itemsLeft = Items.Count(i => !i.IsChecked);
+        // Estimate 30 seconds per remaining item
+        var minutesLeft = Math.Ceiling(itemsLeft * 0.5);
+        return minutesLeft > 0 ? $"~{minutesLeft} min remaining" : "Done!";
+    }
+
+    private string GetAveragePackingTime() => "15 min";
+
+    private string GetLastPackedDate() => _currentActivity.LastPacked.ToString("MMM d");
+
+    private class HistoryEntry
+    {
+        public DateTime Date { get; set; }
+        public string Action { get; set; }
+    }
+
+    // This would be replaced with actual history data from storage
+    private List<HistoryEntry> GetRecentPackingHistory() => new()
+    {
+        new HistoryEntry { Date = DateTime.Now.AddDays(-5), Action = "Packed 15 items in 12 minutes" },
+        new HistoryEntry { Date = DateTime.Now.AddDays(-12), Action = "Packed 18 items in 15 minutes" }
+    };
+
+    private string GetPackingDuration()
+    {
+        var duration = DateTime.Now - _packingStartTime;
+        return $"{(int)duration.TotalMinutes} minutes";
+    }
+
+    private string GetPackingEfficiency() => "95%"; // Placeholder
+    private string GetComparisonClass() => "better"; // Placeholder
+    private string GetComparisonText() => "2 minutes faster"; // Placeholder
+
+    private async Task AcknowledgeCompletion()
+    {
+        _completionAcknowledged = true;
+        // Record completion
+        _currentActivity.LastPacked = DateTime.Now;
+        _currentActivity.RunCount++;
+        
+        // Save to repository
+        if (!string.IsNullOrWhiteSpace(Id))
+        {
+            await PackingRepository.AddOrUpdateAsync(_currentActivity);
+            ShowToast("Packing completed and recorded!");
+        }
+    }
+
+    private void SwitchToEditMode()
+    {
+        if (!string.IsNullOrEmpty(Id))
+        {
+            Navigation.NavigateTo($"/edit-packing/{Id}");
+        }
+    }
+
+    public void Dispose()
+    {
+        try
+        {
+            _toastCts?.Cancel();
+            _toastCts?.Dispose();
+        }
+        catch { }
+    }
+}

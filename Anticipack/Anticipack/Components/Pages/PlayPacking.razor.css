@@ -722,3 +722,49 @@
     text-decoration: line-through;
     color: #888;
 }
+
+/* Add this to your PlayPacking.razor.css file */
+
+/* Toggle visibility button */
+.toggle-visibility-btn {
+    background-color: #4b89dc;
+    color: white;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.toggle-visibility-btn:hover {
+    background-color: #3a7bd5;
+}
+
+/* Icons for visibility states */
+.eye-open {
+    position: relative;
+    display: inline-block;
+}
+
+.eye-closed {
+    position: relative;
+    display: inline-block;
+}
+
+/* Hide checked items when in hidden mode */
+.hide-checked .packing-row.checked {
+    display: none;
+}
+
+/* Visual indicator for active filter */
+.toggle-visibility-btn.filtering {
+    background-color: #f0ad4e;
+}
+
+.toggle-visibility-btn.filtering:hover {
+    background-color: #ec971f;
+}

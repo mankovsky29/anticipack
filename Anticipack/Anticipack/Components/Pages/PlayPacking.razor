@@ -22,8 +22,11 @@
             <h3 class="activity-title">
                 @_currentActivity.Name
             </h3>
-        </div>
+        </div>  
         <div class="activity-actions">
+            <button class="toggle-visibility-btn @(_hideCheckedItems ? "filtering" : "")" title="@(_hideCheckedItems ? "Show All Items" : "Hide Checked Items")" @onclick="ToggleItemVisibility">
+                <i class="fa @(_hideCheckedItems ? "fa-eye-slash" : "fa-eye")"></i>
+            </button>
             <button class="icon-btn" title="Edit Activity" @onclick="SwitchToEditMode">
                 <i class="fa fa-edit"></i>
             </button>
@@ -43,7 +46,7 @@
         </div>
     </div>
 
-    <main class="content-area" @onkeydown="HandleKeyboardNavigation" tabindex="0" @ref="contentArea">
+    <main class="content-area @(_hideCheckedItems ? "hide-checked" : "")" @onkeydown="HandleKeyboardNavigation" tabindex="0" @ref="contentArea">
         @if (_isLoading)
         {
             <div class="loading">
@@ -73,6 +76,9 @@
                     <ul class="category-content @(collapsed ? "hidden" : "")">
                         @foreach (var item in groupItems)
                         {
+                            if (item.IsChecked && _hideCheckedItems)
+                                continue;
+
                             <li class="packing-row">
                                 <div class="item-main">
                                     <div class="round-checkbox">
@@ -172,6 +178,10 @@
     <div class="@($"toast {(_showToast ? "show" : "")}")">@_toastMessage</div>
 </div>
 
+<button class="btn toggle-visibility" @onclick="ToggleItemVisibility">
+    @(_hideCheckedItems ? "Show" : "Hide") Checked Items
+</button>
+
 @code {
     [Parameter]
     public string Id { get; set; } = string.Empty;
@@ -180,6 +190,7 @@
     private DateTime _packingStartTime;
     private bool _showHistory = false;
     private bool _completionAcknowledged = false;
+    private bool _hideCheckedItems = false;
 
     private Storage.PackingActivity _currentActivity = new Storage.PackingActivity();
 
@@ -463,4 +474,10 @@
         }
         catch { }
     }
+
+    private void ToggleItemVisibility()
+    {
+        _hideCheckedItems = !_hideCheckedItems;
+    }
+
 }

@@ -315,27 +315,27 @@
                class="quick-add-input" />
                
         <div class="quick-category-select">
-            <div class="custom-select" @onclick="ToggleQuickCategoryDropdown">
-                <div class="selected-option">
-                    <i class="fa @GetCategoryIcon(Enum.Parse<PackingCategory>(_quickAddCategory))" aria-hidden="true"></i>
-                    <span>@_quickAddCategory</span>
-                    <i class="fa fa-chevron-down dropdown-arrow @(_showQuickCategoryDropdown ? "open" : "")" aria-hidden="true"></i>
+            <button type="button" 
+                   class="category-btn" 
+                   title="@_quickAddCategory" 
+                   @onclick="ToggleQuickCategoryDropdown">
+                <i class="fa @GetCategoryIcon(Enum.Parse<PackingCategory>(_quickAddCategory))" aria-hidden="true"></i>
+            </button>
+            
+            @if (_showQuickCategoryDropdown)
+            {
+                <div class="options-dropdown @(_dropdownPosition == "up" ? "dropdown-up" : "dropdown-down")" @ref="dropdownElement">
+                    @foreach (var category in Enum.GetValues<PackingCategory>())
+                    {
+                        <div class="option @(category.ToString() == _quickAddCategory ? "selected" : "")" 
+                             @onclick:stopPropagation
+                             @onclick="() => SelectQuickCategory(category.ToString())">
+                            <i class="fa @GetCategoryIcon(category)" aria-hidden="true"></i>
+                            <span>@category</span>
+                        </div>
+                    }
                 </div>
-                @if (_showQuickCategoryDropdown)
-                {
-                    <div class="options-dropdown @(_dropdownPosition == "up" ? "dropdown-up" : "dropdown-down")" @ref="dropdownElement">
-                        @foreach (var category in Enum.GetValues<PackingCategory>())
-                        {
-                            <div class="option @(category.ToString() == _quickAddCategory ? "selected" : "")" 
-                                 @onclick:stopPropagation
-                                 @onclick="() => SelectQuickCategory(category.ToString())">
-                                <i class="fa @GetCategoryIcon(category)" aria-hidden="true"></i>
-                                <span>@category</span>
-                            </div>
-                        }
-                    </div>
-                }
-            </div>
+            }
         </div>
         
         <button class="quick-add-btn @(string.IsNullOrWhiteSpace(_quickAddName) ? "disabled" : "")" 

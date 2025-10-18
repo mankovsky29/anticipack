@@ -319,27 +319,29 @@
                 <div class="selected-option">
                     <i class="fa @GetCategoryIcon(Enum.Parse<PackingCategory>(_quickAddCategory))" aria-hidden="true"></i>
                     <span>@_quickAddCategory</span>
-                    <i class="fa fa-chevron-down dropdown-arrow" aria-hidden="true"></i>
+                    <i class="fa fa-chevron-down dropdown-arrow @(_showQuickCategoryDropdown ? "open" : "")" aria-hidden="true"></i>
                 </div>
                 @if (_showQuickCategoryDropdown)
                 {
-                    <!-- Replace the options-dropdown div with this updated version -->
-<div class="options-dropdown @(_dropdownPosition == "up" ? "dropdown-up" : "dropdown-down")" @ref="dropdownElement">
-    @foreach (var category in Enum.GetValues<PackingCategory>())
-    {
-        <div class="option @(category.ToString() == _quickAddCategory ? "selected" : "")" 
-             @onclick:stopPropagation
-             @onclick="() => SelectQuickCategory(category.ToString())">
-            <i class="fa @GetCategoryIcon(category)" aria-hidden="true"></i>
-            <span>@category</span>
-        </div>
-    }
-</div>
+                    <div class="options-dropdown @(_dropdownPosition == "up" ? "dropdown-up" : "dropdown-down")" @ref="dropdownElement">
+                        @foreach (var category in Enum.GetValues<PackingCategory>())
+                        {
+                            <div class="option @(category.ToString() == _quickAddCategory ? "selected" : "")" 
+                                 @onclick:stopPropagation
+                                 @onclick="() => SelectQuickCategory(category.ToString())">
+                                <i class="fa @GetCategoryIcon(category)" aria-hidden="true"></i>
+                                <span>@category</span>
+                            </div>
+                        }
+                    </div>
                 }
             </div>
         </div>
         
-        <button class="quick-add-btn" @onclick="QuickAddItem" title="Add Item">
+        <button class="quick-add-btn @(string.IsNullOrWhiteSpace(_quickAddName) ? "disabled" : "")" 
+                @onclick="QuickAddItem" 
+                disabled="@string.IsNullOrWhiteSpace(_quickAddName)"
+                title="@(string.IsNullOrWhiteSpace(_quickAddName) ? "Enter item name first" : "Add Item")">
             <i class="fa fa-plus"></i>
         </button>
     </div>

@@ -312,6 +312,30 @@
     <div class="@($"toast {(_showToast ? "show" : "")}")">@_toastMessage</div>
 </div>
 
+<div class="quick-add-container">
+    <div class="quick-add-form">
+        <input type="text" 
+               @bind="_quickAddName" 
+               @bind:event="oninput"
+               @onkeydown="@HandleQuickAddKeyDown"
+               placeholder="Type item name for quick add..." 
+               class="quick-add-input" />
+               
+        <div class="quick-category-select">
+            <select @bind="_quickAddCategory">
+                @foreach (var category in Enum.GetValues<PackingCategory>())
+                {
+                    <option value="@category.ToString()">@category</option>
+                }
+            </select>
+        </div>
+        
+        <button class="quick-add-btn" @onclick="QuickAddItem" title="Add Item">
+            <i class="fa fa-arrow-up"></i>
+        </button>
+    </div>
+</div>
+
 @code {
     [Parameter]
     public string Id { get; set; } = string.Empty;
@@ -359,6 +383,60 @@
     private PackingItemView? _dragOverItem;
 
     private bool _showCategorySelector = false;
+
+    private string _quickAddName = string.Empty;
+    private string _quickAddCategory = PackingCategory.Miscellaneous.ToString();
+
+    private async Task QuickAddItem()
+    {
+        var name = _quickAddName.Trim();
+        
+        if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(Id))
+            return;
+            
+        var newItem = new Storage.PackingItem 
+        { 
+            Name = name, 
+            Category = _quickAddCategory,
+            Notes = string.Empty,
+            ActivityId = Id 
+        };
+        
+        try
+        {
+            await PackingRepository.AddItemToActivityAsync(Id, newItem);
+            // Add to local collection without full reload for better performance
+            var newItemView = new PackingItemView(newItem);
+            Items.Add(newItemView);
+            
+            // Make sure category is in the list
+            if (!_categoryOrder.Contains(_quickAddCategory, StringComparer.OrdinalIgnoreCase))
+            {
+                _categoryOrder.Add(_quickAddCategory);
+                _manualOverride[_quickAddCategory] = false; // Expand by default
+            }
+            
+            // Clear input
+            _quickAddName = string.Empty;
+            
+            // Show toast
+            ShowToast($"Added {name}");
+            
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            ShowToast($"Error adding item: {ex.Message}");
+        }
+    }
+
+    private void HandleQuickAddKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            _ = QuickAddItem();
+        }
+    }
 
     protected override async Task OnInitializedAsync()
     {

@@ -874,3 +874,70 @@ ul.category-content {
 .packing-row.editing {
     background-color: #f8fafc;
 }
+
+/* Quick Add Container */
+.quick-add-container {
+    position: sticky;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: #fff;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+    padding: 12px 16px;
+    z-index: 100;
+    border-top: 1px solid #e2e8f0;
+}
+
+.quick-add-form {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.quick-add-input {
+    flex: 1;
+    padding: 10px 16px;
+    border: 1px solid #d1d1d1;
+    border-radius: 24px;
+    font-size: 16px;
+    outline: none;
+}
+
+.quick-add-input:focus {
+    border-color: #4b89dc;
+    box-shadow: 0 0 0 2px rgba(75, 137, 220, 0.2);
+}
+
+.quick-category-select select {
+    padding: 10px;
+    border: 1px solid #d1d1d1;
+    border-radius: 4px;
+    background-color: #fff;
+    min-width: 120px;
+    font-size: 14px;
+}
+
+.quick-add-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    background-color: #4b89dc;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.quick-add-btn:hover {
+    background-color: #3a7bd5;
+}
+
+/* Adjust main content to account for sticky bar */
+.content-area {
+    padding-bottom: 72px;
+}

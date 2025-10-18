@@ -933,21 +933,74 @@ ul.category-content {
     transition: background-color 0.2s ease;
 }
 
-.quick-add-btn:hover {
-    background-color: #3a7bd5;
+/* Update dropdown positioning to handle upward display */
+.quick-category-select {
+    position: relative;
 }
 
-/* Adjust main content to account for sticky bar */
-.content-area {
-    padding-bottom: 72px;
+.custom-select {
+    position: relative;
+    min-width: 150px;
+    user-select: none;
+    cursor: pointer;
 }
 
-/* Add this rule to make trash icons blue */
-.icon-btn .fa-trash {
-    color: #4285f4; /* Google-style blue color */
+.selected-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    border: 1px solid #d1d1d1;
+    border-radius: 24px;
+    background-color: white;
+    transition: all 0.2s ease;
 }
 
-/* Optional - you might want to adjust the hover state too */
-.icon-btn:hover .fa-trash {
-    color: #3367d6; /* Slightly darker blue on hover */
+.options-dropdown {
+    position: absolute;
+    width: 100%;
+    max-height: 250px;
+    overflow-y: auto;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 110;
+    animation: fadeIn 0.2s ease;
+}
+
+/* Default positioning (dropdown opens downward) */
+.options-dropdown.dropdown-down {
+    top: calc(100% + 5px);
+    left: 0;
+    animation: fadeInDown 0.2s ease;
+}
+
+/* Upward positioning when needed */
+.options-dropdown.dropdown-up {
+    bottom: calc(100% + 5px);
+    left: 0;
+    animation: fadeInUp 0.2s ease;
+}
+
+/* Animations for both directions */
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }

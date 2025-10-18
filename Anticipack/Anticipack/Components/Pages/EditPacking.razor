@@ -163,50 +163,75 @@
                                 @ondragleave="@((DragEventArgs e) => OnDragLeave(e, item))"
                                 @ondrop:preventDefault
                                 @ondrop="@((DragEventArgs e) => OnDrop(e, item))">
-                                <div class="item-main" @onclick:stopPropagation>
-                                    @if (_editingItem == item)
-                                    {
-                                        <input type="text" 
-                                               value="@item.Item.Name" 
-                                               @oninput="@((e) => UpdateItemName(item, e.Value?.ToString()))"
-                                               @onblur="() => SaveItemChanges(item)"
-                                               @onfocus="@(e => SelectAllInputText(e))"
-                                               @ref="itemEditInputElement"
-                                               class="edit-item-input"
-                                               @onclick:stopPropagation />
-                                    }
-                                    else
-                                    {
+                                @if (_editingItem == item)
+                                {
+                                    <div class="item-edit-container">
+                                        <div class="item-edit-header">
+                                            <input type="text" 
+                                                   value="@item.Item.Name" 
+                                                   @oninput="@((e) => UpdateItemName(item, e.Value?.ToString()))"
+                                                   @onfocus="@(e => SelectAllInputText(e))"
+                                                   @ref="itemEditInputElement"
+                                                   class="edit-item-input"
+                                                   @onkeydown="@(e => HandleItemEditKeyDown(e, item))"
+                                                   placeholder="Item name..."
+                                                   @onclick:stopPropagation />
+                                                   
+                                            <div class="category-dropdown">
+                                                <select @bind="item.Item.Category">
+                                                    @foreach (var cat in Enum.GetValues<PackingCategory>())
+                                                    {
+                                                        <option value="@cat.ToString()">@cat</option>
+                                                    }
+                                                </select>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="edit-notes">
+                                            <textarea placeholder="Add notes about this item..." 
+                                                      @bind="item.Item.Notes"
+                                                      @bind:event="oninput"
+                                                      rows="2"
+                                                      class="edit-notes-textarea"></textarea>
+                                        </div>
+                                        
+                                        <div class="item-edit-actions">
+                                            <button class="btn secondary btn-sm" @onclick="() => CancelItemEdit(item)" title="Cancel">
+                                                <i class="fa fa-times"></i> Cancel
+                                            </button>
+                                            <button class="btn primary btn-sm" @onclick="() => SaveItemChanges(item)" title="Save">
+                                                <i class="fa fa-check"></i> Save
+                                            </button>
+                                        </div>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="item-display">
                                         <span class="item-text"
                                               role="button"
                                               @onclick="() => StartEditingItem(item)"
                                               @onclick:stopPropagation>
                                             @item.Item.Name
                                         </span>
-                                    }
-                                </div>
-
-                                @if (_editingItem == item)
-                                {
-                                    <div class="edit-notes">
-                                        <textarea placeholder="Add notes about this item..." 
-                                                  @bind="item.Item.Notes"
-                                                  @bind:event="oninput"
-                                                  @onblur="() => SaveItemChanges(item)"
-                                                  rows="2"
-                                                  class="edit-notes-textarea"></textarea>
+                                        
+                                        @if (!string.IsNullOrWhiteSpace(item.Item.Notes))
+                                        {
+                                            <div class="notes" @onclick="() => StartEditingItem(item)" @onclick:stopPropagation>
+                                                @item.Item.Notes
+                                            </div>
+                                        }
+                                    </div>
+                                    
+                                    <div class="item-actions">
+                                        <button class="icon-btn item-edit-btn" title="Edit item" @onclick:stopPropagation @onclick="() => StartEditingItem(item)">
+                                            <i class="fa fa-pencil"></i>
+                                        </button>
+                                        <button class="icon-btn danger item-delete-btn" title="Delete item" @onclick:stopPropagation @onclick="@(() => PromptDelete(item))">
+                                            <i class="fa fa-trash"></i>
+                                        </button>
                                     </div>
                                 }
-                                else if (!string.IsNullOrWhiteSpace(item.Item.Notes))
-                                {
-                                    <div class="notes" 
-                                         @onclick="() => StartEditingItem(item)"
-                                         @onclick:stopPropagation>@item.Item.Notes</div>
-                                }
-
-                                <button class="icon-btn danger item-delete-btn" title="Delete item" @onclick:stopPropagation @onclick="@(() => PromptDelete(item))">
-                                    <i class="fa fa-trash"></i>
-                                </button>
                             </li>
                         }
                     </ul>
@@ -862,5 +887,25 @@
             _toastCts?.Dispose();
         }
         catch { }
+    }
+
+    private void HandleItemEditKeyDown(KeyboardEventArgs e, PackingItemView item)
+    {
+        if (e.Key == "Escape")
+        {
+            CancelItemEdit(item);
+        }
+        else if (e.Key == "Enter" && !e.ShiftKey)
+        {
+            _ = SaveItemChanges(item);
+        }
+    }
+
+    private void CancelItemEdit(PackingItemView item)
+    {
+        // If we have the original values, we could restore them here
+        // For now, just exit edit mode without saving
+        _editingItem = null;
+        StateHasChanged();
     }
 }

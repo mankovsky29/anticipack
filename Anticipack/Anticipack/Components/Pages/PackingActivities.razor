@@ -3,6 +3,7 @@
 @using Anticipack.Packing
 @inject IPackingRepository PackingRepository
 @inject NavigationManager Navigation
+@implements IDisposable
 
 <div class="page-container with-fixed-navbar">
     @if (_isLoading)
@@ -16,51 +17,39 @@
     {
         <div class="search-bar @(_isSearchVisible ? "visible" : "hidden")">
             <input type="text" class="search-input" placeholder="Search activities..." @bind="_searchTerm" @bind:event="oninput" />
-        </div>
-        
-        <div class="add-activity-container">
-            <button class="add-activity-btn" @onclick="AddNewActivity" title="Add New Activity">
-                <i class="fa fa-plus"></i>
-            </button>
-            <button class="icon-btn search-toggle-btn" @onclick="ToggleSearchBar" title="Search">
-                <i class="fa fa-search"></i>
+            <button class="search-close-btn" @onclick="ToggleSearchBar">
+                <i class="fa fa-times"></i>
             </button>
         </div>
         
         @if (_activities.Any())
         {
-
-            <div class="activities-grid">
+            <div class="activities-list">
                 @foreach (var activity in FilteredActivities)
                 {
                     <div class="activity-card">
-                        <div class="activity-card-header">
+                        <div class="activity-header">
                             <h3 class="activity-name">@activity.Name</h3>
                         </div>
-                        <div class="activity-content">
-                            <div class="activity-meta">
+                        
+                        <div class="activity-info">
+                            <div class="activity-date">
                                 <i class="fa fa-calendar"></i> Last packed: @activity.LastPacked.ToString("MMM d, yyyy")
                             </div>
-                            @if (activity.Category != default)
-                            {
-                                <div class="activity-category">
-                                    @activity.Category
-                                </div>
-                            }
-                            <div class="activity-stats">
-                                <span>Packed @activity.RunCount time@(activity.RunCount != 1 ? "s" : "")</span>
-                                <span>@(activity.Items?.Count ?? 0) items</span>
+                            <div class="activity-type">
+                                <i class="fa @GetCategoryIcon(activity.Category)"></i> @activity.Category
                             </div>
                         </div>
-                        <div class="activity-footer">
-                            <button class="card-btn" title="Copy" @onclick="() => CopyActivity(activity.Id)">
-                                <i class="fa fa-copy"></i>
+                        
+                        <div class="activity-actions">
+                            <button class="action-btn play" @onclick="() => OpenActivityInPackingMode(activity.Id)" title="Pack Now">
+                                <i class="fa fa-play"></i>
                             </button>
-                            <button class="card-btn danger" title="Delete" @onclick="() => PromptDeleteActivity(activity)">
+                            <button class="action-btn edit" @onclick="() => OpenActivityInEditMode(activity.Id)" title="Edit">
+                                <i class="fa fa-edit"></i>
+                            </button>
+                            <button class="action-btn delete" @onclick="() => PromptDeleteActivity(activity)" title="Delete">
                                 <i class="fa fa-trash"></i>
-                            </button>
-                            <button class="card-btn primary" title="Open" @onclick="() => OpenActivity(activity.Id)">
-                                <i class="fa fa-arrow-right"></i>
                             </button>
                         </div>
                     </div>
@@ -80,6 +69,24 @@
                 </button>
             </div>
         }
+        
+        <!-- Speed Dial FAB -->
+        <div class="speed-dial @(_isFabExpanded ? "expanded" : "")">
+            <div class="fab-backdrop @(_isFabExpanded ? "visible" : "")" @onclick="ToggleFab"></div>
+            
+            <div class="fab-options">
+                <button class="fab-option search-fab @(_isFabExpanded ? "visible" : "")" @onclick="OpenSearchBar" title="Search">
+                    <i class="fa fa-search"></i>
+                </button>
+                <button class="fab-option add-fab @(_isFabExpanded ? "visible" : "")" @onclick="AddNewActivity" title="Add Activity">
+                    <i class="fa fa-plus"></i>
+                </button>
+            </div>
+            
+            <button class="main-fab" @onclick="ToggleFab" aria-label="Actions menu">
+                <i class="fa @(_isFabExpanded ? "fa-times" : "fa-ellipsis-v")"></i>
+            </button>
+        </div>
     }
 </div>
 
@@ -138,6 +145,7 @@
     private string _searchTerm = string.Empty;
     private string _selectedCategory = string.Empty;
     private bool _isSearchVisible = false;
+    private bool _isFabExpanded = false;
 
     // Add dialog
     private bool _showAddDialog;
@@ -158,9 +166,24 @@
         await LoadActivitiesAsync();
     }
 
+    private void ToggleFab()
+    {
+        _isFabExpanded = !_isFabExpanded;
+    }
+
+    private void OpenSearchBar()
+    {
+        _isSearchVisible = true;
+        _isFabExpanded = false;
+    }
+
     private void ToggleSearchBar()
     {
         _isSearchVisible = !_isSearchVisible;
+        if (_isSearchVisible)
+        {
+            _isFabExpanded = false;
+        }
     }
 
     private async Task LoadActivitiesAsync()
@@ -204,11 +227,31 @@
         }
     }
 
+    private string GetCategoryIcon(PackingCategory category)
+    {
+        return category switch
+        {
+            PackingCategory.Clothing => "fa-tshirt",
+            PackingCategory.Shoes => "fa-shoe-prints",
+            PackingCategory.Toiletries => "fa-toothbrush",
+            PackingCategory.Electronics => "fa-laptop",
+            PackingCategory.Documents => "fa-passport",
+            PackingCategory.Health => "fa-medkit",
+            PackingCategory.Accessories => "fa-glasses",
+            PackingCategory.Outdoor => "fa-hiking",
+            PackingCategory.Food => "fa-utensils",
+            PackingCategory.Entertainment => "fa-gamepad",
+            PackingCategory.Miscellaneous => "fa-box",
+            _ => "fa-box"
+        };
+    }
+
     private void AddNewActivity()
     {
         _newActivityName = "New Packing Activity";
         _newActivityCategory = PackingCategory.Miscellaneous;
         _showAddDialog = true;
+        _isFabExpanded = false;
     }
 
     private void CancelAddActivity()
@@ -278,23 +321,14 @@
         }
     }
 
-    private async Task CopyActivity(string id)
+    private void OpenActivityInPackingMode(string id)
     {
-        try
-        {
-            await PackingRepository.CopyPackingAsync(id);
-            ShowToast("Activity copied successfully");
-            await LoadActivitiesAsync();
-        }
-        catch
-        {
-            ShowToast("Failed to copy activity");
-        }
+        Navigation.NavigateTo($"/packing-activity?id={id}&mode=packing");
     }
 
-    private void OpenActivity(string id)
+    private void OpenActivityInEditMode(string id)
     {
-        Navigation.NavigateTo($"/packing-activity?id={id}");
+        Navigation.NavigateTo($"/packing-activity?id={id}&mode=edit");
     }
 
     private void ShowToast(string message)

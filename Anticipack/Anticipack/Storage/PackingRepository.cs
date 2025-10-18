@@ -98,5 +98,10 @@ namespace Anticipack.Storage
 
             await _db.InsertAsync(newPackingActivity);
         }
+
+        public Task AddOrUpdateItemAsync(PackingItem item)
+        {
+            return _db.InsertOrReplaceAsync(item);
+        }
     }
 }

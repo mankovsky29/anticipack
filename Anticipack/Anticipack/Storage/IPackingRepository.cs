@@ -7,6 +7,7 @@ namespace Anticipack.Storage
         Task<List<PackingActivity>> GetAllAsync();
         Task<PackingActivity?> GetByIdAsync(string id);
         Task AddOrUpdateAsync(PackingActivity packing);
+        Task AddOrUpdateItemAsync(PackingItem item);
         Task CopyPackingAsync(string packingId);
         Task DeleteAsync(string id);
 

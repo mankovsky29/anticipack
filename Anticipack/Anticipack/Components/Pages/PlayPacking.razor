@@ -27,11 +27,14 @@
             <button class="toggle-visibility-btn @(_hideCheckedItems ? "filtering" : "")" title="@(_hideCheckedItems ? "Show All Items" : "Hide Checked Items")" @onclick="ToggleItemVisibility">
                 <i class="fa @(_hideCheckedItems ? "fa-eye-slash" : "fa-eye")"></i>
             </button>
+            <button class="icon-btn" @onclick="ToggleHistory" title="@(_showHistory ? "Hide History" : "Show History")">
+                <i class="fa @(_showHistory ? "fa-chevron-down" : "fa-list-ul")"></i>
+            </button>
+            <button class="icon-btn" title="Reset All Items" @onclick="ConfirmResetAllItems">
+                <i class="fa fa-undo-alt"></i>
+            </button>
             <button class="icon-btn" title="Edit Activity" @onclick="SwitchToEditMode">
                 <i class="fa fa-edit"></i>
-            </button>
-            <button class="icon-btn" @onclick="ToggleHistory" title="@(_showHistory ? "Hide History" : "Show History")">
-                <i class="fa @(_showHistory ? "fa-chevron-down" : "fa-history")"></i>
             </button>
         </div>
     </div>
@@ -58,7 +61,10 @@
         {
             @foreach (var category in _categoryOrder)
             {
-                var groupItems = Items.Where(i => string.Equals(i.Item.Category, category, StringComparison.OrdinalIgnoreCase)).ToList();
+                var groupItems = Items.Where(i => string.Equals(i.Item.Category, category, StringComparison.OrdinalIgnoreCase))
+                                     .Where(i => !(_hideCheckedItems && i.IsChecked)) // Filter BEFORE rendering
+                                     .ToList();
+                                     
                 if (!groupItems.Any())
                     continue;
 
@@ -66,25 +72,22 @@
                 var collapsed = IsCollapsed(category);
                 var categoryId = $"cat-{category}";
 
-                <section class="category @(allChecked ? "category-completed" : "")" aria-labelledby="@categoryId">
+                <section class="category @(allChecked && !_hideCheckedItems ? "category-completed" : "")" aria-labelledby="@categoryId">
                     <div class="category-header" role="button" @onclick="() => ToggleCategory(category)" aria-expanded="@(!collapsed)">
                         <span class="chev @(collapsed ? "collapsed" : "")" aria-hidden="true">▾</span>
-                        <h4 id="@categoryId" class="category-title @(allChecked ? "checked" : "")">@category</h4>
-                        <span class="count">(@groupItems.Count(i => i.IsChecked)/@groupItems.Count)</span>
+                        <h4 id="@categoryId" class="category-title @(allChecked && !_hideCheckedItems ? "checked" : "")">@category</h4>
+                        <span class="count">(@groupItems.Count(i => i.IsChecked)/@(Items.Count(i => string.Equals(i.Item.Category, category, StringComparison.OrdinalIgnoreCase))))</span>
                     </div>
 
                     <ul class="category-content @(collapsed ? "hidden" : "")">
                         @foreach (var item in groupItems)
                         {
-                            if (item.IsChecked && _hideCheckedItems)
-                                continue;
-
-                            <li class="packing-row">
+                            <li class="packing-row" @key="item.Item.Id">
                                 <div class="item-main">
                                     <div class="round-checkbox">
                                         <input id="@($"checkbox-{item.Item.Id}")" class="item-checkbox" type="checkbox" 
                                                checked="@item.IsChecked"
-                                               @onchange="@((ChangeEventArgs e) => SetItemChecked(item, Convert.ToBoolean(e.Value)))" />
+                                               @onchange="@(async (ChangeEventArgs e) => await HandleItemChecked(item, Convert.ToBoolean(e.Value)))" />
                                         <label for="@($"checkbox-{item.Item.Id}")"></label>
                                     </div>
                                     <span class="@($"item-text {(item.IsChecked ? "checked" : "")}")">
@@ -164,7 +167,7 @@
                 <div class="stat">
                     <span class="label">Compared to Last Time</span>
                     <span class="value @GetComparisonClass()">@GetComparisonText()</span>
-                </div>
+                </div }
             </div>
             
             <button class="btn primary" @onclick="AcknowledgeCompletion">
@@ -182,6 +185,36 @@
     @(_hideCheckedItems ? "Show" : "Hide") Checked Items
 </button>
 
+@if (_showResetConfirmation)
+{
+    <div class="modal-overlay">
+        <div class="confirmation-modal">
+            <h3>Reset Packing List</h3>
+            <p>Are you sure you want to mark all items as unpacked?</p>
+            
+            <div class="modal-actions">
+                <button class="btn secondary" @onclick="CancelReset">Cancel</button>
+                <button class="btn danger" @onclick="ResetAllItems">Reset All</button>
+            </div>
+        </div>
+    </div>
+}
+
+@if (_showEditConfirmation)
+{
+    <div class="modal-overlay">
+        <div class="confirmation-modal">
+            <h3>Switch to Edit Mode?</h3>
+            <p>Editing this packing list might affect your current packing progress.</p>
+            
+            <div class="modal-actions">
+                <button class="btn secondary" @onclick="CancelEdit">Cancel</button>
+                <button class="btn primary" @onclick="ConfirmEdit">Continue to Edit</button>
+            </div>
+        </div>
+    </div>
+}
+
 @code {
     [Parameter]
     public string Id { get; set; } = string.Empty;
@@ -190,7 +223,9 @@
     private DateTime _packingStartTime;
     private bool _showHistory = false;
     private bool _completionAcknowledged = false;
-    private bool _hideCheckedItems = false;
+    private bool _hideCheckedItems = true;
+    private bool _showResetConfirmation = false;
+    private bool _showEditConfirmation = false;
 
     private Storage.PackingActivity _currentActivity = new Storage.PackingActivity();
 
@@ -421,8 +456,8 @@
 
     private class HistoryEntry
     {
-        public DateTime Date { get; set; }
-        public string Action { get; set; }
+        public DateTime Date = DateTime.Now;
+        public string Action { get; set; } = "Packed items";
     }
 
     // This would be replaced with actual history data from storage
@@ -459,6 +494,19 @@
 
     private void SwitchToEditMode()
     {
+        // Show confirmation instead of navigating directly
+        _showEditConfirmation = true;
+    }
+
+    private void CancelEdit()
+    {
+        _showEditConfirmation = false;
+    }
+
+    private void ConfirmEdit()
+    {
+        _showEditConfirmation = false;
+        
         if (!string.IsNullOrEmpty(Id))
         {
             Navigation.NavigateTo($"/edit-packing/{Id}");
@@ -480,4 +528,80 @@
         _hideCheckedItems = !_hideCheckedItems;
     }
 
+    private void ConfirmResetAllItems()
+    {
+        _showResetConfirmation = true;
+    }
+
+    private async Task ResetAllItems()
+    {
+        _showResetConfirmation = false;
+        
+        // Count how many items were checked before reset
+        int checkedItemsCount = Items.Count(i => i.IsChecked);
+        
+        foreach (var item in Items)
+        {
+            item.IsChecked = false;
+            item.Item.IsPacked = false;
+        }
+        
+        // Save to repository
+        if (!string.IsNullOrEmpty(Id))
+        {
+            try
+            {
+                foreach (var item in Items)
+                {
+                    await PackingRepository.AddOrUpdateItemAsync(item.Item);
+                }
+                
+                // Show a toast with the result
+                ShowToast($"Reset {checkedItemsCount} items");
+                
+                // Refresh categories state
+                foreach (var category in _categoryOrder)
+                {
+                    UpdateCategoryStateAfterItemChange(category);
+                }
+                
+                await InvokeAsync(StateHasChanged);
+            }
+            catch (Exception ex)
+            {
+                ShowToast($"Error resetting items: {ex.Message}");
+            }
+        }
+    }
+
+    private void CancelReset()
+    {
+        _showResetConfirmation = false;
+    }
+
+    private async Task HandleItemChecked(PackingItemView item, bool isChecked)
+    {
+        // First update the data model
+        item.IsChecked = isChecked;
+        UpdateCategoryStateAfterItemChange(item.Item.Category);
+        
+        // Show toast when an item is packed (checked)
+        if (isChecked)
+        {
+            ShowToast($"✓ {item.Item.Name} packed");
+        }
+        else
+        {
+            ShowToast($"◯ {item.Item.Name} unpacked");
+        }
+        
+        // Save the change
+        SaveCheckState(item);
+        
+        // Force a complete re-render when an item is checked in hide-checked mode
+        if (_hideCheckedItems && isChecked)
+        {
+            await InvokeAsync(StateHasChanged);
+        }
+    }
 }

@@ -1004,3 +1004,109 @@ ul.category-content {
 .content-area {
     padding-bottom: calc(var(--space-lg) + 70px); /* Add extra padding at the bottom to account for the fixed panel */
 }
+
+.razor.css
+/* Enhanced dropdown positioning and styling */
+.options-dropdown {
+    position: absolute;
+    width: 220px; /* Slightly wider for better readability */
+    max-height: 320px;
+    overflow-y: auto;
+    background: white;
+    border-radius: 12px; /* More rounded corners */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0, 0, 0, 0.08);
+    z-index: 110;
+    border: 1px solid #e2e8f0;
+    right: 0;
+    padding: 8px 0; /* Add padding at top and bottom */
+    scrollbar-width: thin;
+}
+
+.options-dropdown.dropdown-up {
+    bottom: calc(100% + 8px);
+    animation: fadeInUp 0.2s ease;
+}
+
+.options-dropdown.dropdown-down {
+    top: calc(100% + 8px);
+    animation: fadeInDown 0.2s ease;
+}
+
+/* Category heading */
+.dropdown-heading {
+    padding: 6px 16px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: #6b7280;
+    border-bottom: 1px solid #f0f0f0;
+    margin-bottom: 4px;
+}
+
+/* Enhanced option items */
+.option {
+    display: flex;
+    align-items: center;
+    gap: 12px; /* More space between icon and text */
+    padding: 12px 16px; /* More vertical padding for better tap targets */
+    transition: all 0.15s ease;
+    border-left: 3px solid transparent;
+    position: relative;
+}
+
+    .option i {
+        width: 20px;
+        text-align: center;
+        font-size: 18px; /* Slightly larger icon */
+        color: #4285f4;
+    }
+
+    .option span {
+        font-size: 15px; /* Slightly larger text */
+        font-weight: 400;
+    }
+
+    .option:hover {
+        background-color: #f3f6fb;
+        border-left-color: #4b89dc;
+    }
+
+    .option.selected {
+        background-color: rgba(66, 133, 244, 0.08);
+        border-left-color: #4285f4;
+        font-weight: 500;
+    }
+
+        .option.selected::after {
+            content: '';
+            position: absolute;
+            right: 16px;
+            width: 6px;
+            height: 12px;
+            border: solid #4285f4;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+
+    .option:active {
+        background-color: rgba(66, 133, 244, 0.12);
+    }
+
+/* Custom scrollbar for better UX */
+.options-dropdown::-webkit-scrollbar {
+    width: 6px;
+}
+
+.options-dropdown::-webkit-scrollbar-track {
+    background: #f9f9f9;
+    border-radius: 4px;
+}
+
+.options-dropdown::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+    border-radius: 4px;
+}
+
+    .options-dropdown::-webkit-scrollbar-thumb:hover {
+        background: #9ca3af;
+    }

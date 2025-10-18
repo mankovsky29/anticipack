@@ -325,16 +325,17 @@
             @if (_showQuickCategoryDropdown)
             {
                 <div class="options-dropdown @(_dropdownPosition == "up" ? "dropdown-up" : "dropdown-down")" @ref="dropdownElement">
-                    @foreach (var category in Enum.GetValues<PackingCategory>())
-                    {
-                        <div class="option @(category.ToString() == _quickAddCategory ? "selected" : "")" 
-                             @onclick:stopPropagation
-                             @onclick="() => SelectQuickCategory(category.ToString())">
-                            <i class="fa @GetCategoryIcon(category)" aria-hidden="true"></i>
-                            <span>@category</span>
-                        </div>
-                    }
-                </div>
+    <div class="dropdown-heading">Select Category</div>
+    @foreach (var category in Enum.GetValues<PackingCategory>())
+    {
+        <div class="option @(category.ToString() == _quickAddCategory ? "selected" : "")" 
+             @onclick:stopPropagation
+             @onclick="() => SelectQuickCategory(category.ToString())">
+            <i class="fa @GetCategoryIcon(category)" aria-hidden="true"></i>
+            <span>@category</span>
+        </div>
+    }
+</div>
             }
         </div>
         

@@ -40,42 +40,13 @@ window.setupMobileKeyboardHandling = function() {
     positionHelper.style.cssText = 'position:absolute; top:40%; left:0; width:100%; height:1px; pointer-events:none; visibility:hidden; z-index:-1;';
     document.body.appendChild(positionHelper);
     
-    // Store original position directly on the element for global access
-    function forceContainerToMiddle() {
-        // Save original position if not already saved
-        if (!quickAddContainer.__originalPosition) {
-            quickAddContainer.__originalPosition = {
-                position: quickAddContainer.style.position,
-                bottom: quickAddContainer.style.bottom,
-                top: quickAddContainer.style.top,
-                left: quickAddContainer.style.left,
-                right: quickAddContainer.style.right,
-                transform: quickAddContainer.style.transform
-            };
-        }
-        
-        // Force the container to be positioned in the middle of the visible area
-        quickAddContainer.style.position = 'fixed';
-        quickAddContainer.style.bottom = 'auto';
-        quickAddContainer.style.left = '0';
-        quickAddContainer.style.right = '0';
-        
-        // Calculate position to be at ~40% from top of current viewport
-        // This places it in the middle of the visible area when keyboard is open
-        const viewportHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
-        const targetPosition = Math.floor(viewportHeight * 0.42);
-        
-        quickAddContainer.style.top = `${targetPosition}px`;
-        quickAddContainer.style.transform = 'none'; // Clear any transforms
-    }
-    
     // When input gets focus, position element in the middle of the visible area
     input.addEventListener('focus', () => {
         // Multiple positioning attempts to catch keyboard at different states
-        setTimeout(forceContainerToMiddle, 100);
-        setTimeout(forceContainerToMiddle, 300);
-        setTimeout(forceContainerToMiddle, 500);
-        setTimeout(forceContainerToMiddle, 700); // Extra delay for Samsung
+        setTimeout(window.forceContainerToMiddle, 100);
+        setTimeout(window.forceContainerToMiddle, 300);
+        setTimeout(window.forceContainerToMiddle, 500);
+        setTimeout(window.forceContainerToMiddle, 700); // Extra delay for Samsung
     });
     
     input.addEventListener('blur', () => {
@@ -85,7 +56,7 @@ window.setupMobileKeyboardHandling = function() {
     // Also respond to resize events which happen when keyboard opens/closes
     window.addEventListener('resize', () => {
         if (document.activeElement === input) {
-            setTimeout(forceContainerToMiddle, 50);
+            setTimeout(window.forceContainerToMiddle, 50);
         }
     });
     
@@ -93,7 +64,7 @@ window.setupMobileKeyboardHandling = function() {
     window.addEventListener('orientationchange', () => {
         setTimeout(() => {
             if (document.activeElement === input) {
-                forceContainerToMiddle();
+                window.forceContainerToMiddle();
             }
         }, 300);
     });
@@ -102,17 +73,51 @@ window.setupMobileKeyboardHandling = function() {
     if (window.visualViewport) {
         window.visualViewport.addEventListener('resize', () => {
             if (document.activeElement === input) {
-                setTimeout(forceContainerToMiddle, 50);
+                setTimeout(window.forceContainerToMiddle, 50);
             }
         });
         
         window.visualViewport.addEventListener('scroll', () => {
             if (document.activeElement === input) {
-                setTimeout(forceContainerToMiddle, 50);
+                setTimeout(window.forceContainerToMiddle, 50);
             }
         });
     }
 };
+
+/**
+ * Forces the quick-add container to be positioned in the middle of the visible area
+ */
+window.forceContainerToMiddle = function() {
+    const quickAddContainer = document.querySelector('.quick-add-container');
+    if (!quickAddContainer) return;
+    
+    // Save original position if not already saved
+    if (!quickAddContainer.__originalPosition) {
+        quickAddContainer.__originalPosition = {
+            position: quickAddContainer.style.position,
+            bottom: quickAddContainer.style.bottom,
+            top: quickAddContainer.style.top,
+            left: quickAddContainer.style.left,
+            right: quickAddContainer.style.right,
+            transform: quickAddContainer.style.transform
+        };
+    }
+    
+    // Force the container to be positioned in the middle of the visible area
+    quickAddContainer.style.position = 'fixed';
+    quickAddContainer.style.bottom = 'auto';
+    quickAddContainer.style.left = '0';
+    quickAddContainer.style.right = '0';
+    
+    // Calculate position to be at ~40% from top of current viewport
+    // This places it in the middle of the visible area when keyboard is open
+    const viewportHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+    const targetPosition = Math.floor(viewportHeight * 0.44);
+    
+    quickAddContainer.style.top = `${targetPosition}px`;
+    quickAddContainer.style.transform = 'none'; // Clear any transforms
+}
 
 /**
  * Restores quick-add container to its original position
@@ -141,8 +146,7 @@ window.handleKeyboardVisibility = function(isVisible) {
     if (!quickAddContainer) return;
     
     if (isVisible) {
-        // When keyboard is visible, make sure any dropdowns are closed
-        // (Blazor component will handle this part)
+        window.forceContainerToMiddle()
     } else {
         // When keyboard hides, restore position
         window.restoreContainerPosition();

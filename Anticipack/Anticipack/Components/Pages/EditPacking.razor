@@ -1,5 +1,6 @@
 ﻿@page "/edit-packing/{id}"
 @using Anticipack.Packing
+@using Anticipack.Services
 @using Anticipack.Storage
 @using System.Threading
 @using Microsoft.AspNetCore.Components.Web
@@ -10,6 +11,7 @@
 @inject IPackingRepository PackingRepository
 @inject IJSRuntime JSRuntime
 @implements IDisposable
+@inject IKeyboardService KeyboardService
 
 <NavigationLock OnBeforeInternalNavigation="OnBeforeInternalNavigation" />
 
@@ -354,6 +356,7 @@
 
     private bool _isAddingItem = false;
     private bool _isLoading;
+    private bool _keyboardVisible;
     private Storage.PackingActivity _currentActivity = new Storage.PackingActivity();
 
     private sealed class PackingItemView
@@ -406,7 +409,7 @@
     private void ToggleQuickCategoryDropdown()
     {
         _showQuickCategoryDropdown = !_showQuickCategoryDropdown;
-        
+
         if (_showQuickCategoryDropdown)
         {
             // Calculate dropdown position on next render
@@ -418,7 +421,7 @@
     {
         // Wait for the UI to render so the element is available
         await Task.Delay(1);
-        
+
         // Use JS interop to determine if there's enough space below
         var shouldOpenUp = await JSRuntime.InvokeAsync<bool>("shouldOpenDropdownUp", dropdownElement);
         _dropdownPosition = shouldOpenUp ? "up" : "down";
@@ -429,19 +432,20 @@
     {
         if (firstRender)
         {
+            KeyboardService.Initialize(this);
             await JSRuntime.InvokeVoidAsync("setupMobileKeyboardHandling");
         }
-    
+
         await base.OnAfterRenderAsync(firstRender);
     }
 
     private async Task QuickAddItem()
     {
         var name = _quickAddName.Trim();
-        
+
         if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(Id))
             return;
-            
+
         var newItem = new Storage.PackingItem 
         { 
             Name = name, 
@@ -449,27 +453,27 @@
             Notes = string.Empty,
             ActivityId = Id 
         };
-        
+
         try
         {
             await PackingRepository.AddItemToActivityAsync(Id, newItem);
             // Add to local collection without full reload for better performance
             var newItemView = new PackingItemView(newItem);
             Items.Add(newItemView);
-            
+
             // Make sure category is in the list
             if (!_categoryOrder.Contains(_quickAddCategory, StringComparer.OrdinalIgnoreCase))
             {
                 _categoryOrder.Add(_quickAddCategory);
                 _manualOverride[_quickAddCategory] = false; // Expand by default
             }
-            
+
             // Clear input
             _quickAddName = string.Empty;
-            
+
             // Show toast
             ShowToast($"Added {name}");
-            
+
             StateHasChanged();
         }
         catch (Exception ex)
@@ -497,13 +501,15 @@
             InitializeDefaultItems();
         }
 
+        KeyboardService.KeyboardVisibilityChanged += OnKeyboardVisibilityChanged;
+
         await base.OnInitializedAsync();
     }
 
     private void InitializeDefaultItems()
     {
         _currentActivity = new Storage.PackingActivity { Name = "New Packing Activity" };
-        
+
         Items = new List<PackingItemView>
         {
             new(new Storage.PackingItem { Name = "Шорты", Category = PackingCategory.Clothing.ToString(), Notes = "" }),
@@ -544,8 +550,6 @@
             _manualOverride.Clear();
             foreach (var cat in _categoryOrder)
                 _manualOverride[cat] = null;
-
-            ShowToast($"Loaded {Items.Count} items");
         }
         catch
         {
@@ -629,7 +633,7 @@
     {
         var name = (_newName ?? string.Empty).Trim();
         var category = string.IsNullOrWhiteSpace(_newCategory) ? "Uncategorized" : _newCategory.Trim();
-        
+
         // Handle the "New" category option
         if (category == "New")
         {
@@ -637,7 +641,7 @@
             // For simplicity, we'll use Miscellaneous
             category = PackingCategory.Miscellaneous.ToString();
         }
-        
+
         var notes = _newNotes ?? string.Empty;
 
         if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(Id))
@@ -953,7 +957,7 @@
         _editingItem = item;
         StateHasChanged();
     }
-    
+
     private async Task SelectAllInputText(FocusEventArgs e)
     {
         if (itemEditInputElement.Id != null)
@@ -961,7 +965,7 @@
             await JSRuntime.InvokeVoidAsync("selectAllText", itemEditInputElement);
         }
     }
-    
+
     private void UpdateItemName(PackingItemView item, string? newName)
     {
         if (newName != null)
@@ -969,12 +973,12 @@
             item.Item.Name = newName;
         }
     }
-    
+
     private async Task SaveItemChanges(PackingItemView item)
     {
         if (string.IsNullOrWhiteSpace(Id))
             return;
-            
+
         try
         {
             // Validate item name isn't empty
@@ -982,7 +986,7 @@
             {
                 item.Item.Name = "Unnamed Item";
             }
-            
+
             await PackingRepository.AddOrUpdateItemAsync(item.Item);
             ShowToast("Item updated");
         }
@@ -1005,12 +1009,38 @@
         }
     }
 
+    private void OnKeyboardVisibilityChanged(bool visible)
+    {
+        _keyboardVisible = visible;
+        
+        // When keyboard becomes visible, reset the quick-add container UI elements
+        if (visible)
+        {
+            _showQuickCategoryDropdown = false;
+            
+            // Call JavaScript to handle any visual adjustments
+            _ = JSRuntime.InvokeVoidAsync("handleKeyboardVisibility", true);
+        }
+        else
+        {
+            // Call JavaScript to reset container when keyboard disappears
+            _ = JSRuntime.InvokeVoidAsync("handleKeyboardVisibility", false);
+        }
+        
+        // Ensure UI updates happen on the Blazor renderer thread
+        _ = InvokeAsync(StateHasChanged);
+    }
+
     public void Dispose()
     {
         try
         {
             _toastCts?.Cancel();
             _toastCts?.Dispose();
+            if (KeyboardService != null)
+            {
+                KeyboardService.KeyboardVisibilityChanged -= OnKeyboardVisibilityChanged;
+            }
         }
         catch { }
     }

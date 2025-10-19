@@ -29,6 +29,13 @@ namespace Anticipack
             builder.Logging.AddDebug();
 #endif
 
+
+#if ANDROID
+            builder.Services.AddSingleton<Anticipack.Services.IKeyboardService, Anticipack.Platforms.Android.KeyboardService>();
+#elif IOS
+            builder.Services.AddSingleton<Anticipack.Services.IKeyboardService, Anticipack.Platforms.iOS.KeyboardService>();
+#endif
+
             var app = builder.Build();
 
             return app;

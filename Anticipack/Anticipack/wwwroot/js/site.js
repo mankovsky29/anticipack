@@ -17,12 +17,18 @@ window.selectAllText = function (el) {
     sel.addRange(range);
 };
 
+/**
+ * Focuses on the provided element
+ */
 window.focusElement = function (elementRef) {
     if (elementRef && elementRef.focus) {
         elementRef.focus();
     }
 };
 
+/**
+ * Sets up mobile keyboard handling for the quick add container
+ */
 window.setupMobileKeyboardHandling = function() {
     const quickAddContainer = document.querySelector('.quick-add-container');
     const input = document.querySelector('.quick-add-input');
@@ -34,19 +40,11 @@ window.setupMobileKeyboardHandling = function() {
     positionHelper.style.cssText = 'position:absolute; top:40%; left:0; width:100%; height:1px; pointer-events:none; visibility:hidden; z-index:-1;';
     document.body.appendChild(positionHelper);
     
-    // Position tracking
-    let originalPosition = null;
-    let originalContainerStyles = {
-        position: quickAddContainer.style.position,
-        bottom: quickAddContainer.style.bottom,
-        left: quickAddContainer.style.left,
-        right: quickAddContainer.style.right
-    };
-    
+    // Store original position directly on the element for global access
     function forceContainerToMiddle() {
         // Save original position if not already saved
-        if (!originalPosition) {
-            originalPosition = {
+        if (!quickAddContainer.__originalPosition) {
+            quickAddContainer.__originalPosition = {
                 position: quickAddContainer.style.position,
                 bottom: quickAddContainer.style.bottom,
                 top: quickAddContainer.style.top,
@@ -65,23 +63,10 @@ window.setupMobileKeyboardHandling = function() {
         // Calculate position to be at ~40% from top of current viewport
         // This places it in the middle of the visible area when keyboard is open
         const viewportHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
-        const targetPosition = Math.floor(viewportHeight * 0.4);
+        const targetPosition = Math.floor(viewportHeight * 0.42);
         
         quickAddContainer.style.top = `${targetPosition}px`;
         quickAddContainer.style.transform = 'none'; // Clear any transforms
-    }
-    
-    function restoreContainerPosition() {
-        // Only restore if we have original position saved
-        if (originalPosition) {
-            quickAddContainer.style.position = originalPosition.position;
-            quickAddContainer.style.bottom = originalPosition.bottom;
-            quickAddContainer.style.top = originalPosition.top;
-            quickAddContainer.style.left = originalPosition.left;
-            quickAddContainer.style.right = originalPosition.right;
-            quickAddContainer.style.transform = originalPosition.transform;
-            originalPosition = null;
-        }
     }
     
     // When input gets focus, position element in the middle of the visible area
@@ -94,7 +79,7 @@ window.setupMobileKeyboardHandling = function() {
     });
     
     input.addEventListener('blur', () => {
-        setTimeout(restoreContainerPosition, 100);
+        setTimeout(window.restoreContainerPosition, 100);
     });
     
     // Also respond to resize events which happen when keyboard opens/closes
@@ -127,4 +112,56 @@ window.setupMobileKeyboardHandling = function() {
             }
         });
     }
+};
+
+/**
+ * Restores quick-add container to its original position
+ */
+window.restoreContainerPosition = function() {
+    const quickAddContainer = document.querySelector('.quick-add-container');
+    if (!quickAddContainer) return;
+    
+    // Only restore if we have original position saved
+    if (quickAddContainer.__originalPosition) {
+        quickAddContainer.style.position = quickAddContainer.__originalPosition.position;
+        quickAddContainer.style.bottom = quickAddContainer.__originalPosition.bottom;
+        quickAddContainer.style.top = quickAddContainer.__originalPosition.top;
+        quickAddContainer.style.left = quickAddContainer.__originalPosition.left;
+        quickAddContainer.style.right = quickAddContainer.__originalPosition.right;
+        quickAddContainer.style.transform = quickAddContainer.__originalPosition.transform;
+        quickAddContainer.__originalPosition = null;
+    }
+};
+
+/**
+ * Handles keyboard visibility changes from C# code
+ */
+window.handleKeyboardVisibility = function(isVisible) {
+    const quickAddContainer = document.querySelector('.quick-add-container');
+    if (!quickAddContainer) return;
+    
+    if (isVisible) {
+        // When keyboard is visible, make sure any dropdowns are closed
+        // (Blazor component will handle this part)
+    } else {
+        // When keyboard hides, restore position
+        window.restoreContainerPosition();
+    }
+};
+
+/**
+ * Determines if a dropdown should open upward based on available space
+ */
+window.shouldOpenDropdownUp = function(element) {
+    if (!element) return false;
+    
+    const rect = element.getBoundingClientRect();
+    const dropdownHeight = element.offsetHeight || 200; // Fallback if height not available
+    const viewportHeight = window.innerHeight;
+    
+    // Check if there's enough space below
+    const spaceBelow = viewportHeight - rect.bottom;
+    
+    // If we have less than dropdown height + padding, open upward
+    return spaceBelow < (dropdownHeight + 20);
 };

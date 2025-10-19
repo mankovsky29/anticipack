@@ -250,12 +250,12 @@
     protected override async Task OnInitializedAsync()
     {
         _packingStartTime = DateTime.Now;
-        
+
         if (!string.IsNullOrEmpty(Id))
         {
             await LoadItemsForPackingAsync(Id);
         }
-        
+
         await base.OnInitializedAsync();
     }
 
@@ -333,9 +333,9 @@
 
         if (allChecked)
             _manualOverride[category] = true; // Auto-collapse when all items checked
-        
+
         StateHasChanged();
-        
+
         if (GetCompletionPercentage() == 100 && !_completionAcknowledged)
         {
             StateHasChanged(); // Trigger completion modal
@@ -409,7 +409,7 @@
     private void HandleKeyboardNavigation(KeyboardEventArgs e)
     {
         var itemsList = Items.ToList();
-        
+
         switch (e.Key)
         {
             case "ArrowDown":
@@ -423,14 +423,14 @@
                     ToggleItemChecked(itemsList[_currentFocusIndex]);
                 break;
         }
-        
+
         StateHasChanged();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         await base.OnAfterRenderAsync(firstRender);
-        
+
         if (firstRender)
         {
             await JSRuntime.InvokeVoidAsync("focusElement", contentArea);
@@ -441,7 +441,7 @@
 
     private int GetCompletionPercentage() => 
         Items.Any() ? (int)(Items.Count(i => i.IsChecked) * 100.0 / Items.Count) : 0;
-        
+
     private string GetEstimatedTimeRemaining()
     {
         var itemsLeft = Items.Count(i => !i.IsChecked);
@@ -483,7 +483,7 @@
         // Record completion
         _currentActivity.LastPacked = DateTime.Now;
         _currentActivity.RunCount++;
-        
+
         // Save to repository
         if (!string.IsNullOrWhiteSpace(Id))
         {
@@ -494,8 +494,14 @@
 
     private void SwitchToEditMode()
     {
-        // Show confirmation instead of navigating directly
-        _showEditConfirmation = true;
+        if(Items.Count(i => i.IsChecked) > 0)
+        {
+            _showEditConfirmation = true;
+        }
+        else
+        {
+            ConfirmEdit();
+        }
     }
 
     private void CancelEdit()

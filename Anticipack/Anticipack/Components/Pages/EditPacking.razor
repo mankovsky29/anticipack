@@ -429,18 +429,7 @@
     {
         if (firstRender)
         {
-            // Register the JavaScript function
-            await JSRuntime.InvokeVoidAsync("eval", @"
-                window.shouldOpenDropdownUp = function(element) {
-                    if (!element) return false;
-                    
-                    const rect = element.getBoundingClientRect();
-                    const spaceBelow = window.innerHeight - rect.bottom;
-                    const elementHeight = rect.height || 200; // Default height if not rendered yet
-                    
-                    return spaceBelow < elementHeight && rect.top > elementHeight;
-                }
-            ");
+            await JSRuntime.InvokeVoidAsync("setupMobileKeyboardHandling");
         }
     
         await base.OnAfterRenderAsync(firstRender);

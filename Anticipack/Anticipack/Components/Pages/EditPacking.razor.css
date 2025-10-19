@@ -877,7 +877,7 @@ ul.category-content {
 
 /* Quick Add Container */
 .quick-add-container {
-    position: fixed; /* Changed from sticky to fixed */
+    position: sticky; /* Change back to sticky instead of fixed */
     bottom: 0;
     left: 0;
     right: 0;
@@ -886,19 +886,20 @@ ul.category-content {
     padding: 12px 16px;
     z-index: 100;
     border-top: 1px solid #e2e8f0;
-    width: 100%; /* Ensure full width */
+    width: 100%;
+    margin-top: 16px; /* Add some spacing from content */
 }
-
-.quick-add-form {
+    
+    .quick-add-form {
     display: flex;
     align-items: center;
     gap: 10px;
     max-width: 800px;
     margin: 0 auto;
-}
-
+    }
+    
 /* Maximize text input space */
-.quick-add-input {
+    .quick-add-input {
     flex: 1;
     padding: 12px 16px;
     border: 1px solid #d1d1d1;
@@ -906,8 +907,8 @@ ul.category-content {
     font-size: 16px;
     outline: none;
     transition: all 0.2s ease;
-}
-
+    }
+    
 .quick-add-input:focus {
     border-color: #4b89dc;
     box-shadow: 0 0 0 2px rgba(75, 137, 220, 0.2);
@@ -933,7 +934,7 @@ ul.category-content {
     transition: all 0.2s ease;
     flex-shrink: 0;
     padding: 0;
-}
+    }
 
 .category-btn:hover {
     background-color: #3a7bd5;
@@ -1110,3 +1111,45 @@ ul.category-content {
     .options-dropdown::-webkit-scrollbar-thumb:hover {
         background: #9ca3af;
     }
+
+/* Quick Add Container - Mobile keyboard-aware version */
+.quick-add-container {
+    position: fixed; /* Keep fixed positioning */
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: #f8fafc;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+    padding: 12px 16px;
+    z-index: 100;
+    border-top: 1px solid #e2e8f0;
+    width: 100%;
+    transition: transform 0.3s ease;
+    will-change: transform; /* Optimization for animations */
+}
+
+/* Add this class when input is focused - will be toggled with JS */
+.quick-add-container.keyboard-active {
+    /* Position above keyboard - adjust value as needed */
+    transform: translateY(-40vh);
+}
+
+/* Add viewport adjustments for iOS */
+@supports (-webkit-touch-callout: none) {
+    .quick-add-container.keyboard-active {
+        transform: translateY(-40vh); /* iOS specific value if needed */
+    }
+}
+
+/* For Android devices */
+@supports not (-webkit-touch-callout: none) {
+    .quick-add-container.keyboard-active {
+        transform: translateY(-30vh); /* Android specific value if needed */
+    }
+}
+
+/* Keep the input visible and full-size */
+.quick-add-input:focus {
+    border-color: #4b89dc;
+    box-shadow: 0 0 0 2px rgba(75, 137, 220, 0.2);
+}

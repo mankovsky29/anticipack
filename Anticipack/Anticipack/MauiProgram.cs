@@ -1,4 +1,5 @@
-﻿using Anticipack.Storage;
+﻿using Anticipack.Components.Shared.DialogComponent;
+using Anticipack.Storage;
 using Microsoft.Extensions.Logging;
 
 namespace Anticipack
@@ -38,6 +39,8 @@ namespace Anticipack
 #elif WINDOWS
             builder.Services.AddSingleton<Anticipack.Services.IKeyboardService, Anticipack.Platforms.Windows.KeyboardService>();
 #endif
+
+            builder.Services.AddScoped<IDialogService, DialogService>();
 
             var app = builder.Build();
 

@@ -1,8 +1,10 @@
 ﻿@page "/packing-activities"
+@using Anticipack.Components.Shared.DialogComponent
 @using Anticipack.Storage
 @using Anticipack.Packing
 @inject IPackingRepository PackingRepository
 @inject NavigationManager Navigation
+@inject IDialogService DialogService
 @implements IDisposable
 
 <div class="page-container with-fixed-navbar">
@@ -119,22 +121,6 @@
     </div>
 }
 
-@if (_showDeleteConfirm)
-{
-    <div class="modal-overlay" @onclick="CancelDelete">
-        <div class="modal-content" @onclick:stopPropagation>
-            <h4 class="modal-header">Delete Activity?</h4>
-            <p>Are you sure you want to delete "@_activityToDelete?.Name"?</p>
-            <p>This action cannot be undone.</p>
-            
-            <div class="form-actions">
-                <button class="btn cancel" @onclick="CancelDelete">Cancel</button>
-                <button class="btn danger" @onclick="ConfirmDeleteActivityAsync">Delete</button>
-            </div>
-        </div>
-    </div>
-}
-
 <div class="toast-container" aria-live="polite" aria-atomic="true">
     <div class="@($"toast {(_showToast ? "show" : "")}")">@_toastMessage</div>
 </div>
@@ -151,10 +137,6 @@
     private bool _showAddDialog;
     private string _newActivityName = string.Empty;
     private PackingCategory _newActivityCategory = PackingCategory.Miscellaneous;
-
-    // Delete confirmation
-    private bool _showDeleteConfirm;
-    private Storage.PackingActivity? _activityToDelete;
 
     // Toast
     private bool _showToast;
@@ -287,37 +269,27 @@
         }
     }
 
-    private void PromptDeleteActivity(Storage.PackingActivity activity)
+    private async Task PromptDeleteActivity(Storage.PackingActivity activity)
     {
-        _activityToDelete = activity;
-        _showDeleteConfirm = true;
-    }
-
-    private void CancelDelete()
-    {
-        _activityToDelete = null;
-        _showDeleteConfirm = false;
-    }
-
-    private async Task ConfirmDeleteActivityAsync()
-    {
-        if (_activityToDelete == null)
+        var result = await DialogService.ShowConfirmAsync("Delete Activity?", $"Are you sure you want to delete \"{activity.Name}\"? This action cannot be undone.");
+        
+        if (!result) 
             return;
+            
+        await DeleteActivityAsync(activity);
+    }
 
+    private async Task DeleteActivityAsync(Storage.PackingActivity activity)
+    {
         try
         {
-            await PackingRepository.DeleteAsync(_activityToDelete.Id);
+            await PackingRepository.DeleteAsync(activity.Id);
             ShowToast("Activity deleted successfully");
             await LoadActivitiesAsync();
         }
         catch
         {
             ShowToast("Failed to delete activity");
-        }
-        finally
-        {
-            _activityToDelete = null;
-            _showDeleteConfirm = false;
         }
     }
 

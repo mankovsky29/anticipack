@@ -1,0 +1,112 @@
+﻿@namespace Anticipack.Components.Shared.DialogComponent
+
+<div class="dialog-overlay @(IsVisible ? "visible" : "")" @onclick="HandleOverlayClick">
+    <div class="dialog @GetDialogTypeClass() @(IsVisible ? "visible" : "")" @onclick:stopPropagation="true" tabindex="-1">
+        <div class="dialog-header">
+            <h2 class="dialog-title">@Title</h2>
+            @if (ShowCloseButton)
+            {
+                <button class="close-button" @onclick="HandleClose">×</button>
+            }
+        </div>
+        <div class="dialog-content">
+            @if (!string.IsNullOrEmpty(Message))
+            {
+                <p>@Message</p>
+            }
+            @if (ContentTemplate != null)
+            {
+                @ContentTemplate
+            }
+        </div>
+        <div class="dialog-footer">
+            @if (!string.IsNullOrEmpty(CancelText))
+            {
+                <button class="dialog-button button-cancel" @onclick="HandleCancel">@CancelText</button>
+            }
+            @if (!string.IsNullOrEmpty(ConfirmText))
+            {
+                <button class="dialog-button button-confirm" @onclick="HandleConfirm">@ConfirmText</button>
+            }
+            @if (!string.IsNullOrEmpty(OkText))
+            {
+                <button class="dialog-button button-primary" @onclick="HandleClose">@OkText</button>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public bool IsVisible { get; set; }
+
+    [Parameter]
+    public string Title { get; set; } = "Dialog";
+
+    [Parameter]
+    public string Message { get; set; } = "";
+
+    [Parameter]
+    public RenderFragment? ContentTemplate { get; set; }
+
+    [Parameter]
+    public DialogType DialogType { get; set; } = DialogType.Default;
+
+    [Parameter]
+    public EventCallback OnClose { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> OnConfirm { get; set; }
+
+    [Parameter]
+    public string OkText { get; set; } = "OK";
+
+    [Parameter]
+    public string ConfirmText { get; set; } = "";
+
+    [Parameter]
+    public string CancelText { get; set; } = "";
+
+    [Parameter]
+    public bool ShowCloseButton { get; set; } = true;
+
+    [Parameter]
+    public bool CloseOnOverlayClick { get; set; } = true;
+
+    private string GetDialogTypeClass()
+    {
+        return DialogType switch
+        {
+            DialogType.Info => "info",
+            DialogType.Success => "success",
+            DialogType.Warning => "warning",
+            DialogType.Error => "error",
+            _ => ""
+        };
+    }
+
+    private async Task HandleClose()
+    {
+        await OnClose.InvokeAsync();
+    }
+
+    private async Task HandleConfirm()
+    {
+        await OnConfirm.InvokeAsync(true);
+        await OnClose.InvokeAsync(); // Close the dialog after confirming
+    }
+
+    private async Task HandleCancel()
+    {
+        await OnConfirm.InvokeAsync(false);
+        await OnClose.InvokeAsync(); // Close the dialog after canceling
+    }
+
+    private async Task HandleOverlayClick()
+    {
+        if (CloseOnOverlayClick)
+        {
+            await OnClose.InvokeAsync();
+        }
+    }
+}

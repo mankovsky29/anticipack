@@ -1,5 +1,7 @@
 ﻿@page "/"
+@using Anticipack.Components.Shared.DialogComponent
 @inherits LayoutComponentBase
+@implements IDisposable
 
 <link href="css/app.css" rel="stylesheet" />
 
@@ -14,3 +16,68 @@
         </div>
     </main>
 </div>
+
+<Dialog 
+    IsVisible="@_dialogVisible"
+    Title="@_dialogOptions.Title"
+    Message="@_dialogOptions.Message"
+    DialogType="@_dialogOptions.DialogType"
+    ContentTemplate="@_dialogOptions.ContentTemplate"
+    OnClose="HandleDialogClose"
+    OnConfirm="HandleDialogConfirm"
+    OkText="@_dialogOptions.OkText"
+    ConfirmText="@_dialogOptions.ConfirmText"
+    CancelText="@_dialogOptions.CancelText"
+    ShowCloseButton="@_dialogOptions.ShowCloseButton"
+    CloseOnOverlayClick="@_dialogOptions.CloseOnOverlayClick" />
+
+@code {
+    [Inject] private IDialogService DialogService { get; set; } = default!;
+    
+    private bool _dialogVisible;
+    private DialogOptions _dialogOptions = new();
+    
+    protected override void OnInitialized()
+    {
+        // Subscribe to dialog service events
+        if (DialogService is DialogService service)
+        {
+            service.OnDialogShow += ShowDialog;
+            service.OnDialogClose += CloseDialog;
+        }
+    }
+    
+    private void ShowDialog(DialogOptions options)
+    {
+        _dialogOptions = options;
+        _dialogVisible = true;
+        StateHasChanged();
+    }
+    
+    private void CloseDialog()
+    {
+        _dialogVisible = false;
+        StateHasChanged();
+    }
+    
+    private void HandleDialogClose()
+    {
+        _dialogVisible = false;
+        StateHasChanged();
+    }
+    
+    private void HandleDialogConfirm(bool result)
+    {
+        _dialogOptions.OnConfirmCallback?.Invoke(result);
+    }
+    
+    void IDisposable.Dispose()
+    {
+        // Unsubscribe from events
+        if (DialogService is DialogService service)
+        {
+            service.OnDialogShow -= ShowDialog;
+            service.OnDialogClose -= CloseDialog;
+        }
+    }
+}

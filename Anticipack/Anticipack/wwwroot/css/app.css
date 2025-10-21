@@ -31,6 +31,8 @@
     --space-md: 1rem;
     --space-lg: 1.5rem;
     --space-xl: 2rem;
+    --space-xxl: 3rem;
+    --space-xxxl: 4rem;
     /* Borders */
     --border-radius-sm: 0.25rem;
     --border-radius: 0.5rem;
@@ -165,7 +167,7 @@ input, select, textarea {
 /* Toast notifications */
 .toast-container {
     position: fixed;
-    bottom: var(--space-lg);
+    top: var(--space-xxxl);
     left: 50%;
     transform: translateX(-50%);
     z-index: 1001;

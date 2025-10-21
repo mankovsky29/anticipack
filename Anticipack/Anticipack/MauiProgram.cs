@@ -34,6 +34,9 @@ namespace Anticipack
             builder.Services.AddSingleton<Anticipack.Services.IKeyboardService, Anticipack.Platforms.Android.KeyboardService>();
 #elif IOS
             builder.Services.AddSingleton<Anticipack.Services.IKeyboardService, Anticipack.Platforms.iOS.KeyboardService>();
+
+#elif WINDOWS
+            builder.Services.AddSingleton<Anticipack.Services.IKeyboardService, Anticipack.Platforms.Windows.KeyboardService>();
 #endif
 
             var app = builder.Build();

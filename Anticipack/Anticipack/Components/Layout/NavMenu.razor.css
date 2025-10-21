@@ -38,7 +38,6 @@
 
 /* top row visuals */
 .top-row {
-    height: 3.5rem;
     background-color: var(--primary-dark);
     display: flex;
     align-items: center;

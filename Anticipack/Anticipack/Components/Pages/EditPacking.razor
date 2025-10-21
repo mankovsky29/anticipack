@@ -568,12 +568,6 @@
         _manualOverride[category] = !currentlyCollapsed;
     }
 
-    private void SetItemChecked(PackingItemView item, bool isChecked)
-    {
-        item.IsChecked = isChecked;
-        UpdateCategoryStateAfterItemChange(item.Item.Category);
-    }
-
     private void UpdateCategoryStateAfterItemChange(string category)
     {
         var allChecked = IsAllChecked(category);

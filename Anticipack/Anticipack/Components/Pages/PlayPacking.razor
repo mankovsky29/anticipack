@@ -82,13 +82,14 @@
                     <ul class="category-content @(collapsed ? "hidden" : "")">
                         @foreach (var item in groupItems)
                         {
-                            <li class="packing-row" @key="item.Item.Id">
+                            <li class="packing-row" @key="item.Item.Id" @onclick="() => HandleRowClick(item)">
                                 <div class="item-main">
                                     <div class="round-checkbox">
                                         <input id="@($"checkbox-{item.Item.Id}")" class="item-checkbox" type="checkbox" 
                                                checked="@item.IsChecked"
-                                               @onchange="@(async (ChangeEventArgs e) => await HandleItemChecked(item, Convert.ToBoolean(e.Value)))" />
-                                        <label for="@($"checkbox-{item.Item.Id}")"></label>
+                                               @onchange="@(async (ChangeEventArgs e) => await HandleItemChecked(item, Convert.ToBoolean(e.Value)))" 
+                                               @onclick:stopPropagation="true" />
+                                        <label for="@($"checkbox-{item.Item.Id}")" @onclick:stopPropagation="true"></label>
                                     </div>
                                     <span class="@($"item-text {(item.IsChecked ? "checked" : "")}")">
                                         @item.Item.Name
@@ -609,5 +610,10 @@
         {
             await InvokeAsync(StateHasChanged);
         }
+    }
+
+    private async Task HandleRowClick(PackingItemView item)
+    {
+        await HandleItemChecked(item, !item.IsChecked);
     }
 }

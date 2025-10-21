@@ -6,9 +6,11 @@
 @using Microsoft.AspNetCore.Components
 @using Microsoft.AspNetCore.Components.Routing
 @using Microsoft.JSInterop
+@using Anticipack.Components.Shared.DialogComponent
 @inject NavigationManager Navigation
 @inject IPackingRepository PackingRepository
 @inject IJSRuntime JSRuntime
+@inject IDialogService DialogService
 @implements IDisposable
 
 <div class="page-container with-fixed-navbar">
@@ -201,21 +203,6 @@
     </div>
 }
 
-@if (_showEditConfirmation)
-{
-    <div class="modal-overlay">
-        <div class="confirmation-modal">
-            <h3>Switch to Edit Mode?</h3>
-            <p>Editing this packing list might affect your current packing progress.</p>
-            
-            <div class="modal-actions">
-                <button class="btn secondary" @onclick="CancelEdit">Cancel</button>
-                <button class="btn primary" @onclick="ConfirmEdit">Continue to Edit</button>
-            </div>
-        </div>
-    </div>
-}
-
 @code {
     [Parameter]
     public string Id { get; set; } = string.Empty;
@@ -226,7 +213,6 @@
     private bool _completionAcknowledged = false;
     private bool _hideCheckedItems = true;
     private bool _showResetConfirmation = false;
-    private bool _showEditConfirmation = false;
 
     private Storage.PackingActivity _currentActivity = new Storage.PackingActivity();
 
@@ -493,27 +479,29 @@
         }
     }
 
-    private void SwitchToEditMode()
+    private async Task SwitchToEditMode()
     {
         if(Items.Count(i => i.IsChecked) > 0)
         {
-            _showEditConfirmation = true;
+            bool confirm = await DialogService.ShowConfirmAsync(
+                "Switch to Edit Mode?", 
+                "Editing this packing list might affect your current packing progress.", 
+                "Continue to Edit", 
+                "Cancel");
+                
+            if (confirm)
+            {
+                NavigateToEditMode();
+            }
         }
         else
         {
-            ConfirmEdit();
+            NavigateToEditMode();
         }
     }
 
-    private void CancelEdit()
+    private void NavigateToEditMode()
     {
-        _showEditConfirmation = false;
-    }
-
-    private void ConfirmEdit()
-    {
-        _showEditConfirmation = false;
-        
         if (!string.IsNullOrEmpty(Id))
         {
             Navigation.NavigateTo($"/edit-packing/{Id}");

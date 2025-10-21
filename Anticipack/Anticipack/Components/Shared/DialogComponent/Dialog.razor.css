@@ -37,10 +37,10 @@
     transition: transform 0.4s cubic-bezier(0.17, 0.89, 0.32, 1.28), opacity 0.25s ease;
 }
 
-.dialog.visible {
-    transform: scale(1);
-    opacity: 1;
-}
+    .dialog.visible {
+        transform: scale(1);
+        opacity: 1;
+    }
 
 /* Dialog header */
 .dialog-header {
@@ -76,11 +76,11 @@
     border-radius: 50%;
 }
 
-.close-button:hover {
-    color: #333;
-    background-color: rgba(0, 0, 0, 0.05);
-    transform: rotate(90deg);
-}
+    .close-button:hover {
+        color: #333;
+        background-color: rgba(0, 0, 0, 0.05);
+        transform: rotate(90deg);
+    }
 
 /* Dialog content */
 .dialog-content {
@@ -91,9 +91,9 @@
     font-size: 1rem;
 }
 
-/* Dialog types styling with modern colors */
+/* Dialog types styling with more user-friendly colors */
 .dialog.info .dialog-header {
-    border-bottom-color: #0078d4;
+    border-bottom-color: #0284c7;
     background-color: rgba(0, 120, 212, 0.05);
 }
 
@@ -111,21 +111,21 @@
 }
 
 .dialog.warning .dialog-header {
-    border-bottom-color: #ff8c00;
-    background-color: rgba(255, 140, 0, 0.05);
+    border-bottom-color: #f59e0b;
+    background-color: rgba(245, 158, 11, 0.05);
 }
 
 .dialog.warning .dialog-title {
-    color: #ff8c00;
+    color: #b45309;
 }
 
 .dialog.error .dialog-header {
-    border-bottom-color: #d13438;
-    background-color: rgba(209, 52, 56, 0.05);
+    border-bottom-color: #ea580c;
+    background-color: rgba(234, 88, 12, 0.05);
 }
 
 .dialog.error .dialog-title {
-    color: #d13438;
+    color: #c2410c;
 }
 
 /* Confirm dialog specific styling */
@@ -170,54 +170,54 @@
     color: white;
 }
 
-.button-primary:hover {
-    background-color: #0067b8;
-    box-shadow: 0 2px 8px rgba(0, 120, 212, 0.3);
-    transform: translateY(-1px);
-}
+    .button-primary:hover {
+        background-color: #0067b8;
+        box-shadow: 0 2px 8px rgba(0, 120, 212, 0.3);
+        transform: translateY(-1px);
+    }
 
 .button-secondary {
     background-color: #5b5fc7;
     color: white;
 }
 
-.button-secondary:hover {
-    background-color: #4b4fb7;
-    box-shadow: 0 2px 8px rgba(91, 95, 199, 0.3);
-    transform: translateY(-1px);
-}
+    .button-secondary:hover {
+        background-color: #4b4fb7;
+        box-shadow: 0 2px 8px rgba(91, 95, 199, 0.3);
+        transform: translateY(-1px);
+    }
 
 /* Confirmation dialog buttons */
 .button-confirm {
-    background-color: #ff8c00;
+    background-color: #0284c7;
     color: white;
 }
 
-.button-confirm:hover {
-    background-color: #f08000;
-    box-shadow: 0 2px 8px rgba(255, 140, 0, 0.3);
-    transform: translateY(-1px);
-}
+    .button-confirm:hover {
+        background-color: #0369a1;
+        box-shadow: 0 2px 8px rgba(2, 132, 199, 0.3);
+        transform: translateY(-1px);
+    }
 
 .button-cancel {
     background-color: #f0f0f0;
     color: #333;
 }
 
-.button-cancel:hover {
-    background-color: #e0e0e0;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
+    .button-cancel:hover {
+        background-color: #e0e0e0;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
 
-/* Danger button for delete confirmation */
+/* Confirmation button for warning dialogs - now more friendly blue instead of red */
 .dialog.warning .button-confirm {
-    background-color: #d13438;
+    background-color: #0284c7;
 }
 
-.dialog.warning .button-confirm:hover {
-    background-color: #c12e32;
-    box-shadow: 0 2px 8px rgba(209, 52, 56, 0.3);
-}
+    .dialog.warning .button-confirm:hover {
+        background-color: #0369a1;
+        box-shadow: 0 2px 8px rgba(2, 132, 199, 0.3);
+    }
 
 /* Responsive adjustments */
 @media (max-width: 576px) {
@@ -228,31 +228,31 @@
         margin: 16px;
         border-radius: 10px;
     }
-    
+
     .dialog-header {
         padding: 16px 20px;
     }
-    
+
     .dialog-content {
         padding: 20px;
     }
-    
+
     .dialog-footer {
         padding: 16px 20px;
         flex-direction: column-reverse;
     }
-    
+
     .dialog-button {
         width: 100%;
         margin: 4px 0;
         padding: 14px 16px;
     }
-    
+
     /* On mobile, confirm button appears first (at bottom) */
     .button-confirm {
         order: 1;
     }
-    
+
     .button-cancel {
         order: 2;
     }
@@ -276,6 +276,13 @@
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }

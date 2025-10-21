@@ -42,7 +42,7 @@ namespace Anticipack.Components.Shared.DialogComponent
                 Message = message,
                 ConfirmText = confirmText,
                 CancelText = cancelText,
-                DialogType = DialogType.Warning,
+                DialogType = DialogType.Info,
                 OkText = string.Empty, // No OK button for confirm dialog
                 ShowCloseButton = true,
                 CloseOnOverlayClick = false, // Prevent accidentally closing

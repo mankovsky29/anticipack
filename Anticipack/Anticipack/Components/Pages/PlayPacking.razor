@@ -191,21 +191,6 @@
     @(_hideCheckedItems ? "Show" : "Hide") Checked Items
 </button>
 
-@if (_showResetConfirmation)
-{
-    <div class="modal-overlay">
-        <div class="confirmation-modal">
-            <h3>Reset Packing List</h3>
-            <p>Are you sure you want to mark all items as unpacked?</p>
-            
-            <div class="modal-actions">
-                <button class="btn secondary" @onclick="CancelReset">Cancel</button>
-                <button class="btn danger" @onclick="ResetAllItems">Reset All</button>
-            </div>
-        </div>
-    </div>
-}
-
 @code {
     [Parameter]
     public string Id { get; set; } = string.Empty;
@@ -215,7 +200,6 @@
     private bool _showHistory = false;
     private bool _completionAcknowledged = false;
     private bool _hideCheckedItems = true;
-    private bool _showResetConfirmation = false;
 
     private Storage.PackingActivity _currentActivity = new Storage.PackingActivity();
 
@@ -527,15 +511,22 @@
         _hideCheckedItems = !_hideCheckedItems;
     }
 
-    private void ConfirmResetAllItems()
+    private async Task ConfirmResetAllItems()
     {
-        _showResetConfirmation = true;
+        bool confirm = await DialogService.ShowConfirmAsync(
+            "Reset Packing List", 
+            "Are you sure you want to mark all items as unpacked?", 
+            "Reset All", 
+            "Cancel");
+            
+        if (confirm)
+        {
+            await ResetAllItems();
+        }
     }
 
     private async Task ResetAllItems()
     {
-        _showResetConfirmation = false;
-        
         // Count how many items were checked before reset
         int checkedItemsCount = Items.Count(i => i.IsChecked);
         
@@ -571,11 +562,6 @@
                 ShowToast($"Error resetting items: {ex.Message}");
             }
         }
-    }
-
-    private void CancelReset()
-    {
-        _showResetConfirmation = false;
     }
 
     private async Task HandleRowClick(MouseEventArgs e, PackingItemView item)

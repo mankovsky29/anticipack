@@ -64,9 +64,9 @@
             @foreach (var category in _categoryOrder)
             {
                 var groupItems = Items.Where(i => string.Equals(i.Item.Category, category, StringComparison.OrdinalIgnoreCase))
-                                     .Where(i => !(_hideCheckedItems && i.IsChecked)) // Filter BEFORE rendering
-                                     .ToList();
-                                     
+                                      .Where(i => !(_hideCheckedItems && i.IsChecked && !i.IsAnimating)) // Keep animating items visible
+                                      .ToList();
+                                      
                 if (!groupItems.Any())
                     continue;
 
@@ -84,12 +84,15 @@
                     <ul class="category-content @(collapsed ? "hidden" : "")">
                         @foreach (var item in groupItems)
                         {
-                            <li class="packing-row" @key="item.Item.Id" @onclick="() => HandleRowClick(item)">
+                            <li class="packing-row @(item.IsAnimating ? "vanishing" : "")" 
+                                @key="item.Item.Id" 
+                                @onclick="(e) => HandleRowClick(e, item)"
+                                id="item-@item.Item.Id">
                                 <div class="item-main">
                                     <div class="round-checkbox">
                                         <input id="@($"checkbox-{item.Item.Id}")" class="item-checkbox" type="checkbox" 
                                                checked="@item.IsChecked"
-                                               @onchange="@(async (ChangeEventArgs e) => await HandleItemChecked(item, Convert.ToBoolean(e.Value)))" 
+                                               @onchange="@(async (ChangeEventArgs e) => await HandleItemChecked(item, Convert.ToBoolean(e.Value), null))" 
                                                @onclick:stopPropagation="true" />
                                         <label for="@($"checkbox-{item.Item.Id}")" @onclick:stopPropagation="true"></label>
                                     </div>
@@ -221,6 +224,7 @@
         public PackingItemView(Storage.PackingItem item) => Item = item;
         public Storage.PackingItem Item { get; }
         public bool IsChecked { get; set; }
+        public bool IsAnimating { get; set; } // Track animation state
     }
 
     private ElementReference contentArea;
@@ -574,34 +578,73 @@
         _showResetConfirmation = false;
     }
 
-    private async Task HandleItemChecked(PackingItemView item, bool isChecked)
+    private async Task HandleRowClick(MouseEventArgs e, PackingItemView item)
     {
-        // First update the data model
-        item.IsChecked = isChecked;
-        UpdateCategoryStateAfterItemChange(item.Item.Category);
-        
-        // Show toast when an item is packed (checked)
-        if (isChecked)
+        await HandleItemChecked(item, !item.IsChecked, e);
+    }
+
+    private async Task HandleItemChecked(PackingItemView item, bool isChecked, MouseEventArgs? e)
+    {
+        // Only apply animation when marking as checked (not unchecking)
+        if (!item.IsChecked && isChecked)
         {
-            ShowToast($"✓ {item.Item.Name} packed");
+            try
+            {
+                item.IsAnimating = true;
+                StateHasChanged(); // Force UI update to show animation starting
+                
+                item.IsChecked = isChecked;
+                await Task.Delay(750); 
+                
+                UpdateCategoryStateAfterItemChange(item.Item.Category);
+                
+                // Show toast
+                ShowToast($"✓ {item.Item.Name} packed");
+                
+                // Save the change to repository
+                SaveCheckState(item);
+            }
+            catch (Exception ex)
+            {
+                // Fallback if animation fails
+                item.IsChecked = isChecked;
+                UpdateCategoryStateAfterItemChange(item.Item.Category);
+                SaveCheckState(item);
+                ShowToast($"✓ {item.Item.Name} packed");
+            }
+            finally
+            {
+                // End animation state
+                item.IsAnimating = false;
+                
+                // Force UI update if needed
+                if (_hideCheckedItems)
+                {
+                    await InvokeAsync(StateHasChanged);
+                }
+            }
         }
         else
         {
-            ShowToast($"◯ {item.Item.Name} unpacked");
+            // For unchecking, just update without animation
+            item.IsChecked = isChecked;
+            
+            if (isChecked)
+            {
+                ShowToast($"✓ {item.Item.Name} packed");
+            }
+            else
+            {
+                ShowToast($"◯ {item.Item.Name} unpacked");
+            }
+            
+            UpdateCategoryStateAfterItemChange(item.Item.Category);
+            SaveCheckState(item);
+            
+            if (_hideCheckedItems)
+            {
+                await InvokeAsync(StateHasChanged);
+            }
         }
-        
-        // Save the change
-        SaveCheckState(item);
-        
-        // Force a complete re-render when an item is checked in hide-checked mode
-        if (_hideCheckedItems && isChecked)
-        {
-            await InvokeAsync(StateHasChanged);
-        }
-    }
-
-    private async Task HandleRowClick(PackingItemView item)
-    {
-        await HandleItemChecked(item, !item.IsChecked);
     }
 }

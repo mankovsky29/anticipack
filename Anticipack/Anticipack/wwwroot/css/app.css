@@ -278,3 +278,150 @@ input, select, textarea {
         width: 95%;
     }
 }
+
+
+/* Thanos snap vanish animation */
+@keyframes vanish {
+    0% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    20% {
+        opacity: 0.9;
+        transform: scale(1.01) rotate(0.5deg);
+        filter: blur(0);
+    }
+
+    50% {
+        opacity: 0.7;
+        transform: scale(0.98) rotate(-0.5deg);
+        filter: blur(1px);
+    }
+
+    80% {
+        opacity: 0.3;
+        transform: scale(0.95);
+        filter: blur(2px);
+    }
+
+    100% {
+        opacity: 0;
+        transform: scale(0.9);
+        filter: blur(3px);
+    }
+}
+
+/* Add this particle effect for more Thanos-like disintegration */
+/* Enhanced Thanos snap vanish animation with dust effect */
+@keyframes vanish {
+    0% {
+        opacity: 1;
+        transform: scale(1);
+        filter: blur(0);
+    }
+
+    20% {
+        opacity: 0.95;
+        transform: scale(1.01) rotate(0.5deg);
+        filter: blur(0px);
+    }
+
+    60% {
+        opacity: 0.5;
+        transform: scale(0.97) rotate(-0.5deg);
+        filter: blur(1px);
+    }
+
+    100% {
+        opacity: 0;
+        transform: scale(0.9);
+        filter: blur(2px);
+    }
+}
+
+/* Particle dust effect */
+@keyframes dust {
+    0% {
+        opacity: 0;
+        transform: translateY(0);
+    }
+
+    10% {
+        opacity: 0.2;
+    }
+
+    60% {
+        opacity: 0.8;
+    }
+
+    100% {
+        opacity: 0;
+        transform: translateY(-10px) translateX(5px);
+    }
+}
+
+.packing-row.vanishing {
+    animation: vanish 650ms ease-out forwards;
+    position: relative;
+    pointer-events: none;
+    overflow: visible;
+}
+
+    /* Add multiple particles with different positions */
+.packing-row.vanishing::before,
+.packing-row.vanishing::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 2;
+}
+
+.packing-row.vanishing::before {
+        background-size: 8px 8px, 12px 12px, 16px 16px;
+    background-position: 0 0, 4px 4px, -4px -4px;
+    opacity: 0;
+    animation: dust 650ms ease-out forwards;
+}
+
+.packing-row.vanishing::after {
+    background-size: 10px 10px, 14px 14px;
+    background-position: -2px -2px, 2px 2px;
+    opacity: 0;
+    animation: dust 650ms ease-out 100ms forwards;
+}
+
+/* Essential style to prevent hiding during animation */
+.hide-checked .packing-row.vanishing {
+    display: flex !important;
+    opacity: 1;
+}
+
+.vanishing {
+    animation: fade-out 0.7s forwards;
+}
+
+@keyframes fade-out {
+    0% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+    }
+}
+
+@keyframes float-away {
+    0% {
+        opacity: 0.8;
+        transform: scale(1) translateY(0);
+    }
+
+    100% {
+        opacity: 0;
+        transform: scale(0.5) translateY(-20px) translateX(var(--float-x, 10px));
+    }
+}

@@ -848,6 +848,10 @@
         if (itemEditInputElement.Id != null)
         {
             await JSRuntime.InvokeVoidAsync("selectAllText", itemEditInputElement);
+
+            // Ensure the focused edit element is visible above the keyboard (pass the last known keyboard height)
+            // This uses JS to compute whether scrolling is needed and performs it.
+            _ = JSRuntime.InvokeVoidAsync("ensureElementVisible", itemEditInputElement, _keyboardHeight);
         }
     }
 

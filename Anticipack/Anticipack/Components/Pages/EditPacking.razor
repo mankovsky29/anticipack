@@ -8,10 +8,12 @@
 @using Microsoft.AspNetCore.Components.Routing
 @using Microsoft.JSInterop
 @using Anticipack.Components.Shared.DialogComponent
+@using Anticipack.Components.Shared.ToastComponent
 @inject NavigationManager Navigation
 @inject IPackingRepository PackingRepository
 @inject IJSRuntime JSRuntime
 @inject IDialogService DialogService
+@inject IToastService ToastService
 @implements IDisposable
 @inject IKeyboardService KeyboardService
 
@@ -237,10 +239,6 @@
     </main>
 </div>
 
-<div class="toast-container" aria-live="polite" aria-atomic="true">
-    <div class="@($"toast {(_showToast ? "show" : "")}")">@_toastMessage</div>
-</div>
-
 <div class="quick-add-container">
     <div class="quick-add-form">
         <input type="text" 
@@ -321,10 +319,6 @@
 
     private PackingItemView? _pendingDeleteItem;
 
-    private bool _showToast;
-    private string _toastMessage = string.Empty;
-    private CancellationTokenSource? _toastCts;
-
     private PackingItemView? _draggedItem;
     private PackingItemView? _dragOverItem;
 
@@ -403,14 +397,14 @@
             // Clear input
             _quickAddName = string.Empty;
 
-            // Show toast
-            ShowToast($"Added {name}");
+            // Show toast via centralized service
+            ToastService.ShowSuccess($"Added {name}");
 
             StateHasChanged();
         }
         catch (Exception ex)
         {
-            ShowToast($"Error adding item: {ex.Message}");
+            ToastService.ShowError($"Error adding item: {ex.Message}");
         }
     }
 
@@ -485,7 +479,7 @@
         }
         catch (Exception ex)
         {
-            ShowToast("Failed to load items");
+            ToastService.ShowError("Failed to load items");
         }
         finally
         {
@@ -570,7 +564,7 @@
             _manualOverride[category] = false;
         }
         catch (Exception ex) {
-            ShowToast($"Error adding item: {ex.Message}");
+            ToastService.ShowError($"Error adding item: {ex.Message}");
         }
 
         _isAddingItem = false;
@@ -605,11 +599,11 @@
         {
             await PackingRepository.DeleteItemAsync(toRemove.Item.Id);
             await LoadItemsForPackingAsync(Id);
-            ShowToast($"Deleted \"{toRemove.Item.Name}\"");
+            ToastService.ShowSuccess($"Deleted \"{toRemove.Item.Name}\"");
         }
         catch (Exception ex)
         {
-            ShowToast($"Failed to delete item: {ex.Message}");
+            ToastService.ShowError($"Failed to delete item: {ex.Message}");
         }
 
         _pendingDeleteItem = null;
@@ -623,13 +617,13 @@
         try
         {
             var newId = await PackingRepository.CopyPackingAsync(Id);
-            ShowToast("Packing activity copied successfully.");
+            ToastService.ShowSuccess("Packing activity copied successfully.");
             // Optionally navigate to the new copy
             Navigation.NavigateTo($"/edit-packing/{newId}");
         }
         catch (Exception ex)
         {
-            ShowToast($"Failed to copy packing activity: {ex.Message}");
+            ToastService.ShowError($"Failed to copy packing activity: {ex.Message}");
         }
     }
 
@@ -655,43 +649,12 @@
         try
         {
             await PackingRepository.DeleteAsync(Id);
-            ShowToast("Packing activity deleted successfully.");
+            ToastService.ShowSuccess("Packing activity deleted successfully.");
             Navigation.NavigateTo("/packing-activities");
         }
         catch (Exception ex)
         {
-            ShowToast($"Failed to delete packing activity: {ex.Message}");
-        }
-    }
-
-    private void ShowToast(string message)
-    {
-        try
-        {
-            _toastCts?.Cancel();
-            _toastCts?.Dispose();
-        }
-        catch { }
-
-        _toastCts = new CancellationTokenSource();
-
-        _toastMessage = message;
-        _showToast = true;
-        StateHasChanged();
-
-        _ = HideToastAfterDelayAsync(_toastCts.Token);
-    }
-
-    private async Task HideToastAfterDelayAsync(CancellationToken token)
-    {
-        try
-        {
-            await Task.Delay(2000, token);
-            _showToast = false;
-            await InvokeAsync(StateHasChanged);
-        }
-        catch (OperationCanceledException)
-        {
+            ToastService.ShowError($"Failed to delete packing activity: {ex.Message}");
         }
     }
 
@@ -909,11 +872,11 @@
             }
 
             await PackingRepository.AddOrUpdateItemAsync(item.Item);
-            ShowToast("Item updated");
+            ToastService.ShowSuccess("Item updated");
         }
         catch (Exception ex)
         {
-            ShowToast($"Failed to update item: {ex.Message}");
+            ToastService.ShowError($"Failed to update item: {ex.Message}");
         }
         finally
         {
@@ -956,8 +919,6 @@
     {
         try
         {
-            _toastCts?.Cancel();
-            _toastCts?.Dispose();
             if (KeyboardService != null)
             {
                 KeyboardService.KeyboardVisibilityChanged -= OnKeyboardVisibilityChanged;

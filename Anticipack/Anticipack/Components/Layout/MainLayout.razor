@@ -1,5 +1,6 @@
 ﻿@page "/"
 @using Anticipack.Components.Shared.DialogComponent
+@using Anticipack.Components.Shared.ToastComponent
 @inherits LayoutComponentBase
 @implements IDisposable
 
@@ -30,6 +31,8 @@
     CancelText="@_dialogOptions.CancelText"
     ShowCloseButton="@_dialogOptions.ShowCloseButton"
     CloseOnOverlayClick="@_dialogOptions.CloseOnOverlayClick" />
+
+<Toast />
 
 @code {
     [Inject] private IDialogService DialogService { get; set; } = default!;

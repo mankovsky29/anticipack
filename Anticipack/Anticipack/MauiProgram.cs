@@ -1,4 +1,5 @@
 ﻿using Anticipack.Components.Shared.DialogComponent;
+using Anticipack.Components.Shared.ToastComponent;
 using Anticipack.Storage;
 using Microsoft.Extensions.Logging;
 
@@ -41,6 +42,7 @@ namespace Anticipack
 #endif
 
             builder.Services.AddScoped<IDialogService, DialogService>();
+            builder.Services.AddScoped<IToastService, ToastService>();
 
             var app = builder.Build();
 

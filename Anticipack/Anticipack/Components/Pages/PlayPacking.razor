@@ -7,10 +7,12 @@
 @using Microsoft.AspNetCore.Components.Routing
 @using Microsoft.JSInterop
 @using Anticipack.Components.Shared.DialogComponent
+@using Anticipack.Components.Shared.ToastComponent
 @inject NavigationManager Navigation
 @inject IPackingRepository PackingRepository
 @inject IJSRuntime JSRuntime
 @inject IDialogService DialogService
+@inject IToastService ToastService
 @implements IDisposable
 
 <div class="page-container with-fixed-navbar">
@@ -101,6 +103,7 @@
                                     </span>
                                 </div>
                                 
+
                                 @if (!string.IsNullOrWhiteSpace(item.Item.Notes))
                                 {
                                     <div class="notes">@item.Item.Notes</div>
@@ -183,10 +186,6 @@
     </div>
 }
 
-<div class="toast-container" aria-live="polite" aria-atomic="true">
-    <div class="@($"toast {(_showToast ? "show" : "")}")">@_toastMessage</div>
-</div>
-
 <button class="btn toggle-visibility" @onclick="ToggleItemVisibility">
     @(_hideCheckedItems ? "Show" : "Hide") Checked Items
 </button>
@@ -217,10 +216,6 @@
     private List<PackingItemView> Items { get; set; } = new();
     private List<string> _categoryOrder = new();
     private readonly Dictionary<string, bool?> _manualOverride = new(StringComparer.OrdinalIgnoreCase);
-
-    private bool _showToast;
-    private string _toastMessage = string.Empty;
-    private CancellationTokenSource? _toastCts;
 
     protected override async Task OnInitializedAsync()
     {
@@ -257,7 +252,7 @@
         }
         catch
         {
-            ShowToast("Failed to load items");
+            ToastService.ShowError("Failed to load items");
         }
         finally
         {
@@ -297,7 +292,7 @@
             }
             catch (Exception ex)
             {
-                ShowToast($"Error saving item state: {ex.Message}");
+                ToastService.ShowError($"Error saving item state: {ex.Message}");
             }
         }
     }
@@ -348,37 +343,6 @@
             PackingCategory.Miscellaneous => "fa-box",
             _ => "fa-box"
         };
-    }
-
-    private void ShowToast(string message)
-    {
-        try
-        {
-            _toastCts?.Cancel();
-            _toastCts?.Dispose();
-        }
-        catch { }
-
-        _toastCts = new CancellationTokenSource();
-
-        _toastMessage = message;
-        _showToast = true;
-        StateHasChanged();
-
-        _ = HideToastAfterDelayAsync(_toastCts.Token);
-    }
-
-    private async Task HideToastAfterDelayAsync(CancellationToken token)
-    {
-        try
-        {
-            await Task.Delay(2000, token);
-            _showToast = false;
-            await InvokeAsync(StateHasChanged);
-        }
-        catch (OperationCanceledException)
-        {
-        }
     }
 
     private void HandleKeyboardNavigation(KeyboardEventArgs e)
@@ -463,7 +427,7 @@
         if (!string.IsNullOrWhiteSpace(Id))
         {
             await PackingRepository.AddOrUpdateAsync(_currentActivity);
-            ShowToast("Packing completed and recorded!");
+            ToastService.ShowSuccess("Packing completed and recorded!");
         }
     }
 
@@ -498,12 +462,7 @@
 
     public void Dispose()
     {
-        try
-        {
-            _toastCts?.Cancel();
-            _toastCts?.Dispose();
-        }
-        catch { }
+        // No toast cleanup needed anymore
     }
 
     private void ToggleItemVisibility()
@@ -547,7 +506,7 @@
                 }
                 
                 // Show a toast with the result
-                ShowToast($"Reset {checkedItemsCount} items");
+                ToastService.ShowInfo($"Reset {checkedItemsCount} items");
                 
                 // Refresh categories state
                 foreach (var category in _categoryOrder)
@@ -559,7 +518,7 @@
             }
             catch (Exception ex)
             {
-                ShowToast($"Error resetting items: {ex.Message}");
+                ToastService.ShowError($"Error resetting items: {ex.Message}");
             }
         }
     }
@@ -585,7 +544,7 @@
                 UpdateCategoryStateAfterItemChange(item.Item.Category);
                 
                 // Show toast
-                ShowToast($"✓ {item.Item.Name} packed");
+                ToastService.ShowSuccess($"✓ {item.Item.Name} packed");
                 
                 // Save the change to repository
                 SaveCheckState(item);
@@ -596,7 +555,7 @@
                 item.IsChecked = isChecked;
                 UpdateCategoryStateAfterItemChange(item.Item.Category);
                 SaveCheckState(item);
-                ShowToast($"✓ {item.Item.Name} packed");
+                ToastService.ShowSuccess($"✓ {item.Item.Name} packed");
             }
             finally
             {
@@ -617,11 +576,11 @@
             
             if (isChecked)
             {
-                ShowToast($"✓ {item.Item.Name} packed");
+                ToastService.ShowSuccess($"✓ {item.Item.Name} packed");
             }
             else
             {
-                ShowToast($"◯ {item.Item.Name} unpacked");
+                ToastService.ShowInfo($"◯ {item.Item.Name} unpacked");
             }
             
             UpdateCategoryStateAfterItemChange(item.Item.Category);

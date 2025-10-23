@@ -199,6 +199,24 @@ window.handleKeyboardVisibility = function(isVisible, keyboardHeight) {
 
             top = Math.max(8, top);
             quickAddContainer.style.top = `${top}px`;
+            
+            // Add a small delayed re-calculation to fix initial positioning issue
+            // when keyboard first appears and measurements might be unstable
+            setTimeout(() => {
+                const updatedViewportHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+                const updatedContainerHeight = quickAddContainer.offsetHeight || 0;
+                let updatedTop = Math.floor((updatedViewportHeight - updatedContainerHeight) * 0.5);
+                
+                if (kbHeight > 0) {
+                    const updatedTopOfKeyboard = updatedViewportHeight - kbHeight;
+                    if ((updatedTop + updatedContainerHeight) > (updatedTopOfKeyboard - 8)) {
+                        updatedTop = Math.max(8, updatedTopOfKeyboard - updatedContainerHeight - 8);
+                    }
+                }
+                
+                updatedTop = Math.max(8, updatedTop);
+                quickAddContainer.style.top = `${updatedTop}px`;
+            }, 100);
         } else {
             // Not focused: restore default position if we previously modified it
             if (quickAddContainer.__originalPosition) {
@@ -278,4 +296,21 @@ window.ensureElementVisible = function(element, keyboardHeight) {
     } catch (ex) {
         // silent
     }
+};
+
+/**
+ * Determines if a dropdown should open upward based on available space
+ */
+window.shouldOpenDropdownUp = function(element) {
+    if (!element) return false;
+    
+    const rect = element.getBoundingClientRect();
+    const dropdownHeight = element.offsetHeight || 200; // Fallback if height not available
+    const viewportHeight = window.innerHeight;
+    
+    // Check if there's enough space below
+    const spaceBelow = viewportHeight - rect.bottom;
+    
+    // If we have less than dropdown height + padding, open upward
+    return spaceBelow < (dropdownHeight + 20);
 };

@@ -7,22 +7,25 @@ namespace Anticipack.Platforms.iOS
 {
     public class KeyboardService : IKeyboardService
     {
-        public event Action<bool>? KeyboardVisibilityChanged;
+        public event Action<bool, double>? KeyboardVisibilityChanged;
 
         private NSObject? _willShowObserver;
         private NSObject? _willHideObserver;
 
         public void Initialize(object? platformSpecific)
         {
-            // Subscribe to keyboard notifications
             _willShowObserver = UIKeyboard.Notifications.ObserveWillShow((sender, args) =>
             {
-                KeyboardVisibilityChanged?.Invoke(true);
+                var keyboardFrame = args.FrameEnd;
+                // Convert pixel height to DIPs
+                double density = DeviceDisplay.MainDisplayInfo.Density;
+                double heightDp = keyboardFrame.Height / density;
+                KeyboardVisibilityChanged?.Invoke(true, heightDp);
             });
 
             _willHideObserver = UIKeyboard.Notifications.ObserveWillHide((sender, args) =>
             {
-                KeyboardVisibilityChanged?.Invoke(false);
+                KeyboardVisibilityChanged?.Invoke(false, 0);
             });
         }
 
@@ -34,8 +37,8 @@ namespace Anticipack.Platforms.iOS
         private void DisposeObservers()
         {
             _willShowObserver?.Dispose();
-            _willShowObserver = null;
             _willHideObserver?.Dispose();
+            _willShowObserver = null;
             _willHideObserver = null;
         }
     }

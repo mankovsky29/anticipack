@@ -7,7 +7,7 @@ namespace Anticipack.Platforms.Android
 {
     public class KeyboardService : IKeyboardService
     {
-        public event Action<bool>? KeyboardVisibilityChanged;
+        public event Action<bool, double>? KeyboardVisibilityChanged;
 
         // optional store to allow manual initialization
         private global::Android.Views.View? _rootView;
@@ -27,7 +27,9 @@ namespace Anticipack.Platforms.Android
 
         private void OnGlobalLayout(object? sender, EventArgs e)
         {
-            if (_rootView == null) return;
+            if (_rootView == null)
+                return;
+
             var rect = new global::Android.Graphics.Rect();
             _rootView.GetWindowVisibleDisplayFrame(rect);
 
@@ -39,11 +41,20 @@ namespace Anticipack.Platforms.Android
             }
 
             int delta = _lastVisibleHeight - visibleHeight;
-            // if more than ~150px difference -> keyboard show/hide (tweak threshold if needed)
+
             if (Math.Abs(delta) > 150)
             {
-                bool isVisible = delta > 0; // positive delta => keyboard shown
-                KeyboardVisibilityChanged?.Invoke(isVisible);
+                bool isVisible = delta > 0;
+
+                double keyboardHeightDp = 0;
+                if (isVisible)
+                {
+                    // Convert pixel height to device-independent units
+                    double density = DeviceDisplay.MainDisplayInfo.Density;
+                    keyboardHeightDp = delta / density;
+                }
+
+                KeyboardVisibilityChanged?.Invoke(isVisible, keyboardHeightDp);
             }
 
             _lastVisibleHeight = visibleHeight;

@@ -1121,7 +1121,7 @@ ul.category-content {
     background-color: #f8fafc;
     box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
     padding: 12px 12px;
-    padding-bottom: 24px;
+    padding-bottom: 12px;
     z-index: 100;
     border-top: 1px solid #e2e8f0;
     width: 100%;

@@ -289,6 +289,7 @@
     private bool _isAddingItem = false;
     private bool _isLoading;
     private bool _keyboardVisible;
+    private double _keyboardHeight;
     private Storage.PackingActivity _currentActivity = new Storage.PackingActivity();
 
     private sealed class PackingItemView
@@ -893,22 +894,22 @@
         }
     }
 
-    private void OnKeyboardVisibilityChanged(bool visible)
+    private void OnKeyboardVisibilityChanged(bool visible, double height)
     {
         _keyboardVisible = visible;
-        
+        _keyboardHeight = height;
         // When keyboard becomes visible, reset the quick-add container UI elements
         if (visible)
         {
             _showQuickCategoryDropdown = false;
             
-            // Call JavaScript to handle any visual adjustments
-            _ = JSRuntime.InvokeVoidAsync("handleKeyboardVisibility", true);
+            // Call JavaScript to handle any visual adjustments and pass keyboard height
+            _ = JSRuntime.InvokeVoidAsync("handleKeyboardVisibility", true, height);
         }
         else
         {
-            // Call JavaScript to reset container when keyboard disappears
-            _ = JSRuntime.InvokeVoidAsync("handleKeyboardVisibility", false);
+            // Call JavaScript to reset container when keyboard disappears (height may be 0)
+            _ = JSRuntime.InvokeVoidAsync("handleKeyboardVisibility", false, height);
         }
         
         // Ensure UI updates happen on the Blazor renderer thread

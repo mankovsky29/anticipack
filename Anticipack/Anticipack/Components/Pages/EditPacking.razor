@@ -360,7 +360,6 @@
         if (firstRender)
         {
             KeyboardService.Initialize(this);
-            await JSRuntime.InvokeVoidAsync("setupMobileKeyboardHandling");
         }
 
         await base.OnAfterRenderAsync(firstRender);

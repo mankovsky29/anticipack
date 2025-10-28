@@ -1,11 +1,14 @@
-﻿:root {
+﻿:root,
+[data-theme="light"] {
     /* Color Palette - Peaceful Blues */
     --primary: #4B89DC;
     --primary-light: #5D9CEC;
     --primary-dark: #3A6FC7;
+    --primary-light-bg: rgba(75, 137, 220, 0.1);
     --secondary: #7F8C8D;
     --accent: #36D7B7;
     --danger: #E74C3C;
+    --danger-rgb: 231, 76, 60;
     --warning: #F39C12;
     --success: #2ECC71;
     --background: #F5F7FA;
@@ -13,11 +16,14 @@
     --text-primary: #2C3E50;
     --text-secondary: #7F8C8D;
     --text-light: #BDC3C7;
+    --border-color: #E0E5EC;
+    
     /* Chat Colors */
     --chat-received: #e9f2ff;
     --chat-sent: #4B89DC;
     --chat-meta: rgba(0,0,0,0.45);
     --chat-input-bg: #fafafa;
+    
     /* Typography */
     --font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
     --font-size-xs: 0.75rem;
@@ -25,6 +31,7 @@
     --font-size-md: 1rem;
     --font-size-lg: 1.125rem;
     --font-size-xl: 1.25rem;
+    
     /* Spacing */
     --space-xs: 0.25rem;
     --space-sm: 0.5rem;
@@ -33,18 +40,53 @@
     --space-xl: 2rem;
     --space-xxl: 3rem;
     --space-xxxl: 4rem;
+    
     /* Borders */
     --border-radius-sm: 0.25rem;
     --border-radius: 0.5rem;
     --border-radius-lg: 0.75rem;
     --border-radius-xl: 1rem;
+    
     /* Shadows */
     --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
     --shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
     --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+    
     /* Transitions */
     --transition-fast: 150ms ease;
     --transition: 250ms ease;
+}
+
+/* Dark Theme */
+[data-theme="dark"] {
+    /* Color Palette - Dark Theme */
+    --primary: #5D9CEC;
+    --primary-light: #70A9F0;
+    --primary-dark: #4B89DC;
+    --primary-light-bg: rgba(93, 156, 236, 0.15);
+    --secondary: #95A5A6;
+    --accent: #48E4C6;
+    --danger: #FF6B6B;
+    --danger-rgb: 255, 107, 107;
+    --warning: #FFB84D;
+    --success: #51E898;
+    --background: #1A1D23;
+    --surface: #252A31;
+    --text-primary: #E8EAED;
+    --text-secondary: #B4B8BF;
+    --text-light: #6B7280;
+    --border-color: #3A3F47;
+    
+    /* Chat Colors - Dark */
+    --chat-received: #2D3441;
+    --chat-sent: #5D9CEC;
+    --chat-meta: rgba(255,255,255,0.45);
+    --chat-input-bg: #2D3441;
+    
+    /* Shadows - Adjusted for dark theme */
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
+    --shadow: 0 4px 6px -1px rgba(0,0,0,0.3), 0 2px 4px -1px rgba(0,0,0,0.2);
+    --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.4), 0 4px 6px -2px rgba(0,0,0,0.3);
 }
 
 /* Base Styles */
@@ -55,6 +97,7 @@ html, body {
     line-height: 1.5;
     margin: 0;
     padding: 0;
+    transition: background-color var(--transition), color var(--transition);
 }
 
 /* Common Button Styles */
@@ -72,54 +115,55 @@ html, body {
     gap: 0.5rem;
 }
 
-    .btn:active {
-        transform: translateY(1px);
-    }
+.btn:active {
+    transform: translateY(1px);
+}
 
-    .btn.primary {
-        background-color: var(--primary);
-        color: white;
-    }
+.btn.primary {
+    background-color: var(--primary);
+    color: white;
+}
 
-        .btn.primary:hover {
-            background-color: var(--primary-dark);
-        }
+.btn.primary:hover {
+    background-color: var(--primary-dark);
+}
 
-    .btn.secondary {
-        background-color: var(--secondary);
-        color: white;
-    }
+.btn.secondary {
+    background-color: var(--secondary);
+    color: white;
+}
 
-        .btn.secondary:hover {
-            background-color: #6C7A7A;
-        }
+.btn.secondary:hover {
+    background-color: #6C7A7A;
+}
 
-    .btn.success {
-        background-color: var(--success);
-        color: white;
-    }
+.btn.success {
+    background-color: var(--success);
+    color: white;
+}
 
-        .btn.success:hover {
-            background-color: #27AE60;
-        }
+.btn.success:hover {
+    opacity: 0.9;
+}
 
-    .btn.danger {
-        background-color: var(--danger);
-        color: white;
-    }
+.btn.danger {
+    background-color: var(--danger);
+    color: white;
+}
 
-        .btn.danger:hover {
-            background-color: #C0392B;
-        }
+.btn.danger:hover {
+    opacity: 0.9;
+}
 
-    .btn.cancel {
-        background-color: #ECF0F1;
-        color: var(--text-primary);
-    }
+.btn.cancel {
+    background-color: var(--surface);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+}
 
-        .btn.cancel:hover {
-            background-color: #BDC3C7;
-        }
+.btn.cancel:hover {
+    background-color: var(--background);
+}
 
 /* Icon Button */
 .icon-btn {
@@ -132,17 +176,18 @@ html, body {
     padding: 0.5rem;
     border-radius: 50%;
     transition: background-color var(--transition-fast);
+    color: var(--text-primary);
 }
 
-    .icon-btn:hover {
-        background-color: rgba(0, 0, 0, 0.05);
-    }
+.icon-btn:hover {
+    background-color: var(--primary-light-bg);
+}
 
 /* Form Elements */
 input, select, textarea {
     padding: 0.75rem 1rem;
     border-radius: var(--border-radius);
-    border: 1px solid var(--text-light);
+    border: 1px solid var(--border-color);
     font-family: var(--font-family);
     font-size: 1rem;
     background-color: var(--surface);
@@ -150,11 +195,11 @@ input, select, textarea {
     transition: border-color var(--transition-fast);
 }
 
-    input:focus, select:focus, textarea:focus {
-        outline: none;
-        border-color: var(--primary);
-        box-shadow: 0 0 0 3px rgba(75, 137, 220, 0.15);
-    }
+input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--primary-light-bg);
+}
 
 /* Card Styles */
 .card {
@@ -188,18 +233,18 @@ input, select, textarea {
     font-weight: 500;
 }
 
-    .toast.show {
-        opacity: 1;
-        transform: translateY(0);
-    }
+.toast.show {
+    opacity: 1;
+    transform: translateY(0);
+}
 
-    .toast.error {
-        background-color: var(--danger);
-    }
+.toast.error {
+    background-color: var(--danger);
+}
 
-    .toast.warning {
-        background-color: var(--warning);
-    }
+.toast.warning {
+    background-color: var(--warning);
+}
 
 /* Modal styles */
 .modal-overlay {
@@ -211,6 +256,10 @@ input, select, textarea {
     justify-content: center;
     z-index: 1000;
     backdrop-filter: blur(4px);
+}
+
+[data-theme="dark"] .modal-overlay {
+    background: rgba(0, 0, 0, 0.7);
 }
 
 .modal {
@@ -228,7 +277,6 @@ input, select, textarea {
         opacity: 0;
         transform: translateY(10px);
     }
-
     to {
         opacity: 1;
         transform: translateY(0);
@@ -238,18 +286,19 @@ input, select, textarea {
 .modal-header {
     margin: -1rem -1rem 1rem -1rem;
     padding: 1rem;
-    border-bottom: 1px solid rgba(0,0,0,0.1);
+    border-bottom: 1px solid var(--border-color);
 }
 
-    .modal-header h4 {
-        margin: 0;
-        font-weight: 600;
-    }
+.modal-header h4 {
+    margin: 0;
+    font-weight: 600;
+    color: var(--text-primary);
+}
 
 .modal-footer {
     margin: 1rem -1rem -1rem -1rem;
     padding: 1rem;
-    border-top: 1px solid rgba(0,0,0,0.1);
+    border-top: 1px solid var(--border-color);
     display: flex;
     justify-content: flex-end;
     gap: 0.5rem;
@@ -273,66 +322,28 @@ input, select, textarea {
     .btn {
         padding: 0.5rem 1rem;
     }
-
     .modal {
         width: 95%;
     }
 }
 
-
-/* Thanos snap vanish animation */
-@keyframes vanish {
-    0% {
-        opacity: 1;
-        transform: scale(1);
-    }
-
-    20% {
-        opacity: 0.9;
-        transform: scale(1.01) rotate(0.5deg);
-        filter: blur(0);
-    }
-
-    50% {
-        opacity: 0.7;
-        transform: scale(0.98) rotate(-0.5deg);
-        filter: blur(1px);
-    }
-
-    80% {
-        opacity: 0.3;
-        transform: scale(0.95);
-        filter: blur(2px);
-    }
-
-    100% {
-        opacity: 0;
-        transform: scale(0.9);
-        filter: blur(3px);
-    }
-}
-
-/* Add this particle effect for more Thanos-like disintegration */
-/* Enhanced Thanos snap vanish animation with dust effect */
+/* Animations remain the same */
 @keyframes vanish {
     0% {
         opacity: 1;
         transform: scale(1);
         filter: blur(0);
     }
-
     20% {
         opacity: 0.95;
         transform: scale(1.01) rotate(0.5deg);
         filter: blur(0px);
     }
-
     60% {
         opacity: 0.5;
         transform: scale(0.97) rotate(-0.5deg);
         filter: blur(1px);
     }
-
     100% {
         opacity: 0;
         transform: scale(0.9);
@@ -340,21 +351,17 @@ input, select, textarea {
     }
 }
 
-/* Particle dust effect */
 @keyframes dust {
     0% {
         opacity: 0;
         transform: translateY(0);
     }
-
     10% {
         opacity: 0.2;
     }
-
     60% {
         opacity: 0.8;
     }
-
     100% {
         opacity: 0;
         transform: translateY(-10px) translateX(5px);
@@ -368,7 +375,6 @@ input, select, textarea {
     overflow: visible;
 }
 
-    /* Add multiple particles with different positions */
 .packing-row.vanishing::before,
 .packing-row.vanishing::after {
     content: '';
@@ -381,7 +387,7 @@ input, select, textarea {
 }
 
 .packing-row.vanishing::before {
-        background-size: 8px 8px, 12px 12px, 16px 16px;
+    background-size: 8px 8px, 12px 12px, 16px 16px;
     background-position: 0 0, 4px 4px, -4px -4px;
     opacity: 0;
     animation: dust 650ms ease-out forwards;
@@ -394,7 +400,6 @@ input, select, textarea {
     animation: dust 650ms ease-out 100ms forwards;
 }
 
-/* Essential style to prevent hiding during animation */
 .hide-checked .packing-row.vanishing {
     display: flex !important;
     opacity: 1;
@@ -408,7 +413,6 @@ input, select, textarea {
     0% {
         opacity: 1;
     }
-
     100% {
         opacity: 0;
     }
@@ -419,7 +423,6 @@ input, select, textarea {
         opacity: 0.8;
         transform: scale(1) translateY(0);
     }
-
     100% {
         opacity: 0;
         transform: scale(0.5) translateY(-20px) translateX(var(--float-x, 10px));

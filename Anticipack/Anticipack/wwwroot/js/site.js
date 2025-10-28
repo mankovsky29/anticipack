@@ -221,3 +221,66 @@ window.shouldOpenDropdownUp = function(element) {
     // If we have less than dropdown height + padding, open upward
     return spaceBelow < (dropdownHeight + 20);
 };
+
+/**
+ * Theme Manager
+ */
+window.themeManager = {
+    init: function() {
+        const savedTheme = localStorage.getItem('app-theme') || 'light';
+        this.applyTheme(savedTheme);
+        
+        // Listen for system theme changes if auto mode
+        if (savedTheme === 'auto') {
+            this.watchSystemTheme();
+        }
+    },
+    
+    setTheme: function(theme) {
+        localStorage.setItem('app-theme', theme);
+        this.applyTheme(theme);
+        
+        if (theme === 'auto') {
+            this.watchSystemTheme();
+        }
+    },
+    
+    getTheme: function() {
+        return localStorage.getItem('app-theme') || 'light';
+    },
+    
+    applyTheme: function(theme) {
+        let actualTheme = theme;
+        
+        if (theme === 'auto') {
+            actualTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        
+        document.documentElement.setAttribute('data-theme', actualTheme);
+    },
+    
+    watchSystemTheme: function() {
+        const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+        const handler = (e) => {
+            const currentTheme = localStorage.getItem('app-theme');
+            if (currentTheme === 'auto') {
+                this.applyTheme('auto');
+            }
+        };
+        
+        // Remove old listener if exists
+        if (this._themeListener) {
+            mediaQuery.removeListener(this._themeListener);
+        }
+        
+        this._themeListener = handler;
+        mediaQuery.addListener(handler);
+    }
+};
+
+// Initialize theme on load
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => window.themeManager.init());
+} else {
+    window.themeManager.init();
+}

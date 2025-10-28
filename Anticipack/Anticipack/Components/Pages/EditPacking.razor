@@ -172,36 +172,36 @@
                                 @if (_editingItem == item)
                                 {
                                     <!-- Replace the item edit container to remove the category dropdown -->
-<div class="item-edit-container">
-    <div class="item-edit-header">
-        <input type="text" 
-               value="@item.Item.Name" 
-               @oninput="@((e) => UpdateItemName(item, e.Value?.ToString()))"
-               @onfocus="@(e => SelectAllInputText(e))"
-               @ref="itemEditInputElement"
-               class="edit-item-input"
-               @onkeydown="@(e => HandleItemEditKeyDown(e, item))"
-               placeholder="Item name..."
-               @onclick:stopPropagation />
-    </div>
+                                    <div class="item-edit-container">
+                                        <div class="item-edit-header">
+                                            <input type="text" 
+                                                   value="@item.Item.Name" 
+                                                   @oninput="@((e) => UpdateItemName(item, e.Value?.ToString()))"
+                                                   @onfocus="@(e => SelectAllInputText(e))"
+                                                   @ref="itemEditInputElement"
+                                                   class="edit-item-input"
+                                                   @onkeydown="@(e => HandleItemEditKeyDown(e, item))"
+                                                   placeholder="Item name..."
+                                                   @onclick:stopPropagation />
+                                        </div>
     
-    <div class="edit-notes">
-        <textarea placeholder="Add notes about this item..." 
-                  @bind="item.Item.Notes"
-                  @bind:event="oninput"
-                  rows="2"
-                  class="edit-notes-textarea"></textarea>
-    </div>
+                                        <div class="edit-notes">
+                                            <textarea placeholder="Add notes about this item..." 
+                                                      @bind="item.Item.Notes"
+                                                      @bind:event="oninput"
+                                                      rows="2"
+                                                      class="edit-notes-textarea"></textarea>
+                                        </div>
     
-    <div class="item-edit-actions">
-        <button class="btn secondary btn-sm" @onclick="() => CancelItemEdit(item)" title="Cancel">
-            <i class="fa fa-times"></i> Cancel
-        </button>
-        <button class="btn primary btn-sm" @onclick="() => SaveItemChanges(item)" title="Save">
-            <i class="fa fa-check"></i> Save
-        </button>
-    </div>
-</div>
+                                        <div class="item-edit-actions">
+                                            <button class="btn secondary btn-sm" @onclick="() => CancelItemEdit(item)" title="Cancel">
+                                                <i class="fa fa-times"></i> Cancel
+                                            </button>
+                                            <button class="btn primary btn-sm" @onclick="() => SaveItemChanges(item)" title="Save">
+                                                <i class="fa fa-check"></i> Save
+                                            </button>
+                                        </div>
+                                    </div>
                                 }
                                 else
                                 {
@@ -222,9 +222,6 @@
                                     </div>
                                     
                                     <div class="item-actions">
-                                        <button class="icon-btn item-edit-btn" title="Edit item" @onclick:stopPropagation @onclick="() => StartEditingItem(item)">
-                                            <i class="fa fa-pencil"></i>
-                                        </button>
                                         <button class="icon-btn" title="Delete item" @onclick:stopPropagation @onclick="@(() => PromptDelete(item))">
                                             <i class="fa fa-trash"></i>
                                         </button>

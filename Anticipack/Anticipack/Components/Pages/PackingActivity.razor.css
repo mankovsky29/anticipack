@@ -192,16 +192,6 @@
     background-color: rgba(var(--danger-rgb), 0.2);
 }
 
-.item-delete-btn {
-    color: var(--danger);
-    background: transparent;
-    font-size: 1rem;
-}
-
-.item-delete-btn:hover {
-    background-color: rgba(var(--danger-rgb), 0.1);
-}
-
 /* Editable title */
 .packing-name-display {
     display: block;
@@ -426,7 +416,7 @@
     display: flex;
     align-items: center;
     padding: 10px 15px;
-    background-color: #f5f7fa;
+    background-color: var(--surface);
     border-bottom: 1px solid #e0e5ec;
     cursor: pointer;
 }
@@ -460,7 +450,7 @@
     align-items: center;
     padding: 12px 15px;
     border-bottom: 1px solid #eee;
-    background-color: white;
+    background-color: var(--surface);
     position: relative;
 }
 
@@ -533,28 +523,6 @@
 .item-text.checked {
     text-decoration: line-through;
     color: #999;
-}
-
-/* Delete Button Alignment */
-.item-delete-btn {
-    margin-left: auto;
-    color: #e74c3c;
-    background: transparent;
-    border: none;
-    width: 32px;
-    height: 32px;
-    border-radius: 4px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    opacity: 0.7;
-    transition: all 0.2s ease;
-}
-
-.item-delete-btn:hover {
-    background-color: #fee;
-    opacity: 1;
 }
 
 /* Notes styling */

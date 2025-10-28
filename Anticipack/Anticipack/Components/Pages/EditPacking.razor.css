@@ -75,10 +75,10 @@
 .activity-header {
     display: flex;
     align-items: center;
-    margin-bottom: var(--space-lg);
+    margin-bottom: var(--space-sm);
     padding: 8px 12px;
-    background: #4285f4; /* Google-style blue color matching checkbox */
-    color: white;
+    background: var(--surface); /* Google-style blue color matching checkbox */
+    color: var(--text-primary);
     border-radius: 4px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     justify-content: space-between; /* Ensure proper spacing */
@@ -163,44 +163,6 @@
 .add-btn {
     border-radius: 4px; /* Square with rounded corners instead of circle */
 }
-
-.icon-btn {
-    border-radius: 4px; /* Square with rounded corners instead of circle */
-}
-
-/* Icon button styling (consistent with PackingActivities) */
-.icon-btn {
-    background: none;
-    border: none;
-    font-size: 1.2rem;
-    cursor: pointer;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    padding: 0;
-}
-
-    .icon-btn:hover {
-        background-color: rgba(255, 255, 255, 0.2);
-    }
-
-    .icon-btn.danger:hover {
-        background-color: rgba(var(--danger-rgb), 0.2);
-    }
-
-.item-delete-btn {
-    color: var(--danger);
-    background: transparent;
-    font-size: 1rem;
-}
-
-    .item-delete-btn:hover {
-        background-color: rgba(var(--danger-rgb), 0.1);
-    }
 
 /* Editable title */
 .packing-name-display {
@@ -419,14 +381,16 @@
     border-radius: 8px;
     overflow: hidden;
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    background-color: white;
+    background-color: var(--primary);
+    border: 1px solid;
 }
 
 .category-header {
     display: flex;
     align-items: center;
     padding: 10px 15px;
-    background-color: #f5f7fa;
+    background-color: var(--surface);
+    border-color: var(--border-color);
     border-bottom: 1px solid #e0e5ec;
     cursor: pointer;
 }
@@ -446,11 +410,11 @@
     flex-grow: 1;
     font-size: 16px;
     font-weight: 500;
-    color: #333;
+    color: var(--text-primary);
 }
 
 .count {
-    color: #666;
+    color: var(--text-primary);
     font-size: 14px;
 }
 
@@ -460,7 +424,8 @@
     align-items: center;
     padding: 12px 15px;
     border-bottom: 1px solid #eee;
-    background-color: white;
+    background-color: var(--surface);
+    color: var(--text-primary);
     position: relative;
 }
 
@@ -528,6 +493,7 @@
     flex-grow: 1;
     padding: 3px 0;
     margin-left: 5px;
+    color: var(--text-primary)
 }
 
     .item-text.checked {
@@ -535,34 +501,13 @@
         color: #999;
     }
 
-/* Delete Button Alignment */
-.item-delete-btn {
-    margin-left: auto;
-    color: #e74c3c;
-    background: transparent;
-    border: none;
-    width: 32px;
-    height: 32px;
-    border-radius: 4px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    opacity: 0.7;
-    transition: all 0.2s ease;
-}
-
-    .item-delete-btn:hover {
-        background-color: #fee;
-        opacity: 1;
-    }
 
 /* Notes styling */
 .notes {
     padding-left: 35px; /* Aligned with the text, not the checkbox */
     margin: 5px 0 5px 0;
     font-size: 13px;
-    color: #777;
+    color: var(--text-primary);
     font-style: italic;
 }
 
@@ -579,7 +524,7 @@ ul.category-content {
 
 /* Fix for the category completed state */
 .category-completed .category-header {
-    background-color: #f0f9f0;
+    background-color: var(--surface);
     border-bottom-color: #d0e9d0;
 }
 
@@ -780,7 +725,7 @@ ul.category-content {
     flex-direction: column;
     gap: 8px;
     width: 100%;
-    background-color: #f8fafc;
+    background-color: var(--surface);
     border-radius: 6px;
     padding: 12px;
 }
@@ -810,7 +755,7 @@ ul.category-content {
     padding: 8px 12px;
     border: 1px solid #d1d1d1;
     border-radius: 4px;
-    background-color: #fff;
+    background-color: var(--surface);
     min-width: 120px;
 }
 
@@ -868,29 +813,14 @@ ul.category-content {
 }
 
 .packing-row:hover {
-    background-color: #f1f5f9;
+    background-color: var(--surface);
 }
 
 .packing-row.editing {
-    background-color: #f8fafc;
+    background-color: var(--background);
 }
-
-/* Quick Add Container */
-.quick-add-container {
-    position: sticky; /* Change back to sticky instead of fixed */
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background-color: #f8fafc;
-    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
-    padding: 12px 16px;
-    z-index: 100;
-    border-top: 1px solid #e2e8f0;
-    width: 100%;
-    margin-top: 16px; /* Add some spacing from content */
-}
-    
-    .quick-add-form {
+ 
+.quick-add-form {
     display: flex;
     align-items: center;
     gap: 10px;
@@ -924,7 +854,7 @@ ul.category-content {
     height: 46px;
     border-radius: 23px;
     border: none;
-    background-color: #4285f4;
+    background-color: var(--surface);
     color: white;
     display: flex;
     align-items: center;
@@ -934,7 +864,7 @@ ul.category-content {
     transition: all 0.2s ease;
     flex-shrink: 0;
     padding: 0;
-    }
+}
 
 .category-btn:hover {
     background-color: #3a7bd5;
@@ -1118,7 +1048,7 @@ ul.category-content {
     bottom: 0;
     left: 0;
     right: 0;
-    background-color: #f8fafc;
+    background-color: var(--surface);
     box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
     padding: 12px 12px;
     padding-bottom: 12px;

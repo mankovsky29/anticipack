@@ -10,7 +10,7 @@ main {
 }
 
 .sidebar {
-    background-color: var(--primary-dark);
+    background-color: var(--background);
 }
 
 .content {

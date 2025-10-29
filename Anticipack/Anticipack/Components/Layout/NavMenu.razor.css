@@ -169,5 +169,6 @@
         right: unset;
         height: calc(100vh - 3.5rem);
         overflow-y: auto;
+        background-color: var(--background)
     }
 }

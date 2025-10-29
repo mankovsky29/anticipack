@@ -17,7 +17,8 @@
     --text-secondary: #7F8C8D;
     --text-light: #BDC3C7;
     --border-color: #E0E5EC;
-    --button-default-color: #f7f7f7
+    --button-default-color: #2C3E50;
+    --button-color-hover: #666666d1;
     /* Chat Colors */
     --chat-received: #e9f2ff;
     --chat-sent: #4B89DC;
@@ -71,7 +72,9 @@
     --text-secondary: #B4B8BF;
     --text-light: #6B7280;
     --border-color: #3A3F47;
-    --button-default-color: #f7f7f7
+    --button-color: #2C3E50;
+    --button-default-color: #f7f7f7;
+    --button-color-hover: #737373;
     /* Chat Colors - Dark */
     --chat-received: #2D3441;
     --chat-sent: #5D9CEC;

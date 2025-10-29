@@ -140,24 +140,7 @@
     justify-content: flex-end; /* Ensure buttons align to the right */
 }
 
-/* Button styling */
-.activity-actions .icon-btn,
-.activity-actions .add-btn {
-    width: 36px;
-    height: 36px;
-    border-radius: 4px;
-    background: rgba(255, 255, 255, 0.15);
-    color: white;
-    font-size: 16px;
-    transition: background-color 0.2s;
-    border: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    flex-shrink: 0;
-    padding: 0;
-}
+
 
 /* Override existing button styles to ensure consistency */
 .add-btn {
@@ -255,19 +238,6 @@
     background-color: var(--surface);
     border-radius: var(--border-radius);
     box-shadow: var(--shadow);
-}
-
-/* Add item form */
-.add-item-form {
-    border: 1px solid var(--color-border, #e0e0e0);
-    border-radius: 12px;
-    background-color: white;
-    padding: 20px;
-    margin-bottom: 20px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    width: 100%;
-    display: flex;
-    flex-direction: column;
 }
 
 .form-header {

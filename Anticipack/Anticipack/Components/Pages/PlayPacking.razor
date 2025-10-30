@@ -8,6 +8,7 @@
 @using Microsoft.JSInterop
 @using Anticipack.Components.Shared.DialogComponent
 @using Anticipack.Components.Shared.ToastComponent
+@using Anticipack.Resources.Localization
 @inject NavigationManager Navigation
 @inject IPackingRepository PackingRepository
 @inject IJSRuntime JSRuntime
@@ -28,16 +29,16 @@
             </h3>
         </div>  
         <div class="activity-actions">
-            <button class="toggle-visibility-btn @(_hideCheckedItems ? "filtering" : "")" title="@(_hideCheckedItems ? "Show All Items" : "Hide Checked Items")" @onclick="ToggleItemVisibility">
+            <button class="toggle-visibility-btn @(_hideCheckedItems ? "filtering" : "")" title="@(_hideCheckedItems ? AppResources.ShowAllItems : AppResources.HideCheckedItems)" @onclick="ToggleItemVisibility">
                 <i class="fa @(_hideCheckedItems ? "fa-eye-slash" : "fa-eye")"></i>
             </button>
-            <button class="icon-btn" @onclick="ToggleHistory" title="@(_showHistory ? "Hide History" : "Show History")">
+            <button class="icon-btn" @onclick="ToggleHistory" title="@(_showHistory ? AppResources.HideHistory : AppResources.ShowHistory)">
                 <i class="fa @(_showHistory ? "fa-chevron-down" : "fa-list-ul")"></i>
             </button>
-            <button class="icon-btn" title="Reset All Items" @onclick="ConfirmResetAllItems">
+            <button class="icon-btn" title="@AppResources.ResetAllItems" @onclick="ConfirmResetAllItems">
                 <i class="fa fa-undo-alt"></i>
             </button>
-            <button class="icon-btn" title="Edit Activity" @onclick="SwitchToEditMode">
+            <button class="icon-btn" title="@AppResources.EditActivity" @onclick="SwitchToEditMode">
                 <i class="fa fa-edit"></i>
             </button>
         </div>
@@ -48,7 +49,7 @@
             <div class="progress-fill" style="width: @($"{GetCompletionPercentage()}%")"></div>
         </div>
         <div class="progress-stats">
-            <span>@Items.Count(i => i.IsChecked)/@Items.Count items packed</span>
+            <span>@string.Format(AppResources.ItemsPacked, Items.Count(i => i.IsChecked), Items.Count)</span>
             <span class="time-remaining">@GetEstimatedTimeRemaining()</span>
         </div>
     </div>
@@ -58,7 +59,7 @@
         {
             <div class="loading">
                 <div class="loading-spinner"></div>
-                <span>Loading packing…</span>
+                <span>@AppResources.LoadingPacking</span>
             </div>
         }
         else
@@ -119,7 +120,7 @@
 
 <div class="history-panel @(_showHistory ? "expanded" : "")">
     <div class="history-header" @onclick="ToggleHistory">
-        <h4>Packing History</h4>
+        <h4>@AppResources.PackingHistory</h4>
         <span class="chev @(_showHistory ? "" : "collapsed")">▾</span>
     </div>
     
@@ -129,20 +130,20 @@
             <div class="history-stats">
                 <div class="stat-card">
                     <span class="stat-value">@_currentActivity.RunCount</span>
-                    <span class="stat-label">Times Packed</span>
+                    <span class="stat-label">@AppResources.TimesPacked</span>
                 </div>
                 <div class="stat-card">
                     <span class="stat-value">@(GetAveragePackingTime())</span>
-                    <span class="stat-label">Avg. Time</span>
+                    <span class="stat-label">@AppResources.AvgTime</span>
                 </div>
                 <div class="stat-card">
                     <span class="stat-value">@(GetLastPackedDate())</span>
-                    <span class="stat-label">Last Packed</span>
+                    <span class="stat-label">@AppResources.LastPackedLabel</span>
                 </div>
             </div>
             
             <div class="history-timeline">
-                <h5>Recent Activity</h5>
+                <h5>@AppResources.RecentActivity</h5>
                 <ul class="timeline-list">
                     @foreach (var entry in GetRecentPackingHistory())
                     {
@@ -165,29 +166,29 @@
                 <!-- Confetti animation here -->
             </div>
             
-            <h3>Packing Complete!</h3>
-            <p>You packed @Items.Count items in @GetPackingDuration()</p>
+            <h3>@AppResources.PackingComplete</h3>
+            <p>@string.Format(AppResources.YouPackedItems, Items.Count, GetPackingDuration())</p>
             
             <div class="completion-stats">
                 <div class="stat">
-                    <span class="label">Efficiency</span>
+                    <span class="label">@AppResources.Efficiency</span>
                     <span class="value">@GetPackingEfficiency()</span>
                 </div>
                 <div class="stat">
-                    <span class="label">Compared to Last Time</span>
+                    <span class="label">@AppResources.ComparedToLastTime</span>
                     <span class="value @GetComparisonClass()">@GetComparisonText()</span>
-                </div }
+                </div>
             </div>
             
             <button class="btn primary" @onclick="AcknowledgeCompletion">
-                Great!
+                @AppResources.Great
             </button>
         </div>
     </div>
 }
 
 <button class="btn toggle-visibility" @onclick="ToggleItemVisibility">
-    @(_hideCheckedItems ? "Show" : "Hide") Checked Items
+    @(_hideCheckedItems ? AppResources.ShowCheckedItems : AppResources.HideLabel) @AppResources.HideCheckedItems.Replace("Hide ", "").Replace("Ocultar ", "").Replace("Скрыть ", "")
 </button>
 
 @code {
@@ -236,7 +237,7 @@
 
         try
         {
-            _currentActivity = await PackingRepository.GetByIdAsync(id) ?? new Storage.PackingActivity(){ Name = "Packing Activity" };
+            _currentActivity = await PackingRepository.GetByIdAsync(id) ?? new Storage.PackingActivity(){ Name = AppResources.PackingActivity };
             var itemsFromRepo = await PackingRepository.GetItemsForActivityAsync(id);
             Items = itemsFromRepo.Select(pi => new PackingItemView(pi)).ToList();
             _categoryOrder = Items.Select(i => i.Item.Category).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
@@ -252,7 +253,7 @@
         }
         catch
         {
-            ToastService.ShowError("Failed to load items");
+            ToastService.ShowError(AppResources.FailedToLoadItems);
         }
         finally
         {
@@ -292,7 +293,7 @@
             }
             catch (Exception ex)
             {
-                ToastService.ShowError($"Error saving item state: {ex.Message}");
+                ToastService.ShowError(string.Format(AppResources.ErrorSavingItemState, ex.Message));
             }
         }
     }
@@ -386,7 +387,7 @@
         var itemsLeft = Items.Count(i => !i.IsChecked);
         // Estimate 30 seconds per remaining item
         var minutesLeft = Math.Ceiling(itemsLeft * 0.5);
-        return minutesLeft > 0 ? $"~{minutesLeft} min remaining" : "Done!";
+        return minutesLeft > 0 ? string.Format(AppResources.MinRemaining, minutesLeft) : AppResources.Done;
     }
 
     private string GetAveragePackingTime() => "15 min";
@@ -427,7 +428,7 @@
         if (!string.IsNullOrWhiteSpace(Id))
         {
             await PackingRepository.AddOrUpdateAsync(_currentActivity);
-            ToastService.ShowSuccess("Packing completed and recorded!");
+            ToastService.ShowSuccess(AppResources.PackingCompletedRecorded);
         }
     }
 
@@ -436,10 +437,10 @@
         if(Items.Count(i => i.IsChecked) > 0)
         {
             bool confirm = await DialogService.ShowConfirmAsync(
-                "Switch to Edit Mode?", 
-                "Editing this packing list might affect your current packing progress.", 
-                "Continue to Edit", 
-                "Cancel");
+                AppResources.SwitchToEditMode, 
+                AppResources.EditingMightAffectProgress, 
+                AppResources.ContinueToEdit, 
+                AppResources.Cancel);
                 
             if (confirm)
             {
@@ -473,10 +474,10 @@
     private async Task ConfirmResetAllItems()
     {
         bool confirm = await DialogService.ShowConfirmAsync(
-            "Reset Packing List", 
-            "Are you sure you want to mark all items as unpacked?", 
-            "Reset All", 
-            "Cancel");
+            AppResources.ResetPackingList, 
+            AppResources.ConfirmResetAllItems, 
+            AppResources.ResetAll, 
+            AppResources.Cancel);
             
         if (confirm)
         {
@@ -506,7 +507,7 @@
                 }
                 
                 // Show a toast with the result
-                ToastService.ShowInfo($"Reset {checkedItemsCount} items");
+                ToastService.ShowInfo(string.Format(AppResources.ResetItemsSuccess, checkedItemsCount));
                 
                 // Refresh categories state
                 foreach (var category in _categoryOrder)
@@ -518,7 +519,7 @@
             }
             catch (Exception ex)
             {
-                ToastService.ShowError($"Error resetting items: {ex.Message}");
+                ToastService.ShowError(string.Format(AppResources.ErrorResettingItems, ex.Message));
             }
         }
     }
@@ -544,7 +545,7 @@
                 UpdateCategoryStateAfterItemChange(item.Item.Category);
                 
                 // Show toast
-                ToastService.ShowSuccess($"✓ {item.Item.Name} packed");
+                ToastService.ShowSuccess(string.Format(AppResources.ItemPacked, item.Item.Name));
                 
                 // Save the change to repository
                 SaveCheckState(item);
@@ -555,7 +556,7 @@
                 item.IsChecked = isChecked;
                 UpdateCategoryStateAfterItemChange(item.Item.Category);
                 SaveCheckState(item);
-                ToastService.ShowSuccess($"✓ {item.Item.Name} packed");
+                ToastService.ShowSuccess(string.Format(AppResources.ItemPacked, item.Item.Name));
             }
             finally
             {
@@ -576,11 +577,11 @@
             
             if (isChecked)
             {
-                ToastService.ShowSuccess($"✓ {item.Item.Name} packed");
+                ToastService.ShowSuccess(string.Format(AppResources.ItemPacked, item.Item.Name));
             }
             else
             {
-                ToastService.ShowInfo($"◯ {item.Item.Name} unpacked");
+                ToastService.ShowInfo(string.Format(AppResources.ItemUnpacked, item.Item.Name));
             }
             
             UpdateCategoryStateAfterItemChange(item.Item.Category);

@@ -104,6 +104,86 @@
     <value>Failed to delete activity</value>
   </data>
   
+  <!-- UserSettings Page -->
+  <data name="Settings" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="CustomizeExperience" xml:space="preserve">
+    <value>Customize your experience</value>
+  </data>
+  <data name="Appearance" xml:space="preserve">
+    <value>Appearance</value>
+  </data>
+  <data name="PersonalizeAppLooks" xml:space="preserve">
+    <value>Personalize how the app looks and feels</value>
+  </data>
+  <data name="Theme" xml:space="preserve">
+    <value>Theme</value>
+  </data>
+  <data name="LightTheme" xml:space="preserve">
+    <value>Light</value>
+  </data>
+  <data name="DarkTheme" xml:space="preserve">
+    <value>Dark</value>
+  </data>
+  <data name="AutoTheme" xml:space="preserve">
+    <value>Auto</value>
+  </data>
+  <data name="LightThemeTitle" xml:space="preserve">
+    <value>Light theme</value>
+  </data>
+  <data name="DarkThemeTitle" xml:space="preserve">
+    <value>Dark theme</value>
+  </data>
+  <data name="AutoThemeTitle" xml:space="preserve">
+    <value>Automatic theme based on system preferences</value>
+  </data>
+  <data name="AutoThemeHint" xml:space="preserve">
+    <value>The app will automatically match your device's system theme</value>
+  </data>
+  <data name="DarkThemeHint" xml:space="preserve">
+    <value>Dark theme reduces eye strain in low-light environments</value>
+  </data>
+  <data name="LightThemeHint" xml:space="preserve">
+    <value>Light theme is ideal for bright environments</value>
+  </data>
+  <data name="Notifications" xml:space="preserve">
+    <value>Notifications</value>
+  </data>
+  <data name="ManageNotificationPreferences" xml:space="preserve">
+    <value>Manage your notification preferences</value>
+  </data>
+  <data name="PushNotifications" xml:space="preserve">
+    <value>Push Notifications</value>
+  </data>
+  <data name="NotifiedAboutUpdates" xml:space="preserve">
+    <value>Get notified about important updates</value>
+  </data>
+  <data name="ComingSoon" xml:space="preserve">
+    <value>Coming Soon</value>
+  </data>
+  <data name="DataStorage" xml:space="preserve">
+    <value>Data &amp; Storage</value>
+  </data>
+  <data name="ManageAppData" xml:space="preserve">
+    <value>Manage your app data</value>
+  </data>
+  <data name="ClearCache" xml:space="preserve">
+    <value>Clear Cache</value>
+  </data>
+  <data name="FreeUpStorage" xml:space="preserve">
+    <value>Free up storage space</value>
+  </data>
+  <data name="Language" xml:space="preserve">
+    <value>Language</value>
+  </data>
+  <data name="ChoosePreferredLanguage" xml:space="preserve">
+    <value>Choose your preferred language</value>
+  </data>
+  <data name="Version" xml:space="preserve">
+    <value>Version</value>
+  </data>
+  
   <!-- Packing Categories -->
   <data name="Category_Clothing" xml:space="preserve">
     <value>Clothing</value>
@@ -137,5 +217,114 @@
   </data>
   <data name="Category_Miscellaneous" xml:space="preserve">
     <value>Miscellaneous</value>
+  </data>
+  <!-- PlayPacking Page -->
+  <data name="LoadingPacking" xml:space="preserve">
+    <value>Loading packing…</value>
+  </data>
+  <data name="ShowAllItems" xml:space="preserve">
+    <value>Show All Items</value>
+  </data>
+  <data name="HideCheckedItems" xml:space="preserve">
+    <value>Hide Checked Items</value>
+  </data>
+  <data name="ShowHistory" xml:space="preserve">
+    <value>Show History</value>
+  </data>
+  <data name="HideHistory" xml:space="preserve">
+    <value>Hide History</value>
+  </data>
+  <data name="ResetAllItems" xml:space="preserve">
+    <value>Reset All Items</value>
+  </data>
+  <data name="EditActivity" xml:space="preserve">
+    <value>Edit Activity</value>
+  </data>
+  <data name="ItemsPacked" xml:space="preserve">
+    <value>{0}/{1} items packed</value>
+  </data>
+  <data name="MinRemaining" xml:space="preserve">
+    <value>~{0} min remaining</value>
+  </data>
+  <data name="Done" xml:space="preserve">
+    <value>Done!</value>
+  </data>
+  <data name="PackingHistory" xml:space="preserve">
+    <value>Packing History</value>
+  </data>
+  <data name="TimesPacked" xml:space="preserve">
+    <value>Times Packed</value>
+  </data>
+  <data name="AvgTime" xml:space="preserve">
+    <value>Avg. Time</value>
+  </data>
+  <data name="LastPackedLabel" xml:space="preserve">
+    <value>Last Packed</value>
+  </data>
+  <data name="RecentActivity" xml:space="preserve">
+    <value>Recent Activity</value>
+  </data>
+  <data name="PackingComplete" xml:space="preserve">
+    <value>Packing Complete!</value>
+  </data>
+  <data name="YouPackedItems" xml:space="preserve">
+    <value>You packed {0} items in {1}</value>
+  </data>
+  <data name="Efficiency" xml:space="preserve">
+    <value>Efficiency</value>
+  </data>
+  <data name="ComparedToLastTime" xml:space="preserve">
+    <value>Compared to Last Time</value>
+  </data>
+  <data name="Great" xml:space="preserve">
+    <value>Great!</value>
+  </data>
+  <data name="ShowCheckedItems" xml:space="preserve">
+    <value>Show</value>
+  </data>
+  <data name="HideLabel" xml:space="preserve">
+    <value>Hide</value>
+  </data>
+  <data name="SwitchToEditMode" xml:space="preserve">
+    <value>Switch to Edit Mode?</value>
+  </data>
+  <data name="EditingMightAffectProgress" xml:space="preserve">
+    <value>Editing this packing list might affect your current packing progress.</value>
+  </data>
+  <data name="ContinueToEdit" xml:space="preserve">
+    <value>Continue to Edit</value>
+  </data>
+  <data name="ResetPackingList" xml:space="preserve">
+    <value>Reset Packing List</value>
+  </data>
+  <data name="ConfirmResetAllItems" xml:space="preserve">
+    <value>Are you sure you want to mark all items as unpacked?</value>
+  </data>
+  <data name="ResetAll" xml:space="preserve">
+    <value>Reset All</value>
+  </data>
+  <data name="ResetItemsSuccess" xml:space="preserve">
+    <value>Reset {0} items</value>
+  </data>
+  <data name="ItemPacked" xml:space="preserve">
+    <value>✓ {0} packed</value>
+  </data>
+  <data name="ItemUnpacked" xml:space="preserve">
+    <value>◯ {0} unpacked</value>
+  </data>
+  <data name="FailedToLoadItems" xml:space="preserve">
+    <value>Failed to load items</value>
+  </data>
+  <data name="ErrorSavingItemState" xml:space="preserve">
+    <value>Error saving item state: {0}</value>
+  </data>
+  <data name="ErrorResettingItems" xml:space="preserve">
+    <value>Error resetting items: {0}</value>
+  </data>
+  <data name="PackingCompletedRecorded" xml:space="preserve">
+    <value>Packing completed and recorded!</value>
+  </data>
+  <data name="PackingActivity" xml:space="preserve">
+    <value>Packing Activity</value>
   </data>
 </root>

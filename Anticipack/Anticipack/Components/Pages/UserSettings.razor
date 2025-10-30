@@ -1,8 +1,10 @@
 ﻿@page "/user-settings"
 @using Anticipack.Services
+@using Anticipack.Resources.Localization
 @inject IJSRuntime JSRuntime
 @using System.Globalization
 @inject ILocalizationService LocalizationService
+@implements IDisposable
 
 <div class="settings-page">
     <div class="settings-header">
@@ -11,8 +13,8 @@
                 <i class="fas fa-cog"></i>
             </div>
             <div>
-                <h2>Settings</h2>
-                <p class="header-subtitle">Customize your experience</p>
+                <h2>@AppResources.Settings</h2>
+                <p class="header-subtitle">@AppResources.CustomizeExperience</p>
             </div>
         </div>
     </div>
@@ -25,24 +27,24 @@
                     <i class="fas fa-palette"></i>
                 </div>
                 <div>
-                    <h3>Appearance</h3>
-                    <p class="section-description">Personalize how the app looks and feels</p>
+                    <h3>@AppResources.Appearance</h3>
+                    <p class="section-description">@AppResources.PersonalizeAppLooks</p>
                 </div>
             </div>
 
             <div class="setting-group">
                 <div class="setting-item">
                     <div class="setting-label">
-                        <label>Theme</label>
+                        <label>@AppResources.Theme</label>
                     </div>
                     <div class="theme-selector">
                         <button class="theme-option @(CurrentTheme == "light" ? "active" : "")"
                                 @onclick='() => SetTheme("light")'
-                                title="Light theme">
+                                title="@AppResources.LightThemeTitle">
                             <div class="theme-icon">
                                 <i class="fas fa-sun"></i>
                             </div>
-                            <span class="theme-name">Light</span>
+                            <span class="theme-name">@AppResources.LightTheme</span>
                             @if (CurrentTheme == "light")
                             {
                                 <i class="fas fa-check theme-check"></i>
@@ -50,11 +52,11 @@
                         </button>
                         <button class="theme-option @(CurrentTheme == "dark" ? "active" : "")"
                                 @onclick='() => SetTheme("dark")'
-                                title="Dark theme">
+                                title="@AppResources.DarkThemeTitle">
                             <div class="theme-icon">
                                 <i class="fas fa-moon"></i>
                             </div>
-                            <span class="theme-name">Dark</span>
+                            <span class="theme-name">@AppResources.DarkTheme</span>
                             @if (CurrentTheme == "dark")
                             {
                                 <i class="fas fa-check theme-check"></i>
@@ -62,11 +64,11 @@
                         </button>
                         <button class="theme-option @(CurrentTheme == "auto" ? "active" : "")"
                                 @onclick='() => SetTheme("auto")'
-                                title="Automatic theme based on system preferences">
+                                title="@AppResources.AutoThemeTitle">
                             <div class="theme-icon">
                                 <i class="fas fa-magic"></i>
                             </div>
-                            <span class="theme-name">Auto</span>
+                            <span class="theme-name">@AppResources.AutoTheme</span>
                             @if (CurrentTheme == "auto")
                             {
                                 <i class="fas fa-check theme-check"></i>
@@ -78,15 +80,15 @@
                         <span>
                             @if (CurrentTheme == "auto")
                             {
-                                <text>The app will automatically match your device's system theme</text>
+                                <text>@AppResources.AutoThemeHint</text>
                             }
                             else if (CurrentTheme == "dark")
                             {
-                                <text>Dark theme reduces eye strain in low-light environments</text>
+                                <text>@AppResources.DarkThemeHint</text>
                             }
                             else
                             {
-                                <text>Light theme is ideal for bright environments</text>
+                                <text>@AppResources.LightThemeHint</text>
                             }
                         </span>
                     </div>
@@ -101,16 +103,16 @@
                     <i class="fas fa-bell"></i>
                 </div>
                 <div>
-                    <h3>Notifications</h3>
-                    <p class="section-description">Manage your notification preferences</p>
+                    <h3>@AppResources.Notifications</h3>
+                    <p class="section-description">@AppResources.ManageNotificationPreferences</p>
                 </div>
             </div>
 
             <div class="setting-group">
                 <div class="setting-item-row">
                     <div class="setting-label">
-                        <label>Push Notifications</label>
-                        <span class="label-description">Get notified about important updates</span>
+                        <label>@AppResources.PushNotifications</label>
+                        <span class="label-description">@AppResources.NotifiedAboutUpdates</span>
                     </div>
                     <label class="toggle-switch">
                         <input type="checkbox" @bind="NotificationsEnabled" disabled>
@@ -118,7 +120,7 @@
                     </label>
                 </div>
                 <div class="coming-soon-badge">
-                    <i class="fas fa-clock"></i> Coming Soon
+                    <i class="fas fa-clock"></i> @AppResources.ComingSoon
                 </div>
             </div>
         </div>
@@ -130,8 +132,8 @@
                     <i class="fas fa-database"></i>
                 </div>
                 <div>
-                    <h3>Data & Storage</h3>
-                    <p class="section-description">Manage your app data</p>
+                    <h3>@AppResources.DataStorage</h3>
+                    <p class="section-description">@AppResources.ManageAppData</p>
                 </div>
             </div>
 
@@ -140,14 +142,14 @@
                     <div class="action-btn-content">
                         <i class="fas fa-trash-alt"></i>
                         <div>
-                            <div class="action-btn-title">Clear Cache</div>
-                            <div class="action-btn-subtitle">Free up storage space</div>
+                            <div class="action-btn-title">@AppResources.ClearCache</div>
+                            <div class="action-btn-subtitle">@AppResources.FreeUpStorage</div>
                         </div>
                     </div>
                     <i class="fas fa-chevron-right"></i>
                 </button>
                 <div class="coming-soon-badge">
-                    <i class="fas fa-clock"></i> Coming Soon
+                    <i class="fas fa-clock"></i> @AppResources.ComingSoon
                 </div>
             </div>
         </div>
@@ -159,8 +161,8 @@
                     <i class="fa fa-language"></i>
                 </div>
                 <div>
-                    <h3>Language / Idioma / Язык</h3>
-                    <p class="section-description">Choose your preferred language</p>
+                    <h3>@AppResources.Language</h3>
+                    <p class="section-description">@AppResources.ChoosePreferredLanguage</p>
                 </div>
             </div>
 
@@ -200,7 +202,7 @@
     <div class="settings-footer">
         <div class="app-version">
             <i class="fas fa-info-circle"></i>
-            <span>Version 1.0.0</span>
+            <span>@AppResources.Version 1.0.0</span>
         </div>
     </div>
 </div>
@@ -219,6 +221,9 @@
         {
             CurrentTheme = "light";
         }
+
+        // Subscribe to culture changes to trigger re-render
+        LocalizationService.CultureChanged += OnCultureChanged;
     }
 
     private async Task SetTheme(string theme)
@@ -235,5 +240,16 @@
     private void ChangeLanguage(string culture)
     {
         LocalizationService.SetCulture(culture);
+    }
+
+    private void OnCultureChanged(object? sender, CultureInfo culture)
+    {
+        // Force component re-render when culture changes
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        LocalizationService.CultureChanged -= OnCultureChanged;
     }
 }

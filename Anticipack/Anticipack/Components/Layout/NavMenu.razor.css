@@ -7,9 +7,9 @@
 
 /* hamburger button */
 .navbar-toggler {
-    background-color: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: white;
+    background-color: var(--background);
+    border: 1px solid var(--background);
+    color: var(--background);
     padding: 0.5rem;
     border-radius: var(--border-radius-sm);
     cursor: pointer;
@@ -17,13 +17,13 @@
     order: -1; /* This places the button on the left */
 }
 
-.navbar-toggler:hover {
-    background-color: rgba(255, 255, 255, 0.2);
-}
+    .navbar-toggler:hover {
+        background-color: var(--surface);
+    }
 
-.navbar-toggler:checked {
-    background-color: rgba(255, 255, 255, 0.5);
-}
+    .navbar-toggler:checked {
+        background-color: var(--surface);
+    }
 
 .navbar-toggler-icon {
     display: inline-block;
@@ -104,12 +104,11 @@
     }
 
 .nav-item ::deep .nav-link.active {
-    background-color: rgba(255, 255, 255, 0.25);
     color: var(--text-primary);
 }
 
 .nav-item ::deep .nav-link:hover {
-    background-color: rgba(255, 255, 255, 0.1);
+
     color: var(--text-primary);
 }
 

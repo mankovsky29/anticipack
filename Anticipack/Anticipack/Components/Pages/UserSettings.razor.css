@@ -395,59 +395,63 @@
     border-radius: var(--border-radius);
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-    .settings-header {
-        padding: var(--space-lg) var(--space-md);
-    }
-
-    .header-content {
-        gap: var(--space-sm);
-    }
-
-    .header-icon {
-        width: 48px;
-        height: 48px;
-        font-size: 1.25rem;
-    }
-
-    .settings-header h2 {
-        font-size: 1.5rem;
-    }
-
-    .settings-content {
-        padding: var(--space-md);
-    }
-
-    .section-header,
-    .setting-group {
-        padding: var(--space-md);
-    }
-
-    .theme-selector {
-        grid-template-columns: 1fr;
-    }
-
-    .setting-item-row {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .toggle-switch {
-        align-self: flex-end;
-    }
+/* Language Selector */
+.language-selector {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: var(--space-md);
+    margin-top: var(--space-sm);
 }
 
-@media (max-width: 480px) {
-    .settings-header h2 {
-        font-size: 1.25rem;
-    }
+.language-option {
+    position: relative;
+    background-color: var(--background);
+    border: 2px solid var(--border-color);
+    border-radius: var(--border-radius-lg);
+    padding: var(--space-lg);
+    cursor: pointer;
+    transition: all var(--transition);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-sm);
+    min-height: 100px;
+}
 
-    .header-subtitle {
-        font-size: 0.75rem;
-    }
+.language-option:hover {
+    border-color: var(--primary);
+    background-color: var(--primary-light-bg);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+}
 
-    .section-header h3 {
-        font-size: 1rem;
-    }
+.language-option.active {
+    border-color: var(--primary);
+    background-color: var(--primary-light-bg);
+    box-shadow: 0 0 0 3px var(--primary-light-bg);
+}
+
+.language-icon {
+    font-size: 2.5rem;
+    transition: all var(--transition);
+}
+
+.language-option:hover .language-icon,
+.language-option.active .language-icon {
+    transform: scale(1.1);
+}
+
+.language-name {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: var(--font-size-md);
+}
+
+.language-check {
+    position: absolute;
+    top: var(--space-sm);
+    right: var(--space-sm);
+    color: var(--primary);
+    font-size: 1rem;
+    animation: checkmark-appear 0.3s ease;
 }

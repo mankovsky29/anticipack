@@ -1,7 +1,10 @@
 ﻿using Anticipack.Components.Shared.DialogComponent;
 using Anticipack.Components.Shared.ToastComponent;
 using Anticipack.Storage;
+using Anticipack.Services;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Localization;
+using System.Reflection;
 
 namespace Anticipack
 {
@@ -25,6 +28,18 @@ namespace Anticipack
                 var repo = new PackingRepository(dbPath);
                 return repo; 
             });
+
+            // Add Localization Services
+            builder.Services.AddLocalization();
+            
+            // Register a custom string localizer that uses AppResources
+            builder.Services.AddSingleton<IStringLocalizer>(sp =>
+            {
+                var factory = sp.GetRequiredService<IStringLocalizerFactory>();
+                return factory.Create("AppResources", "Anticipack.Resources.Localization");
+            });
+            
+            builder.Services.AddSingleton<ILocalizationService, LocalizationService>();
 
 #if DEBUG
             builder.Services.AddBlazorWebViewDeveloperTools();

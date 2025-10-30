@@ -1,0 +1,141 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  
+  <!-- PackingActivities Page -->
+  <data name="Loading" xml:space="preserve">
+    <value>Loading activities...</value>
+  </data>
+  <data name="SearchPlaceholder" xml:space="preserve">
+    <value>Search activities...</value>
+  </data>
+  <data name="NoActivities" xml:space="preserve">
+    <value>No Packing Activities</value>
+  </data>
+  <data name="NoActivitiesDescription" xml:space="preserve">
+    <value>Create your first packing activity to get started.</value>
+  </data>
+  <data name="CreateActivity" xml:space="preserve">
+    <value>Create Packing Activity</value>
+  </data>
+  <data name="LastPacked" xml:space="preserve">
+    <value>Last packed:</value>
+  </data>
+  <data name="PackNow" xml:space="preserve">
+    <value>Pack Now</value>
+  </data>
+  <data name="Edit" xml:space="preserve">
+    <value>Edit</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="Search" xml:space="preserve">
+    <value>Search</value>
+  </data>
+  <data name="AddActivity" xml:space="preserve">
+    <value>Add Activity</value>
+  </data>
+  <data name="NewPackingActivity" xml:space="preserve">
+    <value>New Packing Activity</value>
+  </data>
+  <data name="Name" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="Category" xml:space="preserve">
+    <value>Category</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="Create" xml:space="preserve">
+    <value>Create</value>
+  </data>
+  <data name="DeleteActivityTitle" xml:space="preserve">
+    <value>Delete Activity?</value>
+  </data>
+  <data name="DeleteActivityMessage" xml:space="preserve">
+    <value>Are you sure you want to delete "{0}"? This action cannot be undone.</value>
+  </data>
+  <data name="ActivityCreated" xml:space="preserve">
+    <value>Activity created successfully</value>
+  </data>
+  <data name="ActivityDeleted" xml:space="preserve">
+    <value>Activity deleted successfully</value>
+  </data>
+  <data name="FailedToLoad" xml:space="preserve">
+    <value>Failed to load activities</value>
+  </data>
+  <data name="FailedToCreate" xml:space="preserve">
+    <value>Failed to create activity</value>
+  </data>
+  <data name="FailedToDelete" xml:space="preserve">
+    <value>Failed to delete activity</value>
+  </data>
+  
+  <!-- Packing Categories -->
+  <data name="Category_Clothing" xml:space="preserve">
+    <value>Clothing</value>
+  </data>
+  <data name="Category_Shoes" xml:space="preserve">
+    <value>Shoes</value>
+  </data>
+  <data name="Category_Toiletries" xml:space="preserve">
+    <value>Toiletries</value>
+  </data>
+  <data name="Category_Electronics" xml:space="preserve">
+    <value>Electronics</value>
+  </data>
+  <data name="Category_Documents" xml:space="preserve">
+    <value>Documents</value>
+  </data>
+  <data name="Category_Health" xml:space="preserve">
+    <value>Health</value>
+  </data>
+  <data name="Category_Accessories" xml:space="preserve">
+    <value>Accessories</value>
+  </data>
+  <data name="Category_Outdoor" xml:space="preserve">
+    <value>Outdoor</value>
+  </data>
+  <data name="Category_Food" xml:space="preserve">
+    <value>Food</value>
+  </data>
+  <data name="Category_Entertainment" xml:space="preserve">
+    <value>Entertainment</value>
+  </data>
+  <data name="Category_Miscellaneous" xml:space="preserve">
+    <value>Miscellaneous</value>
+  </data>
+</root>

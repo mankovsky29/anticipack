@@ -1,5 +1,8 @@
-@page "/user-settings"
+﻿@page "/user-settings"
+@using Anticipack.Services
 @inject IJSRuntime JSRuntime
+@using System.Globalization
+@inject ILocalizationService LocalizationService
 
 <div class="settings-page">
     <div class="settings-header">
@@ -26,14 +29,14 @@
                     <p class="section-description">Personalize how the app looks and feels</p>
                 </div>
             </div>
-            
+
             <div class="setting-group">
                 <div class="setting-item">
                     <div class="setting-label">
                         <label>Theme</label>
                     </div>
                     <div class="theme-selector">
-                        <button class="theme-option @(CurrentTheme == "light" ? "active" : "")" 
+                        <button class="theme-option @(CurrentTheme == "light" ? "active" : "")"
                                 @onclick='() => SetTheme("light")'
                                 title="Light theme">
                             <div class="theme-icon">
@@ -45,7 +48,7 @@
                                 <i class="fas fa-check theme-check"></i>
                             }
                         </button>
-                        <button class="theme-option @(CurrentTheme == "dark" ? "active" : "")" 
+                        <button class="theme-option @(CurrentTheme == "dark" ? "active" : "")"
                                 @onclick='() => SetTheme("dark")'
                                 title="Dark theme">
                             <div class="theme-icon">
@@ -57,7 +60,7 @@
                                 <i class="fas fa-check theme-check"></i>
                             }
                         </button>
-                        <button class="theme-option @(CurrentTheme == "auto" ? "active" : "")" 
+                        <button class="theme-option @(CurrentTheme == "auto" ? "active" : "")"
                                 @onclick='() => SetTheme("auto")'
                                 title="Automatic theme based on system preferences">
                             <div class="theme-icon">
@@ -102,7 +105,7 @@
                     <p class="section-description">Manage your notification preferences</p>
                 </div>
             </div>
-            
+
             <div class="setting-group">
                 <div class="setting-item-row">
                     <div class="setting-label">
@@ -131,7 +134,7 @@
                     <p class="section-description">Manage your app data</p>
                 </div>
             </div>
-            
+
             <div class="setting-group">
                 <button class="setting-action-btn" disabled>
                     <div class="action-btn-content">
@@ -145,6 +148,50 @@
                 </button>
                 <div class="coming-soon-badge">
                     <i class="fas fa-clock"></i> Coming Soon
+                </div>
+            </div>
+        </div>
+
+        <!-- Language Section -->
+        <div class="setting-section">
+            <div class="section-header">
+                <div class="section-icon">
+                    <i class="fa fa-language"></i>
+                </div>
+                <div>
+                    <h3>Language / Idioma / Язык</h3>
+                    <p class="section-description">Choose your preferred language</p>
+                </div>
+            </div>
+
+            <div class="setting-group">
+                <div class="language-selector">
+                    <div class="language-option @(IsCurrentLanguage("en") ? "active" : "")" @onclick='() => ChangeLanguage("en")'>
+                        <div class="language-icon">🇺🇸</div>
+                        <span class="language-name">English</span>
+                        @if (IsCurrentLanguage("en"))
+                        {
+                            <i class="fa fa-check language-check"></i>
+                        }
+                    </div>
+
+                    <div class="language-option @(IsCurrentLanguage("es") ? "active" : "")" @onclick='() => ChangeLanguage("es")'>
+                        <div class="language-icon">🇪🇸</div>
+                        <span class="language-name">Español</span>
+                        @if (IsCurrentLanguage("es"))
+                        {
+                            <i class="fa fa-check language-check"></i>
+                        }
+                    </div>
+
+                    <div class="language-option @(IsCurrentLanguage("ru") ? "active" : "")" @onclick='() => ChangeLanguage("ru")'>
+                        <div class="language-icon">🇷🇺</div>
+                        <span class="language-name">Русский</span>
+                        @if (IsCurrentLanguage("ru"))
+                        {
+                            <i class="fa fa-check language-check"></i>
+                        }
+                    </div>
                 </div>
             </div>
         </div>
@@ -178,5 +225,15 @@
     {
         CurrentTheme = theme;
         await JSRuntime.InvokeVoidAsync("themeManager.setTheme", theme);
+    }
+
+    private bool IsCurrentLanguage(string culture)
+    {
+        return LocalizationService.CurrentCulture.TwoLetterISOLanguageName == culture;
+    }
+
+    private void ChangeLanguage(string culture)
+    {
+        LocalizationService.SetCulture(culture);
     }
 }

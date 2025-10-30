@@ -2,9 +2,14 @@
 @using Anticipack.Components.Shared.DialogComponent
 @using Anticipack.Storage
 @using Anticipack.Packing
+@using Anticipack.Services
+@using Microsoft.Extensions.Localization
+@using Anticipack.Resources.Localization
 @inject IPackingRepository PackingRepository
 @inject NavigationManager Navigation
 @inject IDialogService DialogService
+@inject ILocalizationService LocalizationService
+@inject IStringLocalizer<AppResources> Localizer
 @implements IDisposable
 
 <div class="page-container with-fixed-navbar">
@@ -12,13 +17,13 @@
     {
         <div class="loading">
             <div class="loading-spinner"></div>
-            <span>Loading activities...</span>
+            <span>@Localizer["Loading"]</span>
         </div>
     }
     else
     {
         <div class="search-bar @(_isSearchVisible ? "visible" : "hidden")">
-            <input type="text" class="search-input" placeholder="Search activities..." @bind="_searchTerm" @bind:event="oninput" />
+            <input type="text" class="search-input" placeholder="@Localizer["SearchPlaceholder"]" @bind="_searchTerm" @bind:event="oninput" />
             <button class="search-close-btn" @onclick="ToggleSearchBar">
                 <i class="fa fa-times"></i>
             </button>
@@ -36,21 +41,21 @@
                         
                         <div class="activity-info">
                             <div class="activity-date">
-                                <i class="fa fa-calendar"></i> Last packed: @activity.LastPacked.ToString("MMM d, yyyy")
+                                <i class="fa fa-calendar"></i> @Localizer["LastPacked"] @activity.LastPacked.ToString("MMM d, yyyy")
                             </div>
                             <div class="activity-type">
-                                <i class="fa @GetCategoryIcon(activity.Category)"></i> @activity.Category
+                                <i class="fa @GetCategoryIcon(activity.Category)"></i> @GetLocalizedCategory(activity.Category)
                             </div>
                         </div>
                         
                         <div class="activity-actions">
-                            <button class="action-btn play" @onclick="() => OpenActivityInPackingMode(activity.Id)" title="Pack Now">
+                            <button class="action-btn play" @onclick="() => OpenActivityInPackingMode(activity.Id)" title="@Localizer["PackNow"]">
                                 <i class="fa fa-play"></i>
                             </button>
-                            <button class="action-btn edit" @onclick="() => OpenActivityInEditMode(activity.Id)" title="Edit">
+                            <button class="action-btn edit" @onclick="() => OpenActivityInEditMode(activity.Id)" title="@Localizer["Edit"]">
                                 <i class="fa fa-edit"></i>
                             </button>
-                            <button class="action-btn delete" @onclick="() => PromptDeleteActivity(activity)" title="Delete">
+                            <button class="action-btn delete" @onclick="() => PromptDeleteActivity(activity)" title="@Localizer["Delete"]">
                                 <i class="fa fa-trash"></i>
                             </button>
                         </div>
@@ -64,10 +69,10 @@
                 <div class="empty-icon">
                     <i class="fa fa-luggage-cart"></i>
                 </div>
-                <h3>No Packing Activities</h3>
-                <p>Create your first packing activity to get started.</p>
+                <h3>@Localizer["NoActivities"]</h3>
+                <p>@Localizer["NoActivitiesDescription"]</p>
                 <button class="btn primary" @onclick="AddNewActivity">
-                    <i class="fa fa-plus"></i> Create Packing Activity
+                    <i class="fa fa-plus"></i> @Localizer["CreateActivity"]
                 </button>
             </div>
         }
@@ -77,10 +82,10 @@
             <div class="fab-backdrop @(_isFabExpanded ? "visible" : "")" @onclick="ToggleFab"></div>
             
             <div class="fab-options">
-                <button class="fab-option search-fab @(_isFabExpanded ? "visible" : "")" @onclick="OpenSearchBar" title="Search">
+                <button class="fab-option search-fab @(_isFabExpanded ? "visible" : "")" @onclick="OpenSearchBar" title="@Localizer["Search"]">
                     <i class="fa fa-search"></i>
                 </button>
-                <button class="fab-option add-fab @(_isFabExpanded ? "visible" : "")" @onclick="AddNewActivity" title="Add Activity">
+                <button class="fab-option add-fab @(_isFabExpanded ? "visible" : "")" @onclick="AddNewActivity" title="@Localizer["AddActivity"]">
                     <i class="fa fa-plus"></i>
                 </button>
             </div>
@@ -96,26 +101,26 @@
 {
     <div class="modal-overlay" @onclick="CancelAddActivity">
         <div class="modal-content" @onclick:stopPropagation>
-            <h4 class="modal-header">New Packing Activity</h4>
+            <h4 class="modal-header">@Localizer["NewPackingActivity"]</h4>
             
             <div class="form-row">
-                <label for="activity-name">Name</label>
+                <label for="activity-name">@Localizer["Name"]</label>
                 <input id="activity-name" @bind="_newActivityName" />
             </div>
 
             <div class="form-row">
-                <label for="activity-category">Category</label>
+                <label for="activity-category">@Localizer["Category"]</label>
                 <select id="activity-category" @bind="_newActivityCategory">
                     @foreach (var category in Enum.GetValues<PackingCategory>())
                     {
-                        <option value="@category">@category</option>
+                        <option value="@category">@GetLocalizedCategory(category)</option>
                     }
                 </select>
             </div>
 
             <div class="form-actions">
-                <button class="btn cancel" @onclick="CancelAddActivity">Cancel</button>
-                <button class="btn primary" @onclick="ConfirmAddActivityAsync">Create</button>
+                <button class="btn cancel" @onclick="CancelAddActivity">@Localizer["Cancel"]</button>
+                <button class="btn primary" @onclick="ConfirmAddActivityAsync">@Localizer["Create"]</button>
             </div>
         </div>
     </div>
@@ -143,9 +148,25 @@
     private string _toastMessage = string.Empty;
     private System.Threading.CancellationTokenSource? _toastCts;
 
+    protected override void OnInitialized()
+    {
+        LocalizationService.CultureChanged += OnCultureChanged;
+    }
+
     protected override async Task OnInitializedAsync()
     {
         await LoadActivitiesAsync();
+    }
+
+    private void OnCultureChanged(object? sender, System.Globalization.CultureInfo culture)
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    private string GetLocalizedCategory(PackingCategory category)
+    {
+        var key = LocalizationService.GetLocalizedCategory(category.ToString());
+        return Localizer[key];
     }
 
     private void ToggleFab()
@@ -180,7 +201,7 @@
         }
         catch
         {
-            ShowToast("Failed to load activities");
+            ShowToast(Localizer["FailedToLoad"]);
         }
         finally
         {
@@ -256,12 +277,12 @@
         try
         {
             await PackingRepository.AddOrUpdateAsync(newActivity);
-            ShowToast("Activity created successfully");
+            ShowToast(Localizer["ActivityCreated"]);
             await LoadActivitiesAsync();
         }
         catch
         {
-            ShowToast("Failed to create activity");
+            ShowToast(Localizer["FailedToCreate"]);
         }
         finally
         {
@@ -271,7 +292,8 @@
 
     private async Task PromptDeleteActivity(Storage.PackingActivity activity)
     {
-        var result = await DialogService.ShowConfirmAsync("Delete Activity?", $"Are you sure you want to delete \"{activity.Name}\"? This action cannot be undone.");
+        var message = string.Format(Localizer["DeleteActivityMessage"], activity.Name);
+        var result = await DialogService.ShowConfirmAsync(Localizer["DeleteActivityTitle"], message);
         
         if (!result) 
             return;
@@ -284,12 +306,12 @@
         try
         {
             await PackingRepository.DeleteAsync(activity.Id);
-            ShowToast("Activity deleted successfully");
+            ShowToast(Localizer["ActivityDeleted"]);
             await LoadActivitiesAsync();
         }
         catch
         {
-            ShowToast("Failed to delete activity");
+            ShowToast(Localizer["FailedToDelete"]);
         }
     }
 
@@ -336,6 +358,7 @@
 
     public void Dispose()
     {
+        LocalizationService.CultureChanged -= OnCultureChanged;
         _toastCts?.Cancel();
         _toastCts?.Dispose();
     }

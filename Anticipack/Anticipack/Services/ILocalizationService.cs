@@ -16,14 +16,23 @@ namespace Anticipack.Services
         
         public CultureInfo CurrentCulture
         {
-            get => _currentCulture;
+            get
+            {
+                // Always check if the culture matches the saved preference
+                var savedLanguage = Preferences.Default.Get("AppLanguage", string.Empty);
+                if (!string.IsNullOrEmpty(savedLanguage) && _currentCulture?.Name != savedLanguage)
+                {
+                    _currentCulture = new CultureInfo(savedLanguage);
+                    ApplyCulture(_currentCulture);
+                }
+                return _currentCulture;
+            }
             private set
             {
                 if (_currentCulture?.Name != value?.Name)
                 {
                     _currentCulture = value;
-                    CultureInfo.CurrentCulture = value;
-                    CultureInfo.CurrentUICulture = value;
+                    ApplyCulture(value);
                     
                     // Persist the preference
                     Preferences.Default.Set("AppLanguage", value.Name);
@@ -49,8 +58,7 @@ namespace Anticipack.Services
                 _currentCulture = CultureInfo.CurrentCulture;
             }
             
-            CultureInfo.CurrentCulture = _currentCulture;
-            CultureInfo.CurrentUICulture = _currentCulture;
+            ApplyCulture(_currentCulture);
         }
 
         public void SetCulture(string culture)
@@ -61,6 +69,14 @@ namespace Anticipack.Services
         public string GetLocalizedCategory(string categoryKey)
         {
             return $"Category_{categoryKey}";
+        }
+
+        private void ApplyCulture(CultureInfo culture)
+        {
+            CultureInfo.CurrentCulture = culture;
+            CultureInfo.CurrentUICulture = culture;
+            CultureInfo.DefaultThreadCurrentCulture = culture;
+            CultureInfo.DefaultThreadCurrentUICulture = culture;
         }
     }
 }

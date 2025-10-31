@@ -411,8 +411,6 @@
   <data name="Send" xml:space="preserve">
     <value>Enviar</value>
   </data>
-
-    <!-- EditPacking Page -->
   <data name="DeleteTitle" xml:space="preserve">
     <value>Eliminar</value>
   </data>
@@ -504,7 +502,6 @@ Esta acción no se puede deshacer.</value>
   <data name="UnnamedItem" xml:space="preserve">
     <value>Artículo sin nombre</value>
   </data>
-    <!-- Navigation Menu -->
   <data name="NavigationMenu" xml:space="preserve">
     <value>Menú de navegación</value>
   </data>
@@ -516,5 +513,11 @@ Esta acción no se puede deshacer.</value>
   </data>
   <data name="SettingsMenu" xml:space="preserve">
     <value>Configuración</value>
+  </data>
+  <data name="SomethingWentWrong" xml:space="preserve">
+    <value>Algo salió mal</value>
+  </data>
+  <data name="Retry" xml:space="preserve">
+    <value>Reintentar</value>
   </data>
 </root>

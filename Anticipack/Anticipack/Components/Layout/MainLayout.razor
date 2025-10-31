@@ -1,6 +1,6 @@
-﻿@page "/"
-@using Anticipack.Components.Shared.DialogComponent
+﻿@using Anticipack.Components.Shared.DialogComponent
 @using Anticipack.Components.Shared.ToastComponent
+@using Anticipack.Components.Shared
 @inherits LayoutComponentBase
 @implements IDisposable
 
@@ -12,9 +12,15 @@
     </div>
 
     <main>
-        <div>
-            @Body
+        <div class="top-row px-4">
+            <!-- Your header content -->
         </div>
+
+        <article class="content px-4">
+            <CustomErrorBoundary>
+                @Body
+            </CustomErrorBoundary>
+        </article>
     </main>
 </div>
 

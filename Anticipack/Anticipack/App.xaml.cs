@@ -17,6 +17,30 @@ namespace Anticipack
         {
             InitializeComponent();
             _packingRepository = packingRepository;
+            
+            // Add global exception handler
+            AppDomain.CurrentDomain.UnhandledException += (sender, args) =>
+            {
+                var exception = args.ExceptionObject as Exception;
+                System.Diagnostics.Debug.WriteLine("═══════════════════════════════════════");
+                System.Diagnostics.Debug.WriteLine("❌ UNHANDLED DOMAIN EXCEPTION");
+                System.Diagnostics.Debug.WriteLine($"Exception: {exception?.GetType().FullName}");
+                System.Diagnostics.Debug.WriteLine($"Message: {exception?.Message}");
+                System.Diagnostics.Debug.WriteLine($"Stack trace:\n{exception?.StackTrace}");
+                System.Diagnostics.Debug.WriteLine("═══════════════════════════════════════");
+            };
+
+            // Also catch task exceptions
+            TaskScheduler.UnobservedTaskException += (sender, args) =>
+            {
+                System.Diagnostics.Debug.WriteLine("═══════════════════════════════════════");
+                System.Diagnostics.Debug.WriteLine("❌ UNOBSERVED TASK EXCEPTION");
+                System.Diagnostics.Debug.WriteLine($"Exception: {args.Exception.GetType().FullName}");
+                System.Diagnostics.Debug.WriteLine($"Message: {args.Exception.Message}");
+                System.Diagnostics.Debug.WriteLine($"Stack trace:\n{args.Exception.StackTrace}");
+                System.Diagnostics.Debug.WriteLine("═══════════════════════════════════════");
+                args.SetObserved(); // Prevent app crash
+            };
         }
 
         protected override Window CreateWindow(IActivationState? activationState)
@@ -51,9 +75,9 @@ namespace Anticipack
                         //appWindow.Move(new PointInt32((int)centerX, (int)centerY));
                     }
                 }
-                catch
+                catch (Exception ex)
                 {
-                    // Ignore errors when windowing APIs are not available.
+                    System.Diagnostics.Debug.WriteLine($"Window creation error: {ex.Message}");
                 }
             };
 #endif
@@ -63,19 +87,26 @@ namespace Anticipack
 
         protected override async void OnStart()
         {
-            var status = await Permissions.CheckStatusAsync<Permissions.StorageWrite>();
-            if (status != PermissionStatus.Granted)
+            try
             {
-                status = await Permissions.RequestAsync<Permissions.StorageWrite>();
-            }
+                var status = await Permissions.CheckStatusAsync<Permissions.StorageWrite>();
+                if (status != PermissionStatus.Granted)
+                {
+                    status = await Permissions.RequestAsync<Permissions.StorageWrite>();
+                }
 
-            if (status != PermissionStatus.Granted)
+                if (status != PermissionStatus.Granted)
+                {
+                    throw new Exception("Storage permission is required to use this feature.");
+                }
+
+                await _packingRepository.InitializeAsync();
+            }
+            catch (Exception ex)
             {
-                throw new Exception("Storage permission is required to use this feature.");
+                System.Diagnostics.Debug.WriteLine($"❌ OnStart Error: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"Stack: {ex.StackTrace}");
             }
-
-            await _packingRepository.InitializeAsync();
-
         }
     }
 }

@@ -44,6 +44,7 @@ namespace Anticipack
 #if DEBUG
             builder.Services.AddBlazorWebViewDeveloperTools();
             builder.Logging.AddDebug();
+            builder.Logging.SetMinimumLevel(LogLevel.Debug); // Add this line
 #endif
 
 

@@ -411,7 +411,6 @@
   <data name="Send" xml:space="preserve">
     <value>Отправить</value>
   </data>
-    <!-- EditPacking Page -->
   <data name="DeleteTitle" xml:space="preserve">
     <value>Удалить</value>
   </data>
@@ -503,7 +502,6 @@
   <data name="UnnamedItem" xml:space="preserve">
     <value>Безымянный предмет</value>
   </data>
-    <!-- Navigation Menu -->
   <data name="NavigationMenu" xml:space="preserve">
     <value>Меню навигации</value>
   </data>
@@ -515,5 +513,11 @@
   </data>
   <data name="SettingsMenu" xml:space="preserve">
     <value>Настройки</value>
+  </data>
+  <data name="SomethingWentWrong" xml:space="preserve">
+    <value>Что-то пошло не так</value>
+  </data>
+  <data name="Retry" xml:space="preserve">
+    <value>Повторить</value>
   </data>
 </root>

@@ -81,15 +81,15 @@ namespace Anticipack.Storage
 
             foreach (var item in packingItems)
             {
-                var newItem = new PackingItem
-                {
-                    Id = Guid.NewGuid().ToString(),
-                    ActivityId = newPackingActivity.Id,
-                    Name = item.Name,
-                    IsPacked = false,
-                    Category = item.Category,
-                    Notes = item.Notes
-                };
+                //var newItem = new PackingItem
+                //{
+                //    Id = Guid.NewGuid().ToString(),
+                //    ActivityId = newPackingActivity.Id,
+                //    Name = item.Name,
+                //    IsPacked = false,
+                //    Category = item.Category,
+                //    Notes = item.Notes
+                //};
                 item.Id = Guid.NewGuid().ToString();
                 item.ActivityId = newPackingActivity.Id;
 

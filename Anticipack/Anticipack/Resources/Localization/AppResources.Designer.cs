@@ -1079,15 +1079,6 @@ namespace Anticipack.Resources.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Retry.
-        /// </summary>
-        public static string Retry {
-            get {
-                return ResourceManager.GetString("Retry", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Save.
         /// </summary>
         public static string Save {
@@ -1174,15 +1165,6 @@ namespace Anticipack.Resources.Localization {
         public static string ShowHistory {
             get {
                 return ResourceManager.GetString("ShowHistory", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Something went wrong.
-        /// </summary>
-        public static string SomethingWentWrong {
-            get {
-                return ResourceManager.GetString("SomethingWentWrong", resourceCulture);
             }
         }
         

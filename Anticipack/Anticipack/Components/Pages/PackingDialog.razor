@@ -1,5 +1,6 @@
 ﻿@page "/packing-dialog"
 @using Microsoft.JSInterop
+@using Anticipack.Resources.Localization
 @implements IAsyncDisposable
 
 <div class="chat-container">
@@ -14,14 +15,14 @@
     </div>
 
     <div class="chat-input">
-        <textarea @bind="currentMessage" @bind:event="oninput" placeholder="Type a message..."
+        <textarea @bind="currentMessage" @bind:event="oninput" placeholder="@AppResources.TypeMessage"
                   rows="2" @ref="messageInput"></textarea>
         <button class="send-btn" @onclick="Send">
             <!-- simple send SVG icon -->
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
                 <path d="M2 21L23 12L2 3V10L17 12L2 14V21Z" fill="currentColor"/>
             </svg>
-            <span class="sr-only">Send</span>
+            <span class="sr-only">@AppResources.Send</span>
         </button>
     </div>
 </div>

@@ -88,6 +88,33 @@ namespace Anticipack.Resources.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Add Item.
+        /// </summary>
+        public static string AddItem {
+            get {
+                return ResourceManager.GetString("AddItem", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Add New Item.
+        /// </summary>
+        public static string AddNewItem {
+            get {
+                return ResourceManager.GetString("AddNewItem", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Add notes about this item....
+        /// </summary>
+        public static string AddNotesAboutItem {
+            get {
+                return ResourceManager.GetString("AddNotesAboutItem", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Appearance.
         /// </summary>
         public static string Appearance {
@@ -304,6 +331,15 @@ namespace Anticipack.Resources.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Copy.
+        /// </summary>
+        public static string CopyTitle {
+            get {
+                return ResourceManager.GetString("CopyTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Create.
         /// </summary>
         public static string Create {
@@ -376,6 +412,25 @@ namespace Anticipack.Resources.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Delete Activity.
+        /// </summary>
+        public static string DeleteActivity {
+            get {
+                return ResourceManager.GetString("DeleteActivity", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Are you sure you want to delete this packing activity?
+        ///This action cannot be undone..
+        /// </summary>
+        public static string DeleteActivityConfirm {
+            get {
+                return ResourceManager.GetString("DeleteActivityConfirm", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Are you sure you want to delete &quot;{0}&quot;? This action cannot be undone..
         /// </summary>
         public static string DeleteActivityMessage {
@@ -390,6 +445,42 @@ namespace Anticipack.Resources.Localization {
         public static string DeleteActivityTitle {
             get {
                 return ResourceManager.GetString("DeleteActivityTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Delete item.
+        /// </summary>
+        public static string DeleteItem {
+            get {
+                return ResourceManager.GetString("DeleteItem", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Are you sure you want to delete &quot;{0}&quot;?.
+        /// </summary>
+        public static string DeleteItemMessage {
+            get {
+                return ResourceManager.GetString("DeleteItemMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Delete Item.
+        /// </summary>
+        public static string DeleteItemTitle {
+            get {
+                return ResourceManager.GetString("DeleteItemTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Delete.
+        /// </summary>
+        public static string DeleteTitle {
+            get {
+                return ResourceManager.GetString("DeleteTitle", resourceCulture);
             }
         }
         
@@ -439,6 +530,42 @@ namespace Anticipack.Resources.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Enter activity name....
+        /// </summary>
+        public static string EnterActivityName {
+            get {
+                return ResourceManager.GetString("EnterActivityName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enter item name....
+        /// </summary>
+        public static string EnterItemName {
+            get {
+                return ResourceManager.GetString("EnterItemName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enter item name first.
+        /// </summary>
+        public static string EnterItemNameFirst {
+            get {
+                return ResourceManager.GetString("EnterItemNameFirst", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error adding item: {0}.
+        /// </summary>
+        public static string ErrorAddingItem {
+            get {
+                return ResourceManager.GetString("ErrorAddingItem", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Error resetting items: {0}.
         /// </summary>
         public static string ErrorResettingItems {
@@ -453,6 +580,15 @@ namespace Anticipack.Resources.Localization {
         public static string ErrorSavingItemState {
             get {
                 return ResourceManager.GetString("ErrorSavingItemState", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to copy packing activity: {0}.
+        /// </summary>
+        public static string FailedToCopyActivity {
+            get {
+                return ResourceManager.GetString("FailedToCopyActivity", resourceCulture);
             }
         }
         
@@ -475,6 +611,24 @@ namespace Anticipack.Resources.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Failed to delete packing activity: {0}.
+        /// </summary>
+        public static string FailedToDeleteActivity {
+            get {
+                return ResourceManager.GetString("FailedToDeleteActivity", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to delete item: {0}.
+        /// </summary>
+        public static string FailedToDeleteItem {
+            get {
+                return ResourceManager.GetString("FailedToDeleteItem", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Failed to load activities.
         /// </summary>
         public static string FailedToLoad {
@@ -489,6 +643,15 @@ namespace Anticipack.Resources.Localization {
         public static string FailedToLoadItems {
             get {
                 return ResourceManager.GetString("FailedToLoadItems", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to update item: {0}.
+        /// </summary>
+        public static string FailedToUpdateItem {
+            get {
+                return ResourceManager.GetString("FailedToUpdateItem", resourceCulture);
             }
         }
         
@@ -538,6 +701,33 @@ namespace Anticipack.Resources.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Added {0}.
+        /// </summary>
+        public static string ItemAdded {
+            get {
+                return ResourceManager.GetString("ItemAdded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Deleted &quot;{0}&quot;.
+        /// </summary>
+        public static string ItemDeleted {
+            get {
+                return ResourceManager.GetString("ItemDeleted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Item name....
+        /// </summary>
+        public static string ItemName {
+            get {
+                return ResourceManager.GetString("ItemName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to ✓ {0} packed.
         /// </summary>
         public static string ItemPacked {
@@ -561,6 +751,15 @@ namespace Anticipack.Resources.Localization {
         public static string ItemUnpacked {
             get {
                 return ResourceManager.GetString("ItemUnpacked", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Item updated.
+        /// </summary>
+        public static string ItemUpdated {
+            get {
+                return ResourceManager.GetString("ItemUpdated", resourceCulture);
             }
         }
         
@@ -673,6 +872,15 @@ namespace Anticipack.Resources.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Navigation menu.
+        /// </summary>
+        public static string NavigationMenu {
+            get {
+                return ResourceManager.GetString("NavigationMenu", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to New Packing Activity.
         /// </summary>
         public static string NewPackingActivity {
@@ -700,6 +908,15 @@ namespace Anticipack.Resources.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Notes (optional):.
+        /// </summary>
+        public static string NotesOptional {
+            get {
+                return ResourceManager.GetString("NotesOptional", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Notifications.
         /// </summary>
         public static string Notifications {
@@ -718,11 +935,38 @@ namespace Anticipack.Resources.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Packing Activities.
+        /// </summary>
+        public static string PackingActivitiesMenu {
+            get {
+                return ResourceManager.GetString("PackingActivitiesMenu", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Packing Activity.
         /// </summary>
         public static string PackingActivity {
             get {
                 return ResourceManager.GetString("PackingActivity", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Packing activity copied successfully..
+        /// </summary>
+        public static string PackingActivityCopied {
+            get {
+                return ResourceManager.GetString("PackingActivityCopied", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Packing activity deleted successfully..
+        /// </summary>
+        public static string PackingActivityDeleted {
+            get {
+                return ResourceManager.GetString("PackingActivityDeleted", resourceCulture);
             }
         }
         
@@ -741,6 +985,15 @@ namespace Anticipack.Resources.Localization {
         public static string PackingCompletedRecorded {
             get {
                 return ResourceManager.GetString("PackingCompletedRecorded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Packing Dialog.
+        /// </summary>
+        public static string PackingDialogMenu {
+            get {
+                return ResourceManager.GetString("PackingDialogMenu", resourceCulture);
             }
         }
         
@@ -826,6 +1079,15 @@ namespace Anticipack.Resources.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Save.
+        /// </summary>
+        public static string Save {
+            get {
+                return ResourceManager.GetString("Save", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Search.
         /// </summary>
         public static string Search {
@@ -844,11 +1106,38 @@ namespace Anticipack.Resources.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Select Category:.
+        /// </summary>
+        public static string SelectCategory {
+            get {
+                return ResourceManager.GetString("SelectCategory", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Send.
+        /// </summary>
+        public static string Send {
+            get {
+                return ResourceManager.GetString("Send", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Settings.
         /// </summary>
         public static string Settings {
             get {
                 return ResourceManager.GetString("Settings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Settings.
+        /// </summary>
+        public static string SettingsMenu {
+            get {
+                return ResourceManager.GetString("SettingsMenu", resourceCulture);
             }
         }
         
@@ -880,6 +1169,15 @@ namespace Anticipack.Resources.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Start Packing.
+        /// </summary>
+        public static string StartPacking {
+            get {
+                return ResourceManager.GetString("StartPacking", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Switch to Edit Mode?.
         /// </summary>
         public static string SwitchToEditMode {
@@ -903,6 +1201,33 @@ namespace Anticipack.Resources.Localization {
         public static string TimesPacked {
             get {
                 return ResourceManager.GetString("TimesPacked", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Type item name for quick add....
+        /// </summary>
+        public static string TypeItemNameForQuickAdd {
+            get {
+                return ResourceManager.GetString("TypeItemNameForQuickAdd", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Type a message....
+        /// </summary>
+        public static string TypeMessage {
+            get {
+                return ResourceManager.GetString("TypeMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unnamed Item.
+        /// </summary>
+        public static string UnnamedItem {
+            get {
+                return ResourceManager.GetString("UnnamedItem", resourceCulture);
             }
         }
         

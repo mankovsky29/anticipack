@@ -1,396 +1,519 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
-	<!-- 
-		Microsoft ResX Schema
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
 
-		Version 1.3
-
-		The primary goals of this format is to allow a simple XML format 
-		that is mostly human readable. The generation and parsing of the 
-		various data types are done through the TypeConverter classes 
-		associated with the data types.
-
-		Example:
-
-		... ado.net/XML headers & schema ...
-		<resheader name="resmimetype">text/microsoft-resx</resheader>
-		<resheader name="version">1.3</resheader>
-		<resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
-		<resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
-		<data name="Name1">this is my long string</data>
-		<data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
-		<data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
-			[base64 mime encoded serialized .NET Framework object]
-		</data>
-		<data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
-			[base64 mime encoded string representing a byte array form of the .NET Framework object]
-		</data>
-
-		There are any number of "resheader" rows that contain simple 
-		name/value pairs.
-
-		Each data row contains a name, and value. The row also contains a 
-		type or mimetype. Type corresponds to a .NET class that support 
-		text/value conversion through the TypeConverter architecture. 
-		Classes that don't support this are serialized and stored with the 
-		mimetype set.
-
-		The mimetype is used for serialized objects, and tells the 
-		ResXResourceReader how to depersist the object. This is currently not 
-		extensible. For a given mimetype the value must be set accordingly:
-
-		Note - application/x-microsoft.net.object.binary.base64 is the format 
-		that the ResXResourceWriter will generate, however the reader can 
-		read any of the formats listed below.
-
-		mimetype: application/x-microsoft.net.object.binary.base64
-		value   : The object must be serialized with 
-			: System.Serialization.Formatters.Binary.BinaryFormatter
-			: and then encoded with base64 encoding.
-
-		mimetype: application/x-microsoft.net.object.soap.base64
-		value   : The object must be serialized with 
-			: System.Runtime.Serialization.Formatters.Soap.SoapFormatter
-			: and then encoded with base64 encoding.
-
-		mimetype: application/x-microsoft.net.object.bytearray.base64
-		value   : The object must be serialized into a byte array 
-			: using a System.ComponentModel.TypeConverter
-			: and then encoded with base64 encoding.
-	-->
-	
-	<xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
-		<xsd:element name="root" msdata:IsDataSet="true">
-			<xsd:complexType>
-				<xsd:choice maxOccurs="unbounded">
-					<xsd:element name="data">
-						<xsd:complexType>
-							<xsd:sequence>
-								<xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
-								<xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
-							</xsd:sequence>
-							<xsd:attribute name="name" type="xsd:string" msdata:Ordinal="1" />
-							<xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
-							<xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
-						</xsd:complexType>
-					</xsd:element>
-					<xsd:element name="resheader">
-						<xsd:complexType>
-							<xsd:sequence>
-								<xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
-							</xsd:sequence>
-							<xsd:attribute name="name" type="xsd:string" use="required" />
-						</xsd:complexType>
-					</xsd:element>
-				</xsd:choice>
-			</xsd:complexType>
-		</xsd:element>
-	</xsd:schema>
-	<resheader name="resmimetype">
-		<value>text/microsoft-resx</value>
-	</resheader>
-	<resheader name="version">
-		<value>1.3</value>
-	</resheader>
-	<resheader name="reader">
-		<value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.3500.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-	</resheader>
-	<resheader name="writer">
-		<value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.3500.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-	</resheader>
-	
-	<!-- PackingActivities Page -->
-	<data name="Loading" xml:space="preserve">
-		<value>Загрузка активностей...</value>
-	</data>
-	<data name="SearchPlaceholder" xml:space="preserve">
-		<value>Поиск активностей...</value>
-	</data>
-	<data name="NoActivities" xml:space="preserve">
-		<value>Нет активностей упаковки</value>
-	</data>
-	<data name="NoActivitiesDescription" xml:space="preserve">
-		<value>Создайте свою первую активность упаковки, чтобы начать.</value>
-	</data>
-	<data name="CreateActivity" xml:space="preserve">
-		<value>Создать активность упаковки</value>
-	</data>
-	<data name="LastPacked" xml:space="preserve">
-		<value>Последняя упаковка:</value>
-	</data>
-	<data name="PackNow" xml:space="preserve">
-		<value>Упаковать сейчас</value>
-	</data>
-	<data name="Edit" xml:space="preserve">
-		<value>Редактировать</value>
-	</data>
-	<data name="Delete" xml:space="preserve">
-		<value>Удалить</value>
-	</data>
-	<data name="Search" xml:space="preserve">
-		<value>Поиск</value>
-	</data>
-	<data name="AddActivity" xml:space="preserve">
-		<value>Добавить активность</value>
-	</data>
-	<data name="NewPackingActivity" xml:space="preserve">
-		<value>Новая активность упаковки</value>
-	</data>
-	<data name="Name" xml:space="preserve">
-		<value>Название</value>
-	</data>
-	<data name="Category" xml:space="preserve">
-		<value>Категория</value>
-	</data>
-	<data name="Cancel" xml:space="preserve">
-		<value>Отмена</value>
-	</data>
-	<data name="Create" xml:space="preserve">
-		<value>Создать</value>
-	</data>
-	<data name="DeleteActivityTitle" xml:space="preserve">
-		<value>Удалить активность?</value>
-	</data>
-	<data name="DeleteActivityMessage" xml:space="preserve">
-		<value>Вы уверены, что хотите удалить "{0}"? Это действие нельзя отменить.</value>
-	</data>
-	<data name="ActivityCreated" xml:space="preserve">
-		<value>Активность успешно создана</value>
-	</data>
-	<data name="ActivityDeleted" xml:space="preserve">
-		<value>Активность успешно удалена</value>
-	</data>
-	<data name="FailedToLoad" xml:space="preserve">
-		<value>Ошибка загрузки активностей</value>
-	</data>
-	<data name="FailedToCreate" xml:space="preserve">
-		<value>Ошибка создания активности</value>
-	</data>
-	<data name="FailedToDelete" xml:space="preserve">
-		<value>Ошибка удаления активности</value>
-	</data>
-	
-	<!-- Packing Categories -->
-	<data name="Category_Clothing" xml:space="preserve">
-		<value>Одежда</value>
-	</data>
-	<data name="Category_Shoes" xml:space="preserve">
-		<value>Обувь</value>
-	</data>
-	<data name="Category_Toiletries" xml:space="preserve">
-		<value>Туалетные принадлежности</value>
-	</data>
-	<data name="Category_Electronics" xml:space="preserve">
-		<value>Электроника</value>
-	</data>
-	<data name="Category_Documents" xml:space="preserve">
-		<value>Документы</value>
-	</data>
-	<data name="Category_Health" xml:space="preserve">
-		<value>Здоровье</value>
-	</data>
-	<data name="Category_Accessories" xml:space="preserve">
-		<value>Аксессуары</value>
-	</data>
-	<data name="Category_Outdoor" xml:space="preserve">
-		<value>Для улицы</value>
-	</data>
-	<data name="Category_Food" xml:space="preserve">
-		<value>Еда</value>
-	</data>
-	<data name="Category_Entertainment" xml:space="preserve">
-		<value>Развлечения</value>
-	</data>
-	<data name="Category_Miscellaneous" xml:space="preserve">
-		<value>Разное</value>
-	</data>
-	<!-- UserSettings Page -->
-	<data name="Settings" xml:space="preserve">
-		<value>Настройки</value>
-	</data>
-	<data name="CustomizeExperience" xml:space="preserve">
-		<value>Настройте свой опыт</value>
-	</data>
-	<data name="Appearance" xml:space="preserve">
-		<value>Внешний вид</value>
-	</data>
-	<data name="PersonalizeAppLooks" xml:space="preserve">
-		<value>Персонализируйте внешний вид приложения</value>
-	</data>
-	<data name="Theme" xml:space="preserve">
-		<value>Тема</value>
-	</data>
-	<data name="LightTheme" xml:space="preserve">
-		<value>Светлая</value>
-	</data>
-	<data name="DarkTheme" xml:space="preserve">
-		<value>Тёмная</value>
-	</data>
-	<data name="AutoTheme" xml:space="preserve">
-		<value>Авто</value>
-	</data>
-	<data name="LightThemeTitle" xml:space="preserve">
-		<value>Светлая тема</value>
-	</data>
-	<data name="DarkThemeTitle" xml:space="preserve">
-		<value>Тёмная тема</value>
-	</data>
-	<data name="AutoThemeTitle" xml:space="preserve">
-		<value>Автоматическая тема на основе системных настроек</value>
-	</data>
-	<data name="AutoThemeHint" xml:space="preserve">
-		<value>Приложение автоматически подстроится под системную тему вашего устройства</value>
-	</data>
-	<data name="DarkThemeHint" xml:space="preserve">
-		<value>Тёмная тема снижает напряжение глаз в условиях низкой освещённости</value>
-	</data>
-	<data name="LightThemeHint" xml:space="preserve">
-		<value>Светлая тема идеальна для ярких условий</value>
-	</data>
-	<data name="Notifications" xml:space="preserve">
-		<value>Уведомления</value>
-	</data>
-	<data name="ManageNotificationPreferences" xml:space="preserve">
-		<value>Управляйте настройками уведомлений</value>
-	</data>
-	<data name="PushNotifications" xml:space="preserve">
-		<value>Push-уведомления</value>
-	</data>
-	<data name="NotifiedAboutUpdates" xml:space="preserve">
-		<value>Получайте уведомления о важных обновлениях</value>
-	</data>
-	<data name="ComingSoon" xml:space="preserve">
-		<value>Скоро</value>
-	</data>
-	<data name="DataStorage" xml:space="preserve">
-		<value>Данные и Хранилище</value>
-	</data>
-	<data name="ManageAppData" xml:space="preserve">
-		<value>Управление данными приложения</value>
-	</data>
-	<data name="ClearCache" xml:space="preserve">
-		<value>Очистить кэш</value>
-	</data>
-	<data name="FreeUpStorage" xml:space="preserve">
-		<value>Освободить место в хранилище</value>
-	</data>
-	<data name="Language" xml:space="preserve">
-		<value>Язык</value>
-	</data>
-	<data name="ChoosePreferredLanguage" xml:space="preserve">
-		<value>Выберите предпочитаемый язык</value>
-	</data>
-	<data name="Version" xml:space="preserve">
-		<value>Версия</value>
-	</data>
-	
-	<!-- PlayPacking Page -->
-	<data name="LoadingPacking" xml:space="preserve">
-		<value>Загрузка упаковки…</value>
-	</data>
-	<data name="ShowAllItems" xml:space="preserve">
-		<value>Показать все предметы</value>
-	</data>
-	<data name="HideCheckedItems" xml:space="preserve">
-		<value>Скрыть отмеченные предметы</value>
-	</data>
-	<data name="ShowHistory" xml:space="preserve">
-		<value>Показать историю</value>
-	</data>
-	<data name="HideHistory" xml:space="preserve">
-		<value>Скрыть историю</value>
-	</data>
-	<data name="ResetAllItems" xml:space="preserve">
-		<value>Сбросить все предметы</value>
-	</data>
-	<data name="EditActivity" xml:space="preserve">
-		<value>Редактировать активность</value>
-	</data>
-	<data name="ItemsPacked" xml:space="preserve">
-		<value>{0}/{1} предметов упаковано</value>
-	</data>
-	<data name="MinRemaining" xml:space="preserve">
-		<value>~{0} мин осталось</value>
-	</data>
-	<data name="Done" xml:space="preserve">
-		<value>Готово!</value>
-	</data>
-	<data name="PackingHistory" xml:space="preserve">
-		<value>История упаковки</value>
-	</data>
-	<data name="TimesPacked" xml:space="preserve">
-		<value>Раз упаковано</value>
-	</data>
-	<data name="AvgTime" xml:space="preserve">
-		<value>Среднее время</value>
-	</data>
-	<data name="LastPackedLabel" xml:space="preserve">
-		<value>Последняя упаковка</value>
-	</data>
-	<data name="RecentActivity" xml:space="preserve">
-		<value>Недавняя активность</value>
-	</data>
-	<data name="PackingComplete" xml:space="preserve">
-		<value>Упаковка завершена!</value>
-	</data>
-	<data name="YouPackedItems" xml:space="preserve">
-		<value>Вы упаковали {0} предметов за {1}</value>
-	</data>
-	<data name="Efficiency" xml:space="preserve">
-		<value>Эффективность</value>
-	</data>
-	<data name="ComparedToLastTime" xml:space="preserve">
-		<value>По сравнению с прошлым разом</value>
-	</data>
-	<data name="Great" xml:space="preserve">
-		<value>Отлично!</value>
-	</data>
-	<data name="ShowCheckedItems" xml:space="preserve">
-		<value>Показать</value>
-	</data>
-	<data name="HideLabel" xml:space="preserve">
-		<value>Скрыть</value>
-	</data>
-	<data name="SwitchToEditMode" xml:space="preserve">
-		<value>Переключиться в режим редактирования?</value>
-	</data>
-	<data name="EditingMightAffectProgress" xml:space="preserve">
-		<value>Редактирование этого списка упаковки может повлиять на ваш текущий прогресс упаковки.</value>
-	</data>
-	<data name="ContinueToEdit" xml:space="preserve">
-		<value>Продолжить редактирование</value>
-	</data>
-	<data name="ResetPackingList" xml:space="preserve">
-		<value>Сбросить список упаковки</value>
-	</data>
-	<data name="ConfirmResetAllItems" xml:space="preserve">
-		<value>Вы уверены, что хотите пометить все предметы как неупакованные?</value>
-	</data>
-	<data name="ResetAll" xml:space="preserve">
-		<value>Сбросить всё</value>
-	</data>
-	<data name="ResetItemsSuccess" xml:space="preserve">
-		<value>Сброшено {0} предметов</value>
-	</data>
-	<data name="ItemPacked" xml:space="preserve">
-		<value>✓ {0} упаковано</value>
-	</data>
-	<data name="ItemUnpacked" xml:space="preserve">
-		<value>◯ {0} распаковано</value>
-	</data>
-	<data name="FailedToLoadItems" xml:space="preserve">
-		<value>Ошибка загрузки предметов</value>
-	</data>
-	<data name="ErrorSavingItemState" xml:space="preserve">
-		<value>Ошибка сохранения состояния предмета: {0}</value>
-	</data>
-	<data name="ErrorResettingItems" xml:space="preserve">
-		<value>Ошибка сброса предметов: {0}</value>
-	</data>
-	<data name="PackingCompletedRecorded" xml:space="preserve">
-		<value>Упаковка завершена и записана!</value>
-	</data>
-	<data name="PackingActivity" xml:space="preserve">
-		<value>Активность упаковки</value>
-	</data>
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Loading" xml:space="preserve">
+    <value>Загрузка активностей...</value>
+  </data>
+  <data name="SearchPlaceholder" xml:space="preserve">
+    <value>Поиск активностей...</value>
+  </data>
+  <data name="NoActivities" xml:space="preserve">
+    <value>Нет активностей упаковки</value>
+  </data>
+  <data name="NoActivitiesDescription" xml:space="preserve">
+    <value>Создайте свою первую активность упаковки, чтобы начать.</value>
+  </data>
+  <data name="CreateActivity" xml:space="preserve">
+    <value>Создать активность упаковки</value>
+  </data>
+  <data name="LastPacked" xml:space="preserve">
+    <value>Последняя упаковка:</value>
+  </data>
+  <data name="PackNow" xml:space="preserve">
+    <value>Упаковать сейчас</value>
+  </data>
+  <data name="Edit" xml:space="preserve">
+    <value>Редактировать</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>Удалить</value>
+  </data>
+  <data name="Search" xml:space="preserve">
+    <value>Поиск</value>
+  </data>
+  <data name="AddActivity" xml:space="preserve">
+    <value>Добавить активность</value>
+  </data>
+  <data name="NewPackingActivity" xml:space="preserve">
+    <value>Новая активность упаковки</value>
+  </data>
+  <data name="Name" xml:space="preserve">
+    <value>Название</value>
+  </data>
+  <data name="Category" xml:space="preserve">
+    <value>Категория</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Отмена</value>
+  </data>
+  <data name="Create" xml:space="preserve">
+    <value>Создать</value>
+  </data>
+  <data name="DeleteActivityTitle" xml:space="preserve">
+    <value>Удалить активность?</value>
+  </data>
+  <data name="DeleteActivityMessage" xml:space="preserve">
+    <value>Вы уверены, что хотите удалить "{0}"? Это действие нельзя отменить.</value>
+  </data>
+  <data name="ActivityCreated" xml:space="preserve">
+    <value>Активность успешно создана</value>
+  </data>
+  <data name="ActivityDeleted" xml:space="preserve">
+    <value>Активность успешно удалена</value>
+  </data>
+  <data name="FailedToLoad" xml:space="preserve">
+    <value>Ошибка загрузки активностей</value>
+  </data>
+  <data name="FailedToCreate" xml:space="preserve">
+    <value>Ошибка создания активности</value>
+  </data>
+  <data name="FailedToDelete" xml:space="preserve">
+    <value>Ошибка удаления активности</value>
+  </data>
+  <data name="Settings" xml:space="preserve">
+    <value>Настройки</value>
+  </data>
+  <data name="CustomizeExperience" xml:space="preserve">
+    <value>Настройте свой опыт</value>
+  </data>
+  <data name="Appearance" xml:space="preserve">
+    <value>Внешний вид</value>
+  </data>
+  <data name="PersonalizeAppLooks" xml:space="preserve">
+    <value>Персонализируйте внешний вид приложения</value>
+  </data>
+  <data name="Theme" xml:space="preserve">
+    <value>Тема</value>
+  </data>
+  <data name="LightTheme" xml:space="preserve">
+    <value>Светлая</value>
+  </data>
+  <data name="DarkTheme" xml:space="preserve">
+    <value>Тёмная</value>
+  </data>
+  <data name="AutoTheme" xml:space="preserve">
+    <value>Авто</value>
+  </data>
+  <data name="LightThemeTitle" xml:space="preserve">
+    <value>Светлая тема</value>
+  </data>
+  <data name="DarkThemeTitle" xml:space="preserve">
+    <value>Тёмная тема</value>
+  </data>
+  <data name="AutoThemeTitle" xml:space="preserve">
+    <value>Автоматическая тема на основе системных настроек</value>
+  </data>
+  <data name="AutoThemeHint" xml:space="preserve">
+    <value>Приложение автоматически подстроится под системную тему вашего устройства</value>
+  </data>
+  <data name="DarkThemeHint" xml:space="preserve">
+    <value>Тёмная тема снижает напряжение глаз в условиях низкой освещённости</value>
+  </data>
+  <data name="LightThemeHint" xml:space="preserve">
+    <value>Светлая тема идеальна для ярких условий</value>
+  </data>
+  <data name="Notifications" xml:space="preserve">
+    <value>Уведомления</value>
+  </data>
+  <data name="ManageNotificationPreferences" xml:space="preserve">
+    <value>Управляйте настройками уведомлений</value>
+  </data>
+  <data name="PushNotifications" xml:space="preserve">
+    <value>Push-уведомления</value>
+  </data>
+  <data name="NotifiedAboutUpdates" xml:space="preserve">
+    <value>Получайте уведомления о важных обновлениях</value>
+  </data>
+  <data name="ComingSoon" xml:space="preserve">
+    <value>Скоро</value>
+  </data>
+  <data name="DataStorage" xml:space="preserve">
+    <value>Данные и Хранилище</value>
+  </data>
+  <data name="ManageAppData" xml:space="preserve">
+    <value>Управление данными приложения</value>
+  </data>
+  <data name="ClearCache" xml:space="preserve">
+    <value>Очистить кэш</value>
+  </data>
+  <data name="FreeUpStorage" xml:space="preserve">
+    <value>Освободить место в хранилище</value>
+  </data>
+  <data name="Language" xml:space="preserve">
+    <value>Язык</value>
+  </data>
+  <data name="ChoosePreferredLanguage" xml:space="preserve">
+    <value>Выберите предпочитаемый язык</value>
+  </data>
+  <data name="Version" xml:space="preserve">
+    <value>Версия</value>
+  </data>
+  <data name="Category_Clothing" xml:space="preserve">
+    <value>Одежда</value>
+  </data>
+  <data name="Category_Shoes" xml:space="preserve">
+    <value>Обувь</value>
+  </data>
+  <data name="Category_Toiletries" xml:space="preserve">
+    <value>Туалетные принадлежности</value>
+  </data>
+  <data name="Category_Electronics" xml:space="preserve">
+    <value>Электроника</value>
+  </data>
+  <data name="Category_Documents" xml:space="preserve">
+    <value>Документы</value>
+  </data>
+  <data name="Category_Health" xml:space="preserve">
+    <value>Здоровье</value>
+  </data>
+  <data name="Category_Accessories" xml:space="preserve">
+    <value>Аксессуары</value>
+  </data>
+  <data name="Category_Outdoor" xml:space="preserve">
+    <value>Для улицы</value>
+  </data>
+  <data name="Category_Food" xml:space="preserve">
+    <value>Еда</value>
+  </data>
+  <data name="Category_Entertainment" xml:space="preserve">
+    <value>Развлечения</value>
+  </data>
+  <data name="Category_Miscellaneous" xml:space="preserve">
+    <value>Разное</value>
+  </data>
+  <data name="LoadingPacking" xml:space="preserve">
+    <value>Загрузка упаковки…</value>
+  </data>
+  <data name="ShowAllItems" xml:space="preserve">
+    <value>Показать все предметы</value>
+  </data>
+  <data name="HideCheckedItems" xml:space="preserve">
+    <value>Скрыть отмеченные предметы</value>
+  </data>
+  <data name="ShowHistory" xml:space="preserve">
+    <value>Показать историю</value>
+  </data>
+  <data name="HideHistory" xml:space="preserve">
+    <value>Скрыть историю</value>
+  </data>
+  <data name="ResetAllItems" xml:space="preserve">
+    <value>Сбросить все предметы</value>
+  </data>
+  <data name="EditActivity" xml:space="preserve">
+    <value>Редактировать активность</value>
+  </data>
+  <data name="ItemsPacked" xml:space="preserve">
+    <value>{0}/{1} предметов упаковано</value>
+  </data>
+  <data name="MinRemaining" xml:space="preserve">
+    <value>~{0} мин осталось</value>
+  </data>
+  <data name="Done" xml:space="preserve">
+    <value>Готово!</value>
+  </data>
+  <data name="PackingHistory" xml:space="preserve">
+    <value>История упаковки</value>
+  </data>
+  <data name="TimesPacked" xml:space="preserve">
+    <value>Раз упаковано</value>
+  </data>
+  <data name="AvgTime" xml:space="preserve">
+    <value>Среднее время</value>
+  </data>
+  <data name="LastPackedLabel" xml:space="preserve">
+    <value>Последняя упаковка</value>
+  </data>
+  <data name="RecentActivity" xml:space="preserve">
+    <value>Недавняя активность</value>
+  </data>
+  <data name="PackingComplete" xml:space="preserve">
+    <value>Упаковка завершена!</value>
+  </data>
+  <data name="YouPackedItems" xml:space="preserve">
+    <value>Вы упаковали {0} предметов за {1}</value>
+  </data>
+  <data name="Efficiency" xml:space="preserve">
+    <value>Эффективность</value>
+  </data>
+  <data name="ComparedToLastTime" xml:space="preserve">
+    <value>По сравнению с прошлым разом</value>
+  </data>
+  <data name="Great" xml:space="preserve">
+    <value>Отлично!</value>
+  </data>
+  <data name="ShowCheckedItems" xml:space="preserve">
+    <value>Показать</value>
+  </data>
+  <data name="HideLabel" xml:space="preserve">
+    <value>Скрыть</value>
+  </data>
+  <data name="SwitchToEditMode" xml:space="preserve">
+    <value>Переключиться в режим редактирования?</value>
+  </data>
+  <data name="EditingMightAffectProgress" xml:space="preserve">
+    <value>Редактирование этого списка упаковки может повлиять на ваш текущий прогресс упаковки.</value>
+  </data>
+  <data name="ContinueToEdit" xml:space="preserve">
+    <value>Продолжить редактирование</value>
+  </data>
+  <data name="ResetPackingList" xml:space="preserve">
+    <value>Сбросить список упаковки</value>
+  </data>
+  <data name="ConfirmResetAllItems" xml:space="preserve">
+    <value>Вы уверены, что хотите пометить все предметы как неупакованные?</value>
+  </data>
+  <data name="ResetAll" xml:space="preserve">
+    <value>Сбросить всё</value>
+  </data>
+  <data name="ResetItemsSuccess" xml:space="preserve">
+    <value>Сброшено {0} предметов</value>
+  </data>
+  <data name="ItemPacked" xml:space="preserve">
+    <value>✓ {0} упаковано</value>
+  </data>
+  <data name="ItemUnpacked" xml:space="preserve">
+    <value>◯ {0} распаковано</value>
+  </data>
+  <data name="FailedToLoadItems" xml:space="preserve">
+    <value>Ошибка загрузки предметов</value>
+  </data>
+  <data name="ErrorSavingItemState" xml:space="preserve">
+    <value>Ошибка сохранения состояния предмета: {0}</value>
+  </data>
+  <data name="ErrorResettingItems" xml:space="preserve">
+    <value>Ошибка сброса предметов: {0}</value>
+  </data>
+  <data name="PackingCompletedRecorded" xml:space="preserve">
+    <value>Упаковка завершена и записана!</value>
+  </data>
+  <data name="PackingActivity" xml:space="preserve">
+    <value>Активность упаковки</value>
+  </data>
+  <data name="TypeMessage" xml:space="preserve">
+    <value>Введите сообщение...</value>
+  </data>
+  <data name="Send" xml:space="preserve">
+    <value>Отправить</value>
+  </data>
+    <!-- EditPacking Page -->
+  <data name="DeleteTitle" xml:space="preserve">
+    <value>Удалить</value>
+  </data>
+  <data name="CopyTitle" xml:space="preserve">
+    <value>Копировать</value>
+  </data>
+  <data name="StartPacking" xml:space="preserve">
+    <value>Начать упаковку</value>
+  </data>
+  <data name="AddItem" xml:space="preserve">
+    <value>Добавить предмет</value>
+  </data>
+  <data name="AddNewItem" xml:space="preserve">
+    <value>Добавить новый предмет</value>
+  </data>
+  <data name="EnterActivityName" xml:space="preserve">
+    <value>Введите название активности...</value>
+  </data>
+  <data name="EnterItemName" xml:space="preserve">
+    <value>Введите название предмета...</value>
+  </data>
+  <data name="SelectCategory" xml:space="preserve">
+    <value>Выберите категорию:</value>
+  </data>
+  <data name="NotesOptional" xml:space="preserve">
+    <value>Заметки (необязательно):</value>
+  </data>
+  <data name="AddNotesAboutItem" xml:space="preserve">
+    <value>Добавьте заметки об этом предмете...</value>
+  </data>
+  <data name="ItemName" xml:space="preserve">
+    <value>Название предмета...</value>
+  </data>
+  <data name="DeleteItem" xml:space="preserve">
+    <value>Удалить предмет</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Сохранить</value>
+  </data>
+  <data name="TypeItemNameForQuickAdd" xml:space="preserve">
+    <value>Введите название для быстрого добавления...</value>
+  </data>
+  <data name="EnterItemNameFirst" xml:space="preserve">
+    <value>Сначала введите название предмета</value>
+  </data>
+  <data name="DeleteItemTitle" xml:space="preserve">
+    <value>Удалить предмет</value>
+  </data>
+  <data name="DeleteItemMessage" xml:space="preserve">
+    <value>Вы уверены, что хотите удалить "{0}"?</value>
+  </data>
+  <data name="ItemDeleted" xml:space="preserve">
+    <value>Удалено "{0}"</value>
+  </data>
+  <data name="FailedToDeleteItem" xml:space="preserve">
+    <value>Ошибка удаления предмета: {0}</value>
+  </data>
+  <data name="PackingActivityCopied" xml:space="preserve">
+    <value>Активность упаковки успешно скопирована.</value>
+  </data>
+  <data name="FailedToCopyActivity" xml:space="preserve">
+    <value>Ошибка копирования активности упаковки: {0}</value>
+  </data>
+  <data name="DeleteActivity" xml:space="preserve">
+    <value>Удалить активность</value>
+  </data>
+  <data name="DeleteActivityConfirm" xml:space="preserve">
+    <value>Вы уверены, что хотите удалить эту активность упаковки?
+Это действие нельзя отменить.</value>
+  </data>
+  <data name="PackingActivityDeleted" xml:space="preserve">
+    <value>Активность упаковки успешно удалена.</value>
+  </data>
+  <data name="FailedToDeleteActivity" xml:space="preserve">
+    <value>Ошибка удаления активности упаковки: {0}</value>
+  </data>
+  <data name="ItemAdded" xml:space="preserve">
+    <value>Добавлено {0}</value>
+  </data>
+  <data name="ErrorAddingItem" xml:space="preserve">
+    <value>Ошибка добавления предмета: {0}</value>
+  </data>
+  <data name="ItemUpdated" xml:space="preserve">
+    <value>Предмет обновлён</value>
+  </data>
+  <data name="FailedToUpdateItem" xml:space="preserve">
+    <value>Ошибка обновления предмета: {0}</value>
+  </data>
+  <data name="UnnamedItem" xml:space="preserve">
+    <value>Безымянный предмет</value>
+  </data>
+    <!-- Navigation Menu -->
+  <data name="NavigationMenu" xml:space="preserve">
+    <value>Меню навигации</value>
+  </data>
+  <data name="PackingActivitiesMenu" xml:space="preserve">
+    <value>Активности упаковки</value>
+  </data>
+  <data name="PackingDialogMenu" xml:space="preserve">
+    <value>Диалог упаковки</value>
+  </data>
+  <data name="SettingsMenu" xml:space="preserve">
+    <value>Настройки</value>
+  </data>
 </root>

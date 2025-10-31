@@ -1,396 +1,520 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
-	<!-- 
-		Microsoft ResX Schema
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
 
-		Version 1.3
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Loading" xml:space="preserve">
+    <value>Cargando actividades...</value>
+  </data>
+  <data name="SearchPlaceholder" xml:space="preserve">
+    <value>Buscar actividades...</value>
+  </data>
+  <data name="NoActivities" xml:space="preserve">
+    <value>Sin Actividades de Empaque</value>
+  </data>
+  <data name="NoActivitiesDescription" xml:space="preserve">
+    <value>Crea tu primera actividad de empaque para comenzar.</value>
+  </data>
+  <data name="CreateActivity" xml:space="preserve">
+    <value>Crear Actividad de Empaque</value>
+  </data>
+  <data name="LastPacked" xml:space="preserve">
+    <value>Último empaque:</value>
+  </data>
+  <data name="PackNow" xml:space="preserve">
+    <value>Empacar Ahora</value>
+  </data>
+  <data name="Edit" xml:space="preserve">
+    <value>Editar</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>Eliminar</value>
+  </data>
+  <data name="Search" xml:space="preserve">
+    <value>Buscar</value>
+  </data>
+  <data name="AddActivity" xml:space="preserve">
+    <value>Agregar Actividad</value>
+  </data>
+  <data name="NewPackingActivity" xml:space="preserve">
+    <value>Nueva Actividad de Empaque</value>
+  </data>
+  <data name="Name" xml:space="preserve">
+    <value>Nombre</value>
+  </data>
+  <data name="Category" xml:space="preserve">
+    <value>Categoría</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Cancelar</value>
+  </data>
+  <data name="Create" xml:space="preserve">
+    <value>Crear</value>
+  </data>
+  <data name="DeleteActivityTitle" xml:space="preserve">
+    <value>¿Eliminar Actividad?</value>
+  </data>
+  <data name="DeleteActivityMessage" xml:space="preserve">
+    <value>¿Estás seguro de que quieres eliminar "{0}"? Esta acción no se puede deshacer.</value>
+  </data>
+  <data name="ActivityCreated" xml:space="preserve">
+    <value>Actividad creada exitosamente</value>
+  </data>
+  <data name="ActivityDeleted" xml:space="preserve">
+    <value>Actividad eliminada exitosamente</value>
+  </data>
+  <data name="FailedToLoad" xml:space="preserve">
+    <value>Error al cargar actividades</value>
+  </data>
+  <data name="FailedToCreate" xml:space="preserve">
+    <value>Error al crear actividad</value>
+  </data>
+  <data name="FailedToDelete" xml:space="preserve">
+    <value>Error al eliminar actividad</value>
+  </data>
+  <data name="Settings" xml:space="preserve">
+    <value>Configuración</value>
+  </data>
+  <data name="CustomizeExperience" xml:space="preserve">
+    <value>Personaliza tu experiencia</value>
+  </data>
+  <data name="Appearance" xml:space="preserve">
+    <value>Apariencia</value>
+  </data>
+  <data name="PersonalizeAppLooks" xml:space="preserve">
+    <value>Personaliza cómo se ve y se siente la aplicación</value>
+  </data>
+  <data name="Theme" xml:space="preserve">
+    <value>Tema</value>
+  </data>
+  <data name="LightTheme" xml:space="preserve">
+    <value>Claro</value>
+  </data>
+  <data name="DarkTheme" xml:space="preserve">
+    <value>Oscuro</value>
+  </data>
+  <data name="AutoTheme" xml:space="preserve">
+    <value>Automático</value>
+  </data>
+  <data name="LightThemeTitle" xml:space="preserve">
+    <value>Tema claro</value>
+  </data>
+  <data name="DarkThemeTitle" xml:space="preserve">
+    <value>Tema oscuro</value>
+  </data>
+  <data name="AutoThemeTitle" xml:space="preserve">
+    <value>Tema automático basado en las preferencias del sistema</value>
+  </data>
+  <data name="AutoThemeHint" xml:space="preserve">
+    <value>La aplicación se ajustará automáticamente al tema del sistema de tu dispositivo</value>
+  </data>
+  <data name="DarkThemeHint" xml:space="preserve">
+    <value>El tema oscuro reduce la fatiga visual en entornos con poca luz</value>
+  </data>
+  <data name="LightThemeHint" xml:space="preserve">
+    <value>El tema claro es ideal para entornos luminosos</value>
+  </data>
+  <data name="Notifications" xml:space="preserve">
+    <value>Notificaciones</value>
+  </data>
+  <data name="ManageNotificationPreferences" xml:space="preserve">
+    <value>Administra tus preferencias de notificación</value>
+  </data>
+  <data name="PushNotifications" xml:space="preserve">
+    <value>Notificaciones Push</value>
+  </data>
+  <data name="NotifiedAboutUpdates" xml:space="preserve">
+    <value>Recibe notificaciones sobre actualizaciones importantes</value>
+  </data>
+  <data name="ComingSoon" xml:space="preserve">
+    <value>Próximamente</value>
+  </data>
+  <data name="DataStorage" xml:space="preserve">
+    <value>Datos y Almacenamiento</value>
+  </data>
+  <data name="ManageAppData" xml:space="preserve">
+    <value>Administra los datos de tu aplicación</value>
+  </data>
+  <data name="ClearCache" xml:space="preserve">
+    <value>Borrar Caché</value>
+  </data>
+  <data name="FreeUpStorage" xml:space="preserve">
+    <value>Liberar espacio de almacenamiento</value>
+  </data>
+  <data name="Language" xml:space="preserve">
+    <value>Idioma</value>
+  </data>
+  <data name="ChoosePreferredLanguage" xml:space="preserve">
+    <value>Elige tu idioma preferido</value>
+  </data>
+  <data name="Version" xml:space="preserve">
+    <value>Versión</value>
+  </data>
+  <data name="Category_Clothing" xml:space="preserve">
+    <value>Ropa</value>
+  </data>
+  <data name="Category_Shoes" xml:space="preserve">
+    <value>Calzado</value>
+  </data>
+  <data name="Category_Toiletries" xml:space="preserve">
+    <value>Artículos de Aseo</value>
+  </data>
+  <data name="Category_Electronics" xml:space="preserve">
+    <value>Electrónicos</value>
+  </data>
+  <data name="Category_Documents" xml:space="preserve">
+    <value>Documentos</value>
+  </data>
+  <data name="Category_Health" xml:space="preserve">
+    <value>Salud</value>
+  </data>
+  <data name="Category_Accessories" xml:space="preserve">
+    <value>Accesorios</value>
+  </data>
+  <data name="Category_Outdoor" xml:space="preserve">
+    <value>Aire Libre</value>
+  </data>
+  <data name="Category_Food" xml:space="preserve">
+    <value>Comida</value>
+  </data>
+  <data name="Category_Entertainment" xml:space="preserve">
+    <value>Entretenimiento</value>
+  </data>
+  <data name="Category_Miscellaneous" xml:space="preserve">
+    <value>Varios</value>
+  </data>
+  <data name="LoadingPacking" xml:space="preserve">
+    <value>Cargando empaque…</value>
+  </data>
+  <data name="ShowAllItems" xml:space="preserve">
+    <value>Mostrar todos los artículos</value>
+  </data>
+  <data name="HideCheckedItems" xml:space="preserve">
+    <value>Ocultar artículos marcados</value>
+  </data>
+  <data name="ShowHistory" xml:space="preserve">
+    <value>Mostrar historial</value>
+  </data>
+  <data name="HideHistory" xml:space="preserve">
+    <value>Ocultar historial</value>
+  </data>
+  <data name="ResetAllItems" xml:space="preserve">
+    <value>Restablecer todos los artículos</value>
+  </data>
+  <data name="EditActivity" xml:space="preserve">
+    <value>Editar actividad</value>
+  </data>
+  <data name="ItemsPacked" xml:space="preserve">
+    <value>{0}/{1} artículos empacados</value>
+  </data>
+  <data name="MinRemaining" xml:space="preserve">
+    <value>~{0} min restantes</value>
+  </data>
+  <data name="Done" xml:space="preserve">
+    <value>¡Listo!</value>
+  </data>
+  <data name="PackingHistory" xml:space="preserve">
+    <value>Historial de empaque</value>
+  </data>
+  <data name="TimesPacked" xml:space="preserve">
+    <value>Veces empacado</value>
+  </data>
+  <data name="AvgTime" xml:space="preserve">
+    <value>Tiempo Promedio</value>
+  </data>
+  <data name="LastPackedLabel" xml:space="preserve">
+    <value>Último empaque</value>
+  </data>
+  <data name="RecentActivity" xml:space="preserve">
+    <value>Actividad reciente</value>
+  </data>
+  <data name="PackingComplete" xml:space="preserve">
+    <value>¡Empaque completo!</value>
+  </data>
+  <data name="YouPackedItems" xml:space="preserve">
+    <value>Empacaste {0} artículos en {1}</value>
+  </data>
+  <data name="Efficiency" xml:space="preserve">
+    <value>Eficiencia</value>
+  </data>
+  <data name="ComparedToLastTime" xml:space="preserve">
+    <value>Comparado con la última vez</value>
+  </data>
+  <data name="Great" xml:space="preserve">
+    <value>¡Excelente!</value>
+  </data>
+  <data name="ShowCheckedItems" xml:space="preserve">
+    <value>Mostrar</value>
+  </data>
+  <data name="HideLabel" xml:space="preserve">
+    <value>Ocultar</value>
+  </data>
+  <data name="SwitchToEditMode" xml:space="preserve">
+    <value>¿Cambiar al modo de edición?</value>
+  </data>
+  <data name="EditingMightAffectProgress" xml:space="preserve">
+    <value>Editar esta lista de empaque podría afectar tu progreso actual de empaque.</value>
+  </data>
+  <data name="ContinueToEdit" xml:space="preserve">
+    <value>Continuar editando</value>
+  </data>
+  <data name="ResetPackingList" xml:space="preserve">
+    <value>Restablecer lista de empaque</value>
+  </data>
+  <data name="ConfirmResetAllItems" xml:space="preserve">
+    <value>¿Estás seguro de que quieres marcar todos los artículos como no empacados?</value>
+  </data>
+  <data name="ResetAll" xml:space="preserve">
+    <value>Restablecer todo</value>
+  </data>
+  <data name="ResetItemsSuccess" xml:space="preserve">
+    <value>Restablecidos {0} artículos</value>
+  </data>
+  <data name="ItemPacked" xml:space="preserve">
+    <value>✓ {0} empacado</value>
+  </data>
+  <data name="ItemUnpacked" xml:space="preserve">
+    <value>◯ {0} desempacado</value>
+  </data>
+  <data name="FailedToLoadItems" xml:space="preserve">
+    <value>Error al cargar artículos</value>
+  </data>
+  <data name="ErrorSavingItemState" xml:space="preserve">
+    <value>Error al guardar el estado del artículo: {0}</value>
+  </data>
+  <data name="ErrorResettingItems" xml:space="preserve">
+    <value>Error al restablecer artículos: {0}</value>
+  </data>
+  <data name="PackingCompletedRecorded" xml:space="preserve">
+    <value>¡Empaque completado y registrado!</value>
+  </data>
+  <data name="PackingActivity" xml:space="preserve">
+    <value>Actividad de empaque</value>
+  </data>
+  <data name="TypeMessage" xml:space="preserve">
+    <value>Escribe un mensaje...</value>
+  </data>
+  <data name="Send" xml:space="preserve">
+    <value>Enviar</value>
+  </data>
 
-		The primary goals of this format is to allow a simple XML format 
-		that is mostly human readable. The generation and parsing of the 
-		various data types are done through the TypeConverter classes 
-		associated with the data types.
-
-		Example:
-
-		... ado.net/XML headers & schema ...
-		<resheader name="resmimetype">text/microsoft-resx</resheader>
-		<resheader name="version">1.3</resheader>
-		<resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
-		<resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
-		<data name="Name1">this is my long string</data>
-		<data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
-		<data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
-			[base64 mime encoded serialized .NET Framework object]
-		</data>
-		<data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
-			[base64 mime encoded string representing a byte array form of the .NET Framework object]
-		</data>
-
-		There are any number of "resheader" rows that contain simple 
-		name/value pairs.
-
-		Each data row contains a name, and value. The row also contains a 
-		type or mimetype. Type corresponds to a .NET class that support 
-		text/value conversion through the TypeConverter architecture. 
-		Classes that don't support this are serialized and stored with the 
-		mimetype set.
-
-		The mimetype is used for serialized objects, and tells the 
-		ResXResourceReader how to depersist the object. This is currently not 
-		extensible. For a given mimetype the value must be set accordingly:
-
-		Note - application/x-microsoft.net.object.binary.base64 is the format 
-		that the ResXResourceWriter will generate, however the reader can 
-		read any of the formats listed below.
-
-		mimetype: application/x-microsoft.net.object.binary.base64
-		value   : The object must be serialized with 
-			: System.Serialization.Formatters.Binary.BinaryFormatter
-			: and then encoded with base64 encoding.
-
-		mimetype: application/x-microsoft.net.object.soap.base64
-		value   : The object must be serialized with 
-			: System.Runtime.Serialization.Formatters.Soap.SoapFormatter
-			: and then encoded with base64 encoding.
-
-		mimetype: application/x-microsoft.net.object.bytearray.base64
-		value   : The object must be serialized into a byte array 
-			: using a System.ComponentModel.TypeConverter
-			: and then encoded with base64 encoding.
-	-->
-	
-	<xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
-		<xsd:element name="root" msdata:IsDataSet="true">
-			<xsd:complexType>
-				<xsd:choice maxOccurs="unbounded">
-					<xsd:element name="data">
-						<xsd:complexType>
-							<xsd:sequence>
-								<xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
-								<xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
-							</xsd:sequence>
-							<xsd:attribute name="name" type="xsd:string" msdata:Ordinal="1" />
-							<xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
-							<xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
-						</xsd:complexType>
-					</xsd:element>
-					<xsd:element name="resheader">
-						<xsd:complexType>
-							<xsd:sequence>
-								<xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
-							</xsd:sequence>
-							<xsd:attribute name="name" type="xsd:string" use="required" />
-						</xsd:complexType>
-					</xsd:element>
-				</xsd:choice>
-			</xsd:complexType>
-		</xsd:element>
-	</xsd:schema>
-	<resheader name="resmimetype">
-		<value>text/microsoft-resx</value>
-	</resheader>
-	<resheader name="version">
-		<value>1.3</value>
-	</resheader>
-	<resheader name="reader">
-		<value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.3500.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-	</resheader>
-	<resheader name="writer">
-		<value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.3500.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-	</resheader>
-	
-	<!-- PackingActivities Page -->
-	<data name="Loading" xml:space="preserve">
-		<value>Cargando actividades...</value>
-	</data>
-	<data name="SearchPlaceholder" xml:space="preserve">
-		<value>Buscar actividades...</value>
-	</data>
-	<data name="NoActivities" xml:space="preserve">
-		<value>Sin Actividades de Empaque</value>
-	</data>
-	<data name="NoActivitiesDescription" xml:space="preserve">
-		<value>Crea tu primera actividad de empaque para comenzar.</value>
-	</data>
-	<data name="CreateActivity" xml:space="preserve">
-		<value>Crear Actividad de Empaque</value>
-	</data>
-	<data name="LastPacked" xml:space="preserve">
-		<value>Último empaque:</value>
-	</data>
-	<data name="PackNow" xml:space="preserve">
-		<value>Empacar Ahora</value>
-	</data>
-	<data name="Edit" xml:space="preserve">
-		<value>Editar</value>
-	</data>
-	<data name="Delete" xml:space="preserve">
-		<value>Eliminar</value>
-	</data>
-	<data name="Search" xml:space="preserve">
-		<value>Buscar</value>
-	</data>
-	<data name="AddActivity" xml:space="preserve">
-		<value>Agregar Actividad</value>
-	</data>
-	<data name="NewPackingActivity" xml:space="preserve">
-		<value>Nueva Actividad de Empaque</value>
-	</data>
-	<data name="Name" xml:space="preserve">
-		<value>Nombre</value>
-	</data>
-	<data name="Category" xml:space="preserve">
-		<value>Categoría</value>
-	</data>
-	<data name="Cancel" xml:space="preserve">
-		<value>Cancelar</value>
-	</data>
-	<data name="Create" xml:space="preserve">
-		<value>Crear</value>
-	</data>
-	<data name="DeleteActivityTitle" xml:space="preserve">
-		<value>¿Eliminar Actividad?</value>
-	</data>
-	<data name="DeleteActivityMessage" xml:space="preserve">
-		<value>¿Estás seguro de que quieres eliminar "{0}"? Esta acción no se puede deshacer.</value>
-	</data>
-	<data name="ActivityCreated" xml:space="preserve">
-		<value>Actividad creada exitosamente</value>
-	</data>
-	<data name="ActivityDeleted" xml:space="preserve">
-		<value>Actividad eliminada exitosamente</value>
-	</data>
-	<data name="FailedToLoad" xml:space="preserve">
-		<value>Error al cargar actividades</value>
-	</data>
-	<data name="FailedToCreate" xml:space="preserve">
-		<value>Error al crear actividad</value>
-	</data>
-	<data name="FailedToDelete" xml:space="preserve">
-		<value>Error al eliminar actividad</value>
-	</data>
-	
-	<!-- Packing Categories -->
-	<data name="Category_Clothing" xml:space="preserve">
-		<value>Ropa</value>
-	</data>
-	<data name="Category_Shoes" xml:space="preserve">
-		<value>Calzado</value>
-	</data>
-	<data name="Category_Toiletries" xml:space="preserve">
-		<value>Artículos de Aseo</value>
-	</data>
-	<data name="Category_Electronics" xml:space="preserve">
-		<value>Electrónicos</value>
-	</data>
-	<data name="Category_Documents" xml:space="preserve">
-		<value>Documentos</value>
-	</data>
-	<data name="Category_Health" xml:space="preserve">
-		<value>Salud</value>
-	</data>
-	<data name="Category_Accessories" xml:space="preserve">
-		<value>Accesorios</value>
-	</data>
-	<data name="Category_Outdoor" xml:space="preserve">
-		<value>Aire Libre</value>
-	</data>
-	<data name="Category_Food" xml:space="preserve">
-		<value>Comida</value>
-	</data>
-	<data name="Category_Entertainment" xml:space="preserve">
-		<value>Entretenimiento</value>
-	</data>
-	<data name="Category_Miscellaneous" xml:space="preserve">
-		<value>Varios</value>
-	</data>
-	<!-- UserSettings Page -->
-	<data name="Settings" xml:space="preserve">
-		<value>Configuración</value>
-	</data>
-	<data name="CustomizeExperience" xml:space="preserve">
-		<value>Personaliza tu experiencia</value>
-	</data>
-	<data name="Appearance" xml:space="preserve">
-		<value>Apariencia</value>
-	</data>
-	<data name="PersonalizeAppLooks" xml:space="preserve">
-		<value>Personaliza cómo se ve y se siente la aplicación</value>
-	</data>
-	<data name="Theme" xml:space="preserve">
-		<value>Tema</value>
-	</data>
-	<data name="LightTheme" xml:space="preserve">
-		<value>Claro</value>
-	</data>
-	<data name="DarkTheme" xml:space="preserve">
-		<value>Oscuro</value>
-	</data>
-	<data name="AutoTheme" xml:space="preserve">
-		<value>Automático</value>
-	</data>
-	<data name="LightThemeTitle" xml:space="preserve">
-		<value>Tema claro</value>
-	</data>
-	<data name="DarkThemeTitle" xml:space="preserve">
-		<value>Tema oscuro</value>
-	</data>
-	<data name="AutoThemeTitle" xml:space="preserve">
-		<value>Tema automático basado en las preferencias del sistema</value>
-	</data>
-	<data name="AutoThemeHint" xml:space="preserve">
-		<value>La aplicación se ajustará automáticamente al tema del sistema de tu dispositivo</value>
-	</data>
-	<data name="DarkThemeHint" xml:space="preserve">
-		<value>El tema oscuro reduce la fatiga visual en entornos con poca luz</value>
-	</data>
-	<data name="LightThemeHint" xml:space="preserve">
-		<value>El tema claro es ideal para entornos luminosos</value>
-	</data>
-	<data name="Notifications" xml:space="preserve">
-		<value>Notificaciones</value>
-	</data>
-	<data name="ManageNotificationPreferences" xml:space="preserve">
-		<value>Administra tus preferencias de notificación</value>
-	</data>
-	<data name="PushNotifications" xml:space="preserve">
-		<value>Notificaciones Push</value>
-	</data>
-	<data name="NotifiedAboutUpdates" xml:space="preserve">
-		<value>Recibe notificaciones sobre actualizaciones importantes</value>
-	</data>
-	<data name="ComingSoon" xml:space="preserve">
-		<value>Próximamente</value>
-	</data>
-	<data name="DataStorage" xml:space="preserve">
-		<value>Datos y Almacenamiento</value>
-	</data>
-	<data name="ManageAppData" xml:space="preserve">
-		<value>Administra los datos de tu aplicación</value>
-	</data>
-	<data name="ClearCache" xml:space="preserve">
-		<value>Borrar Caché</value>
-	</data>
-	<data name="FreeUpStorage" xml:space="preserve">
-		<value>Liberar espacio de almacenamiento</value>
-	</data>
-	<data name="Language" xml:space="preserve">
-		<value>Idioma</value>
-	</data>
-	<data name="ChoosePreferredLanguage" xml:space="preserve">
-		<value>Elige tu idioma preferido</value>
-	</data>
-	<data name="Version" xml:space="preserve">
-		<value>Versión</value>
-	</data>
-	
-	<!-- PlayPacking Page -->
-	<data name="LoadingPacking" xml:space="preserve">
-		<value>Cargando empaque…</value>
-	</data>
-	<data name="ShowAllItems" xml:space="preserve">
-		<value>Mostrar todos los artículos</value>
-	</data>
-	<data name="HideCheckedItems" xml:space="preserve">
-		<value>Ocultar artículos marcados</value>
-	</data>
-	<data name="ShowHistory" xml:space="preserve">
-		<value>Mostrar historial</value>
-	</data>
-	<data name="HideHistory" xml:space="preserve">
-		<value>Ocultar historial</value>
-	</data>
-	<data name="ResetAllItems" xml:space="preserve">
-		<value>Restablecer todos los artículos</value>
-	</data>
-	<data name="EditActivity" xml:space="preserve">
-		<value>Editar actividad</value>
-	</data>
-	<data name="ItemsPacked" xml:space="preserve">
-		<value>{0}/{1} artículos empacados</value>
-	</data>
-	<data name="MinRemaining" xml:space="preserve">
-		<value>~{0} min restantes</value>
-	</data>
-	<data name="Done" xml:space="preserve">
-		<value>¡Listo!</value>
-	</data>
-	<data name="PackingHistory" xml:space="preserve">
-		<value>Historial de empaque</value>
-	</data>
-	<data name="TimesPacked" xml:space="preserve">
-		<value>Veces empacado</value>
-	</data>
-	<data name="AvgTime" xml:space="preserve">
-		<value>Tiempo Promedio</value>
-	</data>
-	<data name="LastPackedLabel" xml:space="preserve">
-		<value>Último empaque</value>
-	</data>
-	<data name="RecentActivity" xml:space="preserve">
-		<value>Actividad reciente</value>
-	</data>
-	<data name="PackingComplete" xml:space="preserve">
-		<value>¡Empaque completo!</value>
-	</data>
-	<data name="YouPackedItems" xml:space="preserve">
-		<value>Empacaste {0} artículos en {1}</value>
-	</data>
-	<data name="Efficiency" xml:space="preserve">
-		<value>Eficiencia</value>
-	</data>
-	<data name="ComparedToLastTime" xml:space="preserve">
-		<value>Comparado con la última vez</value>
-	</data>
-	<data name="Great" xml:space="preserve">
-		<value>¡Excelente!</value>
-	</data>
-	<data name="ShowCheckedItems" xml:space="preserve">
-		<value>Mostrar</value>
-	</data>
-	<data name="HideLabel" xml:space="preserve">
-		<value>Ocultar</value>
-	</data>
-	<data name="SwitchToEditMode" xml:space="preserve">
-		<value>¿Cambiar al modo de edición?</value>
-	</data>
-	<data name="EditingMightAffectProgress" xml:space="preserve">
-		<value>Editar esta lista de empaque podría afectar tu progreso actual de empaque.</value>
-	</data>
-	<data name="ContinueToEdit" xml:space="preserve">
-		<value>Continuar editando</value>
-	</data>
-	<data name="ResetPackingList" xml:space="preserve">
-		<value>Restablecer lista de empaque</value>
-	</data>
-	<data name="ConfirmResetAllItems" xml:space="preserve">
-		<value>¿Estás seguro de que quieres marcar todos los artículos como no empacados?</value>
-	</data>
-	<data name="ResetAll" xml:space="preserve">
-		<value>Restablecer todo</value>
-	</data>
-	<data name="ResetItemsSuccess" xml:space="preserve">
-		<value>Restablecidos {0} artículos</value>
-	</data>
-	<data name="ItemPacked" xml:space="preserve">
-		<value>✓ {0} empacado</value>
-	</data>
-	<data name="ItemUnpacked" xml:space="preserve">
-		<value>◯ {0} desempacado</value>
-	</data>
-	<data name="FailedToLoadItems" xml:space="preserve">
-		<value>Error al cargar artículos</value>
-	</data>
-	<data name="ErrorSavingItemState" xml:space="preserve">
-		<value>Error al guardar el estado del artículo: {0}</value>
-	</data>
-	<data name="ErrorResettingItems" xml:space="preserve">
-		<value>Error al restablecer artículos: {0}</value>
-	</data>
-	<data name="PackingCompletedRecorded" xml:space="preserve">
-		<value>¡Empaque completado y registrado!</value>
-	</data>
-	<data name="PackingActivity" xml:space="preserve">
-		<value>Actividad de empaque</value>
-	</data>
+    <!-- EditPacking Page -->
+  <data name="DeleteTitle" xml:space="preserve">
+    <value>Eliminar</value>
+  </data>
+  <data name="CopyTitle" xml:space="preserve">
+    <value>Copiar</value>
+  </data>
+  <data name="StartPacking" xml:space="preserve">
+    <value>Comenzar a empacar</value>
+  </data>
+  <data name="AddItem" xml:space="preserve">
+    <value>Agregar artículo</value>
+  </data>
+  <data name="AddNewItem" xml:space="preserve">
+    <value>Agregar nuevo artículo</value>
+  </data>
+  <data name="EnterActivityName" xml:space="preserve">
+    <value>Ingresa el nombre de la actividad...</value>
+  </data>
+  <data name="EnterItemName" xml:space="preserve">
+    <value>Ingresa el nombre del artículo...</value>
+  </data>
+  <data name="SelectCategory" xml:space="preserve">
+    <value>Seleccionar categoría:</value>
+  </data>
+  <data name="NotesOptional" xml:space="preserve">
+    <value>Notas (opcional):</value>
+  </data>
+  <data name="AddNotesAboutItem" xml:space="preserve">
+    <value>Agrega notas sobre este artículo...</value>
+  </data>
+  <data name="ItemName" xml:space="preserve">
+    <value>Nombre del artículo...</value>
+  </data>
+  <data name="DeleteItem" xml:space="preserve">
+    <value>Eliminar artículo</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Guardar</value>
+  </data>
+  <data name="TypeItemNameForQuickAdd" xml:space="preserve">
+    <value>Escribe el nombre del artículo para agregar rápidamente...</value>
+  </data>
+  <data name="EnterItemNameFirst" xml:space="preserve">
+    <value>Ingresa primero el nombre del artículo</value>
+  </data>
+  <data name="DeleteItemTitle" xml:space="preserve">
+    <value>Eliminar artículo</value>
+  </data>
+  <data name="DeleteItemMessage" xml:space="preserve">
+    <value>¿Estás seguro de que quieres eliminar "{0}"?</value>
+  </data>
+  <data name="ItemDeleted" xml:space="preserve">
+    <value>Eliminado "{0}"</value>
+  </data>
+  <data name="FailedToDeleteItem" xml:space="preserve">
+    <value>Error al eliminar artículo: {0}</value>
+  </data>
+  <data name="PackingActivityCopied" xml:space="preserve">
+    <value>Actividad de empaque copiada exitosamente.</value>
+  </data>
+  <data name="FailedToCopyActivity" xml:space="preserve">
+    <value>Error al copiar actividad de empaque: {0}</value>
+  </data>
+  <data name="DeleteActivity" xml:space="preserve">
+    <value>Eliminar actividad</value>
+  </data>
+  <data name="DeleteActivityConfirm" xml:space="preserve">
+    <value>¿Estás seguro de que quieres eliminar esta actividad de empaque?
+Esta acción no se puede deshacer.</value>
+  </data>
+  <data name="PackingActivityDeleted" xml:space="preserve">
+    <value>Actividad de empaque eliminada exitosamente.</value>
+  </data>
+  <data name="FailedToDeleteActivity" xml:space="preserve">
+    <value>Error al eliminar actividad de empaque: {0}</value>
+  </data>
+  <data name="ItemAdded" xml:space="preserve">
+    <value>Agregado {0}</value>
+  </data>
+  <data name="ErrorAddingItem" xml:space="preserve">
+    <value>Error al agregar artículo: {0}</value>
+  </data>
+  <data name="ItemUpdated" xml:space="preserve">
+    <value>Artículo actualizado</value>
+  </data>
+  <data name="FailedToUpdateItem" xml:space="preserve">
+    <value>Error al actualizar artículo: {0}</value>
+  </data>
+  <data name="UnnamedItem" xml:space="preserve">
+    <value>Artículo sin nombre</value>
+  </data>
+    <!-- Navigation Menu -->
+  <data name="NavigationMenu" xml:space="preserve">
+    <value>Menú de navegación</value>
+  </data>
+  <data name="PackingActivitiesMenu" xml:space="preserve">
+    <value>Actividades de Empaque</value>
+  </data>
+  <data name="PackingDialogMenu" xml:space="preserve">
+    <value>Diálogo de Empaque</value>
+  </data>
+  <data name="SettingsMenu" xml:space="preserve">
+    <value>Configuración</value>
+  </data>
 </root>

@@ -9,6 +9,7 @@
 @using Microsoft.JSInterop
 @using Anticipack.Components.Shared.DialogComponent
 @using Anticipack.Components.Shared.ToastComponent
+@using Anticipack.Resources.Localization
 @inject NavigationManager Navigation
 @inject IPackingRepository PackingRepository
 @inject IJSRuntime JSRuntime
@@ -16,6 +17,7 @@
 @inject IToastService ToastService
 @implements IDisposable
 @inject IKeyboardService KeyboardService
+@inject ILocalizationService LocalizationService
 
 <NavigationLock OnBeforeInternalNavigation="OnBeforeInternalNavigation" />
 
@@ -23,7 +25,7 @@
     <div class="activity-header">
         <div class="header-left-section">
             <div class="category-icon-container" @onclick="ToggleCategorySelector">
-                <div class="category-icon" title="@_currentActivity.Category">
+                <div class="category-icon" title="@GetLocalizedCategoryName(_currentActivity.Category)">
                     <i class="fa @GetCategoryIcon(_currentActivity.Category)" aria-hidden="true"></i>
                 </div>
             </div>
@@ -35,7 +37,7 @@
                            @onblur="() => _isEditingName = false"
                            @onfocus="async () => await SelectAllText(inputElement)"
                            @ref="inputElement"
-                           placeholder="Enter activity name..." />
+                           placeholder="@AppResources.EnterActivityName" />
                 }
                 else
                 {
@@ -51,16 +53,16 @@
             </h3>
         </div>
         <div class="activity-actions">
-            <button class="icon-btn danger" title="Delete" @onclick="PromptDeleteActivity">
+            <button class="icon-btn danger" title="@AppResources.DeleteTitle" @onclick="PromptDeleteActivity">
                 <i class="fa fa-trash"></i>
             </button>
-            <button class="icon-btn" title="Copy" @onclick="CopyPacking">
+            <button class="icon-btn" title="@AppResources.CopyTitle" @onclick="CopyPacking">
                 <i class="fa fa-copy"></i>
             </button>
-            <button class="icon-btn" title="Start Packing" @onclick="SwitchToPackingMode">
+            <button class="icon-btn" title="@AppResources.StartPacking" @onclick="SwitchToPackingMode">
                 <i class="fa fa-play"></i>
             </button>
-            <button class="add-btn" @onclick="ShowAddItemForm" title="Add Item">
+            <button class="add-btn" @onclick="ShowAddItemForm" title="@AppResources.AddItem">
                 <i class="fa fa-plus"></i>
             </button>
         </div>
@@ -75,7 +77,7 @@
                     <div class="category-option @(_currentActivity.Category == category ? "selected" : "")" 
                          @onclick="() => SelectCategory(category)">
                         <i class="fa @GetCategoryIcon(category)" aria-hidden="true"></i>
-                        <span>@category</span>
+                        <span>@GetLocalizedCategoryName(category)</span>
                     </div>
                 }
             </div>
@@ -85,7 +87,7 @@
         {
             <div class="loading">
                 <div class="loading-spinner"></div>
-                <span>Loading packing…</span>
+                <span>@AppResources.LoadingPacking</span>
             </div>
         }
 
@@ -94,13 +96,13 @@
             {
                 <div class="add-item-form">
                     <div class="form-header">
-                        <h4>Add New Item</h4>
+                        <h4>@AppResources.AddNewItem</h4>
                     </div>
                     
                     <div class="form-body">
                         <div class="input-group">
                             <input class="item-name-input" 
-                                   placeholder="Enter item name..." 
+                                   placeholder="@AppResources.EnterItemName" 
                                    @bind="_newName" 
                                    @bind:event="oninput"
                                    @keyup="@HandleKeyUp" 
@@ -108,32 +110,32 @@
                         </div>
                         
                         <div class="category-selector-container">
-                            <label>Select Category:</label>
+                            <label>@AppResources.SelectCategory</label>
                             <div class="category-icons">
                                 @foreach (var category in Enum.GetValues<PackingCategory>())
                                 {
                                     <div class="category-icon-option @(_newCategory == category.ToString() ? "selected" : "")" 
                                          @onclick="() => _newCategory = category.ToString()"
-                                         title="@category">
+                                         title="@GetLocalizedCategoryName(category)">
                                         <i class="fa @GetCategoryIcon(category)" aria-hidden="true"></i>
-                                        <span class="category-label">@category</span>
+                                        <span class="category-label">@GetLocalizedCategoryName(category)</span>
                                     </div>
                                 }
                             </div>
                         </div>
                         
                         <div class="notes-input">
-                            <label>Notes (optional):</label>
-                            <textarea placeholder="Add notes about this item..." 
+                            <label>@AppResources.NotesOptional</label>
+                            <textarea placeholder="@AppResources.AddNotesAboutItem" 
                                       rows="2"
                                       @bind="_newNotes"></textarea>
                         </div>
                     </div>
                     
                     <div class="add-form-actions">
-                        <button class="btn cancel" @onclick="CancelAdd">Cancel</button>
+                        <button class="btn cancel" @onclick="CancelAdd">@AppResources.Cancel</button>
                         <button class="btn primary" @onclick="ConfirmAddAsync">
-                            <i class="fa fa-plus-circle"></i> Add Item
+                            <i class="fa fa-plus-circle"></i> @AppResources.AddItem
                         </button>
                     </div>
                 </div>
@@ -148,11 +150,12 @@
                 var allChecked = IsAllChecked(category);
                 var collapsed = IsCollapsed(category);
                 var categoryId = $"cat-{category}";
+                var localizedCategory = GetLocalizedCategoryName(category);
 
                 <section class="category @(allChecked ? "category-completed" : "")" aria-labelledby="@categoryId">
                     <div class="category-header" role="button" @onclick="() => ToggleCategory(category)" aria-expanded="@(!collapsed)">
                         <span class="chev @(collapsed ? "collapsed" : "")" aria-hidden="true">▾</span>
-                        <h4 id="@categoryId" class="category-title @(allChecked ? "checked" : "")">@category</h4>
+                        <h4 id="@categoryId" class="category-title @(allChecked ? "checked" : "")">@localizedCategory</h4>
                         <span class="count">(@groupItems.Count)</span>
                     </div>
 
@@ -181,12 +184,12 @@
                                                    @ref="itemEditInputElement"
                                                    class="edit-item-input"
                                                    @onkeydown="@(e => HandleItemEditKeyDown(e, item))"
-                                                   placeholder="Item name..."
+                                                   placeholder="@AppResources.ItemName"
                                                    @onclick:stopPropagation />
                                         </div>
     
                                         <div class="edit-notes">
-                                            <textarea placeholder="Add notes about this item..." 
+                                            <textarea placeholder="@AppResources.AddNotesAboutItem" 
                                                       @bind="item.Item.Notes"
                                                       @bind:event="oninput"
                                                       rows="2"
@@ -194,11 +197,11 @@
                                         </div>
     
                                         <div class="item-edit-actions">
-                                            <button class="btn secondary btn-sm" @onclick="() => CancelItemEdit(item)" title="Cancel">
-                                                <i class="fa fa-times"></i> Cancel
+                                            <button class="btn secondary btn-sm" @onclick="() => CancelItemEdit(item)" title="@AppResources.Cancel">
+                                                <i class="fa fa-times"></i> @AppResources.Cancel
                                             </button>
-                                            <button class="btn primary btn-sm" @onclick="() => SaveItemChanges(item)" title="Save">
-                                                <i class="fa fa-check"></i> Save
+                                            <button class="btn primary btn-sm" @onclick="() => SaveItemChanges(item)" title="@AppResources.Save">
+                                                <i class="fa fa-check"></i> @AppResources.Save
                                             </button>
                                         </div>
                                     </div>
@@ -222,7 +225,7 @@
                                     </div>
                                     
                                     <div class="item-actions">
-                                        <button class="icon-btn" title="Delete item" @onclick:stopPropagation @onclick="@(() => PromptDelete(item))">
+                                        <button class="icon-btn" title="@AppResources.DeleteItem" @onclick:stopPropagation @onclick="@(() => PromptDelete(item))">
                                             <i class="fa fa-trash"></i>
                                         </button>
                                     </div>
@@ -242,13 +245,13 @@
                @bind="_quickAddName" 
                @bind:event="oninput"
                @onkeydown="@HandleQuickAddKeyDown"
-               placeholder="Type item name for quick add..." 
+               placeholder="@AppResources.TypeItemNameForQuickAdd" 
                class="quick-add-input" />
                
         <div class="quick-category-select">
             <button type="button" 
                    class="category-btn" 
-                   title="@_quickAddCategory" 
+                   title="@GetLocalizedCategoryName(_quickAddCategory)" 
                    @onclick="ToggleQuickCategoryDropdown">
                 <i class="fa @GetCategoryIcon(Enum.Parse<PackingCategory>(_quickAddCategory))" aria-hidden="true"></i>
             </button>
@@ -256,14 +259,14 @@
             @if (_showQuickCategoryDropdown)
             {
                 <div class="options-dropdown @(_dropdownPosition == "up" ? "dropdown-up" : "dropdown-down")" @ref="dropdownElement">
-                    <div class="dropdown-heading">Select Category</div>
+                    <div class="dropdown-heading">@AppResources.SelectCategory</div>
                     @foreach (var category in Enum.GetValues<PackingCategory>())
                     {
                         <div class="option @(category.ToString() == _quickAddCategory ? "selected" : "")" 
                              @onclick:stopPropagation
                              @onclick="() => SelectQuickCategory(category.ToString())">
                             <i class="fa @GetCategoryIcon(category)" aria-hidden="true"></i>
-                            <span>@category</span>
+                            <span>@GetLocalizedCategoryName(category)</span>
                         </div>
                     }
                 </div>
@@ -273,7 +276,7 @@
         <button class="quick-add-btn @(string.IsNullOrWhiteSpace(_quickAddName) ? "disabled" : "")" 
                 @onclick="QuickAddItem" 
                 disabled="@string.IsNullOrWhiteSpace(_quickAddName)"
-                title="@(string.IsNullOrWhiteSpace(_quickAddName) ? "Enter item name first" : "Add Item")">
+                title="@(string.IsNullOrWhiteSpace(_quickAddName) ? AppResources.EnterItemNameFirst : AppResources.AddItem)">
             <i class="fa fa-plus"></i>
         </button>
     </div>
@@ -395,13 +398,13 @@
             _quickAddName = string.Empty;
 
             // Show toast via centralized service
-            ToastService.ShowSuccess($"Added {name}");
+            ToastService.ShowSuccess(string.Format(AppResources.ItemAdded, name));
 
             StateHasChanged();
         }
         catch (Exception ex)
         {
-            ToastService.ShowError($"Error adding item: {ex.Message}");
+            ToastService.ShowError(string.Format(AppResources.ErrorAddingItem, ex.Message));
         }
     }
 
@@ -431,7 +434,7 @@
 
     private void InitializeDefaultItems()
     {
-        _currentActivity = new Storage.PackingActivity { Name = "New Packing Activity" };
+        _currentActivity = new Storage.PackingActivity { Name = AppResources.NewPackingActivity };
 
         Items = new List<PackingItemView>
         {
@@ -460,7 +463,7 @@
 
         try
         {
-            _currentActivity = await PackingRepository.GetByIdAsync(id) ?? new Storage.PackingActivity(){ Name = "New Packing Activity" };
+            _currentActivity = await PackingRepository.GetByIdAsync(id) ?? new Storage.PackingActivity(){ Name = AppResources.NewPackingActivity };
             var itemsFromRepo = await PackingRepository.GetItemsForActivityAsync(id);
             Items = itemsFromRepo.Select(pi => new PackingItemView(pi)).ToList();
             _categoryOrder = Items.Select(i => i.Item.Category).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
@@ -476,7 +479,7 @@
         }
         catch (Exception ex)
         {
-            ToastService.ShowError("Failed to load items");
+            ToastService.ShowError(AppResources.FailedToLoadItems);
         }
         finally
         {
@@ -561,7 +564,7 @@
             _manualOverride[category] = false;
         }
         catch (Exception ex) {
-            ToastService.ShowError($"Error adding item: {ex.Message}");
+            ToastService.ShowError(string.Format(AppResources.ErrorAddingItem, ex.Message));
         }
 
         _isAddingItem = false;
@@ -574,10 +577,10 @@
         _pendingDeleteItem = item;
         
         bool confirm = await DialogService.ShowConfirmAsync(
-            "Delete Item",
-            $"Are you sure you want to delete \"{item.Item.Name}\"?",
-            "Delete",
-            "Cancel");
+            AppResources.DeleteItemTitle,
+            string.Format(AppResources.DeleteItemMessage, item.Item.Name),
+            AppResources.Delete,
+            AppResources.Cancel);
             
         if (confirm)
         {
@@ -596,11 +599,11 @@
         {
             await PackingRepository.DeleteItemAsync(toRemove.Item.Id);
             await LoadItemsForPackingAsync(Id);
-            ToastService.ShowSuccess($"Deleted \"{toRemove.Item.Name}\"");
+            ToastService.ShowSuccess(string.Format(AppResources.ItemDeleted, toRemove.Item.Name));
         }
         catch (Exception ex)
         {
-            ToastService.ShowError($"Failed to delete item: {ex.Message}");
+            ToastService.ShowError(string.Format(AppResources.FailedToDeleteItem, ex.Message));
         }
 
         _pendingDeleteItem = null;
@@ -614,23 +617,23 @@
         try
         {
             var newId = await PackingRepository.CopyPackingAsync(Id);
-            ToastService.ShowSuccess("Packing activity copied successfully.");
+            ToastService.ShowSuccess(AppResources.PackingActivityCopied);
             // Optionally navigate to the new copy
             Navigation.NavigateTo($"/edit-packing/{newId}");
         }
         catch (Exception ex)
         {
-            ToastService.ShowError($"Failed to copy packing activity: {ex.Message}");
+            ToastService.ShowError(string.Format(AppResources.FailedToCopyActivity, ex.Message));
         }
     }
 
     private async Task PromptDeleteActivity()
     {
         bool confirm = await DialogService.ShowConfirmAsync(
-            "Delete Activity", 
-            "Are you sure you want to delete this packing activity?\nThis action cannot be undone.",
-            "Delete",
-            "Cancel");
+            AppResources.DeleteActivity, 
+            AppResources.DeleteActivityConfirm,
+            AppResources.Delete,
+            AppResources.Cancel);
             
         if (confirm)
         {
@@ -646,12 +649,12 @@
         try
         {
             await PackingRepository.DeleteAsync(Id);
-            ToastService.ShowSuccess("Packing activity deleted successfully.");
+            ToastService.ShowSuccess(AppResources.PackingActivityDeleted);
             Navigation.NavigateTo("/packing-activities");
         }
         catch (Exception ex)
         {
-            ToastService.ShowError($"Failed to delete packing activity: {ex.Message}");
+            ToastService.ShowError(string.Format(AppResources.FailedToDeleteActivity, ex.Message));
         }
     }
 
@@ -833,6 +836,21 @@
         };
     }
 
+    private string GetLocalizedCategoryName(PackingCategory category)
+    {
+        var resourceKey = LocalizationService.GetLocalizedCategory(category.ToString());
+        return AppResources.ResourceManager.GetString(resourceKey, LocalizationService.CurrentCulture) ?? category.ToString();
+    }
+
+    private string GetLocalizedCategoryName(string categoryString)
+    {
+        if (Enum.TryParse<PackingCategory>(categoryString, out var category))
+        {
+            return GetLocalizedCategoryName(category);
+        }
+        return categoryString;
+    }
+
     private void StartEditingItem(PackingItemView item)
     {
         _editingItem = item;
@@ -869,15 +887,15 @@
             // Validate item name isn't empty
             if (string.IsNullOrWhiteSpace(item.Item.Name))
             {
-                item.Item.Name = "Unnamed Item";
+                item.Item.Name = AppResources.UnnamedItem;
             }
 
             await PackingRepository.AddOrUpdateItemAsync(item.Item);
-            ToastService.ShowSuccess("Item updated");
+            ToastService.ShowSuccess(AppResources.ItemUpdated);
         }
         catch (Exception ex)
         {
-            ToastService.ShowError($"Failed to update item: {ex.Message}");
+            ToastService.ShowError(string.Format(AppResources.FailedToUpdateItem, ex.Message));
         }
         finally
         {

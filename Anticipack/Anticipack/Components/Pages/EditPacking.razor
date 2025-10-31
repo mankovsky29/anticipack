@@ -436,20 +436,7 @@
     {
         _currentActivity = new Storage.PackingActivity { Name = AppResources.NewPackingActivity };
 
-        Items = new List<PackingItemView>
-        {
-            new(new Storage.PackingItem { Name = "Шорты", Category = PackingCategory.Clothing.ToString(), Notes = "" }),
-            new(new Storage.PackingItem { Name = "Майка", Category = PackingCategory.Clothing.ToString(), Notes = "" }),
-            new(new Storage.PackingItem { Name = "Трусы", Category = PackingCategory.Clothing.ToString(), Notes = "" }),
-            new(new Storage.PackingItem { Name = "Носки", Category = PackingCategory.Clothing.ToString(), Notes = "" }),
-            new(new Storage.PackingItem { Name = "Полотенце", Category = PackingCategory.Toiletries.ToString(), Notes = "" }),
-            new(new Storage.PackingItem { Name = "Кроссовки", Category = PackingCategory.Shoes.ToString(), Notes = "" }),
-            new(new Storage.PackingItem { Name = "Шлёпки", Category = PackingCategory.Shoes.ToString(), Notes = "" }),
-            new(new Storage.PackingItem { Name = "Шампунь", Category = PackingCategory.Toiletries.ToString(), Notes = "" }),
-            new(new Storage.PackingItem { Name = "Шейкер", Category = PackingCategory.Food.ToString(), Notes = "" }),
-            new(new Storage.PackingItem { Name = "Замок", Category = PackingCategory.Electronics.ToString(), Notes = "" }),
-            new(new Storage.PackingItem { Name = "Пакеты в магаз", Category = PackingCategory.Miscellaneous.ToString(), Notes = "" }),
-        };
+        Items = new List<PackingItemView>();
 
         _categoryOrder = Items.Select(i => i.Item.Category).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
         foreach (var cat in _categoryOrder)

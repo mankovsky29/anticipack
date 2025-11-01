@@ -19,11 +19,31 @@
     --border-color: #E0E5EC;
     --button-default-color: #2C3E50;
     --button-color-hover: #666666d1;
+    
     /* Chat Colors */
     --chat-received: #e9f2ff;
     --chat-sent: #4B89DC;
     --chat-meta: rgba(0,0,0,0.45);
     --chat-input-bg: #fafafa;
+    
+    /* Component-specific colors */
+    --input-bg: #FFFFFF;
+    --input-border: #D1D5DB;
+    --input-focus-border: #4B89DC;
+    --input-focus-shadow: rgba(75, 137, 220, 0.2);
+    
+    /* Overlay colors */
+    --overlay-bg: rgba(0, 0, 0, 0.5);
+    --modal-bg: #FFFFFF;
+    
+    /* Hover states */
+    --hover-bg: #F3F6FB;
+    --hover-bg-light: #FAFBFC;
+    
+    /* Disabled states */
+    --disabled-bg: #E5E7EB;
+    --disabled-text: #9CA3AF;
+    
     /* Typography */
     --font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
     --font-size-xs: 0.75rem;
@@ -31,6 +51,7 @@
     --font-size-md: 1rem;
     --font-size-lg: 1.125rem;
     --font-size-xl: 1.25rem;
+    
     /* Spacing */
     --space-xs: 0.25rem;
     --space-sm: 0.5rem;
@@ -39,15 +60,18 @@
     --space-xl: 2rem;
     --space-xxl: 3rem;
     --space-xxxl: 4rem;
+    
     /* Borders */
     --border-radius-sm: 0.25rem;
     --border-radius: 0.5rem;
     --border-radius-lg: 0.75rem;
     --border-radius-xl: 1rem;
+    
     /* Shadows */
     --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
     --shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
     --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+    
     /* Transitions */
     --transition-fast: 150ms ease;
     --transition: 250ms ease;
@@ -72,14 +96,33 @@
     --text-secondary: #B4B8BF;
     --text-light: #6B7280;
     --border-color: #3A3F47;
-    --button-color: #2C3E50;
-    --button-default-color: #f7f7f7;
+    --button-default-color: #E8EAED;
     --button-color-hover: #737373;
+    
     /* Chat Colors - Dark */
     --chat-received: #2D3441;
     --chat-sent: #5D9CEC;
     --chat-meta: rgba(255,255,255,0.45);
     --chat-input-bg: #2D3441;
+    
+    /* Component-specific colors */
+    --input-bg: #2D3441;
+    --input-border: #3A3F47;
+    --input-focus-border: #5D9CEC;
+    --input-focus-shadow: rgba(93, 156, 236, 0.3);
+    
+    /* Overlay colors */
+    --overlay-bg: rgba(0, 0, 0, 0.7);
+    --modal-bg: #252A31;
+    
+    /* Hover states */
+    --hover-bg: #2D3441;
+    --hover-bg-light: #323842;
+    
+    /* Disabled states */
+    --disabled-bg: #2D3441;
+    --disabled-text: #6B7280;
+    
     /* Shadows - Adjusted for dark theme */
     --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
     --shadow: 0 4px 6px -1px rgba(0,0,0,0.3), 0 2px 4px -1px rgba(0,0,0,0.2);
@@ -159,7 +202,14 @@ html, body {
 }
 
 .btn.cancel:hover {
-    background-color: var(--background);
+    background-color: var(--hover-bg);
+}
+
+.btn:disabled {
+    background-color: var(--disabled-bg);
+    color: var(--disabled-text);
+    cursor: not-allowed;
+    opacity: 0.6;
 }
 
 /* Icon Button */
@@ -184,18 +234,24 @@ html, body {
 input, select, textarea {
     padding: 0.75rem 1rem;
     border-radius: var(--border-radius);
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--input-border);
     font-family: var(--font-family);
     font-size: 1rem;
-    background-color: var(--surface);
+    background-color: var(--input-bg);
     color: var(--text-primary);
-    transition: border-color var(--transition-fast);
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
 }
 
 input:focus, select:focus, textarea:focus {
     outline: none;
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px var(--primary-light-bg);
+    border-color: var(--input-focus-border);
+    box-shadow: 0 0 0 3px var(--input-focus-shadow);
+}
+
+input:disabled, select:disabled, textarea:disabled {
+    background-color: var(--disabled-bg);
+    color: var(--disabled-text);
+    cursor: not-allowed;
 }
 
 /* Card Styles */
@@ -247,7 +303,7 @@ input:focus, select:focus, textarea:focus {
 .modal-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: var(--overlay-bg);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -255,12 +311,8 @@ input:focus, select:focus, textarea:focus {
     backdrop-filter: blur(4px);
 }
 
-[data-theme="dark"] .modal-overlay {
-    background: rgba(0, 0, 0, 0.7);
-}
-
 .modal {
-    background: var(--surface);
+    background: var(--modal-bg);
     border-radius: var(--border-radius);
     padding: var(--space-lg);
     box-shadow: var(--shadow-lg);
@@ -312,6 +364,12 @@ input:focus, select:focus, textarea:focus {
     clip: rect(0, 0, 0, 0);
     white-space: nowrap;
     border-width: 0;
+}
+
+/* Focus visible for keyboard navigation */
+*:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
 }
 
 /* Responsive Design */
@@ -423,5 +481,14 @@ input:focus, select:focus, textarea:focus {
     100% {
         opacity: 0;
         transform: scale(0.5) translateY(-20px) translateX(var(--float-x, 10px));
+    }
+}
+
+/* Prefers reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
     }
 }

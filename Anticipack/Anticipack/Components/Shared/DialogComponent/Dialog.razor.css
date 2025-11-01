@@ -5,7 +5,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(0, 0, 0, 0.65);
+    background-color: var(--overlay-bg);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -23,9 +23,9 @@
 
 /* Dialog container */
 .dialog {
-    background-color: var(--surface);
+    background-color: var(--modal-bg);
     border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    box-shadow: var(--shadow-lg);
     width: 90%;
     max-width: 500px;
     max-height: 90vh;
@@ -37,10 +37,10 @@
     transition: transform 0.4s cubic-bezier(0.17, 0.89, 0.32, 1.28), opacity 0.25s ease;
 }
 
-    .dialog.visible {
-        transform: scale(1);
-        opacity: 1;
-    }
+.dialog.visible {
+    transform: scale(1);
+    opacity: 1;
+}
 
 /* Dialog header */
 .dialog-header {
@@ -48,13 +48,13 @@
     justify-content: space-between;
     align-items: center;
     padding: 18px 24px;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    border-bottom: 1px solid var(--border-color);
 }
 
 .dialog-title {
     font-size: 1.3rem;
     font-weight: 600;
-    color: #333;
+    color: var(--text-primary);
     margin: 0;
 }
 
@@ -62,12 +62,12 @@
     background: none;
     border: none;
     cursor: pointer;
-    color: #666;
+    color: var(--text-secondary);
     font-size: 1.5rem;
     line-height: 1;
     padding: 0;
     margin-left: 12px;
-    transition: all 0.2s ease;
+    transition: all var(--transition);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -76,11 +76,11 @@
     border-radius: 50%;
 }
 
-    .close-button:hover {
-        color: #333;
-        background-color: rgba(0, 0, 0, 0.05);
-        transform: rotate(90deg);
-    }
+.close-button:hover {
+    color: var(--text-primary);
+    background-color: var(--hover-bg);
+    transform: rotate(90deg);
+}
 
 /* Dialog content */
 .dialog-content {
@@ -91,41 +91,41 @@
     font-size: 1rem;
 }
 
-/* Dialog types styling with more user-friendly colors */
+/* Dialog types styling */
 .dialog.info .dialog-header {
-    border-bottom-color: #0284c7;
-    background-color: rgba(0, 120, 212, 0.05);
+    border-bottom-color: var(--primary);
+    background-color: var(--primary-light-bg);
 }
 
 .dialog.info .dialog-title {
-    color: var(--text-secondary);
+    color: var(--primary);
 }
 
 .dialog.success .dialog-header {
-    border-bottom-color: #107c10;
-    background-color: rgba(16, 124, 16, 0.05);
+    border-bottom-color: var(--success);
+    background-color: rgba(46, 204, 113, 0.1);
 }
 
 .dialog.success .dialog-title {
-    color: #107c10;
+    color: var(--success);
 }
 
 .dialog.warning .dialog-header {
-    border-bottom-color: #f59e0b;
-    background-color: rgba(245, 158, 11, 0.05);
+    border-bottom-color: var(--warning);
+    background-color: rgba(243, 156, 18, 0.1);
 }
 
 .dialog.warning .dialog-title {
-    color: #b45309;
+    color: var(--warning);
 }
 
 .dialog.error .dialog-header {
-    border-bottom-color: #ea580c;
-    background-color: rgba(234, 88, 12, 0.05);
+    border-bottom-color: var(--danger);
+    background-color: rgba(231, 76, 60, 0.1);
 }
 
 .dialog.error .dialog-title {
-    color: #c2410c;
+    color: var(--danger);
 }
 
 /* Confirm dialog specific styling */
@@ -147,18 +147,18 @@
     display: flex;
     justify-content: flex-end;
     padding: 16px 24px 20px;
-    border-top: 1px solid rgba(0, 0, 0, 0.08);
+    border-top: 1px solid var(--border-color);
     gap: 12px;
 }
 
-/* Button styling with more modern feel */
+/* Button styling */
 .dialog-button {
     padding: 12px 20px;
     border-radius: 8px;
     font-weight: 600;
     font-size: 0.95rem;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all var(--transition);
     border: none;
     min-width: 100px;
     text-transform: uppercase;
@@ -166,61 +166,60 @@
 }
 
 .button-primary {
-    background-color: #0078d4;
+    background-color: var(--primary);
     color: white;
 }
 
-    .button-primary:hover {
-        background-color: #0067b8;
-        box-shadow: 0 2px 8px rgba(0, 120, 212, 0.3);
-        transform: translateY(-1px);
-    }
+.button-primary:hover {
+    background-color: var(--primary-dark);
+    box-shadow: var(--shadow);
+    transform: translateY(-1px);
+}
 
 .button-secondary {
-    background-color: #5b5fc7;
+    background-color: var(--secondary);
     color: white;
 }
 
-    .button-secondary:hover {
-        background-color: #4b4fb7;
-        box-shadow: 0 2px 8px rgba(91, 95, 199, 0.3);
-        transform: translateY(-1px);
-    }
+.button-secondary:hover {
+    opacity: 0.9;
+    box-shadow: var(--shadow);
+    transform: translateY(-1px);
+}
 
 /* Confirmation dialog buttons */
 .button-confirm {
-    background-color: #0284c7;
+    background-color: var(--primary);
     color: white;
 }
 
 .button-confirm:hover {
-    background-color: #0369a1;
-    box-shadow: 0 2px 8px rgba(2, 132, 199, 0.3);
+    background-color: var(--primary-dark);
+    box-shadow: var(--shadow);
     transform: translateY(-1px);
 }
 
 .button-cancel {
     background-color: var(--surface);
     color: var(--text-primary);
-    border-color: var(--border-color);
-    border: 1px solid;
+    border: 1px solid var(--border-color);
 }
 
-    .button-cancel:hover {
-        background-color: var(--surface);
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        transform: translateY(-1px);
-    }
+.button-cancel:hover {
+    background-color: var(--hover-bg);
+    box-shadow: var(--shadow-sm);
+    transform: translateY(-1px);
+}
 
-/* Confirmation button for warning dialogs - now more friendly blue instead of red */
+/* Confirmation button for warning dialogs */
 .dialog.warning .button-confirm {
     background-color: var(--primary);
 }
 
-    .dialog.warning .button-confirm:hover {
-        background-color: var(--primary);
-        box-shadow: 0 2px 8px rgba(2, 132, 199, 0.3);
-    }
+.dialog.warning .button-confirm:hover {
+    background-color: var(--primary-dark);
+    box-shadow: var(--shadow);
+}
 
 /* Responsive adjustments */
 @media (max-width: 576px) {
@@ -263,14 +262,14 @@
 
 /* Accessibility enhancements */
 .dialog:focus {
-    outline: 2px solid #0078d4;
+    outline: 2px solid var(--primary);
     outline-offset: 2px;
 }
 
 .dialog-button:focus {
-    outline: 2px solid #0078d4;
+    outline: 2px solid var(--primary);
     outline-offset: 2px;
-    box-shadow: 0 0 0 3px rgba(0, 120, 212, 0.25);
+    box-shadow: 0 0 0 3px var(--input-focus-shadow);
 }
 
 /* Animation for dialog content */
@@ -283,9 +282,22 @@
         opacity: 0;
         transform: translateY(10px);
     }
-
     to {
         opacity: 1;
         transform: translateY(0);
+    }
+}
+
+/* Prefers reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    .dialog-overlay,
+    .dialog,
+    .close-button,
+    .dialog-button {
+        transition: none;
+    }
+    
+    .dialog.visible .dialog-content {
+        animation: none;
     }
 }

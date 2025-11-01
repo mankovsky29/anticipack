@@ -1,4 +1,4 @@
-﻿/* General layout */
+﻿/* Page Layout */
 .page-container {
     display: flex;
     flex-direction: column;
@@ -7,7 +7,6 @@
     min-height: 100vh;
 }
 
-/* Page Layout */
 .page-shell {
     min-height: 100vh;
     background: linear-gradient(180deg, var(--primary-light), var(--primary));
@@ -17,7 +16,6 @@
     flex-direction: column;
 }
 
-/* Page container adjustments */
 .page-container.with-fixed-navbar {
     margin-top: 0;
 }
@@ -30,13 +28,13 @@
     justify-content: space-between;
 }
 
-    .top-header h3 {
-        font-size: 1.5rem;
-        margin: 0;
-        max-width: 70%;
-        font-weight: 600;
-        color: white;
-    }
+.top-header h3 {
+    font-size: 1.5rem;
+    margin: 0;
+    max-width: 70%;
+    font-weight: 600;
+    color: white;
+}
 
 .top-right-actions {
     display: flex;
@@ -58,52 +56,47 @@
     transition: background-color var(--transition-fast);
 }
 
-    .action-btn:hover {
-        background: rgba(255, 255, 255, 0.3);
-    }
+.action-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
 
 .copy-btn {
     background: var(--accent);
 }
 
-    .copy-btn:hover {
-        background: #2EC5AA;
-    }
+.copy-btn:hover {
+    opacity: 0.9;
+}
 
 .delete-btn {
     background: var(--danger);
     opacity: 0.85;
 }
 
-    .delete-btn:hover {
-        background: var(--danger);
-        opacity: 1;
-    }
+.delete-btn:hover {
+    opacity: 1;
+}
 
-/* Activity Header (consistent with PackingActivities) */
+/* Activity Header */
 .activity-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 16px;
+    background: var(--surface);
+    padding: 12px 16px;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-sm);
 }
 
-.header-left-section {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-/* Left side with icon and title */
 .header-left-section {
     display: flex;
     align-items: center;
     flex: 1;
-    min-width: 0; /* Allow content to shrink below intrinsic width */
+    min-width: 0;
     overflow: hidden;
 }
 
-/* Category icon container */
 .category-icon-container {
     width: 40px;
     height: 40px;
@@ -116,46 +109,101 @@
     width: 32px;
     height: 32px;
     border-radius: 50%;
-    background-color: var(--button-default-color);
+    background-color: var(--primary-light-bg);
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #4b89dc;
+    color: var(--primary);
 }
 
-/* Title and input container */
 .activity-title {
     margin: 0;
     font-size: 20px;
     font-weight: 500;
+    color: var(--text-primary);
 }
 
 .activity-name-input {
     width: 100%;
-    background: rgba(255, 255, 255, 0.15);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    color: white;
+    background: var(--input-bg);
+    border: 1px solid var(--input-border);
+    color: var(--text-primary);
     padding: 6px 10px;
     border-radius: 4px;
     font-size: 1rem;
     font-weight: 500;
 }
 
-    .activity-name-input::placeholder {
-        color: rgba(255, 255, 255, 0.7);
-    }
+.activity-name-input::placeholder {
+    color: var(--text-light);
+}
 
-/* Action buttons container - now properly aligned to right */
+.activity-name-input:focus {
+    border-color: var(--input-focus-border);
+    box-shadow: 0 0 0 2px var(--input-focus-shadow);
+}
+
+/* Activity Actions - Fixed for better visibility */
 .activity-actions {
     display: flex;
     gap: 8px;
     align-items: center;
-    padding-top: var(--space-sm)
 }
 
-/* Override existing button styles to ensure consistency */
+/* Icon buttons in activity header */
+.activity-actions .icon-btn,
+.activity-actions .toggle-visibility-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all var(--transition);
+    flex-shrink: 0;
+}
+
+/* Default icon button style */
+.activity-actions .icon-btn {
+    background-color: transparent;
+    color: var(--secondary);
+}
+
+.activity-actions .icon-btn:hover {
+    background-color: var(--hover-bg);
+    color: var(--text-primary);
+}
+
+/* Toggle visibility button */
+.toggle-visibility-btn {
+    background-color: var(--primary);
+    color: white;
+}
+
+.toggle-visibility-btn:hover {
+    background-color: var(--primary-dark);
+}
+
+.toggle-visibility-btn.filtering {
+    background-color: var(--warning);
+}
+
+.toggle-visibility-btn.filtering:hover {
+    opacity: 0.9;
+}
+
+/* Focus states for accessibility */
+.activity-actions .icon-btn:focus-visible,
+.activity-actions .toggle-visibility-btn:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
+
 .add-btn {
-    border-radius: 4px; /* Square with rounded corners instead of circle */
+    border-radius: 4px;
 }
 
 .notes-input {
@@ -163,28 +211,30 @@
     margin-bottom: 16px;
 }
 
-    .notes-input label {
-        display: block;
-        font-weight: 500;
-        margin-bottom: 8px;
-        color: #333;
-    }
+.notes-input label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 8px;
+    color: var(--text-primary);
+}
 
-    .notes-input textarea {
-        width: 100%;
-        padding: 10px 12px;
-        border: 1px solid #d1d1d1;
-        border-radius: 6px;
-        font-size: 14px;
-        min-height: 80px;
-        resize: vertical;
-    }
+.notes-input textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--input-border);
+    border-radius: 6px;
+    font-size: 14px;
+    min-height: 80px;
+    resize: vertical;
+    background-color: var(--input-bg);
+    color: var(--text-primary);
+}
 
-        .notes-input textarea:focus {
-            outline: none;
-            border-color: #0078d4;
-            box-shadow: 0 0 0 2px rgba(0, 120, 212, 0.2);
-        }
+.notes-input textarea:focus {
+    outline: none;
+    border-color: var(--input-focus-border);
+    box-shadow: 0 0 0 2px var(--input-focus-shadow);
+}
 
 .add-form-actions {
     display: flex;
@@ -194,13 +244,13 @@
     width: 100%;
 }
 
-/* Improved Category Styling */
+/* Category Styling */
 .category {
     margin-bottom: 10px;
     border-radius: 8px;
     overflow: hidden;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    background-color: white;
+    box-shadow: var(--shadow-sm);
+    background-color: var(--surface);
 }
 
 .category-completed {
@@ -215,12 +265,13 @@
     cursor: pointer;
     user-select: none;
     background-color: var(--surface);
-    border-bottom: 1px solid #edf2f7;
+    border-bottom: 1px solid var(--border-color);
 }
 
 .chev {
     font-size: 18px;
-    transition: transform 0.2s ease;
+    transition: transform var(--transition);
+    color: var(--text-secondary);
 }
 
 .chev.collapsed {
@@ -232,15 +283,16 @@
     margin: 0;
     font-size: 16px;
     font-weight: 500;
+    color: var(--text-primary);
 }
 
 .category-title.checked {
-    color: #4caf50;
+    color: var(--success);
 }
 
 .count {
     font-size: 14px;
-    color: var(--text-primary);
+    color: var(--text-secondary);
 }
 
 .category-content {
@@ -250,73 +302,66 @@
     max-height: 1000px;
     overflow: hidden;
     transition: max-height 0.3s ease;
-    background-color: var(--background)
+    background-color: var(--background);
 }
 
 .category-content.hidden {
     max-height: 0;
 }
 
-/* Packing Row Item Improvements */
+/* Packing Row */
 .packing-row {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
     padding: 12px 16px;
-    border-bottom: 1px solid #edf2f7;
+    border-bottom: 1px solid var(--border-color);
     width: 100%;
-    background-color: var(--surface)
+    background-color: var(--surface);
 }
 
 .packing-row:last-child {
     border-bottom: none;
 }
 
-/* Style for the left side with checkbox and text */
 .item-main {
     display: flex;
     align-items: center;
     gap: 12px;
     position: relative;
     flex: 1;
-    min-width: 0; /* Allow text to shrink if needed */
+    min-width: 0;
 }
 
-/* Style for notes on the right side */
 .notes {
     margin-left: auto;
-    padding-left: var(--space-m);
-    color: #718096;
+    padding-left: var(--space-md);
+    color: var(--text-secondary);
     font-size: 14px;
     max-width: 40%;
     text-align: right;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    padding-right: var(--space-sm)
+    padding-right: var(--space-sm);
 }
 
-/* Remove margin that was added in round-checkbox label */
 .round-checkbox label {
     margin-left: 0;
     margin-top: 0;
 }
 
-
-
-
-/* Item text needs overflow handling */
 .item-text {
     flex-grow: 1;
     position: relative;
     font-size: 16px;
     padding: 8px 0;
-    transition: color 0.2s ease;
+    transition: color var(--transition);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    color: var(--text-primary)
+    color: var(--text-primary);
 }
 
 /* Progress Bar */
@@ -325,14 +370,14 @@
     border-radius: 8px;
     padding: 16px;
     margin-bottom: 16px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
-    top: 70px; /* Account for navbar */
+    box-shadow: var(--shadow);
+    top: 70px;
     z-index: 10;
 }
 
 .progress-bar {
     height: 8px;
-    background-color: #e1e8f0;
+    background-color: var(--border-color);
     border-radius: 4px;
     overflow: hidden;
     margin-bottom: 8px;
@@ -340,7 +385,7 @@
 
 .progress-fill {
     height: 100%;
-    background-color: #4caf50;
+    background-color: var(--success);
     border-radius: 4px;
     transition: width 0.3s ease;
 }
@@ -365,7 +410,7 @@
     background-color: var(--surface);
     border-top-left-radius: 16px;
     border-top-right-radius: 16px;
-    box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-lg);
     max-height: 60vh;
     transition: transform 0.3s ease;
     transform: translateY(calc(100% - 48px));
@@ -391,6 +436,7 @@
     margin: 0;
     font-size: 16px;
     font-weight: 500;
+    color: var(--text-primary);
 }
 
 .history-content {
@@ -407,9 +453,8 @@
 
 .stat-card {
     flex: 1;
-    background-color: var(--surface);
-    border: 1px solid;
-    border-color: var(--primary-light);
+    background-color: var(--background);
+    border: 1px solid var(--border-color);
     border-radius: 8px;
     padding: 16px;
     text-align: center;
@@ -435,25 +480,21 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: var(--overlay-bg);
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 1000;
 }
 
-.modal-overlay.celebration {
-    background-color: rgba(0, 0, 0, 0.7);
-}
-
 .completion-modal {
-    background-color: #fff;
+    background-color: var(--modal-bg);
     border-radius: 16px;
     padding: 24px;
     text-align: center;
     width: 90%;
     max-width: 400px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    box-shadow: var(--shadow-lg);
     position: relative;
     overflow: hidden;
 }
@@ -469,7 +510,7 @@
 
 .completion-modal h3 {
     margin-top: 0;
-    color: #4caf50;
+    color: var(--success);
     font-size: 24px;
 }
 
@@ -486,22 +527,22 @@
 .stat .label {
     display: block;
     font-size: 14px;
-    color: #718096;
+    color: var(--text-secondary);
     margin-bottom: 4px;
 }
 
 .stat .value {
     font-size: 18px;
     font-weight: 600;
-    color: #2d3748;
+    color: var(--text-primary);
 }
 
 .better {
-    color: #4caf50;
+    color: var(--success);
 }
 
 .worse {
-    color: #e53e3e;
+    color: var(--danger);
 }
 
 .btn {
@@ -510,17 +551,17 @@
     border: none;
     font-weight: 500;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all var(--transition);
     font-size: 16px;
 }
 
 .btn.primary {
-    background-color: #4b89dc;
+    background-color: var(--primary);
     color: white;
 }
 
 .btn.primary:hover {
-    background-color: #3a7bd5;
+    background-color: var(--primary-dark);
 }
 
 /* Toast */
@@ -533,11 +574,11 @@
 }
 
 .toast {
-    background-color: #4caf50;
+    background-color: var(--success);
     color: white;
     padding: 12px 24px;
     border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow);
     transform: translateY(20px);
     opacity: 0;
     transition: transform 0.3s ease, opacity 0.3s ease;
@@ -555,14 +596,14 @@
     align-items: center;
     justify-content: center;
     padding: 48px;
-    color: #718096;
+    color: var(--text-secondary);
 }
 
 .loading-spinner {
     width: 40px;
     height: 40px;
-    border: 4px solid rgba(75, 137, 220, 0.3);
-    border-top-color: #4b89dc;
+    border: 4px solid var(--primary-light-bg);
+    border-top-color: var(--primary);
     border-radius: 50%;
     animation: spin 1s linear infinite;
     margin-bottom: 16px;
@@ -583,88 +624,59 @@
     margin-right: 10px;
 }
 
-    .round-checkbox input[type="checkbox"] {
-        opacity: 0;
-        position: absolute;
-        width: 0;
-        height: 0;
-    }
-
-    .round-checkbox label {
-        position: absolute;
-        cursor: pointer;
-        top: 0;
-        left: 0;
-        width: 22px;
-        height: 22px;
-        background-color: #fff;
-        border: 2px solid #ccc;
-        border-radius: 50%;
-        margin-left: var(--space-sm);
-        margin-top: var(--space-xs);
-        transition: all 0.2s ease;
-    }
-
-    .round-checkbox input[type="checkbox"]:checked + label {
-        background-color: #2196F3;
-        border-color: #2196F3;
-    }
-
-    .round-checkbox label:after {
-        content: "";
-        position: absolute;
-        display: none;
-        left: 7px;
-        top: 3px;
-        width: 6px;
-        height: 10px;
-        border: solid white;
-        border-width: 0 2px 2px 0;
-        transform: rotate(45deg);
-    }
-
-    .round-checkbox input[type="checkbox"]:checked + label:after {
-        display: block;
-    }
-
-.item-main {
-    display: flex;
-    align-items: center;
+.round-checkbox input[type="checkbox"] {
+    opacity: 0;
+    position: absolute;
+    width: 0;
+    height: 0;
 }
 
-/* Improve spacing for packing rows */
+.round-checkbox label {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    width: 22px;
+    height: 22px;
+    background-color: var(--surface);
+    border: 2px solid var(--border-color);
+    border-radius: 50%;
+    margin-left: var(--space-sm);
+    margin-top: var(--space-xs);
+    transition: all var(--transition);
+}
+
+.round-checkbox input[type="checkbox"]:checked + label {
+    background-color: var(--primary);
+    border-color: var(--primary);
+}
+
+.round-checkbox label:after {
+    content: "";
+    position: absolute;
+    display: none;
+    left: 7px;
+    top: 3px;
+    width: 6px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+.round-checkbox input[type="checkbox"]:checked + label:after {
+    display: block;
+}
+
 .packing-row {
     padding: 8px 0;
 }
 
-/* Improve style for checked text */
 .item-text.checked {
     text-decoration: line-through;
-    color: #888;
+    color: var(--text-light);
 }
 
-/* Add this to your PlayPacking.razor.css file */
-
-/* Toggle visibility button */
-.toggle-visibility-btn {
-    background-color: #4b89dc;
-    color: white;
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    border: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.toggle-visibility-btn:hover {
-    background-color: #3a7bd5;
-}
-
-/* Icons for visibility states */
 .eye-open {
     position: relative;
     display: inline-block;
@@ -675,34 +687,24 @@
     display: inline-block;
 }
 
-/* Hide checked items when in hidden mode */
 .hide-checked .packing-row.checked {
     display: none;
 }
 
-/* Visual indicator for active filter */
-.toggle-visibility-btn.filtering {
-    background-color: #f0ad4e;
-}
-
-.toggle-visibility-btn.filtering:hover {
-    background-color: #ec971f;
-}
-
 /* Confirmation Modal */
 .confirmation-modal {
-    background-color: #fff;
+    background-color: var(--modal-bg);
     border-radius: 8px;
     padding: 20px;
     width: 90%;
     max-width: 350px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    box-shadow: var(--shadow-lg);
     text-align: center;
 }
 
 .confirmation-modal h3 {
     margin-top: 0;
-    color: #333;
+    color: var(--text-primary);
 }
 
 .modal-actions {
@@ -713,19 +715,33 @@
 }
 
 .btn.secondary {
-    background-color: #e2e8f0;
-    color: #4a5568;
+    background-color: var(--surface);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
 }
 
 .btn.danger {
-    background-color: #e53e3e;
+    background-color: var(--danger);
     color: white;
 }
 
 .btn.secondary:hover {
-    background-color: #cbd5e0;
+    background-color: var(--hover-bg);
 }
 
 .btn.danger:hover {
-    background-color: #c53030;
+    opacity: 0.9;
+}
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+    .activity-actions .icon-btn,
+    .toggle-visibility-btn,
+    .packing-row {
+        transition: none;
+    }
+    
+    @keyframes spin {
+        to { transform: none; }
+    }
 }

@@ -28,6 +28,27 @@
                 <i class="fa fa-times"></i>
             </button>
         </div>
+
+        <!-- Filter Bar -->
+        <div class="filter-bar">
+            <div class="filter-chips">
+                <button class="filter-chip @(_shareFilter == ShareFilterType.All ? "active" : "")" 
+                        @onclick="() => SetShareFilter(ShareFilterType.All)">
+                    <i class="fa fa-layer-group"></i>
+                    <span>@Localizer["All"]</span>
+                </button>
+                <button class="filter-chip @(_shareFilter == ShareFilterType.Private ? "active" : "")" 
+                        @onclick="() => SetShareFilter(ShareFilterType.Private)">
+                    <i class="fa fa-lock"></i>
+                    <span>@Localizer["Private"]</span>
+                </button>
+                <button class="filter-chip @(_shareFilter == ShareFilterType.Shared ? "active" : "")" 
+                        @onclick="() => SetShareFilter(ShareFilterType.Shared)">
+                    <i class="fa fa-share-alt"></i>
+                    <span>@Localizer["Shared"]</span>
+                </button>
+            </div>
+        </div>
         
         @if (_activities.Any())
         {
@@ -36,7 +57,15 @@
                 {
                     <div class="activity-card">
                         <div class="activity-header">
-                            <h3 class="activity-name">@activity.Name</h3>
+                            <div class="activity-title-row">
+                                <h3 class="activity-name">@activity.Name</h3>
+                                @if (activity.IsShared)
+                                {
+                                    <div class="share-badge" title="@Localizer["SharedActivity"]">
+                                        <i class="fa fa-share-alt"></i>
+                                    </div>
+                                }
+                            </div>
                         </div>
                         
                         <div class="activity-info">
@@ -51,6 +80,11 @@
                         <div class="activity-actions">
                             <button class="action-btn play" @onclick="() => OpenActivityInPackingMode(activity.Id)" title="@Localizer["PackNow"]">
                                 <i class="fa fa-play"></i>
+                            </button>
+                            <button class="action-btn share @(activity.IsShared ? "shared" : "")" 
+                                    @onclick="() => ToggleActivityShare(activity)" 
+                                    title="@(activity.IsShared ? Localizer["MakePrivate"] : Localizer["MakeShared"])">
+                                <i class="fa @(activity.IsShared ? "fa-lock-open" : "fa-share-alt")"></i>
                             </button>
                             <button class="action-btn edit" @onclick="() => OpenActivityInEditMode(activity.Id)" title="@Localizer["Edit"]">
                                 <i class="fa fa-edit"></i>
@@ -118,6 +152,17 @@
                 </select>
             </div>
 
+            <div class="form-row checkbox-row">
+                <label class="checkbox-label">
+                    <input type="checkbox" @bind="_newActivityIsShared" />
+                    <span class="checkbox-text">
+                        <i class="fa fa-share-alt"></i>
+                        @Localizer["MakeShared"]
+                    </span>
+                </label>
+                <p class="help-text">@Localizer["SharedActivityDescription"]</p>
+            </div>
+
             <div class="form-actions">
                 <button class="btn cancel" @onclick="CancelAddActivity">@Localizer["Cancel"]</button>
                 <button class="btn primary" @onclick="ConfirmAddActivityAsync">@Localizer["Create"]</button>
@@ -131,17 +176,26 @@
 </div>
 
 @code {
+    private enum ShareFilterType
+    {
+        All,
+        Private,
+        Shared
+    }
+
     private List<Storage.PackingActivity> _activities = new();
     private bool _isLoading = true;
     private string _searchTerm = string.Empty;
     private string _selectedCategory = string.Empty;
     private bool _isSearchVisible = false;
     private bool _isFabExpanded = false;
+    private ShareFilterType _shareFilter = ShareFilterType.All;
 
     // Add dialog
     private bool _showAddDialog;
     private string _newActivityName = string.Empty;
     private PackingCategory _newActivityCategory = PackingCategory.Miscellaneous;
+    private bool _newActivityIsShared = false;
 
     // Toast
     private bool _showToast;
@@ -189,6 +243,11 @@
         }
     }
 
+    private void SetShareFilter(ShareFilterType filterType)
+    {
+        _shareFilter = filterType;
+    }
+
     private async Task LoadActivitiesAsync()
     {
         _isLoading = true;
@@ -225,6 +284,14 @@
             {
                 filtered = filtered.Where(a => a.Category.ToString().Equals(_selectedCategory, StringComparison.OrdinalIgnoreCase));
             }
+
+            // Apply share filter
+            filtered = _shareFilter switch
+            {
+                ShareFilterType.Private => filtered.Where(a => !a.IsShared),
+                ShareFilterType.Shared => filtered.Where(a => a.IsShared),
+                _ => filtered
+            };
             
             return filtered;
         }
@@ -253,6 +320,7 @@
     {
         _newActivityName = "New Packing Activity";
         _newActivityCategory = PackingCategory.Miscellaneous;
+        _newActivityIsShared = false;
         _showAddDialog = true;
         _isFabExpanded = false;
     }
@@ -271,7 +339,8 @@
         {
             Name = _newActivityName,
             Category = _newActivityCategory,
-            LastPacked = DateTime.Now
+            LastPacked = DateTime.Now,
+            IsShared = _newActivityIsShared
         };
 
         try
@@ -287,6 +356,39 @@
         finally
         {
             _showAddDialog = false;
+        }
+    }
+
+    private async Task ToggleActivityShare(Storage.PackingActivity activity)
+    {
+        var newShareState = !activity.IsShared;
+        var confirmMessage = newShareState 
+            ? string.Format(Localizer["ConfirmMakeShared"], activity.Name)
+            : string.Format(Localizer["ConfirmMakePrivate"], activity.Name);
+        
+        var result = await DialogService.ShowConfirmAsync(
+            Localizer["ChangeShareStatus"], 
+            confirmMessage,
+            Localizer["Confirm"],
+            Localizer["Cancel"]);
+        
+        if (!result) 
+            return;
+            
+        activity.IsShared = newShareState;
+        
+        try
+        {
+            await PackingRepository.AddOrUpdateAsync(activity);
+            var message = activity.IsShared 
+                ? string.Format(Localizer["ActivityNowShared"], activity.Name)
+                : string.Format(Localizer["ActivityNowPrivate"], activity.Name);
+            ShowToast(message);
+            await LoadActivitiesAsync();
+        }
+        catch
+        {
+            ShowToast(Localizer["FailedToUpdateShareStatus"]);
         }
     }
 

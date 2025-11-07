@@ -1,0 +1,193 @@
+@Anticipack.API_HostAddress = http://localhost:5275
+@token = your-jwt-token-here
+
+### Authentication Endpoints
+
+# Login with Google
+POST {{Anticipack.API_HostAddress}}/api/auth/login
+Content-Type: application/json
+
+{
+  "idToken": "google-id-token-from-google-sign-in",
+  "provider": "Google"
+}
+
+###
+
+# Login with Apple
+POST {{Anticipack.API_HostAddress}}/api/auth/login
+Content-Type: application/json
+
+{
+  "idToken": "apple-id-token-from-apple-sign-in",
+  "provider": "Apple"
+}
+
+###
+
+# Refresh Token
+POST {{Anticipack.API_HostAddress}}/api/auth/refresh
+Content-Type: application/json
+
+{
+  "refreshToken": "your-refresh-token"
+}
+
+###
+
+### User Endpoints
+
+# Get Current User
+GET {{Anticipack.API_HostAddress}}/api/users/me
+Authorization: Bearer {{token}}
+
+###
+
+# Update Current User
+PUT {{Anticipack.API_HostAddress}}/api/users/me
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "displayName": "John Doe",
+  "profilePictureUrl": "https://example.com/avatar.jpg"
+}
+
+###
+
+# Delete Current User
+DELETE {{Anticipack.API_HostAddress}}/api/users/me
+Authorization: Bearer {{token}}
+
+###
+
+### Activities Endpoints
+
+# Get All Activities
+GET {{Anticipack.API_HostAddress}}/api/activities
+Authorization: Bearer {{token}}
+
+###
+
+# Get Activity by ID
+GET {{Anticipack.API_HostAddress}}/api/activities/activity-id-here
+Authorization: Bearer {{token}}
+
+###
+
+# Create New Activity
+POST {{Anticipack.API_HostAddress}}/api/activities
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Weekend Trip",
+  "category": "Travel",
+  "isShared": false
+}
+
+###
+
+# Update Activity
+PUT {{Anticipack.API_HostAddress}}/api/activities/activity-id-here
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Updated Weekend Trip",
+  "category": "Travel",
+  "isShared": true
+}
+
+###
+
+# Delete Activity
+DELETE {{Anticipack.API_HostAddress}}/api/activities/activity-id-here
+Authorization: Bearer {{token}}
+
+###
+
+# Copy Activity
+POST {{Anticipack.API_HostAddress}}/api/activities/activity-id-here/copy
+Authorization: Bearer {{token}}
+
+###
+
+# Start Packing Session (resets all items to unpacked)
+POST {{Anticipack.API_HostAddress}}/api/activities/activity-id-here/start
+Authorization: Bearer {{token}}
+
+###
+
+### Packing Items Endpoints
+
+# Get All Items for Activity
+GET {{Anticipack.API_HostAddress}}/api/activities/activity-id-here/items
+Authorization: Bearer {{token}}
+
+###
+
+# Create New Item
+POST {{Anticipack.API_HostAddress}}/api/activities/activity-id-here/items
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Toothbrush",
+  "category": "Toiletries",
+  "notes": "Don't forget!",
+  "sortOrder": 1
+}
+
+###
+
+# Update Item
+PUT {{Anticipack.API_HostAddress}}/api/activities/activity-id-here/items/item-id-here
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Toothbrush",
+  "isPacked": true,
+  "category": "Toiletries",
+  "notes": "Packed!",
+  "sortOrder": 1
+}
+
+###
+
+# Delete Item
+DELETE {{Anticipack.API_HostAddress}}/api/activities/activity-id-here/items/item-id-here
+Authorization: Bearer {{token}}
+
+###
+
+### Settings Endpoints
+
+# Get User Settings
+GET {{Anticipack.API_HostAddress}}/api/settings
+Authorization: Bearer {{token}}
+
+###
+
+# Update Settings (partial update)
+PUT {{Anticipack.API_HostAddress}}/api/settings
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "theme": "Dark",
+  "enableNotifications": true,
+  "enablePushNotifications": true,
+  "defaultCategory": "Work",
+  "language": "en",
+  "dateFormat": "yyyy-MM-dd"
+}
+
+###
+
+# Reset Settings to Defaults
+POST {{Anticipack.API_HostAddress}}/api/settings/reset
+Authorization: Bearer {{token}}
+
+###

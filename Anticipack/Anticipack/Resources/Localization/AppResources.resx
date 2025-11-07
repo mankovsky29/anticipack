@@ -442,4 +442,21 @@ This action cannot be undone.</value>
   <data name="SettingsMenu" xml:space="preserve">
   <value>Settings</value>
 </data>
+
+  <!-- Bulk Add Items -->
+  <data name="BulkAddPlaceholder" xml:space="preserve">
+    <value>Enter items (one per line):
+Toothbrush
+Toothpaste
+Shampoo</value>
+  </data>
+  <data name="BulkAddHint" xml:space="preserve">
+    <value>Enter one item per line. All items will be added to the selected category.</value>
+  </data>
+  <data name="ItemsAdded" xml:space="preserve">
+    <value>{0} items added</value>
+  </data>
+  <data name="FailedToAddItems" xml:space="preserve">
+    <value>Failed to add {0} items</value>
+  </data>
 </root>

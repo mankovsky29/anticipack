@@ -1,4 +1,4 @@
-﻿@page "/edit-packing/{id}"
+@page "/edit-packing/{id}"
 @using Anticipack.Packing
 @using Anticipack.Services
 @using Anticipack.Storage
@@ -96,46 +96,60 @@
             {
                 <div class="add-item-form">
                     <div class="form-header">
-                        <h4>@AppResources.AddNewItem</h4>
+                        <div class="form-title-row">
+                            <h4>@AppResources.AddNewItem</h4>
+                            <button class="close-form-btn" @onclick="CancelAdd" title="@AppResources.Cancel">
+                                <i class="fa fa-times"></i>
+                            </button>
+                        </div>
                     </div>
                     
                     <div class="form-body">
-                        <div class="input-group">
-                            <input class="item-name-input" 
-                                   placeholder="@AppResources.EnterItemName" 
-                                   @bind="_newName" 
-                                   @bind:event="oninput"
-                                   @keyup="@HandleKeyUp" 
-                                   @ref="newItemInput" />
-                        </div>
-                        
-                        <div class="category-selector-container">
-                            <label>@AppResources.SelectCategory</label>
-                            <div class="category-icons">
+                        <div class="form-section">
+                            <label class="form-label">@AppResources.SelectCategory</label>
+                            <div class="category-grid">
                                 @foreach (var category in Enum.GetValues<PackingCategory>())
                                 {
-                                    <div class="category-icon-option @(_newCategory == category.ToString() ? "selected" : "")" 
-                                         @onclick="() => _newCategory = category.ToString()"
-                                         title="@GetLocalizedCategoryName(category)">
+                                    <button type="button"
+                                            class="category-card @(_newCategory == category.ToString() ? "selected" : "")" 
+                                            @onclick="() => _newCategory = category.ToString()">
                                         <i class="fa @GetCategoryIcon(category)" aria-hidden="true"></i>
-                                        <span class="category-label">@GetLocalizedCategoryName(category)</span>
-                                    </div>
+                                        <span class="category-name">@GetLocalizedCategoryName(category)</span>
+                                    </button>
                                 }
                             </div>
                         </div>
                         
-                        <div class="notes-input">
-                            <label>@AppResources.NotesOptional</label>
-                            <textarea placeholder="@AppResources.AddNotesAboutItem" 
-                                      rows="2"
-                                      @bind="_newNotes"></textarea>
+                        <div class="form-section">
+                            <label for="bulk-textarea" class="form-label">
+                                <i class="fa fa-list-ul"></i>
+                                @AppResources.EnterItemName
+                            </label>
+                            <textarea id="bulk-textarea"
+                                   class="bulk-textarea" 
+                                   placeholder="@GetBulkAddPlaceholder()" 
+                                   @bind="_bulkItemsText" 
+                                   @bind:event="oninput"
+                                   @ref="bulkItemsTextarea"
+                                   rows="8"
+                                   @onkeydown="HandleBulkTextareaKeyDown"></textarea>
+                            <div class="form-hint">
+                                <i class="fa fa-info-circle"></i>
+                                <span>@AppResources.BulkAddHint</span>
+                            </div>
                         </div>
                     </div>
                     
-                    <div class="add-form-actions">
-                        <button class="btn cancel" @onclick="CancelAdd">@AppResources.Cancel</button>
-                        <button class="btn primary" @onclick="ConfirmAddAsync">
-                            <i class="fa fa-plus-circle"></i> @AppResources.AddItem
+                    <div class="form-actions">
+                        <button class="btn btn-cancel" @onclick="CancelAdd">
+                            <i class="fa fa-times"></i>
+                            <span>@AppResources.Cancel</span>
+                        </button>
+                        <button class="btn btn-primary" 
+                                @onclick="ConfirmBulkAddAsync" 
+                                disabled="@(string.IsNullOrWhiteSpace(_bulkItemsText))">
+                            <i class="fa fa-check"></i>
+                            <span>@AppResources.AddItem</span>
                         </button>
                     </div>
                 </div>
@@ -154,7 +168,7 @@
 
                 <section class="category @(allChecked ? "category-completed" : "")" aria-labelledby="@categoryId">
                     <div class="category-header" role="button" @onclick="() => ToggleCategory(category)" aria-expanded="@(!collapsed)">
-                        <span class="chev @(collapsed ? "collapsed" : "")" aria-hidden="true">▾</span>
+                        <span class="chev @(collapsed ? "collapsed" : "")" aria-hidden="true">?</span>
                         <h4 id="@categoryId" class="category-title @(allChecked ? "checked" : "")">@localizedCategory</h4>
                         <span class="count">(@groupItems.Count)</span>
                     </div>
@@ -174,7 +188,6 @@
                                 @ondrop="@((DragEventArgs e) => OnDrop(e, item))">
                                 @if (_editingItem == item)
                                 {
-                                    <!-- Replace the item edit container to remove the category dropdown -->
                                     <div class="item-edit-container">
                                         <div class="item-edit-header">
                                             <input type="text" 
@@ -301,7 +314,7 @@
 
     private bool _isEditingName = false;
     private ElementReference inputElement;
-    private ElementReference newItemInput;
+    private ElementReference bulkItemsTextarea;
     private PackingItemView? _editingItem = null;
     private ElementReference itemEditInputElement;
 
@@ -314,9 +327,8 @@
     private List<string> _categoryOrder = new();
     private readonly Dictionary<string, bool?> _manualOverride = new(StringComparer.OrdinalIgnoreCase);
 
-    private string _newName = string.Empty;
     private string _newCategory = string.Empty;
-    private string _newNotes = string.Empty;
+    private string _bulkItemsText = string.Empty;
 
     private PackingItemView? _pendingDeleteItem;
 
@@ -328,7 +340,6 @@
     private string _quickAddName = string.Empty;
     private string _quickAddCategory = PackingCategory.Miscellaneous.ToString();
 
-    // Add these fields and methods to the @code section
     private string _dropdownPosition = "down";
     private ElementReference dropdownElement;
     private bool _showQuickCategoryDropdown = false;
@@ -339,17 +350,13 @@
 
         if (_showQuickCategoryDropdown)
         {
-            // Calculate dropdown position on next render
             _ = DetermineDropdownPosition();
         }
     }
 
     private async Task DetermineDropdownPosition()
     {
-        // Wait for the UI to render so the element is available
         await Task.Delay(1);
-
-        // Use JS interop to determine if there's enough space below
         var shouldOpenUp = await JSRuntime.InvokeAsync<bool>("shouldOpenDropdownUp", dropdownElement);
         _dropdownPosition = shouldOpenUp ? "up" : "down";
         StateHasChanged();
@@ -383,23 +390,17 @@
         try
         {
             await PackingRepository.AddItemToActivityAsync(Id, newItem);
-            // Add to local collection without full reload for better performance
             var newItemView = new PackingItemView(newItem);
             Items.Add(newItemView);
 
-            // Make sure category is in the list
             if (!_categoryOrder.Contains(_quickAddCategory, StringComparer.OrdinalIgnoreCase))
             {
                 _categoryOrder.Add(_quickAddCategory);
-                _manualOverride[_quickAddCategory] = false; // Expand by default
+                _manualOverride[_quickAddCategory] = false;
             }
 
-            // Clear input
             _quickAddName = string.Empty;
-
-            // Show toast via centralized service
             ToastService.ShowSuccess(string.Format(AppResources.ItemAdded, name));
-
             StateHasChanged();
         }
         catch (Exception ex)
@@ -435,9 +436,7 @@
     private void InitializeDefaultItems()
     {
         _currentActivity = new Storage.PackingActivity { Name = AppResources.NewPackingActivity };
-
         Items = new List<PackingItemView>();
-
         _categoryOrder = Items.Select(i => i.Item.Category).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
         foreach (var cat in _categoryOrder)
             _manualOverride[cat] = null;
@@ -481,18 +480,6 @@
         _manualOverride[category] = !currentlyCollapsed;
     }
 
-    private void UpdateCategoryStateAfterItemChange(string category)
-    {
-        var allChecked = IsAllChecked(category);
-
-        if (allChecked)
-            _manualOverride[category] = null;
-        else
-            _manualOverride[category] = false;
-
-        StateHasChanged();
-    }
-
     private bool IsAllChecked(string category)
     {
         var group = Items.Where(i => string.Equals(i.Item.Category, category, StringComparison.OrdinalIgnoreCase));
@@ -523,40 +510,81 @@
     private void CancelAdd()
     {
         _isAddingItem = false;
+        _bulkItemsText = string.Empty;
     }
 
-    private async Task ConfirmAddAsync()
+    private async Task ConfirmBulkAddAsync()
     {
-        var name = (_newName ?? string.Empty).Trim();
-        var category = string.IsNullOrWhiteSpace(_newCategory) ? "Uncategorized" : _newCategory.Trim();
-
-        // Handle the "New" category option
-        if (category == "New")
-        {
-            // Here you could open a dialog to enter a new category name
-            // For simplicity, we'll use Miscellaneous
-            category = PackingCategory.Miscellaneous.ToString();
-        }
-
-        var notes = _newNotes ?? string.Empty;
-
-        if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(Id))
+        if (string.IsNullOrWhiteSpace(_bulkItemsText) || string.IsNullOrWhiteSpace(Id))
             return;
 
-        var newItem = new Storage.PackingItem { Name = name, Category = category, Notes = notes, ActivityId = Id };
+        var category = string.IsNullOrWhiteSpace(_newCategory) ? PackingCategory.Miscellaneous.ToString() : _newCategory.Trim();
 
-        try {
-            await PackingRepository.AddItemToActivityAsync(Id, newItem);
+        var lines = _bulkItemsText
+            .Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries)
+            .Select(line => line.Trim())
+            .Where(line => !string.IsNullOrWhiteSpace(line))
+            .ToList();
+
+        if (!lines.Any())
+            return;
+
+        int addedCount = 0;
+        int failedCount = 0;
+
+        try
+        {
+            foreach (var itemName in lines)
+            {
+                try
+                {
+                    var newItem = new Storage.PackingItem 
+                    { 
+                        Name = itemName, 
+                        Category = category, 
+                        Notes = string.Empty, 
+                        ActivityId = Id 
+                    };
+
+                    await PackingRepository.AddItemToActivityAsync(Id, newItem);
+                    addedCount++;
+                }
+                catch
+                {
+                    failedCount++;
+                }
+            }
+
             await LoadItemsForPackingAsync(Id);
             _manualOverride[category] = false;
+
+            if (addedCount > 0)
+            {
+                var message = addedCount == 1 
+                    ? string.Format(AppResources.ItemAdded, lines[0])
+                    : string.Format(AppResources.ItemsAdded, addedCount);
+                ToastService.ShowSuccess(message);
+            }
+
+            if (failedCount > 0)
+            {
+                ToastService.ShowError(string.Format(AppResources.FailedToAddItems, failedCount));
+            }
         }
-        catch (Exception ex) {
+        catch (Exception ex)
+        {
             ToastService.ShowError(string.Format(AppResources.ErrorAddingItem, ex.Message));
         }
 
         _isAddingItem = false;
-        _newName = string.Empty;
+        _bulkItemsText = string.Empty;
         StateHasChanged();
+    }
+
+    private string GetBulkAddPlaceholder()
+    {
+        return AppResources.ResourceManager.GetString("BulkAddPlaceholder", LocalizationService.CurrentCulture) 
+            ?? "Enter items (one per line):\nToothbrush\nToothpaste\nShampoo";
     }
 
     private async Task PromptDelete(PackingItemView item)
@@ -605,7 +633,6 @@
         {
             var newId = await PackingRepository.CopyPackingAsync(Id);
             ToastService.ShowSuccess(AppResources.PackingActivityCopied);
-            // Optionally navigate to the new copy
             Navigation.NavigateTo($"/edit-packing/{newId}");
         }
         catch (Exception ex)
@@ -645,7 +672,6 @@
         }
     }
 
-    // Drag & drop handlers
     private void OnDragStart(DragEventArgs e, PackingItemView item)
     {
         _draggedItem = item;
@@ -761,7 +787,6 @@
         StateHasChanged();
     }
 
-    // Save-before-navigation using NavigationLock
     private bool _isSavingBeforeNav;
 
     private async Task OnBeforeInternalNavigation(LocationChangingContext context)
@@ -782,14 +807,6 @@
         finally
         {
             _isSavingBeforeNav = false;
-        }
-    }
-
-    private void HandleKeyUp(KeyboardEventArgs e)
-    {
-        if(e.Key == "Enter")
-        {
-            _ = ConfirmAddAsync();
         }
     }
 
@@ -849,9 +866,6 @@
         if (itemEditInputElement.Id != null)
         {
             await JSRuntime.InvokeVoidAsync("selectAllText", itemEditInputElement);
-
-            // Ensure the focused edit element is visible above the keyboard (pass the last known keyboard height)
-            // This uses JS to compute whether scrolling is needed and performs it.
             _ = JSRuntime.InvokeVoidAsync("ensureElementVisible", itemEditInputElement, _keyboardHeight);
         }
     }
@@ -871,7 +885,6 @@
 
         try
         {
-            // Validate item name isn't empty
             if (string.IsNullOrWhiteSpace(item.Item.Name))
             {
                 item.Item.Name = AppResources.UnnamedItem;
@@ -903,21 +916,16 @@
     {
         _keyboardVisible = visible;
         _keyboardHeight = height;
-        // When keyboard becomes visible, reset the quick-add container UI elements
         if (visible)
         {
             _showQuickCategoryDropdown = false;
-            
-            // Call JavaScript to handle any visual adjustments and pass keyboard height
             _ = JSRuntime.InvokeVoidAsync("handleKeyboardVisibility", true, height);
         }
         else
         {
-            // Call JavaScript to reset container when keyboard disappears (height may be 0)
             _ = JSRuntime.InvokeVoidAsync("handleKeyboardVisibility", false, height);
         }
         
-        // Ensure UI updates happen on the Blazor renderer thread
         _ = InvokeAsync(StateHasChanged);
     }
 
@@ -947,8 +955,6 @@
 
     private void CancelItemEdit(PackingItemView item)
     {
-        // If we have the original values, we could restore them here
-        // For now, just exit edit mode without saving
         _editingItem = null;
         StateHasChanged();
     }
@@ -957,5 +963,13 @@
     {
         _quickAddCategory = category;
         _showQuickCategoryDropdown = false;
+    }
+
+    private void HandleBulkTextareaKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter" && (e.CtrlKey || e.MetaKey))
+        {
+            _ = ConfirmBulkAddAsync();
+        }
     }
 }

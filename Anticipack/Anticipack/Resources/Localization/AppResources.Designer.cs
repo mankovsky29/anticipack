@@ -1248,5 +1248,44 @@ namespace Anticipack.Resources.Localization {
                 return ResourceManager.GetString("YouPackedItems", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enter items (one per line):
+        ///Toothbrush
+        ///Toothpaste
+        ///Shampoo.
+        /// </summary>
+        public static string BulkAddPlaceholder {
+            get {
+                return ResourceManager.GetString("BulkAddPlaceholder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enter one item per line. All items will be added to the selected category..
+        /// </summary>
+        public static string BulkAddHint {
+            get {
+                return ResourceManager.GetString("BulkAddHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} items added.
+        /// </summary>
+        public static string ItemsAdded {
+            get {
+                return ResourceManager.GetString("ItemsAdded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to add {0} items.
+        /// </summary>
+        public static string FailedToAddItems {
+            get {
+                return ResourceManager.GetString("FailedToAddItems", resourceCulture);
+            }
+        }
     }
 }

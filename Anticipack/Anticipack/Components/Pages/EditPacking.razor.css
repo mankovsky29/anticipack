@@ -255,6 +255,233 @@
 }
 
 /* ============================================
+   DRAG & DROP HELPER STYLES
+   ============================================ */
+
+/* Ghost element for better drag preview */
+.drag-ghost {
+    opacity: 0;
+    position: absolute;
+    pointer-events: none;
+}
+
+/* Drop zone placeholder */
+.drop-placeholder {
+    height: 60px;
+    border: 2px dashed var(--primary);
+    border-radius: 8px;
+    background: repeating-linear-gradient(
+        45deg,
+        var(--primary-light-bg),
+        var(--primary-light-bg) 10px,
+        transparent 10px,
+        transparent 20px
+    );
+    margin: 8px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary);
+    font-weight: 500;
+    animation: fadeIn 0.2s ease;
+}
+
+.drop-placeholder::before {
+    content: '↓ Drop here';
+    font-size: 14px;
+}
+
+/* Enhanced insertion slot visualization */
+.insertion-slot {
+    height: 80px;
+    margin: 16px 0;
+    border: 3px dashed var(--primary);
+    border-radius: 12px;
+    background: repeating-linear-gradient(
+        135deg,
+        transparent,
+        transparent 10px,
+        var(--primary-light-bg) 10px,
+        var(--primary-light-bg) 20px
+    );
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    animation: slotPulse 1.5s ease-in-out infinite;
+    box-shadow: 
+        inset 0 0 20px rgba(var(--primary-rgb, 99, 102, 241), 0.2),
+        0 4px 20px rgba(var(--primary-rgb, 99, 102, 241), 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.insertion-slot::before {
+    content: '⬇';
+    font-size: 24px;
+    color: var(--primary);
+    animation: bounce 1s ease-in-out infinite;
+}
+
+.insertion-slot::after {
+    content: 'Drop item here to insert';
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--primary);
+    letter-spacing: 0.5px;
+}
+
+@keyframes slotPulse {
+    0%, 100% {
+        opacity: 0.8;
+        transform: scaleY(1);
+        border-color: var(--primary);
+    }
+    50% {
+        opacity: 1;
+        transform: scaleY(1.05);
+        border-color: var(--primary-dark);
+    }
+}
+
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-8px);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scaleY(0);
+    }
+    to {
+        opacity: 1;
+        transform: scaleY(1);
+    }
+}
+
+/* Enhanced dimming - OPTIMIZED FOR ZERO FLICKER */
+body.dragging-active .packing-row:not(.dragging):not(.drag-over) {
+    opacity: 0.35;
+    filter: blur(0.5px) grayscale(30%);
+    transform: scale(0.99);
+    transition: opacity 0.2s ease, filter 0.2s ease, transform 0.2s ease;
+    will-change: opacity, filter, transform;
+}
+
+/* Adjacent items movement - SMOOTH */
+body.dragging-active .packing-row.drag-over ~ .packing-row {
+    transform: translateY(6px);
+    transition: transform 0.3s ease-out;
+}
+
+/* Visual spacing around drop target */
+.packing-row.drag-over + .packing-row {
+    margin-top: 12px !important;
+    transition: margin-top 0.3s ease-out;
+}
+
+/* Category dimming - OPTIMIZED */
+body.dragging-active .category:not(.drag-target) {
+    opacity: 0.4;
+    filter: grayscale(60%) brightness(0.95);
+    transform: scale(0.99);
+    transition: opacity 0.2s ease, filter 0.2s ease, transform 0.2s ease;
+}
+
+body.dragging-active .category.drag-target {
+    opacity: 1;
+    filter: none;
+    transform: scale(1.01);
+    transition: transform 0.2s ease;
+}
+
+/* ============================================
+   DRAG HANDLE - ENHANCED MOBILE TOUCH FEEDBACK
+   ============================================ */
+
+.packing-row::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 5px;
+    background: transparent;
+    transition: all 0.3s ease;
+    border-radius: 4px 0 0 4px;
+    z-index: 1;
+}
+
+.packing-row:hover:not(.dragging):not(.drag-over)::after {
+    background: linear-gradient(180deg, 
+        var(--primary) 0%, 
+        var(--primary-dark) 100%);
+    box-shadow: 
+        0 0 12px rgba(var(--primary-rgb, 99, 102, 241), 0.6),
+        inset 0 0 8px rgba(255, 255, 255, 0.3);
+    width: 6px;
+}
+
+/* Remove ::after during drag states to prevent conflicts */
+.packing-row.dragging::after,
+.packing-row.drag-over::after {
+    display: none;
+}
+
+/* Mobile touch optimization with haptic-like feedback */
+@media (max-width: 768px) {
+    .packing-row::before {
+        content: '⋮⋮';
+        position: absolute;
+        left: 8px;
+        color: var(--primary);
+        font-size: 18px;
+        font-weight: bold;
+        letter-spacing: -2px;
+        opacity: 0.4;
+        transition: all 0.3s ease;
+    }
+    
+    .packing-row:active::before {
+        opacity: 1;
+        color: var(--primary);
+        transform: scale(1.2);
+        animation: pulse 0.6s ease-in-out;
+    }
+    
+    @keyframes pulse {
+        0%, 100% {
+            transform: scale(1.2);
+        }
+        50% {
+            transform: scale(1.4);
+        }
+    }
+    
+    /* Add visual feedback for touch */
+    .packing-row:active {
+        background: var(--primary-light-bg);
+        transform: scale(0.98);
+    }
+    
+    /* Enhanced drop zone for touch */
+    .packing-row.drag-over {
+        padding: 24px 16px;
+    }
+    
+    .packing-row.drag-over::before {
+        font-size: 16px;
+        font-weight: 800;
+    }
+}
+
+/* ============================================
    PACKING LIST - MODERN UX IMPROVEMENTS
    ============================================ */
 
@@ -263,10 +490,11 @@
     flex-direction: column;
     gap: 16px;
     padding-bottom: 20px;
+    position: relative;
 }
 
 /* ============================================
-   CATEGORY SECTIONS - ENHANCED DESIGN
+   CATEGORY SECTIONS - ULTRA-OBVIOUS DRAG & DROP FEEDBACK
    ============================================ */
 
 .category {
@@ -275,13 +503,74 @@
     overflow: hidden;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     border: 1px solid var(--border-color);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     margin-bottom: 4px;
+    position: relative;
 }
 
 .category:hover {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-    transform: translateY(-1px);
+    transform: translateY(-2px);
+}
+
+/* Category becomes a glowing drop zone when dragging between categories */
+.category.drag-target {
+    border: 4px dashed var(--primary);
+    background: linear-gradient(135deg, 
+        var(--primary-light-bg) 0%, 
+        rgba(var(--primary-rgb, 99, 102, 241), 0.15) 50%,
+        var(--surface) 100%);
+    box-shadow: 
+        0 0 0 6px rgba(var(--primary-rgb, 99, 102, 241), 0.15),
+        0 8px 32px rgba(var(--primary-rgb, 99, 102, 241), 0.3);
+    transform: scale(1.02);
+    animation: categoryGlow 1.5s ease-in-out infinite;
+}
+
+@keyframes categoryGlow {
+    0%, 100% {
+        box-shadow: 
+            0 0 0 6px rgba(var(--primary-rgb, 99, 102, 241), 0.15),
+            0 8px 32px rgba(var(--primary-rgb, 99, 102, 241), 0.3);
+    }
+    50% {
+        box-shadow: 
+            0 0 0 8px rgba(var(--primary-rgb, 99, 102, 241), 0.25),
+            0 12px 48px rgba(var(--primary-rgb, 99, 102, 241), 0.5);
+    }
+}
+
+/* Add "Drop here to move" overlay on category */
+.category.drag-target::before {
+    content: '📦 Drop here to move to this category';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--primary);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 24px;
+    font-weight: 600;
+    font-size: 14px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+    z-index: 100;
+    animation: bounceIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    white-space: nowrap;
+}
+
+@keyframes bounceIn {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.3);
+    }
+    50% {
+        transform: translate(-50%, -50%) scale(1.05);
+    }
+    100% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
 }
 
 .category-completed {
@@ -296,7 +585,7 @@
     background: linear-gradient(135deg, var(--background) 0%, var(--surface) 100%);
     border-bottom: 1px solid var(--border-color);
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.3s ease;
     user-select: none;
 }
 
@@ -371,7 +660,7 @@ ul.category-content {
 }
 
 /* ============================================
-   PACKING ROW ITEMS - MODERN DESIGN
+   PACKING ROW ITEMS - COMPLETELY FLICKER-FREE WITH PREVIEW
    ============================================ */
 
 .packing-row {
@@ -383,36 +672,178 @@ ul.category-content {
     background: var(--surface);
     color: var(--text-primary);
     position: relative;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     cursor: grab;
+    border-radius: 4px;
+    margin: 2px 0;
+    /* Hardware acceleration */
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    transform: translateZ(0);
 }
 
 .packing-row:last-child {
     border-bottom: none;
 }
 
-.packing-row:hover {
+.packing-row:hover:not(.dragging):not(.drag-over) {
     background: var(--hover-bg);
-    padding-left: 18px;
+    padding-left: 22px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    transform: translateX(4px) translateZ(0);
+}
+
+/* Static drag handle */
+.packing-row:hover:not(.dragging):not(.drag-over)::before {
+    content: '⋮⋮';
+    position: absolute;
+    left: 8px;
+    color: var(--primary);
+    font-size: 20px;
+    font-weight: bold;
+    letter-spacing: -2px;
+    opacity: 0.7;
+    z-index: 5;
 }
 
 .packing-row:active {
     cursor: grabbing;
 }
 
-/* Drag states */
+/* Dragging state - item being dragged */
 .packing-row.dragging {
     opacity: 0.5;
-    transform: scale(0.98);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: scale(0.95) translateZ(0);
     cursor: grabbing;
-    z-index: 10;
+    z-index: 1000;
+    filter: grayscale(50%);
+    transition: all 0.2s ease;
 }
 
+/* Drop target - BUTTER SMOOTH with elegant preview */
 .packing-row.drag-over {
-    background: var(--primary-light-bg);
-    border-color: var(--primary);
-    box-shadow: inset 0 0 0 2px var(--primary);
+    position: relative;
+    border: 2px solid var(--primary);
+    border-left: 6px solid var(--primary);
+    border-radius: 10px;
+    background: linear-gradient(135deg, 
+        rgba(var(--primary-rgb, 99, 102, 241), 0.08) 0%,
+        rgba(var(--primary-rgb, 99, 102, 241), 0.03) 100%);
+    box-shadow: 
+        0 0 0 3px rgba(var(--primary-rgb, 99, 102, 241), 0.12),
+        0 4px 16px rgba(var(--primary-rgb, 99, 102, 241), 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.5);
+    padding: 16px;
+    min-height: 60px;
+    z-index: 100;
+    /* Ultra-smooth transition */
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transform: scale(1.02) translateZ(0);
+}
+
+/* Smooth fade out of original content */
+.packing-row.drag-over .item-display,
+.packing-row.drag-over .item-actions {
+    opacity: 0.15;
+    filter: blur(2px);
+    pointer-events: none;
+    transition: all 0.3s ease;
+}
+
+/* Preview overlay - elegant and clear */
+.packing-row.drag-over::before {
+    content: attr(data-preview-text);
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--primary);
+    z-index: 10;
+    padding: 12px 20px;
+    background: linear-gradient(135deg, 
+        white 0%, 
+        rgba(255, 255, 255, 0.95) 100%);
+    border-radius: 8px;
+    box-shadow: 
+        0 2px 12px rgba(0, 0, 0, 0.08),
+        0 1px 3px rgba(0, 0, 0, 0.12);
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: calc(100% - 40px);
+    /* Smooth entrance */
+    animation: previewSlideIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes previewSlideIn {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
+
+/* Elegant insertion indicator arrow */
+.packing-row.drag-over::after {
+    content: '↓';
+    position: absolute;
+    left: 50%;
+    top: -16px;
+    transform: translateX(-50%);
+    font-size: 20px;
+    color: var(--primary);
+    z-index: 11;
+    background: linear-gradient(135deg, 
+        white 0%, 
+        rgba(var(--primary-rgb, 99, 102, 241), 0.05) 100%);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 
+        0 3px 12px rgba(var(--primary-rgb, 99, 102, 241), 0.25),
+        0 1px 4px rgba(0, 0, 0, 0.1);
+    border: 2px solid var(--primary);
+    /* Smooth entrance */
+    animation: arrowBounceIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes arrowBounceIn {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-10px) scale(0.5);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0) scale(1);
+    }
+}
+
+/* Enhance the glowing ring effect */
+.packing-row.drag-over::after {
+    animation: arrowBounceIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+               gentleGlow 2s ease-in-out infinite;
+}
+
+@keyframes gentleGlow {
+    0%, 100% {
+        box-shadow: 
+            0 3px 12px rgba(var(--primary-rgb, 99, 102, 241), 0.25),
+            0 1px 4px rgba(0, 0, 0, 0.1);
+    }
+    50% {
+        box-shadow: 
+            0 4px 16px rgba(var(--primary-rgb, 99, 102, 241), 0.4),
+            0 2px 6px rgba(0, 0, 0, 0.12);
+    }
 }
 
 .packing-row.editing {
@@ -1110,4 +1541,33 @@ ul.category-content {
 
 .content-area {
     padding-bottom: calc(var(--space-lg) + 70px);
+}
+
+/* Remove obsolete animation keyframes that are no longer used */
+
+/* Removed: breathe animation - no longer needed */
+/* Removed: floatDrag animation - causes flickering */
+/* Removed: magneticPulse animation - causes flickering */
+/* Removed: gentlePulse animation - causes flickering */
+/* Removed: insertionPulse animation - causes flickering */
+/* Removed: dropIndicator animation - causes flickering */
+
+/* Add overlay hint when dragging starts - STATIC VERSION */
+body.dragging-active::before {
+    content: '🎯 Drag to reorder or drop on a category to move';
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 24px;
+    font-weight: 600;
+    font-size: 14px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    z-index: 10000;
+    pointer-events: none;
+    /* Removed slideInFromTop animation - instant appearance */
+    opacity: 1;
 }

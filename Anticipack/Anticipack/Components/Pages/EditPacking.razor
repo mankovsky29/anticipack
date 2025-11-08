@@ -178,7 +178,9 @@
                         {
                             <li draggable="true"
                                 class="@GetPackingRowClass(item)"
+                                data-preview-text="@(_draggedItem?.Item.Name ?? "")"
                                 @ondragstart="@((DragEventArgs e) => OnDragStart(e, item))"
+                                @ondragend="@((DragEventArgs e) => OnDragEnd(e, item))"
                                 @ondragover:preventDefault
                                 @ondragover="@((DragEventArgs e) => OnDragOver(e, item))"
                                 @ondragenter:preventDefault
@@ -672,6 +674,7 @@
         }
     }
 
+    // Drag & drop handlers
     private void OnDragStart(DragEventArgs e, PackingItemView item)
     {
         _draggedItem = item;
@@ -683,11 +686,30 @@
             if (e.DataTransfer is not null)
             {
                 e.DataTransfer.DropEffect = "move";
+                e.DataTransfer.EffectAllowed = "move";
             }
+            
+            // Add class to body for dimming effect
+            _ = JSRuntime.InvokeVoidAsync("document.body.classList.add", "dragging-active");
         }
         catch
         {
         }
+    }
+
+    private void OnDragEnd(DragEventArgs e, PackingItemView item)
+    {
+        try
+        {
+            // Clean up: remove dragging class from body
+            _ = JSRuntime.InvokeVoidAsync("document.body.classList.remove", "dragging-active");
+        }
+        catch { }
+
+        // Reset drag state
+        _draggedItem = null;
+        _dragOverItem = null;
+        StateHasChanged();
     }
 
     private void OnDragOver(DragEventArgs e, PackingItemView item)
@@ -702,14 +724,20 @@
 
     private void OnDragEnter(DragEventArgs e, PackingItemView item)
     {
-        _dragOverItem = item;
-        StateHasChanged();
+        if (_draggedItem != null && !ReferenceEquals(_draggedItem, item))
+        {
+            _dragOverItem = item;
+            StateHasChanged();
+        }
     }
 
     private void OnDragLeave(DragEventArgs e, PackingItemView item)
     {
-        _dragOverItem = null;
-        StateHasChanged();
+        if (ReferenceEquals(_dragOverItem, item))
+        {
+            _dragOverItem = null;
+            StateHasChanged();
+        }
     }
 
     private string GetPackingRowClass(PackingItemView item)
@@ -726,6 +754,13 @@
 
     private void OnDrop(DragEventArgs e, PackingItemView target)
     {
+        try
+        {
+            // Remove dragging class from body
+            _ = JSRuntime.InvokeVoidAsync("document.body.classList.remove", "dragging-active");
+        }
+        catch { }
+
         if (_draggedItem is null)
             return;
 
@@ -736,6 +771,9 @@
             _dragOverItem = null;
             return;
         }
+
+        var oldCategory = dragged.Item.Category;
+        var categoryChanged = !string.Equals(dragged.Item.Category, target.Item.Category, StringComparison.OrdinalIgnoreCase);
 
         Items.Remove(dragged);
 
@@ -753,7 +791,6 @@
         }
         else
         {
-            var oldCategory = dragged.Item.Category;
             dragged.Item.Category = target.Item.Category;
 
             var lastIndex = Items.FindLastIndex(i => string.Equals(i.Item.Category, target.Item.Category, StringComparison.OrdinalIgnoreCase));
@@ -783,6 +820,20 @@
 
         _draggedItem = null;
         _dragOverItem = null;
+
+        // Show toast notification for category changes
+        if (categoryChanged)
+        {
+            var localizedNewCategory = GetLocalizedCategoryName(target.Item.Category);
+            ToastService.ShowSuccess($"? Moved to {localizedNewCategory}");
+        }
+        else
+        {
+            ToastService.ShowSuccess("? Item reordered");
+        }
+
+        // Persist the change
+        _ = PackingRepository.AddOrUpdateItemAsync(dragged.Item);
 
         StateHasChanged();
     }

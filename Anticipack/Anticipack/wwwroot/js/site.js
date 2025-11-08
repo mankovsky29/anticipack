@@ -27,6 +27,16 @@ window.focusElement = function (elementRef) {
 };
 
 /**
+ * Blurs the quick-add input to dismiss the keyboard
+ */
+window.blurQuickAddInput = function() {
+    const quickAddInput = document.querySelector('.quick-add-input');
+    if (quickAddInput && document.activeElement === quickAddInput) {
+        quickAddInput.blur();
+    }
+};
+
+/**
  * Restores quick-add container to its original position
  */
 window.restoreContainerPosition = function() {
@@ -48,6 +58,7 @@ window.restoreContainerPosition = function() {
 /**
  * Handles keyboard visibility changes from C# code
  * Now: - only moves the quick-add container above the keyboard if the quick-add control (or a child) is focused
+ *      - positions container directly above keyboard with no gap
  *      - attempts to ensure the currently focused element is visible (scrolled into view) when keyboard shows
  */
 window.handleKeyboardVisibility = function(isVisible, keyboardHeight) {
@@ -83,46 +94,41 @@ window.handleKeyboardVisibility = function(isVisible, keyboardHeight) {
                 };
             }
 
-            // Fix container to the viewport and position it within the visible area above the keyboard
+            // Fix container to the viewport and position it directly above the keyboard
             quickAddContainer.style.position = 'fixed';
-            quickAddContainer.style.bottom = 'auto';
             quickAddContainer.style.left = '0';
             quickAddContainer.style.right = '0';
             quickAddContainer.style.transform = 'none';
-
-            const containerHeight = quickAddContainer.offsetHeight || 0;
-            const visibleHeight = viewportHeight;
-
-            // Default: center within visible area
-            let top = Math.floor((visibleHeight - containerHeight) * 0.5);
-
-            // If keyboard height is known, ensure the container stays above keyboard
+            quickAddContainer.style.top = 'auto';
+            
+            // Position directly above keyboard with no gap
             if (kbHeight > 0) {
-                const topOfKeyboard = visibleHeight - kbHeight;
-                if ((top + containerHeight) > (topOfKeyboard - 8)) {
-                    top = Math.max(8, topOfKeyboard - containerHeight - 8);
-                }
+                // Use bottom positioning to place it directly above keyboard
+                quickAddContainer.style.bottom = `${kbHeight}px`;
+            } else {
+                // Fallback: position at bottom of visible viewport
+                const containerHeight = quickAddContainer.offsetHeight || 0;
+                const visibleHeight = viewportHeight;
+                quickAddContainer.style.bottom = 'auto';
+                quickAddContainer.style.top = `${visibleHeight - containerHeight}px`;
             }
-
-            top = Math.max(8, top);
-            quickAddContainer.style.top = `${top}px`;
             
             // Add a small delayed re-calculation to fix initial positioning issue
             // when keyboard first appears and measurements might be unstable
             setTimeout(() => {
                 const updatedViewportHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
-                const updatedContainerHeight = quickAddContainer.offsetHeight || 0;
-                let updatedTop = Math.floor((updatedViewportHeight - updatedContainerHeight) * 0.5);
+                const updatedKbHeightFromArg = Number(keyboardHeight) || 0;
+                const updatedInferredKb = Math.max(0, window.innerHeight - updatedViewportHeight);
+                const updatedKbHeight = updatedKbHeightFromArg > 0 ? updatedKbHeightFromArg : updatedInferredKb;
                 
-                if (kbHeight > 0) {
-                    const updatedTopOfKeyboard = updatedViewportHeight - kbHeight;
-                    if ((updatedTop + updatedContainerHeight) > (updatedTopOfKeyboard - 8)) {
-                        updatedTop = Math.max(8, updatedTopOfKeyboard - updatedContainerHeight - 8);
-                    }
+                if (updatedKbHeight > 0) {
+                    quickAddContainer.style.bottom = `${updatedKbHeight}px`;
+                    quickAddContainer.style.top = 'auto';
+                } else {
+                    const updatedContainerHeight = quickAddContainer.offsetHeight || 0;
+                    quickAddContainer.style.bottom = 'auto';
+                    quickAddContainer.style.top = `${updatedViewportHeight - updatedContainerHeight}px`;
                 }
-                
-                updatedTop = Math.max(8, updatedTop);
-                quickAddContainer.style.top = `${updatedTop}px`;
             }, 100);
         } else {
             // Not focused: restore default position if we previously modified it

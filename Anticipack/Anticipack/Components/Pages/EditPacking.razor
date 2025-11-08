@@ -21,7 +21,7 @@
 
 <NavigationLock OnBeforeInternalNavigation="OnBeforeInternalNavigation" />
 
-<div class="page-container with-fixed-navbar">
+<div class="page-container with-fixed-navbar" @onclick="HandlePageClick">
     <div class="activity-header">
         <div class="header-left-section">
             <div class="category-icon-container" @onclick="ToggleCategorySelector">
@@ -254,12 +254,13 @@
     </main>
 </div>
 
-<div class="quick-add-container">
+<div class="quick-add-container" @onclick:stopPropagation @ref="_quickAddContainerRef">
     <div class="quick-add-form">
         <input type="text" 
                @bind="_quickAddName" 
                @bind:event="oninput"
                @onkeydown="@HandleQuickAddKeyDown"
+               @ref="_quickAddInputRef"
                placeholder="@AppResources.TypeItemNameForQuickAdd" 
                class="quick-add-input" />
                
@@ -319,6 +320,9 @@
     private ElementReference bulkItemsTextarea;
     private PackingItemView? _editingItem = null;
     private ElementReference itemEditInputElement;
+    
+    private ElementReference _quickAddInputRef;
+    private ElementReference _quickAddContainerRef;
 
     private async ValueTask SelectAllText(ElementReference inputElement)
     {
@@ -404,6 +408,10 @@
             _quickAddName = string.Empty;
             ToastService.ShowSuccess(string.Format(AppResources.ItemAdded, name));
             StateHasChanged();
+            
+            // Keep focus on input to continue adding items
+            await Task.Delay(50); // Small delay to ensure state update
+            await JSRuntime.InvokeVoidAsync("focusElement", _quickAddInputRef);
         }
         catch (Exception ex)
         {
@@ -411,12 +419,10 @@
         }
     }
 
-    private void HandleQuickAddKeyDown(KeyboardEventArgs e)
+    private void HandlePageClick()
     {
-        if (e.Key == "Enter")
-        {
-            _ = QuickAddItem();
-        }
+        // Blur the quick-add input to hide keyboard when clicking outside
+        _ = JSRuntime.InvokeVoidAsync("blurQuickAddInput");
     }
 
     protected override async Task OnInitializedAsync()
@@ -1021,6 +1027,14 @@
         if (e.Key == "Enter" && (e.CtrlKey || e.MetaKey))
         {
             _ = ConfirmBulkAddAsync();
+        }
+    }
+    
+    private void HandleQuickAddKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            _ = QuickAddItem();
         }
     }
 }

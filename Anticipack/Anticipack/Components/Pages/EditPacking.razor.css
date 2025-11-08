@@ -252,6 +252,8 @@
     background-color: var(--surface);
     border-radius: var(--border-radius);
     box-shadow: var(--shadow);
+    /* Fixed padding to match actual quick-add-container height */
+    padding-bottom: calc(var(--space-lg) + 80px);
 }
 
 /* ============================================
@@ -1403,10 +1405,14 @@ ul.category-content {
     right: 0;
     background: var(--surface);
     box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
-    padding: 12px;
+    /* Increased padding to ensure proper height calculation */
+    padding: 14px 12px;
     z-index: 100;
     border-top: 1px solid var(--border-color);
     transition: transform 0.3s ease;
+    /* Add min-height to ensure consistent sizing */
+    min-height: 80px;
+    box-sizing: border-box;
 }
 
 .quick-add-form {

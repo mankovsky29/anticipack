@@ -44,7 +44,7 @@ window.initializeSwipeHandlers = function() {
     let touchStartY = 0;
     let currentSwipedItem = null;
     let isSwiping = false;
-    const SWIPE_REVEAL_WIDTH = 112; // Width of both buttons (56px each)
+    const SWIPE_REVEAL_WIDTH = 128; // Width of both buttons (64px each)
 
     document.addEventListener('touchstart', function(e) {
         const packingRow = e.target.closest('.packing-row');
@@ -325,19 +325,22 @@ window.ensureElementVisible = function(element, keyboardHeight) {
         const inferredKb = Math.max(0, window.innerHeight - viewportHeight);
         const kbHeight = kbHeightFromArg > 0 ? kbHeightFromArg : inferredKb;
 
-        const padding = 12; // small gap above keyboard
-        const safeBottom = viewportHeight - kbHeight - padding;
+        // Account for quick-add container height if it's visible and repositioned
+        const quickAddContainer = document.querySelector('.quick-add-container');
+        const quickAddHeight = quickAddContainer ? quickAddContainer.offsetHeight : 0;
+        
+        const padding = 20; // increased padding for better visibility
+        const safeBottom = viewportHeight - kbHeight - quickAddHeight - padding;
+        const safeTop = padding;
 
-        if (rect.bottom > safeBottom) {
-            const overlap = rect.bottom - safeBottom;
-            // Prefer smooth scrolling; fall back to instant if not supported
-            window.scrollBy({ top: overlap + padding, left: 0, behavior: 'smooth' });
-        } else if (rect.top < padding) {
-            // Element above the viewport top, bring it down a bit
-            window.scrollBy({ top: rect.top - padding, left: 0, behavior: 'smooth' });
-        } else {
-            // Optionally center element if it's partially visible but covered by other overlays
-            // targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        if (rect.bottom > safeBottom || rect.top < safeTop) {
+            // Center the element in the visible area
+            const visibleHeight = safeBottom - safeTop;
+            const elementCenter = rect.top + (rect.height / 2);
+            const desiredCenter = safeTop + (visibleHeight / 2);
+            const scrollAmount = elementCenter - desiredCenter;
+            
+            window.scrollBy({ top: scrollAmount, left: 0, behavior: 'smooth' });
         }
     } catch (ex) {
         // silent

@@ -274,7 +274,6 @@
         <input type="text" 
                @bind="_quickAddName" 
                @bind:event="oninput"
-               @onkeydown="@HandleQuickAddKeyDown"
                @ref="_quickAddInputRef"
                placeholder="@AppResources.TypeItemNameForQuickAdd" 
                class="quick-add-input" />
@@ -942,13 +941,16 @@
         _editingItem = item;
         StateHasChanged();
         
-        // Small delay to ensure DOM is ready
-        await Task.Delay(100);
+        // Delay to ensure DOM is ready and rendered
+        await Task.Delay(150);
         
         // Focus on the edit input
         if (itemEditInputElement.Id != null)
         {
             await JSRuntime.InvokeVoidAsync("focusElement", itemEditInputElement);
+            // Ensure the input is visible above keyboard
+            await Task.Delay(50);
+            await JSRuntime.InvokeVoidAsync("ensureElementVisible", itemEditInputElement, _keyboardHeight);
         }
     }
 
@@ -957,7 +959,9 @@
         if (itemEditInputElement.Id != null)
         {
             await JSRuntime.InvokeVoidAsync("selectAllText", itemEditInputElement);
-            _ = JSRuntime.InvokeVoidAsync("ensureElementVisible", itemEditInputElement, _keyboardHeight);
+            // Ensure element is visible with a small delay
+            await Task.Delay(100);
+            await JSRuntime.InvokeVoidAsync("ensureElementVisible", itemEditInputElement, _keyboardHeight);
         }
     }
 
@@ -1066,14 +1070,6 @@
         if (e.Key == "Enter" && (e.CtrlKey || e.MetaKey))
         {
             _ = ConfirmBulkAddAsync();
-        }
-    }
-    
-    private void HandleQuickAddKeyDown(KeyboardEventArgs e)
-    {
-        if (e.Key == "Enter")
-        {
-            _ = QuickAddItem();
         }
     }
 }

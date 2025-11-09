@@ -37,6 +37,133 @@ window.blurQuickAddInput = function() {
 };
 
 /**
+ * Initialize swipe-to-reveal functionality for packing items
+ */
+window.initializeSwipeHandlers = function() {
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let currentSwipedItem = null;
+    let isSwiping = false;
+    const SWIPE_REVEAL_WIDTH = 112; // Width of both buttons (56px each)
+
+    document.addEventListener('touchstart', function(e) {
+        const packingRow = e.target.closest('.packing-row');
+        if (!packingRow || packingRow.classList.contains('editing')) return;
+
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+        isSwiping = false;
+    }, { passive: true });
+
+    document.addEventListener('touchmove', function(e) {
+        const packingRow = e.target.closest('.packing-row');
+        if (!packingRow || packingRow.classList.contains('editing')) return;
+
+        const rowContent = packingRow.querySelector('.packing-row-content');
+        if (!rowContent) return;
+
+        const touchX = e.touches[0].clientX;
+        const touchY = e.touches[0].clientY;
+        const deltaX = touchX - touchStartX;
+        const deltaY = touchY - touchStartY;
+
+        // Determine if this is a horizontal swipe
+        if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 10) {
+            isSwiping = true;
+            
+            // Prevent scrolling while swiping
+            e.preventDefault();
+
+            // Close other swiped items
+            if (currentSwipedItem && currentSwipedItem !== packingRow) {
+                const otherContent = currentSwipedItem.querySelector('.packing-row-content');
+                if (otherContent) {
+                    otherContent.style.transform = '';
+                }
+                currentSwipedItem.classList.remove('swiped-left', 'swiped-right');
+            }
+
+            // Apply transform to the content
+            if (deltaX < 0) {
+                // Swipe left - reveal edit/delete buttons
+                const distance = Math.max(deltaX, -SWIPE_REVEAL_WIDTH);
+                rowContent.style.transform = `translateX(${distance}px) translateZ(0)`;
+                packingRow.classList.add('swiping-left');
+                packingRow.classList.remove('swiped-right');
+            } else if (deltaX > 0 && packingRow.classList.contains('swiped-left')) {
+                // Swipe right to close if already swiped left
+                const distance = Math.min(deltaX - SWIPE_REVEAL_WIDTH, 0);
+                rowContent.style.transform = `translateX(${distance}px) translateZ(0)`;
+            }
+        }
+    }, { passive: false });
+
+    document.addEventListener('touchend', function(e) {
+        const packingRow = e.target.closest('.packing-row');
+        if (!packingRow || packingRow.classList.contains('editing')) return;
+
+        const rowContent = packingRow.querySelector('.packing-row-content');
+        if (!rowContent) return;
+
+        const touchX = e.changedTouches[0].clientX;
+        const deltaX = touchX - touchStartX;
+
+        packingRow.classList.remove('swiping-left');
+
+        if (isSwiping && Math.abs(deltaX) > 50) {
+            if (deltaX < 0) {
+                // Swiped left - snap to reveal buttons
+                rowContent.style.transform = `translateX(-${SWIPE_REVEAL_WIDTH}px) translateZ(0)`;
+                packingRow.classList.add('swiped-left');
+                currentSwipedItem = packingRow;
+            } else if (packingRow.classList.contains('swiped-left')) {
+                // Swiped right while open - close
+                rowContent.style.transform = '';
+                packingRow.classList.remove('swiped-left');
+                if (currentSwipedItem === packingRow) {
+                    currentSwipedItem = null;
+                }
+            }
+        } else {
+            // Snap back
+            if (packingRow.classList.contains('swiped-left')) {
+                rowContent.style.transform = `translateX(-${SWIPE_REVEAL_WIDTH}px) translateZ(0)`;
+            } else {
+                rowContent.style.transform = '';
+            }
+        }
+
+        isSwiping = false;
+    });
+
+    // Close swiped item when clicking elsewhere
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.packing-row') && currentSwipedItem) {
+            const rowContent = currentSwipedItem.querySelector('.packing-row-content');
+            if (rowContent) {
+                rowContent.style.transform = '';
+            }
+            currentSwipedItem.classList.remove('swiped-left', 'swiped-right');
+            currentSwipedItem = null;
+        }
+    });
+};
+
+/**
+ * Close any swiped items
+ */
+window.closeSwipedItems = function() {
+    const swipedItems = document.querySelectorAll('.packing-row.swiped-left, .packing-row.swiped-right');
+    swipedItems.forEach(item => {
+        const rowContent = item.querySelector('.packing-row-content');
+        if (rowContent) {
+            rowContent.style.transform = '';
+        }
+        item.classList.remove('swiped-left', 'swiped-right');
+    });
+};
+
+/**
  * Restores quick-add container to its original position
  */
 window.restoreContainerPosition = function() {

@@ -176,9 +176,8 @@
                     <ul class="category-content @(collapsed ? "hidden" : "")">
                         @foreach (var item in groupItems)
                         {
-                            <li draggable="true"
-                                class="@GetPackingRowClass(item)"
-                                data-preview-text="@(_draggedItem?.Item.Name ?? "")"
+                            <li class="@GetPackingRowClass(item)"
+                                draggable="true"
                                 @ondragstart="@((DragEventArgs e) => OnDragStart(e, item))"
                                 @ondragend="@((DragEventArgs e) => OnDragEnd(e, item))"
                                 @ondragover:preventDefault
@@ -188,63 +187,79 @@
                                 @ondragleave="@((DragEventArgs e) => OnDragLeave(e, item))"
                                 @ondrop:preventDefault
                                 @ondrop="@((DragEventArgs e) => OnDrop(e, item))">
-                                @if (_editingItem == item)
-                                {
-                                    <div class="item-edit-container">
-                                        <div class="item-edit-header">
-                                            <input type="text" 
-                                                   value="@item.Item.Name" 
-                                                   @oninput="@((e) => UpdateItemName(item, e.Value?.ToString()))"
-                                                   @onfocus="@(e => SelectAllInputText(e))"
-                                                   @ref="itemEditInputElement"
-                                                   class="edit-item-input"
-                                                   @onkeydown="@(e => HandleItemEditKeyDown(e, item))"
-                                                   placeholder="@AppResources.ItemName"
-                                                   @onclick:stopPropagation />
-                                        </div>
-    
-                                        <div class="edit-notes">
-                                            <textarea placeholder="@AppResources.AddNotesAboutItem" 
-                                                      @bind="item.Item.Notes"
-                                                      @bind:event="oninput"
-                                                      rows="2"
-                                                      class="edit-notes-textarea"></textarea>
-                                        </div>
-    
-                                        <div class="item-edit-actions">
-                                            <button class="btn secondary btn-sm" @onclick="() => CancelItemEdit(item)" title="@AppResources.Cancel">
-                                                <i class="fa fa-times"></i> @AppResources.Cancel
-                                            </button>
-                                            <button class="btn primary btn-sm" @onclick="() => SaveItemChanges(item)" title="@AppResources.Save">
-                                                <i class="fa fa-check"></i> @AppResources.Save
-                                            </button>
-                                        </div>
+                                
+                                <!-- Swipe wrapper to contain row and buttons -->
+                                <div class="swipe-wrapper">
+                                    <!-- Swipe action buttons (positioned behind) -->
+                                    <div class="swipe-actions">
+                                        <button class="swipe-action-btn edit" 
+                                                @onclick="() => StartEditingItemFromSwipe(item)"
+                                                @onclick:stopPropagation 
+                                                title="@AppResources.Edit">
+                                            <i class="fa fa-edit"></i>
+                                            <span class="btn-label">@AppResources.Edit</span>
+                                        </button>
+                                        <button class="swipe-action-btn delete" 
+                                                @onclick="() => PromptDelete(item)"
+                                                @onclick:stopPropagation 
+                                                title="@AppResources.DeleteItem">
+                                            <i class="fa fa-trash"></i>
+                                            <span class="btn-label">@AppResources.Delete</span>
+                                        </button>
                                     </div>
-                                }
-                                else
-                                {
-                                    <div class="item-display">
-                                        <span class="item-text"
-                                              role="button"
-                                              @onclick="() => StartEditingItem(item)"
-                                              @onclick:stopPropagation>
-                                            @item.Item.Name
-                                        </span>
-                                        
-                                        @if (!string.IsNullOrWhiteSpace(item.Item.Notes))
+                                    
+                                    <!-- Row content that swipes -->
+                                    <div class="packing-row-content" data-preview-text="@(_draggedItem?.Item.Name ?? "")">
+                                        @if (_editingItem == item)
                                         {
-                                            <div class="notes" @onclick="() => StartEditingItem(item)" @onclick:stopPropagation>
-                                                @item.Item.Notes
+                                            <div class="item-edit-container">
+                                                <div class="item-edit-header">
+                                                    <input type="text" 
+                                                           value="@item.Item.Name" 
+                                                           @oninput="@((e) => UpdateItemName(item, e.Value?.ToString()))"
+                                                           @onfocus="@(e => SelectAllInputText(e))"
+                                                           @ref="itemEditInputElement"
+                                                           class="edit-item-input"
+                                                           @onkeydown="@(e => HandleItemEditKeyDown(e, item))"
+                                                           placeholder="@AppResources.ItemName"
+                                                           @onclick:stopPropagation />
+                                                </div>
+            
+                                                <div class="edit-notes">
+                                                    <textarea placeholder="@AppResources.AddNotesAboutItem" 
+                                                              @bind="item.Item.Notes"
+                                                              @bind:event="oninput"
+                                                              rows="2"
+                                                              class="edit-notes-textarea"></textarea>
+                                                </div>
+            
+                                                <div class="item-edit-actions">
+                                                    <button class="btn secondary btn-sm" @onclick="() => CancelItemEdit(item)" title="@AppResources.Cancel">
+                                                        <i class="fa fa-times"></i> @AppResources.Cancel
+                                                    </button>
+                                                    <button class="btn primary btn-sm" @onclick="() => SaveItemChanges(item)" title="@AppResources.Save">
+                                                        <i class="fa fa-check"></i> @AppResources.Save
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <div class="item-display">
+                                                <span class="item-text">
+                                                    @item.Item.Name
+                                                </span>
+                                                
+                                                @if (!string.IsNullOrWhiteSpace(item.Item.Notes))
+                                                {
+                                                    <div class="notes">
+                                                        @item.Item.Notes
+                                                    </div>
+                                                }
                                             </div>
                                         }
                                     </div>
-                                    
-                                    <div class="item-actions">
-                                        <button class="icon-btn" title="@AppResources.DeleteItem" @onclick:stopPropagation @onclick="@(() => PromptDelete(item))">
-                                            <i class="fa fa-trash"></i>
-                                        </button>
-                                    </div>
-                                }
+                                </div>
                             </li>
                         }
                     </ul>
@@ -373,6 +388,8 @@
         if (firstRender)
         {
             KeyboardService.Initialize(this);
+            // Initialize swipe handlers
+            await JSRuntime.InvokeVoidAsync("initializeSwipeHandlers");
         }
 
         await base.OnAfterRenderAsync(firstRender);
@@ -917,6 +934,23 @@
         _editingItem = item;
         StateHasChanged();
     }
+    
+    private async Task StartEditingItemFromSwipe(PackingItemView item)
+    {
+        // Close any swiped items first
+        await JSRuntime.InvokeVoidAsync("closeSwipedItems");
+        _editingItem = item;
+        StateHasChanged();
+        
+        // Small delay to ensure DOM is ready
+        await Task.Delay(100);
+        
+        // Focus on the edit input
+        if (itemEditInputElement.Id != null)
+        {
+            await JSRuntime.InvokeVoidAsync("focusElement", itemEditInputElement);
+        }
+    }
 
     private async Task SelectAllInputText(FocusEventArgs e)
     {
@@ -949,6 +983,9 @@
 
             await PackingRepository.AddOrUpdateItemAsync(item.Item);
             ToastService.ShowSuccess(AppResources.ItemUpdated);
+            
+            // Close any swiped items
+            await JSRuntime.InvokeVoidAsync("closeSwipedItems");
         }
         catch (Exception ex)
         {
@@ -1010,9 +1047,11 @@
         }
     }
 
-    private void CancelItemEdit(PackingItemView item)
+    private async Task CancelItemEdit(PackingItemView item)
     {
         _editingItem = null;
+        // Close any swiped items
+        await JSRuntime.InvokeVoidAsync("closeSwipedItems");
         StateHasChanged();
     }
 

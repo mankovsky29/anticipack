@@ -662,69 +662,260 @@ ul.category-content {
 }
 
 /* ============================================
-   PACKING ROW ITEMS - COMPLETELY FLICKER-FREE WITH PREVIEW
+   PACKING ROW ITEMS - SWIPE-TO-REVEAL PATTERN
    ============================================ */
 
 .packing-row {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 14px 16px;
-    border-bottom: 1px solid var(--border-color);
-    background: var(--surface);
-    color: var(--text-primary);
+    display: block;
     position: relative;
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-    cursor: grab;
-    border-radius: 4px;
+    border-bottom: 1px solid var(--border-color);
     margin: 2px 0;
-    /* Hardware acceleration */
-    backface-visibility: hidden;
-    -webkit-backface-visibility: hidden;
-    transform: translateZ(0);
+    background: var(--surface);
+    /* Remove padding/styling - now on .packing-row-content */
 }
 
 .packing-row:last-child {
     border-bottom: none;
 }
 
-.packing-row:hover:not(.dragging):not(.drag-over) {
-    background: var(--hover-bg);
-    padding-left: 22px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    transform: translateX(4px) translateZ(0);
+/* Swipe wrapper - contains both buttons and content */
+.swipe-wrapper {
+    position: relative;
+    display: flex;
+    align-items: stretch;
+    overflow: hidden;
+    min-height: 50px;
 }
 
-/* Static drag handle */
-.packing-row:hover:not(.dragging):not(.drag-over)::before {
-    content: '⋮⋮';
+/* Container for swipe actions that stay fixed on the right */
+.swipe-actions {
     position: absolute;
-    left: 8px;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    z-index: 1;
+}
+
+.swipe-action-btn {
+    height: 100%;
+    width: 56px;
+    border: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    font-size: 20px;
+    color: var(--text-secondary);
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+    padding: 8px;
+}
+
+.swipe-action-btn i {
+    font-size: 20px;
+    transition: transform 0.2s ease;
+}
+
+.swipe-action-btn .btn-label {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    opacity: 0.8;
+}
+
+.swipe-action-btn.edit {
     color: var(--primary);
+}
+
+.swipe-action-btn.edit:active {
+    color: var(--primary-dark);
+}
+
+.swipe-action-btn.edit:active i {
+    transform: scale(1.2);
+}
+
+.swipe-action-btn.delete {
+    color: var(--danger);
+}
+
+.swipe-action-btn.delete:active {
+    color: var(--danger);
+    opacity: 0.7;
+}
+
+.swipe-action-btn.delete:active i {
+    transform: scale(1.2);
+}
+
+/* Row content that swipes over the buttons */
+.packing-row-content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    background: var(--surface);
+    color: var(--text-primary);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    width: 100%;
+    min-height: 50px;
+    /* Hardware acceleration */
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    transform: translateZ(0);
+    border-radius: 4px;
+}
+
+/* Swipe indicator - subtle hint on the right side */
+.packing-row-content::after {
+    content: '‹ ‹ ‹';
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%) rotate(180deg);
     font-size: 20px;
     font-weight: bold;
+    color: var(--text-secondary);
+    opacity: 0.4;
+    pointer-events: none;
+    transition: opacity 0.3s ease, transform 0.3s ease;
     letter-spacing: -2px;
+}
+
+.packing-row-content:hover::after {
     opacity: 0.7;
+    transform: translateY(-50%) rotate(180deg) scale(1.1);
+}
+
+/* Add a tooltip-style hint */
+.packing-row-content::before {
+    content: 'Swipe ←';
+    position: absolute;
+    right: 50px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: var(--primary);
+    color: white;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    opacity: 0;
+    pointer-events: none;
+    white-space: nowrap;
+    transition: opacity 0.3s ease;
     z-index: 5;
 }
 
-.packing-row:active {
+/* Show tooltip briefly on first few items */
+.packing-row:nth-child(-n+2) .packing-row-content::before {
+    animation: showHint 4s ease-in-out 1s 1;
+}
+
+@keyframes showHint {
+    0%, 100% {
+        opacity: 0;
+    }
+    10%, 70% {
+        opacity: 1;
+    }
+    80% {
+        opacity: 0;
+    }
+}
+
+/* Hide swipe indicator when item is swiped or being edited */
+.packing-row.swiped-left .packing-row-content::after,
+.packing-row.editing .packing-row-content::after,
+.packing-row.dragging .packing-row-content::after,
+.packing-row.swiped-left .packing-row-content::before,
+.packing-row.editing .packing-row-content::before,
+.packing-row.dragging .packing-row-content::before {
+    display: none;
+}
+
+/* Swiping state - disable transition for smooth following */
+.packing-row.swiping-left .packing-row-content {
+    transition: none;
+}
+
+/* Swiped state - content moved to the left */
+.packing-row.swiped-left .packing-row-content {
+    transform: translateX(-112px) translateZ(0);
+}
+
+/* Remove hover effects for touch devices */
+@media (hover: hover) {
+    .packing-row-content {
+        cursor: grab;
+    }
+    
+    .packing-row:hover:not(.dragging):not(.drag-over):not(.swiped-left) .packing-row-content {
+        background: var(--hover-bg);
+        padding-left: 22px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        transform: translateX(4px) translateZ(0);
+    }
+
+    /* Static drag handle */
+    .packing-row:hover:not(.dragging):not(.drag-over):not(.swiped-left) .packing-row-content::before {
+        content: '⋮⋮';
+        position: absolute;
+        left: 8px;
+        color: var(--primary);
+        font-size: 20px;
+        font-weight: bold;
+        letter-spacing: -2px;
+        opacity: 0.7;
+        z-index: 5;
+    }
+}
+
+.packing-row:active .packing-row-content {
     cursor: grabbing;
 }
 
+/* Add subtle animation to swipe indicator to draw attention */
+@keyframes swipeHint {
+    0%, 100% {
+        transform: translateY(-50%) rotate(180deg) translateX(0) scale(1);
+        opacity: 0.4;
+    }
+    50% {
+        transform: translateY(-50%) rotate(180deg) translateX(-5px) scale(1.15);
+        opacity: 0.8;
+    }
+}
+
+/* Animate hint on first few items to teach the gesture */
+.packing-row:nth-child(-n+3) .packing-row-content::after {
+    animation: swipeHint 1.8s ease-in-out 0.5s 3;
+}
+
 /* Dragging state - item being dragged */
-.packing-row.dragging {
+.packing-row.dragging .packing-row-content {
     opacity: 0.5;
     transform: scale(0.95) translateZ(0);
     cursor: grabbing;
-    z-index: 1000;
     filter: grayscale(50%);
     transition: all 0.2s ease;
 }
 
+.packing-row.dragging {
+    z-index: 1000;
+}
+
 /* Drop target - BUTTER SMOOTH with elegant preview */
-.packing-row.drag-over {
-    position: relative;
+.packing-row.drag-over .packing-row-content {
     border: 2px solid var(--primary);
     border-left: 6px solid var(--primary);
     border-radius: 10px;
@@ -737,15 +928,16 @@ ul.category-content {
         inset 0 1px 0 rgba(255, 255, 255, 0.5);
     padding: 16px;
     min-height: 60px;
-    z-index: 100;
     /* Ultra-smooth transition */
     transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-    transform: scale(1.02) translateZ(0);
+}
+
+.packing-row.drag-over {
+    z-index: 100;
 }
 
 /* Smooth fade out of original content */
-.packing-row.drag-over .item-display,
-.packing-row.drag-over .item-actions {
+.packing-row.drag-over .item-display {
     opacity: 0.15;
     filter: blur(2px);
     pointer-events: none;
@@ -753,7 +945,7 @@ ul.category-content {
 }
 
 /* Preview overlay - elegant and clear */
-.packing-row.drag-over::before {
+.packing-row.drag-over .packing-row-content::before {
     content: attr(data-preview-text);
     position: absolute;
     left: 50%;
@@ -825,7 +1017,7 @@ ul.category-content {
     }
     to {
         opacity: 1;
-        transform: translateX(-50%) translateY(0) scale(1);
+        transform: translateX(-50%) rotate(180deg) translateY(0) scale(1);
     }
 }
 

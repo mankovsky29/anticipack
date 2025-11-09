@@ -307,13 +307,19 @@ window.handleKeyboardVisibility = function(isVisible, keyboardHeight) {
 /**
  * Ensure a given element (or the document.activeElement if null) is visible above the on-screen keyboard.
  * Accepts keyboardHeight (CSS/device pixels as passed from platform).
+ * 
+ * If the element is an input inside an .item-edit-container, scrolls the container into view instead.
  */
 window.ensureElementVisible = function(element, keyboardHeight) {
     try {
         const el = element || document.activeElement;
         if (!el || !el.getBoundingClientRect) return;
 
-        const rect = el.getBoundingClientRect();
+        // Check if the element is inside an item-edit-container
+        const editContainer = el.closest('.item-edit-container');
+        const targetElement = editContainer || el;
+
+        const rect = targetElement.getBoundingClientRect();
         const viewportHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
         const kbHeightFromArg = Number(keyboardHeight) || 0;
         const inferredKb = Math.max(0, window.innerHeight - viewportHeight);
@@ -331,7 +337,7 @@ window.ensureElementVisible = function(element, keyboardHeight) {
             window.scrollBy({ top: rect.top - padding, left: 0, behavior: 'smooth' });
         } else {
             // Optionally center element if it's partially visible but covered by other overlays
-            // el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            // targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
     } catch (ex) {
         // silent

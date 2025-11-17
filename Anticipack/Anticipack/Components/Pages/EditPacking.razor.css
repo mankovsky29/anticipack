@@ -492,7 +492,7 @@ body.dragging-active .category.drag-target {
     border: 4px dashed var(--primary);
     background: linear-gradient(135deg, 
         var(--primary-light-bg) 0%, 
-        rgba(var(--primary-rgb, 99, 102, 241), 0.15) 50%,
+        rgba(var(--primary-rgb, 99, 102,241), 0.15) 50%,
         var(--surface) 100%);
     box-shadow: 
         0 0 0 6px rgba(var(--primary-rgb, 99, 102, 241), 0.15),
@@ -666,7 +666,7 @@ ul.category-content {
     bottom: 0;
     display: flex;
     align-items: stretch;
-    gap: 1px;
+    gap: 0;  /* Remove gap between buttons */
     z-index: 1;
     background: var(--background);
 }
@@ -687,73 +687,6 @@ ul.category-content {
     flex-shrink: 0;
     padding: 10px 8px;
     position: relative;
-}
-
-.swipe-action-btn::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 3px;
-    background: transparent;
-    transition: background 0.2s ease;
-}
-
-.swipe-action-btn i {
-    font-size: 22px;
-    transition: transform 0.2s ease;
-}
-
-.swipe-action-btn .btn-label {
-    font-size: 10px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.8px;
-    opacity: 0.85;
-    transition: opacity 0.2s ease;
-}
-
-.swipe-action-btn.edit {
-    color: var(--primary);
-}
-
-.swipe-action-btn.edit::before {
-    background: var(--primary);
-}
-
-.swipe-action-btn.edit:active {
-    color: var(--primary-dark);
-    background: var(--primary-light-bg);
-}
-
-.swipe-action-btn.edit:active i {
-    transform: scale(1.15);
-}
-
-.swipe-action-btn.edit:active .btn-label {
-    opacity: 1;
-}
-
-.swipe-action-btn.delete {
-    color: var(--danger);
-}
-
-.swipe-action-btn.delete::before {
-    background: var(--danger);
-}
-
-.swipe-action-btn.delete:active {
-    color: var(--danger);
-    background: rgba(239, 68, 68, 0.08);
-}
-
-.swipe-action-btn.delete:active i {
-    transform: scale(1.15);
-}
-
-.swipe-action-btn.delete:active .btn-label {
-    opacity: 1;
 }
 
 /* Row content that swipes over the buttons */
@@ -858,7 +791,7 @@ ul.category-content {
 
 /* Swiped state - content moved to the left */
 .packing-row.swiped-left .packing-row-content {
-    transform: translateX(-128px) translateZ(0);
+    transform: translateX(-128px) translateZ(0);  /* 64px * 2 buttons = 128px */
     box-shadow: -2px 0 8px rgba(0, 0, 0, 0.08), inset 0 -1px 0 0 var(--border-color);
 }
 

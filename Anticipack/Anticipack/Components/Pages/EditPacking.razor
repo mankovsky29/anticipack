@@ -194,17 +194,13 @@
                                     <div class="swipe-actions">
                                         <button class="swipe-action-btn edit" 
                                                 @onclick="() => StartEditingItemFromSwipe(item)"
-                                                @onclick:stopPropagation 
-                                                title="@AppResources.Edit">
+                                                @onclick:stopPropagation>
                                             <i class="fa fa-edit"></i>
-                                            <span class="btn-label">@AppResources.Edit</span>
                                         </button>
                                         <button class="swipe-action-btn delete" 
                                                 @onclick="() => PromptDelete(item)"
-                                                @onclick:stopPropagation 
-                                                title="@AppResources.DeleteItem">
+                                                @onclick:stopPropagation>
                                             <i class="fa fa-trash"></i>
-                                            <span class="btn-label">@AppResources.Delete</span>
                                         </button>
                                     </div>
                                     

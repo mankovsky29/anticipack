@@ -70,204 +70,506 @@
     opacity: 1;
 }
 
-/* Activity Header */
+/* Activity Header - Optimized for maximum title space */
 .activity-header {
     display: flex;
     align-items: center;
-    margin-bottom: var(--space-sm);
-    padding: 8px 12px;
-    background: var(--surface);
-    color: var(--text-primary);
-    border-radius: 4px;
-    box-shadow: var(--shadow-sm);
     justify-content: space-between;
+    gap: 8px;
+    padding: 10px 12px;
+    background: linear-gradient(135deg, rgba(var(--primary-rgb, 99,102,241), 0.04), rgba(var(--primary-rgb, 99,102,241), 0.01));
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--border-color);
+    margin-bottom: var(--space-sm);
+    min-height: 56px;
 }
 
-/* Left side with icon and title */
+/* Left section: compact icon + flexible title */
 .header-left-section {
     display: flex;
     align-items: center;
-    flex: 1;
+    gap: 10px;
     min-width: 0;
-    overflow: hidden;
+    flex: 1;
 }
 
-/* Category icon container */
-.category-icon-container {
-    flex-shrink: 0;
-    margin-right: 8px;
-    display: flex;
+/* Compact category icon button */
+.category-icon-btn {
+    display: inline-flex;
     align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    padding: 4px;
+    margin: 0;
     cursor: pointer;
-    transition: opacity 0.2s ease;
+    border-radius: 8px;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    flex-shrink: 0;
 }
 
-.category-icon-container:hover {
-    opacity: 0.8;
+.category-icon-btn:hover {
+    background: var(--hover-bg);
+    transform: scale(1.05);
 }
 
-/* Category icon - the actual icon element */
+.category-icon-btn:active {
+    transform: scale(0.98);
+}
+
+.category-icon-btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--primary-light-bg), 0 0 0 4px rgba(var(--primary-rgb, 99, 102, 241), 0.2);
+}
+
 .category-icon {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    background: var(--primary-light-bg);
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, var(--primary-light-bg) 0%, rgba(var(--primary-rgb, 99, 102,241), 0.08) 100%);
     display: flex;
     align-items: center;
     justify-content: center;
     color: var(--primary);
     font-size: 16px;
     flex-shrink: 0;
+    transition: all 0.2s ease;
 }
 
-.category-icon i {
-    font-size: 16px;
+.category-icon-btn:hover .category-icon {
+    background: linear-gradient(135deg, var(--primary-light-bg) 0%, rgba(var(--primary-rgb, 99, 102,241), 0.15) 100%);
+    transform: rotate(-5deg);
 }
 
-/* Title and input container */
-.activity-title {
-    flex: 1;
+/* Title container - maximum flex space */
+.title-wrap {
+    display: flex;
+    flex-direction: column;
     min-width: 0;
-    margin: 0;
-    font-size: 1.1rem;
-    font-weight: 500;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    padding: 0;
+    flex: 1;
 }
 
-/* Activity name input */
+/* Primary title - larger and more prominent */
+.activity-title {
+    margin: 0;
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--text-primary);
+    min-width: 0;
+    line-height: 1.3;
+}
+
+/* Editable name input */
 .activity-name-input {
     width: 100%;
-    background: var(--input-bg);
-    border: 1px solid var(--input-border);
-    color: var(--text-primary);
     padding: 6px 10px;
-    border-radius: 4px;
-    font-size: 1rem;
-    font-weight: 500;
-}
-
-.activity-name-input::placeholder {
-    color: var(--text-light);
+    border: 2px solid var(--primary);
+    border-radius: 8px;
+    font-size: 17px;
+    font-weight: 600;
+    background: var(--surface);
+    color: var(--text-primary);
+    outline: none;
+    box-shadow: 0 0 0 3px var(--input-focus-shadow);
+    transition: all 0.2s ease;
 }
 
 .activity-name-input:focus {
-    border-color: var(--input-focus-border);
-    box-shadow: 0 0 0 2px var(--input-focus-shadow);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px var(--input-focus-shadow);
 }
 
-/* Action buttons container - Fixed for visibility */
-.activity-actions {
-    display: flex;
+/* Name displayed as button - better touch target */
+.packing-name-display-btn {
+    display: inline-flex;
+    align-items: center;
     gap: 6px;
-    align-items: center;
-    flex-shrink: 0;
-    margin-left: 8px;
-    justify-content: flex-end;
-}
-
-/* Button styling - Now visible with proper colors */
-.activity-actions .icon-btn,
-.activity-actions .add-btn {
-    width: 36px;
-    height: 36px;
-    border-radius: 4px;
+    background: transparent;
     border: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    padding: 4px 8px;
+    margin: -4px -8px;
+    font: inherit;
+    color: inherit;
     cursor: pointer;
-    flex-shrink: 0;
-    padding: 0;
-    font-size: 16px;
-    transition: all var(--transition);
+    width: calc(100% + 16px);
+    text-align: left;
+    min-width: 0;
+    border-radius: 6px;
+    transition: all 0.2s ease;
 }
 
-/* Specific button colors */
-.activity-actions .icon-btn {
-    background-color: transparent;
-    color: var(--primary);
+.packing-name-display-btn:hover {
+    background: var(--hover-bg);
 }
 
-.activity-actions .icon-btn:hover {
-    background-color: var(--primary-light-bg);
-    color: var(--primary-dark);
+.packing-name-display-btn:active {
+    transform: scale(0.98);
 }
 
-.activity-actions .icon-btn.danger {
-    color: var(--danger);
+.packing-name-display-btn:focus {
+    outline: none;
+    background: var(--hover-bg);
+    box-shadow: 0 0 0 2px var(--primary-light-bg), 0 0 0 4px rgba(var(--primary-rgb, 99, 102, 241), 0.15);
 }
 
-.activity-actions .icon-btn.danger:hover {
-    background-color: rgba(var(--danger-rgb), 0.1);
-}
-
-.activity-actions .add-btn {
-    background-color: var(--primary);
-    color: white;
-}
-
-.activity-actions .add-btn:hover {
-    background-color: var(--primary-dark);
-}
-
-/* Editable title */
-.packing-name-display {
+.packing-name-text {
     display: block;
-    width: 100%;
-    cursor: pointer;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    flex: 1;
+    min-width: 0;
 }
 
-.packing-name-display .edit-icon {
+.edit-icon {
+    font-size: 13px;
+    color: var(--text-secondary);
     opacity: 0.5;
-    font-size: 0.8em;
-    transition: opacity var(--transition-fast);
+    transition: all 0.2s ease;
+    flex-shrink: 0;
 }
 
-.packing-name-display:hover .edit-icon {
+.packing-name-display-btn:hover .edit-icon {
     opacity: 1;
+    color: var(--primary);
+    transform: rotate(15deg);
 }
 
-.packing-name-input {
-    background: rgba(255, 255, 255, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    color: white;
-    padding: 6px 12px;
-    border-radius: var(--border-radius-sm);
-    font-size: 1.5rem;
-    font-weight: 600;
-    width: 100%;
-    max-width: 400px;
-}
-
-.packing-name-input::placeholder {
-    color: rgba(255, 255, 255, 0.7);
-}
-
-/* Category selector */
-.category-input-container {
+/* Actions - compact and well-spaced */
+.activity-actions {
     display: flex;
     align-items: center;
-    gap: var(--space-md);
-    margin-bottom: var(--space-lg);
-    padding: 0 var(--space-md);
+    gap: 6px;
+    flex-shrink: 0;
 }
 
-.category-input-container label {
-    font-weight: 500;
+/* Buttons base style */
+.activity-actions .icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    background: transparent;
+    color: var(--text-secondary);
+    flex-shrink: 0;
+    font-size: 15px;
+}
+
+/* Play button - balanced size */
+.activity-actions .icon-btn.play {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--success, #10b981) 0%, var(--success-dark, #059669) 100%);
+    color: white;
+    box-shadow: 0 2px 6px rgba(16, 185, 129, 0.25);
+}
+
+.activity-actions .icon-btn.play:hover {
+    transform: translateY(-1px) scale(1.03);
+    box-shadow: 0 3px 10px rgba(16, 185, 129, 0.35);
+}
+
+.activity-actions .icon-btn.play:active {
+    transform: translateY(0) scale(1);
+}
+
+.activity-actions .icon-btn.play:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2), 0 2px 6px rgba(16, 185, 129, 0.25);
+}
+
+/* Overflow menu container */
+.actions-overflow {
+    position: relative;
+}
+
+.overflow-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+}
+
+.overflow-btn:hover {
+    background: var(--hover-bg);
+    border-color: var(--text-secondary);
     color: var(--text-primary);
 }
 
-.category-select {
-    padding: 8px 12px;
-    border-radius: var(--border-radius);
+.overflow-btn:active {
+    transform: scale(0.95);
+}
+
+.overflow-btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--primary-light-bg), 0 0 0 4px rgba(var(--primary-rgb, 99, 102, 241), 0.2);
+    border-color: var(--primary);
+}
+
+/* Dropdown menu - elegant and accessible */
+.action-dropdown {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 6px);
+    background: var(--surface);
     border: 1px solid var(--border-color);
-    background-color: var(--surface);
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08);
+    min-width: 180px;
+    z-index: 1000;
+    padding: 6px;
+    display: flex;
+    flex-direction: column;
+    animation: dropdownSlideIn 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes dropdownSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.action-dropdown .dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 12px;
+    text-align: left;
+    width: 100%;
+    cursor: pointer;
+    color: var(--text-primary);
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+}
+
+.action-dropdown .dropdown-item i {
+    font-size: 14px;
+    width: 16px;
+    color: var(--text-secondary);
+    transition: color 0.15s ease;
+}
+
+.action-dropdown .dropdown-item:hover {
+    background: var(--hover-bg);
+    color: var(--primary);
+}
+
+.action-dropdown .dropdown-item:hover i {
+    color: var(--primary);
+}
+
+.action-dropdown .dropdown-item.delete-item:hover {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--danger);
+}
+
+.action-dropdown .dropdown-item.delete-item:hover i {
+    color: var(--danger);
+}
+
+.action-dropdown .dropdown-item:active {
+    transform: scale(0.98);
+}
+
+.action-dropdown .dropdown-item:focus {
+    outline: none;
+    background: var(--hover-bg);
+    box-shadow: inset 0 0 0 2px var(--primary-light-bg);
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+    .activity-header {
+        padding: 8px 10px;
+        gap: 6px;
+        min-height: 52px;
+    }
+    
+    .header-left-section {
+        gap: 8px;
+    }
+    
+    .category-icon {
+        width: 32px;
+        height: 32px;
+        font-size: 15px;
+    }
+    
+    .activity-title {
+        font-size: 16px;
+    }
+    
+    .activity-actions .icon-btn.play {
+        width: 38px;
+        height: 38px;
+        font-size: 14px;
+    }
+    
+    .overflow-btn {
+        width: 34px;
+        height: 34px;
+    }
+}
+
+@media (max-width: 360px) {
+    .activity-header {
+        padding: 6px 8px;
+    }
+    
+    .activity-title {
+        font-size: 15px;
+    }
+    
+    .activity-actions .icon-btn.play {
+        width: 36px;
+        height: 36px;
+        font-size: 13px;
+    }
+}
+
+/* Large screens - more breathing room */
+@media (min-width: 768px) {
+    .activity-header {
+        padding: 12px 16px;
+        gap: 12px;
+    }
+    
+    .header-left-section {
+        gap: 14px;
+    }
+    
+    .category-icon {
+        width: 38px;
+        height: 38px;
+        font-size: 18px;
+    }
+    
+    .activity-title {
+        font-size: 18px;
+    }
+    
+    .activity-actions .icon-btn.play {
+        width: 42px;
+        height: 42px;
+    }
+}
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+    .activity-header,
+    .category-icon-btn,
+    .packing-name-display-btn,
+    .activity-actions .icon-btn,
+    .overflow-btn,
+    .action-dropdown .dropdown-item {
+        transition: none;
+    }
+    
+    .action-dropdown {
+        animation: none;
+    }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .activity-header {
+        border: 2px solid currentColor;
+    }
+    
+    .activity-actions .icon-btn.play {
+        border: 2px solid currentColor;
+    }
+    
+    .overflow-btn {
+        border: 2px solid currentColor;
+    }
+}
+
+/* Category Selector Dropdown */
+.category-selector {
+    background: var(--surface);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 8px;
+    margin-bottom: 16px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 8px;
+    animation: dropdownSlideIn 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.category-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: var(--background);
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.category-option:hover {
+    background: var(--hover-bg);
+    border-color: var(--primary-light-bg);
+}
+
+.category-option.selected {
+    background: var(--primary-light-bg);
+    border-color: var(--primary);
+    font-weight: 600;
+    color: var(--primary);
+}
+
+.category-option i {
+    font-size: 18px;
+    color: var(--text-secondary);
+}
+
+.category-option.selected i {
+    color: var(--primary);
+}
+
+.category-option span {
+    font-size: 14px;
+}
+
+@media (max-width: 480px) {
+    .category-selector {
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+        gap: 6px;
+    }
+    
+    .category-option {
+        padding: 8px 10px;
+        gap: 8px;
+    }
+    
+    .category-option i {
+        font-size: 16px;
+    }
+    
+    .category-option span {
+        font-size: 13px;
+    }
 }
 
 /* Content Area */
@@ -280,178 +582,28 @@
     padding-bottom: calc(var(--space-lg) + 80px);
 }
 
-/* ============================================
-   DRAG & DROP HELPER STYLES
-   ============================================ */
-
-/* Ghost element for better drag preview */
-.drag-ghost {
-    opacity: 0;
-    position: absolute;
-    pointer-events: none;
-}
-
-/* Drop zone placeholder */
-.drop-placeholder {
-    height: 60px;
-    border: 2px dashed var(--primary);
-    border-radius: 8px;
-    background: repeating-linear-gradient(
-        45deg,
-        var(--primary-light-bg),
-        var(--primary-light-bg) 10px,
-        transparent 10px,
-        transparent 20px
-    );
-    margin: 8px 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--primary);
-    font-weight: 500;
-    animation: fadeIn 0.2s ease;
-}
-
-.drop-placeholder::before {
-    content: '↓ Drop here';
-    font-size: 14px;
-}
-
-/* Enhanced insertion slot visualization */
-.insertion-slot {
-    height: 80px;
-    margin: 16px 0;
-    border: 3px dashed var(--primary);
-    border-radius: 12px;
-    background: repeating-linear-gradient(
-        135deg,
-        transparent,
-        transparent 10px,
-        var(--primary-light-bg) 10px,
-        var(--primary-light-bg) 20px
-    );
+/* Loading State */
+.loading {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    animation: slotPulse 1.5s ease-in-out infinite;
-    box-shadow: 
-        inset 0 0 20px rgba(var(--primary-rgb, 99, 102, 241), 0.2),
-        0 4px 20px rgba(var(--primary-rgb, 99, 102, 241), 0.3);
-    position: relative;
-    overflow: hidden;
+    padding: 40px;
+    gap: 16px;
 }
 
-.insertion-slot::before {
-    content: '⬇';
-    font-size: 24px;
-    color: var(--primary);
-    animation: bounce 1s ease-in-out infinite;
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid var(--border-color);
+    border-top-color: var(--primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
 }
 
-.insertion-slot::after {
-    content: 'Drop item here to insert';
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--primary);
-    letter-spacing: 0.5px;
-}
-
-@keyframes slotPulse {
-    0%, 100% {
-        opacity: 0.8;
-        transform: scaleY(1);
-        border-color: var(--primary);
-    }
-    50% {
-        opacity: 1;
-        transform: scaleY(1.05);
-        border-color: var(--primary-dark);
-    }
-}
-
-@keyframes bounce {
-    0%, 100% {
-        transform: translateY(0);
-    }
-    50% {
-        transform: translateY(-8px);
-    }
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: scaleY(0);
-    }
+@keyframes spin {
     to {
-        opacity: 1;
-        transform: scaleY(1);
-    }
-}
-
-/* Enhanced dimming - OPTIMIZED FOR ZERO FLICKER */
-body.dragging-active .packing-row:not(.dragging):not(.drag-over) {
-    opacity: 0.35;
-    filter: blur(0.5px) grayscale(30%);
-    transform: scale(0.99);
-    transition: opacity 0.2s ease, filter 0.2s ease, transform 0.2s ease;
-    will-change: opacity, filter, transform;
-}
-
-/* Adjacent items movement - SMOOTH */
-body.dragging-active .packing-row.drag-over ~ .packing-row {
-    transform: translateY(6px);
-    transition: transform 0.3s ease-out;
-}
-
-/* Visual spacing around drop target */
-.packing-row.drag-over + .packing-row {
-    margin-top: 12px !important;
-    transition: margin-top 0.3s ease-out;
-}
-
-/* Category dimming - OPTIMIZED */
-body.dragging-active .category:not(.drag-target) {
-    opacity: 0.4;
-    filter: grayscale(60%) brightness(0.95);
-    transform: scale(0.99);
-    transition: opacity 0.2s ease, filter 0.2s ease, transform 0.2s ease;
-}
-
-body.dragging-active .category.drag-target {
-    opacity: 1;
-    filter: none;
-    transform: scale(1.01);
-    transition: transform 0.2s ease;
-}
-
-/* ============================================
-   DRAG HANDLE - ENHANCED MOBILE TOUCH FEEDBACK
-   ============================================ */
-
-/* Remove old ::after styles that are no longer used */
-.packing-row::after {
-    display: none;
-}
-
-/* Mobile touch optimization with haptic-like feedback */
-@media (max-width: 768px) {
-    /* Remove grip dots - not needed with modern swipe UI */
-    .packing-row::before {
-        display: none;
-    }
-    
-    /* Add visual feedback for touch when dragging */
-    .packing-row:active .packing-row-content {
-        background: var(--primary-light-bg);
-        transform: scale(0.98);
-    }
-    
-    /* Enhanced drop zone for touch */
-    .packing-row.drag-over .packing-row-content {
-        padding: 20px 18px;
+        transform: rotate(360deg);
     }
 }
 
@@ -511,38 +663,6 @@ body.dragging-active .category.drag-target {
         box-shadow: 
             0 0 0 8px rgba(var(--primary-rgb, 99, 102,241), 0.25),
             0 12px 48px rgba(var(--primary-rgb, 99, 102, 241), 0.5);
-    }
-}
-
-/* Add "Drop here to move" overlay on category */
-.category.drag-target::before {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: var(--primary);
-    color: white;
-    padding: 12px 24px;
-    border-radius: 24px;
-    font-weight: 600;
-    font-size: 14px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
-    z-index: 100;
-    animation: bounceIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-    white-space: nowrap;
-}
-
-@keyframes bounceIn {
-    0% {
-        opacity: 0;
-        transform: translate(-50%, -50%) scale(0.3);
-    }
-    50% {
-        transform: translate(-50%, -50%) scale(1.05);
-    }
-    100% {
-        opacity: 1;
-        transform: translate(-50%, -50%) scale(1);
     }
 }
 
@@ -642,7 +762,6 @@ ul.category-content {
     position: relative;
     margin: 0;
     background: var(--surface);
-    /* Remove border-bottom from here - will be on content */
 }
 
 .packing-row:last-child {
@@ -666,7 +785,7 @@ ul.category-content {
     bottom: 0;
     display: flex;
     align-items: stretch;
-    gap: 0;  /* Remove gap between buttons */
+    gap: 0;
     z-index: 1;
     background: var(--background);
 }
@@ -680,13 +799,32 @@ ul.category-content {
     align-items: center;
     justify-content: center;
     gap: 6px;
-    color: var(--text-secondary);
-    background: var(--surface);
+    color: white;
     cursor: pointer;
     transition: all 0.2s ease;
     flex-shrink: 0;
     padding: 10px 8px;
     position: relative;
+}
+
+.swipe-action-btn.edit {
+    background: var(--primary);
+}
+
+.swipe-action-btn.edit:hover {
+    background: var(--primary-dark);
+}
+
+.swipe-action-btn.delete {
+    background: var(--danger);
+}
+
+.swipe-action-btn.delete:hover {
+    background: var(--danger-dark, #dc2626);
+}
+
+.swipe-action-btn i {
+    font-size: 18px;
 }
 
 /* Row content that swipes over the buttons */
@@ -732,7 +870,7 @@ ul.category-content {
     transform: translateY(-50%) scale(1.1);
 }
 
-/* Move chevrons left when row is active/pressed to hint at swipeable content */
+/* Move chevrons left when row is active/pressed */
 .packing-row:active:not(.dragging):not(.swiped-left) .packing-row-content::after {
     right: 20px;
     opacity: 0.9;
@@ -758,29 +896,10 @@ ul.category-content {
     }
 }
 
-
-@keyframes showHintEnhanced {
-    0%, 100% {
-        opacity: 0;
-        transform: translateY(-50%) translateX(8px);
-    }
-    10%, 75% {
-        opacity: 1;
-        transform: translateY(-50%) translateX(0);
-    }
-    85% {
-        opacity: 0;
-        transform: translateY(-50%) translateX(-8px);
-    }
-}
-
 /* Hide indicators when swiped, editing, or dragging */
 .packing-row.swiped-left .packing-row-content::after,
 .packing-row.editing .packing-row-content::after,
-.packing-row.dragging .packing-row-content::after,
-.packing-row.swiped-left .packing-row-content::before,
-.packing-row.editing .packing-row-content::before,
-.packing-row.dragging .packing-row-content::before {
+.packing-row.dragging .packing-row-content::after {
     display: none;
 }
 
@@ -805,30 +924,10 @@ ul.category-content {
         background: var(--hover-bg);
         box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06), inset 0 -1px 0 0 var(--border-color);
     }
-
-    /* Remove the problematic drag handle that appears in top-left corner */
-    /* This was causing the strange element when selecting items */
 }
 
 .packing-row:active .packing-row-content {
     cursor: grabbing;
-}
-
-/* Enhanced swipe hint animation */
-@keyframes swipeHint {
-    0%, 100% {
-        transform: translateY(-50%) rotate(180deg) translateX(0) scale(1);
-        opacity: 0.25;
-    }
-    50% {
-        transform: translateY(-50%) rotate(180deg) translateX(-6px) scale(1.12);
-        opacity: 0.6;
-    }
-}
-
-/* Animate hint on first few items */
-.packing-row:nth-child(-n+1) .packing-row-content::after {
-    animation: swipeHint 2s ease-in-out 0.4s 2;
 }
 
 /* Dragging state */
@@ -901,6 +1000,17 @@ ul.category-content {
     border: 2px solid var(--primary);
 }
 
+@keyframes previewSlideIn {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.8);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
+
 .packing-row.editing .packing-row-content {
     background: var(--background);
     padding: 0;
@@ -909,6 +1019,48 @@ ul.category-content {
     /* Ensure proper visibility when keyboard is shown */
     position: relative;
     z-index: 15;
+}
+
+/* Enhanced dimming for drag & drop */
+body.dragging-active .packing-row:not(.dragging):not(.drag-over) {
+    opacity: 0.35;
+    filter: blur(0.5px) grayscale(30%);
+    transform: scale(0.99);
+    transition: opacity 0.2s ease, filter 0.2s ease, transform 0.2s ease;
+    will-change: opacity, filter, transform;
+}
+
+body.dragging-active .category:not(.drag-target) {
+    opacity: 0.4;
+    filter: grayscale(60%) brightness(0.95);
+    transform: scale(0.99);
+    transition: opacity 0.2s ease, filter 0.2s ease, transform 0.2s ease;
+}
+
+body.dragging-active .category.drag-target {
+    opacity: 1;
+    filter: none;
+    transform: scale(1.01);
+    transition: transform 0.2s ease;
+}
+
+/* Add overlay hint when dragging starts */
+body.dragging-active::before {
+    content: '🎯 Drag to reorder or drop on a category to move';
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 24px;
+    font-weight: 600;
+    font-size: 14px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    z-index: 10000;
+    pointer-events: none;
+    opacity: 1;
 }
 
 /* ============================================
@@ -961,46 +1113,6 @@ ul.category-content {
 
 .notes:empty {
     display: none;
-}
-
-/* ============================================
-   ITEM ACTIONS - MODERN BUTTONS
-   ============================================ */
-
-.item-actions {
-    display: flex;
-    gap: 6px;
-    opacity: 0;
-    transition: opacity 0.2s ease;
-}
-
-.packing-row:hover .item-actions {
-    opacity: 1;
-}
-
-.item-actions .icon-btn {
-    width: 32px;
-    height: 32px;
-    border-radius: 6px;
-    border: none;
-    background: transparent;
-    color: var(--text-secondary);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    flex-shrink: 0;
-}
-
-.item-actions .icon-btn:hover {
-    background: var(--danger-light, rgba(239, 68, 68, 0.1));
-    color: var(--danger);
-    transform: scale(1.1);
-}
-
-.item-actions .icon-btn:active {
-    transform: scale(0.95);
 }
 
 /* ============================================
@@ -1423,42 +1535,6 @@ ul.category-content {
     box-shadow: none;
 }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
-    .category-grid {
-        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-        gap: 10px;
-    }
-    
-    .category-card {
-        padding: 12px 6px;
-    }
-    
-    .category-card i {
-        font-size: 20px;
-    }
-    
-    .category-card .category-name {
-        font-size: 12px;
-    }
-    
-    .form-actions {
-        flex-direction: column-reverse;
-    }
-    
-    .btn {
-        width: 100%;
-    }
-    
-    .packing-row {
-        padding: 12px 14px;
-    }
-    
-    .item-text {
-        font-size: 14px;
-    }
-}
-
 /* ============================================
    QUICK ADD CONTAINER - BOTTOM BAR
    ============================================ */
@@ -1470,12 +1546,10 @@ ul.category-content {
     right: 0;
     background: var(--surface);
     box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
-    /* Increased padding to ensure proper height calculation */
     padding: 14px 12px;
     z-index: 100;
     border-top: 1px solid var(--border-color);
     transition: transform 0.3s ease;
-    /* Add min-height to ensure consistent sizing */
     min-height: 80px;
     box-sizing: border-box;
 }
@@ -1610,35 +1684,52 @@ ul.category-content {
     font-weight: 500;
 }
 
-.content-area {
-    padding-bottom: calc(var(--space-lg) + 70px);
+.option i {
+    font-size: 16px;
+    color: var(--text-secondary);
 }
 
-/* Remove obsolete animation keyframes that are no longer used */
+.option.selected i {
+    color: var(--primary);
+}
 
-/* Removed: breathe animation - no longer needed */
-/* Removed: floatDrag animation - causes flickering */
-/* Removed: magneticPulse animation - causes flickering */
-/* Removed: gentlePulse animation - causes flickering */
-/* Removed: insertionPulse animation - causes flickering */
-/* Removed: dropIndicator animation - causes flickering */
+/* Responsive adjustments for forms */
+@media (max-width: 768px) {
+    .category-grid {
+        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+        gap: 10px;
+    }
+    
+    .category-card {
+        padding: 12px 6px;
+    }
+    
+    .category-card i {
+        font-size: 20px;
+    }
+    
+    .category-card .category-name {
+        font-size: 12px;
+    }
+    
+    .form-actions {
+        flex-direction: column-reverse;
+    }
+    
+    .btn {
+        width: 100%;
+    }
+}
 
-/* Add overlay hint when dragging starts - STATIC VERSION */
-body.dragging-active::before {
-    content: '🎯 Drag to reorder or drop on a category to move';
-    position: fixed;
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-    color: white;
-    padding: 12px 24px;
-    border-radius: 24px;
-    font-weight: 600;
-    font-size: 14px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-    z-index: 10000;
-    pointer-events: none;
-    /* Removed slideInFromTop animation - instant appearance */
-    opacity: 1;
+/* Accessibility */
+.sr-only {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border-width: 0 !important;
 }

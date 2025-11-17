@@ -22,51 +22,77 @@
 <NavigationLock OnBeforeInternalNavigation="OnBeforeInternalNavigation" />
 
 <div class="page-container with-fixed-navbar" @onclick="HandlePageClick">
-    <div class="activity-header">
+    <header class="activity-header" role="banner" aria-label="@AppResources.PackingActivity">
         <div class="header-left-section">
-            <div class="category-icon-container" @onclick="ToggleCategorySelector">
-                <div class="category-icon" title="@GetLocalizedCategoryName(_currentActivity.Category)">
-                    <i class="fa @GetCategoryIcon(_currentActivity.Category)" aria-hidden="true"></i>
+            <button type="button"
+                    class="category-icon-btn"
+                    @onclick="ToggleCategorySelector"
+                    @onclick:stopPropagation
+                    aria-expanded="@_showCategorySelector"
+                    aria-label="@GetLocalizedCategoryName(_currentActivity.Category)">
+                <div class="category-icon" aria-hidden="true" title="@GetLocalizedCategoryName(_currentActivity.Category)">
+                    <i class="fa @GetCategoryIcon(_currentActivity.Category)"></i>
                 </div>
-            </div>
-            <h3 class="activity-title">
-                @if (_isEditingName)
-                {
-                    <input type="text" @bind="_currentActivity.Name" @bind:event="oninput"
-                           class="activity-name-input"
-                           @onblur="() => _isEditingName = false"
-                           @onfocus="async () => await SelectAllText(inputElement)"
-                           @ref="inputElement"
-                           placeholder="@AppResources.EnterActivityName" />
-                }
-                else
-                {
-                    @if (string.IsNullOrWhiteSpace(_currentActivity.Name))
+            </button>
+
+            <div class="title-wrap">
+                <h1 class="activity-title">
+                    @if (_isEditingName)
                     {
-                        _isEditingName = true;
+                        <input type="text" @bind="_currentActivity.Name" @bind:event="oninput"
+                               class="activity-name-input"
+                               @onblur="() => _isEditingName = false"
+                               @onfocus="async () => await SelectAllText(inputElement)"
+                               @ref="inputElement"
+                               placeholder="@AppResources.EnterActivityName" />
                     }
-                    <span class="packing-name-display" @onclick="() => _isEditingName = true">
-                        @_currentActivity.Name
-                        <i class="edit-icon fa fa-pencil" aria-hidden="true"></i>
-                    </span>
+                    else
+                    {
+                        @if (string.IsNullOrWhiteSpace(_currentActivity.Name))
+                        {
+                            _isEditingName = true;
+                        }
+                        <button type="button" class="packing-name-display-btn" @onclick="() => _isEditingName = true" aria-label="@AppResources.EditActivity">
+                            <span class="packing-name-text">@_currentActivity.Name</span>
+                            <i class="edit-icon fa fa-pencil" aria-hidden="true"></i>
+                        </button>
+                    }
+                </h1>
+            </div>
+        </div>
+
+        <div class="activity-actions" role="group" aria-label="@AppResources.PackingDialogMenu">
+            <!-- Prominent play button - primary action -->
+            <button class="icon-btn play" title="@AppResources.StartPacking" @onclick="SwitchToPackingMode" @onclick:stopPropagation aria-label="@AppResources.StartPacking">
+                <i class="fa fa-play" aria-hidden="true"></i>
+            </button>
+
+            <!-- Overflow menu for secondary actions -->
+            <div class="actions-overflow">
+                <button class="icon-btn overflow-btn" @onclick="ToggleActionsDropdown" @onclick:stopPropagation aria-haspopup="true" aria-expanded="@_showActionsDropdown" title="@AppResources.PackingDialogMenu">
+                    <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
+                </button>
+
+                @if (_showActionsDropdown)
+                {
+                    <div class="action-dropdown" @onclick:stopPropagation>
+                        <button class="dropdown-item" @onclick="CopyPacking" @onclick:stopPropagation>
+                            <i class="fa fa-copy"></i>
+                            <span>@AppResources.CopyTitle</span>
+                        </button>
+                        <button class="dropdown-item" @onclick="ShowAddItemForm" @onclick:stopPropagation>
+                            <i class="fa fa-plus"></i>
+                            <span>@AppResources.AddItem</span>
+                        </button>
+                        <button class="dropdown-item delete-item" @onclick="PromptDeleteActivity" @onclick:stopPropagation>
+                            <i class="fa fa-trash"></i>
+                            <span>@AppResources.DeleteActivity</span>
+                        </button>
+                    </div>
                 }
-            </h3>
+            </div>
         </div>
-        <div class="activity-actions">
-            <button class="icon-btn danger" title="@AppResources.DeleteTitle" @onclick="PromptDeleteActivity">
-                <i class="fa fa-trash"></i>
-            </button>
-            <button class="icon-btn" title="@AppResources.CopyTitle" @onclick="CopyPacking">
-                <i class="fa fa-copy"></i>
-            </button>
-            <button class="icon-btn" title="@AppResources.StartPacking" @onclick="SwitchToPackingMode">
-                <i class="fa fa-play"></i>
-            </button>
-            <button class="add-btn" @onclick="ShowAddItemForm" title="@AppResources.AddItem">
-                <i class="fa fa-plus"></i>
-            </button>
-        </div>
-    </div>
+    </header>
 
     <main class="content-area">
         @if (_showCategorySelector)
@@ -435,6 +461,15 @@
     {
         // Blur the quick-add input to hide keyboard when clicking outside
         _ = JSRuntime.InvokeVoidAsync("blurQuickAddInput");
+        // Close overflow menu when user clicks away
+        _showActionsDropdown = false;
+    }
+    
+    private bool _showActionsDropdown = false;
+
+    private void ToggleActionsDropdown()
+    {
+        _showActionsDropdown = !_showActionsDropdown;
     }
 
     protected override async Task OnInitializedAsync()
@@ -940,24 +975,32 @@
         // Delay to ensure DOM is ready and rendered
         await Task.Delay(150);
         
-        // Focus on the edit input
-        if (itemEditInputElement.Id != null)
+        // Focus on the edit input (best-effort) - swallow errors if element is not available yet
+        try
         {
             await JSRuntime.InvokeVoidAsync("focusElement", itemEditInputElement);
             // Ensure the input is visible above keyboard
             await Task.Delay(50);
             await JSRuntime.InvokeVoidAsync("ensureElementVisible", itemEditInputElement, _keyboardHeight);
         }
+        catch
+        {
+            // ignore - element may not be present in DOM
+        }
     }
 
     private async Task SelectAllInputText(FocusEventArgs e)
     {
-        if (itemEditInputElement.Id != null)
+        try
         {
             await JSRuntime.InvokeVoidAsync("selectAllText", itemEditInputElement);
             // Ensure element is visible with a small delay
             await Task.Delay(100);
             await JSRuntime.InvokeVoidAsync("ensureElementVisible", itemEditInputElement, _keyboardHeight);
+        }
+        catch
+        {
+            // ignore
         }
     }
 
@@ -1055,17 +1098,17 @@
         StateHasChanged();
     }
 
-    private void SelectQuickCategory(string category)
-    {
-        _quickAddCategory = category;
-        _showQuickCategoryDropdown = false;
-    }
-
     private void HandleBulkTextareaKeyDown(KeyboardEventArgs e)
     {
         if (e.Key == "Enter" && (e.CtrlKey || e.MetaKey))
         {
             _ = ConfirmBulkAddAsync();
         }
+    }
+
+    private void SelectQuickCategory(string category)
+    {
+        _quickAddCategory = category;
+        _showQuickCategoryDropdown = false;
     }
 }

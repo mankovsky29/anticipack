@@ -22,31 +22,33 @@
     }
     else
     {
-        <div class="search-bar @(_isSearchVisible ? "visible" : "hidden")">
-            <input type="text" class="search-input" placeholder="@Localizer["SearchPlaceholder"]" @bind="_searchTerm" @bind:event="oninput" />
-            <button class="search-close-btn" @onclick="ToggleSearchBar">
-                <i class="fa fa-times"></i>
-            </button>
-        </div>
+        <div class="sticky-header">
+            <div class="search-bar @(_isSearchVisible ? "visible" : "hidden")">
+                <input type="text" class="search-input" placeholder="@Localizer["SearchPlaceholder"]" @bind="_searchTerm" @bind:event="oninput" />
+                <button class="search-close-btn" @onclick="ToggleSearchBar">
+                    <i class="fa fa-times"></i>
+                </button>
+            </div>
 
-        <!-- Filter Bar -->
-        <div class="filter-bar">
-            <div class="filter-chips">
-                <button class="filter-chip @(_shareFilter == ShareFilterType.All ? "active" : "")" 
-                        @onclick="() => SetShareFilter(ShareFilterType.All)">
-                    <i class="fa fa-layer-group"></i>
-                    <span>@Localizer["All"]</span>
-                </button>
-                <button class="filter-chip @(_shareFilter == ShareFilterType.Private ? "active" : "")" 
-                        @onclick="() => SetShareFilter(ShareFilterType.Private)">
-                    <i class="fa fa-lock"></i>
-                    <span>@Localizer["Private"]</span>
-                </button>
-                <button class="filter-chip @(_shareFilter == ShareFilterType.Shared ? "active" : "")" 
-                        @onclick="() => SetShareFilter(ShareFilterType.Shared)">
-                    <i class="fa fa-share-alt"></i>
-                    <span>@Localizer["Shared"]</span>
-                </button>
+            <!-- Filter Bar -->
+            <div class="filter-bar">
+                <div class="filter-chips">
+                    <button class="filter-chip @(_shareFilter == ShareFilterType.All ? "active" : "")" 
+                            @onclick="() => SetShareFilter(ShareFilterType.All)">
+                        <i class="fa fa-layer-group"></i>
+                        <span>@Localizer["All"]</span>
+                    </button>
+                    <button class="filter-chip @(_shareFilter == ShareFilterType.Private ? "active" : "")" 
+                            @onclick="() => SetShareFilter(ShareFilterType.Private)">
+                        <i class="fa fa-lock"></i>
+                        <span>@Localizer["Private"]</span>
+                    </button>
+                    <button class="filter-chip @(_shareFilter == ShareFilterType.Shared ? "active" : "")" 
+                            @onclick="() => SetShareFilter(ShareFilterType.Shared)">
+                        <i class="fa fa-share-alt"></i>
+                        <span>@Localizer["Shared"]</span>
+                    </button>
+                </div>
             </div>
         </div>
         

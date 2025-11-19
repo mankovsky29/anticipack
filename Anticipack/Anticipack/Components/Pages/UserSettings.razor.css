@@ -193,7 +193,9 @@
 }
 
 .language-icon {
-    font-size: 1.75rem;
+    font-size: 2rem;
+    line-height: 1;
+    color: var(--text-primary);
     transition: transform var(--transition-fast);
 }
 
@@ -202,10 +204,11 @@
     transform: scale(1.1);
 }
 
-.language-option > span:last-child {
+.language-option > span:not(.language-icon) {
     font-weight: 500;
     color: var(--text-primary);
     font-size: var(--font-size-sm);
+    line-height: 1.2;
 }
 
 /* Compact Setting Row */

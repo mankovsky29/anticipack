@@ -9,12 +9,10 @@
 <div class="settings-page">
     <div class="settings-header">
         <div class="header-content">
-            <div class="header-icon">
-                <i class="fas fa-cog"></i>
-            </div>
+            <i class="fas fa-cog"></i>
             <div>
                 <h2>@AppResources.Settings</h2>
-                <p class="header-subtitle">@AppResources.CustomizeExperience</p>
+                <p>@AppResources.CustomizeExperience</p>
             </div>
         </div>
     </div>
@@ -23,133 +21,30 @@
         <!-- Appearance Section -->
         <div class="setting-section">
             <div class="section-header">
-                <div class="section-icon">
-                    <i class="fas fa-palette"></i>
-                </div>
-                <div>
-                    <h3>@AppResources.Appearance</h3>
-                    <p class="section-description">@AppResources.PersonalizeAppLooks</p>
-                </div>
+                <i class="fas fa-palette"></i>
+                <span>@AppResources.Appearance</span>
             </div>
-
-            <div class="setting-group">
-                <div class="setting-item">
-                    <div class="setting-label">
-                        <label>@AppResources.Theme</label>
-                    </div>
-                    <div class="theme-selector">
-                        <button class="theme-option @(CurrentTheme == "light" ? "active" : "")"
-                                @onclick='() => SetTheme("light")'
-                                title="@AppResources.LightThemeTitle">
-                            <div class="theme-icon">
-                                <i class="fas fa-sun"></i>
-                            </div>
-                            <span class="theme-name">@AppResources.LightTheme</span>
-                            @if (CurrentTheme == "light")
-                            {
-                                <i class="fas fa-check theme-check"></i>
-                            }
-                        </button>
-                        <button class="theme-option @(CurrentTheme == "dark" ? "active" : "")"
-                                @onclick='() => SetTheme("dark")'
-                                title="@AppResources.DarkThemeTitle">
-                            <div class="theme-icon">
-                                <i class="fas fa-moon"></i>
-                            </div>
-                            <span class="theme-name">@AppResources.DarkTheme</span>
-                            @if (CurrentTheme == "dark")
-                            {
-                                <i class="fas fa-check theme-check"></i>
-                            }
-                        </button>
-                        <button class="theme-option @(CurrentTheme == "auto" ? "active" : "")"
-                                @onclick='() => SetTheme("auto")'
-                                title="@AppResources.AutoThemeTitle">
-                            <div class="theme-icon">
-                                <i class="fas fa-magic"></i>
-                            </div>
-                            <span class="theme-name">@AppResources.AutoTheme</span>
-                            @if (CurrentTheme == "auto")
-                            {
-                                <i class="fas fa-check theme-check"></i>
-                            }
-                        </button>
-                    </div>
-                    <div class="setting-hint">
-                        <i class="fas fa-info-circle"></i>
-                        <span>
-                            @if (CurrentTheme == "auto")
-                            {
-                                <text>@AppResources.AutoThemeHint</text>
-                            }
-                            else if (CurrentTheme == "dark")
-                            {
-                                <text>@AppResources.DarkThemeHint</text>
-                            }
-                            else
-                            {
-                                <text>@AppResources.LightThemeHint</text>
-                            }
-                        </span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Notifications Section (Placeholder for future features) -->
-        <div class="setting-section">
-            <div class="section-header">
-                <div class="section-icon">
-                    <i class="fas fa-bell"></i>
-                </div>
-                <div>
-                    <h3>@AppResources.Notifications</h3>
-                    <p class="section-description">@AppResources.ManageNotificationPreferences</p>
-                </div>
-            </div>
-
-            <div class="setting-group">
-                <div class="setting-item-row">
-                    <div class="setting-label">
-                        <label>@AppResources.PushNotifications</label>
-                        <span class="label-description">@AppResources.NotifiedAboutUpdates</span>
-                    </div>
-                    <label class="toggle-switch">
-                        <input type="checkbox" @bind="NotificationsEnabled" disabled>
-                        <span class="toggle-slider"></span>
-                    </label>
-                </div>
-                <div class="coming-soon-badge">
-                    <i class="fas fa-clock"></i> @AppResources.ComingSoon
-                </div>
-            </div>
-        </div>
-
-        <!-- Data & Storage Section (Placeholder) -->
-        <div class="setting-section">
-            <div class="section-header">
-                <div class="section-icon">
-                    <i class="fas fa-database"></i>
-                </div>
-                <div>
-                    <h3>@AppResources.DataStorage</h3>
-                    <p class="section-description">@AppResources.ManageAppData</p>
-                </div>
-            </div>
-
-            <div class="setting-group">
-                <button class="setting-action-btn" disabled>
-                    <div class="action-btn-content">
-                        <i class="fas fa-trash-alt"></i>
-                        <div>
-                            <div class="action-btn-title">@AppResources.ClearCache</div>
-                            <div class="action-btn-subtitle">@AppResources.FreeUpStorage</div>
-                        </div>
-                    </div>
-                    <i class="fas fa-chevron-right"></i>
-                </button>
-                <div class="coming-soon-badge">
-                    <i class="fas fa-clock"></i> @AppResources.ComingSoon
+            
+            <div class="section-body">
+                <div class="theme-selector">
+                    <button class="theme-option @(CurrentTheme == "light" ? "active" : "")"
+                            @onclick='() => SetTheme("light")'
+                            title="@AppResources.LightThemeTitle">
+                        <i class="fas fa-sun"></i>
+                        <span>@AppResources.LightTheme</span>
+                    </button>
+                    <button class="theme-option @(CurrentTheme == "dark" ? "active" : "")"
+                            @onclick='() => SetTheme("dark")'
+                            title="@AppResources.DarkThemeTitle">
+                        <i class="fas fa-moon"></i>
+                        <span>@AppResources.DarkTheme</span>
+                    </button>
+                    <button class="theme-option @(CurrentTheme == "auto" ? "active" : "")"
+                            @onclick='() => SetTheme("auto")'
+                            title="@AppResources.AutoThemeTitle">
+                        <i class="fas fa-magic"></i>
+                        <span>@AppResources.AutoTheme</span>
+                    </button>
                 </div>
             </div>
         </div>
@@ -157,53 +52,79 @@
         <!-- Language Section -->
         <div class="setting-section">
             <div class="section-header">
-                <div class="section-icon">
-                    <i class="fa fa-language"></i>
-                </div>
-                <div>
-                    <h3>@AppResources.Language</h3>
-                    <p class="section-description">@AppResources.ChoosePreferredLanguage</p>
-                </div>
+                <i class="fa fa-language"></i>
+                <span>@AppResources.Language</span>
             </div>
 
-            <div class="setting-group">
+            <div class="section-body">
                 <div class="language-selector">
-                    <div class="language-option @(IsCurrentLanguage("en") ? "active" : "")" @onclick='() => ChangeLanguage("en")'>
-                        <div class="language-icon">🇺🇸</div>
-                        <span class="language-name">English</span>
-                        @if (IsCurrentLanguage("en"))
-                        {
-                            <i class="fa fa-check language-check"></i>
-                        }
-                    </div>
-
-                    <div class="language-option @(IsCurrentLanguage("es") ? "active" : "")" @onclick='() => ChangeLanguage("es")'>
-                        <div class="language-icon">🇪🇸</div>
-                        <span class="language-name">Español</span>
-                        @if (IsCurrentLanguage("es"))
-                        {
-                            <i class="fa fa-check language-check"></i>
-                        }
-                    </div>
-
-                    <div class="language-option @(IsCurrentLanguage("ru") ? "active" : "")" @onclick='() => ChangeLanguage("ru")'>
-                        <div class="language-icon">🇷🇺</div>
-                        <span class="language-name">Русский</span>
-                        @if (IsCurrentLanguage("ru"))
-                        {
-                            <i class="fa fa-check language-check"></i>
-                        }
-                    </div>
+                    <button class="language-option @(IsCurrentLanguage("en") ? "active" : "")" 
+                            @onclick='() => ChangeLanguage("en")'>
+                        <span class="language-icon">🇺🇸</span>
+                        <span>English</span>
+                    </button>
+                    <button class="language-option @(IsCurrentLanguage("es") ? "active" : "")" 
+                            @onclick='() => ChangeLanguage("es")'>
+                        <span class="language-icon">🇪🇸</span>
+                        <span>Español</span>
+                    </button>
+                    <button class="language-option @(IsCurrentLanguage("ru") ? "active" : "")" 
+                            @onclick='() => ChangeLanguage("ru")'>
+                        <span class="language-icon">🇷🇺</span>
+                        <span>Русский</span>
+                    </button>
                 </div>
+            </div>
+        </div>
+
+        <!-- Notifications Section (Coming Soon) -->
+        <div class="setting-section">
+            <div class="section-header">
+                <i class="fas fa-bell"></i>
+                <span>@AppResources.Notifications</span>
+                <div class="coming-soon-badge">@AppResources.ComingSoon</div>
+            </div>
+            
+            <div class="section-body">
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <label>@AppResources.PushNotifications</label>
+                        <span class="setting-hint">@AppResources.NotifiedAboutUpdates</span>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" @bind="NotificationsEnabled" disabled>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Data & Storage Section (Coming Soon) -->
+        <div class="setting-section">
+            <div class="section-header">
+                <i class="fas fa-database"></i>
+                <span>@AppResources.DataStorage</span>
+                <div class="coming-soon-badge">@AppResources.ComingSoon</div>
+            </div>
+
+            <div class="section-body">
+                <button class="setting-action" disabled>
+                    <div class="action-content">
+                        <i class="fas fa-trash-alt"></i>
+                        <div>
+                            <div class="action-title">@AppResources.ClearCache</div>
+                            <div class="action-subtitle">@AppResources.FreeUpStorage</div>
+                        </div>
+                    </div>
+                    <i class="fas fa-chevron-right"></i>
+                </button>
             </div>
         </div>
     </div>
 
     <div class="settings-footer">
-        <div class="app-version">
-            <i class="fas fa-info-circle"></i>
-            <span>@AppResources.Version 1.0.0</span>
-        </div>
+        <i class="fas fa-info-circle"></i>
+        <span>@AppResources.Version 1.0.0</span>
     </div>
 </div>
 
@@ -222,7 +143,6 @@
             CurrentTheme = "light";
         }
 
-        // Subscribe to culture changes to trigger re-render
         LocalizationService.CultureChanged += OnCultureChanged;
     }
 
@@ -244,7 +164,6 @@
 
     private void OnCultureChanged(object? sender, CultureInfo culture)
     {
-        // Force component re-render when culture changes
         InvokeAsync(StateHasChanged);
     }
 

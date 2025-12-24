@@ -430,7 +430,6 @@
         if (!string.IsNullOrWhiteSpace(Id))
         {
             await PackingRepository.AddOrUpdateAsync(_currentActivity);
-            ToastService.ShowSuccess(AppResources.PackingCompletedRecorded);
         }
     }
 
@@ -545,10 +544,7 @@
                 await Task.Delay(PackedItemAnimationDelayMs);
                 
                 UpdateCategoryStateAfterItemChange(item.Item.Category);
-                
-                // Show toast
-                ToastService.ShowSuccess(string.Format(AppResources.ItemPacked, item.Item.Name));
-                
+                                
                 // Save the change to repository
                 SaveCheckState(item);
             }

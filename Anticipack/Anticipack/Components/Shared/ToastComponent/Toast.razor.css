@@ -24,8 +24,8 @@
     box-shadow: var(--shadow);
     transition: all var(--transition);
     pointer-events: all;
-    min-width: 250px;
-    max-width: 450px;
+    width: min(28rem, calc(100vw - 2rem));
+    max-width: 100%;
     margin: 0;
     border: 1px solid var(--border-color);
 }
@@ -126,13 +126,14 @@
 /* Responsive adjustments */
 @media (max-width: 576px) {
     .toast-container {
-        max-width: 95%;
+        width: 100%;
+        max-width: none;
         padding: 0 0.5rem;
     }
     
     .toast {
-        min-width: auto;
         width: 100%;
+        max-width: none;
     }
 }
 

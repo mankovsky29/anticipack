@@ -194,7 +194,9 @@
 
                 <section class="category @(allChecked ? "category-completed" : "")" aria-labelledby="@categoryId">
                     <div class="category-header" role="button" @onclick="() => ToggleCategory(category)" aria-expanded="@(!collapsed)">
-                        <span class="chev @(collapsed ? "collapsed" : "")" aria-hidden="true">?</span>
+                        <span class="chev @(collapsed ? "collapsed" : "")" aria-hidden="true">
+                            <i class="fa fa-chevron-down"></i>
+                        </span>
                         <h4 id="@categoryId" class="category-title @(allChecked ? "checked" : "")">@localizedCategory</h4>
                         <span class="count">(@groupItems.Count)</span>
                     </div>

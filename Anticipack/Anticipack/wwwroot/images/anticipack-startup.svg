@@ -1,0 +1,20 @@
+<svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="caseBody" x1="64" y1="70" x2="196" y2="186" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#4B89DC"/>
+      <stop offset="1" stop-color="#3A6FC7"/>
+    </linearGradient>
+    <linearGradient id="caseAccent" x1="108" y1="154" x2="166" y2="128" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#36D7B7"/>
+      <stop offset="1" stop-color="#2ECC71"/>
+    </linearGradient>
+  </defs>
+  <rect x="64" y="70" width="128" height="116" rx="32" fill="url(#caseBody)" stroke="#274372" stroke-width="6"/>
+  <rect x="100" y="36" width="56" height="42" rx="14" fill="#1B2A4A" stroke="#4B89DC" stroke-width="6"/>
+  <path d="M116 36C116 27.163 123.163 20 132 20C140.837 20 148 27.163 148 36" stroke="#4B89DC" stroke-width="6" stroke-linecap="round"/>
+  <rect x="76" y="108" width="104" height="12" rx="6" fill="white" fill-opacity="0.7"/>
+  <rect x="76" y="136" width="84" height="12" rx="6" fill="white" fill-opacity="0.5"/>
+  <rect x="76" y="164" width="60" height="12" rx="6" fill="white" fill-opacity="0.35"/>
+  <path d="M108 154L128 174L166 128" stroke="url(#caseAccent)" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="188" cy="96" r="22" fill="url(#caseAccent)" fill-opacity="0.45"/>
+</svg>

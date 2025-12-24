@@ -195,6 +195,8 @@
     [Parameter]
     public string Id { get; set; } = string.Empty;
 
+    private const int PackedItemAnimationDelayMs = 350;
+
     private bool _isLoading;
     private DateTime _packingStartTime;
     private bool _showHistory = false;
@@ -540,7 +542,7 @@
                 StateHasChanged(); // Force UI update to show animation starting
                 
                 item.IsChecked = isChecked;
-                await Task.Delay(750); 
+                await Task.Delay(PackedItemAnimationDelayMs);
                 
                 UpdateCategoryStateAfterItemChange(item.Item.Category);
                 

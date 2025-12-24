@@ -1,0 +1,333 @@
+@page "/support"
+@using Microsoft.JSInterop
+@using Anticipack.Resources.Localization
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<AppResources> L
+@implements IAsyncDisposable
+
+<div class="support-container">
+    <!-- Header -->
+    <div class="support-header">
+        <div class="header-content">
+            <i class="fa fa-life-ring"></i>
+            <div>
+                <h2>@L["Support"]</h2>
+                <p>@L["HowCanWeHelp"]</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Help Section -->
+    <div class="quick-help-section">
+        <h3>@L["QuickHelp"]</h3>
+        <div class="help-cards">
+            <button class="help-card" @onclick='() => InsertTemplate("bug")'>
+                <i class="fa fa-bug"></i>
+                <div class="help-card-content">
+                    <h4>@L["ReportBug"]</h4>
+                    <p>@L["ReportBugDescription"]</p>
+                </div>
+            </button>
+            <button class="help-card" @onclick='() => InsertTemplate("feature")'>
+                <i class="fa fa-lightbulb"></i>
+                <div class="help-card-content">
+                    <h4>@L["SuggestFeature"]</h4>
+                    <p>@L["SuggestFeatureDescription"]</p>
+                </div>
+            </button>
+            <button class="help-card" @onclick='() => InsertTemplate("question")'>
+                <i class="fa fa-question-circle"></i>
+                <div class="help-card-content">
+                    <h4>@L["AskQuestion"]</h4>
+                    <p>@L["AskQuestionDescription"]</p>
+                </div>
+            </button>
+        </div>
+    </div>
+
+    <!-- Messages Container -->
+    <div class="messages-section">
+        <h3>@L["YourMessages"]</h3>
+        <div class="messages" @ref="messagesContainer">
+            @if (!messages.Any())
+            {
+                <div class="no-messages">
+                    <i class="fa fa-comments"></i>
+                    <p>@L["NoMessagesYet"]</p>
+                    <p class="hint">@L["SendFirstMessage"]</p>
+                </div>
+            }
+            else
+            {
+                @foreach (var msg in messages)
+                {
+                    <div class="message @(msg.IsSent ? "sent" : "received")">
+                        <div class="message-avatar">
+                            @if (msg.IsSent)
+                            {
+                                <i class="fa fa-user"></i>
+                            }
+                            else
+                            {
+                                <i class="fa fa-headset"></i>
+                            }
+                        </div>
+                        <div class="message-content">
+                            <div class="message-header">
+                                <span class="sender-name">@(msg.IsSent ? L["You"] : L["SupportTeam"])</span>
+                                <span class="message-time">@msg.Timestamp.ToString("HH:mm")</span>
+                            </div>
+                            <div class="bubble">@msg.Text</div>
+                            @if (msg.Status != MessageStatus.None)
+                            {
+                                <div class="message-status">
+                                    @if (msg.Status == MessageStatus.Sending)
+                                    {
+                                        <i class="fa fa-circle-notch fa-spin"></i>
+                                        <span>@L["Sending"]</span>
+                                    }
+                                    else if (msg.Status == MessageStatus.Sent)
+                                    {
+                                        <i class="fa fa-check"></i>
+                                        <span>@L["Sent"]</span>
+                                    }
+                                    else if (msg.Status == MessageStatus.Failed)
+                                    {
+                                        <i class="fa fa-exclamation-circle"></i>
+                                        <span>@L["SendFailed"]</span>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+
+    <!-- Contact Info -->
+    <div class="contact-info">
+        <h3>@L["OtherWaysToReach"]</h3>
+        <div class="contact-methods">
+            <a href="mailto:support@anticipack.com" class="contact-method">
+                <i class="fa fa-envelope"></i>
+                <div>
+                    <strong>@L["Email"]</strong>
+                    <span>support@anticipack.com</span>
+                </div>
+            </a>
+            <a href="https://github.com/mankovsky29/anticipack/issues" target="_blank" class="contact-method">
+                <i class="fa fa-github"></i>
+                <div>
+                    <strong>GitHub</strong>
+                    <span>@L["ReportOnGitHub"]</span>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <!-- Message Input -->
+    <div class="message-input-section">
+        <div class="input-wrapper">
+            <textarea @bind="currentMessage" 
+                      @bind:event="oninput" 
+                      @ref="messageInput"
+                      placeholder="@L["TypeYourMessage"]"
+                      rows="1"
+                      maxlength="1000"></textarea>
+            <div class="input-actions">
+                <span class="char-counter">@currentMessage.Length/1000</span>
+                <button class="send-btn @(CanSend ? "active" : "disabled")" 
+                        @onclick="SendMessage" 
+                        disabled="@(!CanSend)"
+                        title="@L["Send"]">
+                    <i class="fa fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+        <p class="privacy-notice">
+            <i class="fa fa-lock"></i>
+            @L["PrivacyNotice"]
+        </p>
+    </div>
+</div>
+
+@code {
+    [Inject] private IJSRuntime JS { get; set; } = default!;
+
+    private ElementReference messageInput;
+    private ElementReference messagesContainer;
+    private DotNetObjectReference<Support>? _dotNetRef;
+
+    private string currentMessage = string.Empty;
+    private List<SupportMessage> messages = new();
+    private bool CanSend => !string.IsNullOrWhiteSpace(currentMessage);
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _dotNetRef = DotNetObjectReference.Create(this);
+            await JS.InvokeVoidAsync("supportPage.attach", messageInput, _dotNetRef, messagesContainer);
+            
+            // Show welcome message
+            await Task.Delay(500);
+            messages.Add(new SupportMessage
+            {
+                Text = L["WelcomeToSupport"],
+                Timestamp = DateTime.Now,
+                IsSent = false,
+                Status = MessageStatus.None
+            });
+            StateHasChanged();
+            await ScrollToBottom();
+        }
+    }
+
+    private void InsertTemplate(string templateType)
+    {
+        currentMessage = templateType switch
+        {
+            "bug" => $"{L["BugReportTemplate"]}\n\n{L["BugReportTemplateContent"]}",
+            "feature" => $"{L["FeatureRequestTemplate"]}\n\n{L["FeatureRequestTemplateContent"]}",
+            "question" => $"{L["QuestionTemplate"]}\n\n",
+            _ => currentMessage
+        };
+        StateHasChanged();
+    }
+
+    private async Task SendMessage()
+    {
+        var text = currentMessage?.Trim();
+        if (string.IsNullOrWhiteSpace(text))
+            return;
+
+        var message = new SupportMessage
+        {
+            Text = text,
+            Timestamp = DateTime.Now,
+            IsSent = true,
+            Status = MessageStatus.Sending
+        };
+
+        messages.Add(message);
+        currentMessage = string.Empty;
+        StateHasChanged();
+        await ScrollToBottom();
+
+        // Simulate sending to support
+        await Task.Delay(1500);
+        message.Status = MessageStatus.Sent;
+        StateHasChanged();
+
+        // Simulate auto-response after a delay
+        await Task.Delay(2000);
+        messages.Add(new SupportMessage
+        {
+            Text = L["AutoReplyMessage"],
+            Timestamp = DateTime.Now,
+            IsSent = false,
+            Status = MessageStatus.None
+        });
+        StateHasChanged();
+        await ScrollToBottom();
+    }
+
+    [JSInvokable]
+    public Task SubmitFromJs() => SendMessage();
+
+    private async Task ScrollToBottom()
+    {
+        try
+        {
+            await JS.InvokeVoidAsync("supportPage.scrollToBottom", messagesContainer);
+        }
+        catch
+        {
+            // Ignore if JS not ready
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_dotNetRef is not null)
+        {
+            _dotNetRef.Dispose();
+            _dotNetRef = null;
+        }
+
+        try
+        {
+            await JS.InvokeVoidAsync("supportPage.detach", messageInput);
+        }
+        catch
+        {
+            // ignore if JS side not present
+        }
+    }
+
+    private enum MessageStatus
+    {
+        None,
+        Sending,
+        Sent,
+        Failed
+    }
+
+    private sealed class SupportMessage
+    {
+        public string Text { get; set; } = string.Empty;
+        public DateTime Timestamp { get; set; }
+        public bool IsSent { get; set; }
+        public MessageStatus Status { get; set; } = MessageStatus.None;
+    }
+}
+
+<script>
+    window.supportPage = {
+        attach: function (inputEl, dotNetRef, messagesEl) {
+            if (!inputEl) return;
+            
+            // Auto-resize textarea
+            const autoResize = function() {
+                inputEl.style.height = 'auto';
+                inputEl.style.height = Math.min(inputEl.scrollHeight, 120) + 'px';
+            };
+            
+            const keydownHandler = function (e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    dotNetRef.invokeMethodAsync('SubmitFromJs');
+                }
+            };
+            
+            inputEl.__supportAutoResize = autoResize;
+            inputEl.__supportKeydownHandler = keydownHandler;
+            inputEl.addEventListener('input', autoResize);
+            inputEl.addEventListener('keydown', keydownHandler);
+            inputEl.__messagesEl = messagesEl;
+        },
+        
+        detach: function (inputEl) {
+            if (!inputEl) return;
+            if (inputEl.__supportAutoResize) {
+                inputEl.removeEventListener('input', inputEl.__supportAutoResize);
+                delete inputEl.__supportAutoResize;
+            }
+            if (inputEl.__supportKeydownHandler) {
+                inputEl.removeEventListener('keydown', inputEl.__supportKeydownHandler);
+                delete inputEl.__supportKeydownHandler;
+            }
+            delete inputEl.__messagesEl;
+        },
+        
+        scrollToBottom: function (messagesEl) {
+            try {
+                if (!messagesEl) return;
+                messagesEl.scrollTop = messagesEl.scrollHeight;
+            } catch (e) {
+                // ignore
+            }
+        }
+    };
+</script>

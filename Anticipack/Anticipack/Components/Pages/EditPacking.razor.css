@@ -813,6 +813,8 @@ ul.category-content {
 
 .swipe-action-btn.edit {
     background: var(--primary);
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
 }
 
 .swipe-action-btn.edit:hover {
@@ -821,6 +823,8 @@ ul.category-content {
 
 .swipe-action-btn.delete {
     background: var(--danger);
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
 }
 
 .swipe-action-btn.delete:hover {

@@ -60,7 +60,7 @@
                     <div class="activity-card">
                         <div class="activity-header">
                             <div class="activity-title-row">
-                                <h3 class="activity-name">@activity.Name</h3>
+                                <h3 @onclick="() => OpenActivityInEditMode(activity.Id)"  class="activity-name">@activity.Name</h3>
                                 @if (activity.IsShared)
                                 {
                                     <div class="share-badge" title="@Localizer["SharedActivity"]">
@@ -69,8 +69,8 @@
                                 }
                             </div>
                         </div>
-                        
-                        <div class="activity-info">
+
+                        <div class="activity-info" @onclick="() => OpenActivityInEditMode(activity.Id)">
                             <div class="activity-date">
                                 <i class="fa fa-calendar"></i> @Localizer["LastPacked"] @activity.LastPacked.ToString("MMM d, yyyy")
                             </div>
@@ -87,9 +87,6 @@
                                     @onclick="() => ToggleActivityShare(activity)" 
                                     title="@(activity.IsShared ? Localizer["MakePrivate"] : Localizer["MakeShared"])">
                                 <i class="fa @(activity.IsShared ? "fa-lock-open" : "fa-share-alt")"></i>
-                            </button>
-                            <button class="action-btn edit" @onclick="() => OpenActivityInEditMode(activity.Id)" title="@Localizer["Edit"]">
-                                <i class="fa fa-edit"></i>
                             </button>
                             <button class="action-btn delete" @onclick="() => PromptDeleteActivity(activity)" title="@Localizer["Delete"]">
                                 <i class="fa fa-trash"></i>

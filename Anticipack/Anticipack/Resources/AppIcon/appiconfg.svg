@@ -11,7 +11,7 @@
     </linearGradient>
   </defs>
 
-  <g transform="translate(36 26)">
+  <g transform="translate(50 50)">
     <rect x="98" y="70" width="188" height="200" rx="44" fill="url(#case)" stroke="#0E1A2E" stroke-width="8"/>
     <rect x="158" y="38" width="68" height="60" rx="18" fill="#0E1A2E" stroke="#6FB8FF" stroke-width="8"/>
     <path d="M176 38c0-16 13-30 30-30s30 14 30 30" stroke="#6FB8FF" stroke-width="8" stroke-linecap="round" fill="none"/>

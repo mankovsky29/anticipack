@@ -24,6 +24,11 @@
 <div class="page-container with-fixed-navbar" @onclick="HandlePageClick">
     <header class="activity-header" role="banner" aria-label="@AppResources.PackingActivity">
         <div class="header-left-section">
+            <!-- Primary action: Play button -->
+            <button class="icon-btn play" @onclick="SwitchToPackingMode" @onclick:stopPropagation aria-label="@AppResources.StartPacking">
+                <i class="fa fa-play" aria-hidden="true"></i>
+            </button>
+
             <div class="title-wrap">
                 <h1 class="activity-title">
                     @if (_isEditingName)
@@ -51,11 +56,6 @@
         </div>
 
         <div class="activity-actions" role="group" aria-label="@AppResources.PackingDialogMenu">
-            <!-- Prominent play button - primary action -->
-            <button class="icon-btn play" title="@AppResources.StartPacking" @onclick="SwitchToPackingMode" @onclick:stopPropagation aria-label="@AppResources.StartPacking">
-                <i class="fa fa-play" aria-hidden="true"></i>
-                <span class="play-label">@AppResources.StartPacking</span>
-            </button>
             <!-- Overflow menu for secondary actions -->
             <div class="actions-overflow">
                 <button class="icon-btn overflow-btn" @onclick="ToggleActionsDropdown" @onclick:stopPropagation aria-haspopup="true" aria-expanded="@_showActionsDropdown" title="@AppResources.PackingDialogMenu">

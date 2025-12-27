@@ -31,13 +31,11 @@ public record UpdateUserRequest(
 // Activity DTOs
 public record CreateActivityRequest(
     string Name,
-    string? Category,
     bool IsShared = false
 );
 
 public record UpdateActivityRequest(
     string Name,
-    string? Category,
     bool IsShared
 );
 
@@ -45,7 +43,6 @@ public record ActivityDto(
     string Id,
     string UserId,
     string Name,
-    string? Category,
     DateTime LastPacked,
     int RunCount,
     bool IsShared,

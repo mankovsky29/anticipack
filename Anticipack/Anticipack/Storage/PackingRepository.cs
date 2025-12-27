@@ -73,7 +73,6 @@ namespace Anticipack.Storage
                 Id = Guid.NewGuid().ToString(),
                 Name = packingActivity.Name + " (Copy)",
                 LastPacked = DateTime.Now,
-                Category = packingActivity.Category,
                 RunCount = 0
             };
 

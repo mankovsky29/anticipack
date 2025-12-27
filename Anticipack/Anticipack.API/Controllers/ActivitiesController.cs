@@ -42,7 +42,6 @@ public class ActivitiesController : ControllerBase
                 activity.Id,
                 activity.UserId,
                 activity.Name,
-                activity.Category,
                 activity.LastPacked,
                 activity.RunCount,
                 activity.IsShared,
@@ -75,7 +74,6 @@ public class ActivitiesController : ControllerBase
             activity.Id,
             activity.UserId,
             activity.Name,
-            activity.Category,
             activity.LastPacked,
             activity.RunCount,
             activity.IsShared,
@@ -95,7 +93,6 @@ public class ActivitiesController : ControllerBase
         {
             UserId = userId,
             Name = request.Name,
-            Category = request.Category,
             IsShared = request.IsShared
         };
 
@@ -105,7 +102,6 @@ public class ActivitiesController : ControllerBase
             activity.Id,
             activity.UserId,
             activity.Name,
-            activity.Category,
             activity.LastPacked,
             activity.RunCount,
             activity.IsShared,
@@ -133,7 +129,6 @@ public class ActivitiesController : ControllerBase
         }
 
         activity.Name = request.Name;
-        activity.Category = request.Category;
         activity.IsShared = request.IsShared;
         activity.UpdatedAt = DateTime.UtcNow;
 
@@ -147,7 +142,6 @@ public class ActivitiesController : ControllerBase
             activity.Id,
             activity.UserId,
             activity.Name,
-            activity.Category,
             activity.LastPacked,
             activity.RunCount,
             activity.IsShared,
@@ -202,7 +196,6 @@ public class ActivitiesController : ControllerBase
             copiedActivity.Id,
             copiedActivity.UserId,
             copiedActivity.Name,
-            copiedActivity.Category,
             copiedActivity.LastPacked,
             copiedActivity.RunCount,
             copiedActivity.IsShared,
@@ -247,7 +240,6 @@ public class ActivitiesController : ControllerBase
             activity.Id,
             activity.UserId,
             activity.Name,
-            activity.Category,
             activity.LastPacked,
             activity.RunCount,
             activity.IsShared,

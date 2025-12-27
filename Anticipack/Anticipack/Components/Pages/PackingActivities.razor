@@ -74,9 +74,6 @@
                             <div class="activity-date">
                                 <i class="fa fa-calendar"></i> @Localizer["LastPacked"] @activity.LastPacked.ToString("MMM d, yyyy")
                             </div>
-                            <div class="activity-type">
-                                <i class="fa @GetCategoryIcon(activity.Category)"></i> @GetLocalizedCategory(activity.Category)
-                            </div>
                         </div>
                         
                         <div class="activity-actions">
@@ -141,16 +138,6 @@
                 <input id="activity-name" @bind="_newActivityName" />
             </div>
 
-            <div class="form-row">
-                <label for="activity-category">@Localizer["Category"]</label>
-                <select id="activity-category" @bind="_newActivityCategory">
-                    @foreach (var category in Enum.GetValues<PackingCategory>())
-                    {
-                        <option value="@category">@GetLocalizedCategory(category)</option>
-                    }
-                </select>
-            </div>
-
             <div class="form-row checkbox-row">
                 <label class="checkbox-label">
                     <input type="checkbox" @bind="_newActivityIsShared" />
@@ -185,7 +172,6 @@
     private List<Storage.PackingActivity> _activities = new();
     private bool _isLoading = true;
     private string _searchTerm = string.Empty;
-    private string _selectedCategory = string.Empty;
     private bool _isSearchVisible = false;
     private bool _isFabExpanded = false;
     private ShareFilterType _shareFilter = ShareFilterType.All;
@@ -193,7 +179,6 @@
     // Add dialog
     private bool _showAddDialog;
     private string _newActivityName = string.Empty;
-    private PackingCategory _newActivityCategory = PackingCategory.Miscellaneous;
     private bool _newActivityIsShared = false;
 
     // Toast
@@ -214,12 +199,6 @@
     private void OnCultureChanged(object? sender, System.Globalization.CultureInfo culture)
     {
         InvokeAsync(StateHasChanged);
-    }
-
-    private string GetLocalizedCategory(PackingCategory category)
-    {
-        var key = LocalizationService.GetLocalizedCategory(category.ToString());
-        return Localizer[key];
     }
 
     private void ToggleFab()
@@ -278,11 +257,6 @@
             {
                 filtered = filtered.Where(a => a.Name.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase));
             }
-            
-            if (!string.IsNullOrWhiteSpace(_selectedCategory))
-            {
-                filtered = filtered.Where(a => a.Category.ToString().Equals(_selectedCategory, StringComparison.OrdinalIgnoreCase));
-            }
 
             // Apply share filter
             filtered = _shareFilter switch
@@ -296,29 +270,9 @@
         }
     }
 
-    private string GetCategoryIcon(PackingCategory category)
-    {
-        return category switch
-        {
-            PackingCategory.Clothing => "fa-tshirt",
-            PackingCategory.Shoes => "fa-shoe-prints",
-            PackingCategory.Toiletries => "fa-toothbrush",
-            PackingCategory.Electronics => "fa-laptop",
-            PackingCategory.Documents => "fa-passport",
-            PackingCategory.Health => "fa-medkit",
-            PackingCategory.Accessories => "fa-glasses",
-            PackingCategory.Outdoor => "fa-hiking",
-            PackingCategory.Food => "fa-utensils",
-            PackingCategory.Entertainment => "fa-gamepad",
-            PackingCategory.Miscellaneous => "fa-box",
-            _ => "fa-box"
-        };
-    }
-
     private void AddNewActivity()
     {
         _newActivityName = "New Packing Activity";
-        _newActivityCategory = PackingCategory.Miscellaneous;
         _newActivityIsShared = false;
         _showAddDialog = true;
         _isFabExpanded = false;
@@ -337,7 +291,6 @@
         var newActivity = new Storage.PackingActivity
         {
             Name = _newActivityName,
-            Category = _newActivityCategory,
             LastPacked = DateTime.Now,
             IsShared = _newActivityIsShared
         };

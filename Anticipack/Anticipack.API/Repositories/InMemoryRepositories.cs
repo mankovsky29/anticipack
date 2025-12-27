@@ -95,7 +95,6 @@ public class InMemoryActivityRepository : IActivityRepository
             Id = Guid.NewGuid().ToString(),
             UserId = userId,
             Name = $"{original.Name} (Copy)",
-            Category = original.Category,
             IsShared = false,
             RunCount = 0,
             Items = original.Items.Select(item => new PackingItem

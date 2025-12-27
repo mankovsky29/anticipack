@@ -1,5 +1,4 @@
-﻿using Anticipack.Packing;
-using SQLite;
+﻿using SQLite;
 
 namespace Anticipack.Storage
 {
@@ -9,7 +8,6 @@ namespace Anticipack.Storage
         public string Id { get; set; } = Guid.NewGuid().ToString();
         public string Name { get; set; } = string.Empty;
         public DateTime LastPacked { get; set; }
-        public PackingCategory Category { get; set; }
         public int RunCount { get; set; }
         public bool IsShared { get; set; } = false; // New property for sharing capability
 

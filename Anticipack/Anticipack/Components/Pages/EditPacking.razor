@@ -24,17 +24,6 @@
 <div class="page-container with-fixed-navbar" @onclick="HandlePageClick">
     <header class="activity-header" role="banner" aria-label="@AppResources.PackingActivity">
         <div class="header-left-section">
-            <button type="button"
-                    class="category-icon-btn"
-                    @onclick="ToggleCategorySelector"
-                    @onclick:stopPropagation
-                    aria-expanded="@_showCategorySelector"
-                    aria-label="@GetLocalizedCategoryName(_currentActivity.Category)">
-                <div class="category-icon" aria-hidden="true" title="@GetLocalizedCategoryName(_currentActivity.Category)">
-                    <i class="fa @GetCategoryIcon(_currentActivity.Category)"></i>
-                </div>
-            </button>
-
             <div class="title-wrap">
                 <h1 class="activity-title">
                     @if (_isEditingName)
@@ -67,7 +56,6 @@
                 <i class="fa fa-play" aria-hidden="true"></i>
                 <span class="play-label">@AppResources.StartPacking</span>
             </button>
-
             <!-- Overflow menu for secondary actions -->
             <div class="actions-overflow">
                 <button class="icon-btn overflow-btn" @onclick="ToggleActionsDropdown" @onclick:stopPropagation aria-haspopup="true" aria-expanded="@_showActionsDropdown" title="@AppResources.PackingDialogMenu">
@@ -96,20 +84,6 @@
     </header>
 
     <main class="content-area">
-        @if (_showCategorySelector)
-        {
-            <div class="category-selector">
-                @foreach (var category in Enum.GetValues<PackingCategory>())
-                {
-                    <div class="category-option @(_currentActivity.Category == category ? "selected" : "")" 
-                         @onclick="() => SelectCategory(category)">
-                        <i class="fa @GetCategoryIcon(category)" aria-hidden="true"></i>
-                        <span>@GetLocalizedCategoryName(category)</span>
-                    </div>
-                }
-            </div>
-        }
-
         @if (_isLoading)
         {
             <div class="loading">
@@ -923,7 +897,6 @@
 
     private void SelectCategory(PackingCategory category)
     {
-        _currentActivity.Category = category;
         _showCategorySelector = false;
     }
 

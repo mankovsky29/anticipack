@@ -19,11 +19,6 @@
 <div class="page-container with-fixed-navbar">
     <div class="activity-header">
         <div class="header-left-section">
-            <div class="category-icon-container">
-                <div class="category-icon" title="@_currentActivity.Category">
-                    <i class="fa @GetCategoryIcon(_currentActivity.Category)" aria-hidden="true"></i>
-                </div>
-            </div>
             <h3 class="activity-title">
                 @_currentActivity.Name
             </h3>
@@ -81,7 +76,7 @@
                     <div class="category-header" role="button" @onclick="() => ToggleCategory(category)" aria-expanded="@(!collapsed)">
                         <span class="chev @(collapsed ? "collapsed" : "")" aria-hidden="true">▾</span>
                         <h4 id="@categoryId" class="category-title @(allChecked && !_hideCheckedItems ? "checked" : "")">@category</h4>
-                        <span class="count">(@groupItems.Count(i => i.IsChecked)/@(Items.Count(i => string.Equals(i.Item.Category, category, StringComparison.OrdinalIgnoreCase))))</span>
+                        <span class="count">(@groupItems.Count(i => i.IsChecked)/@groupItems.Count)</span>
                     </div>
 
                     <ul class="category-content @(collapsed ? "hidden" : "")">
@@ -327,25 +322,6 @@
             return manual.Value;
 
         return IsAllChecked(category);
-    }
-
-    private string GetCategoryIcon(PackingCategory category)
-    {
-        return category switch
-        {
-            PackingCategory.Clothing => "fa-tshirt",
-            PackingCategory.Shoes => "fa-shoe-prints",
-            PackingCategory.Toiletries => "fa-toothbrush",
-            PackingCategory.Electronics => "fa-laptop",
-            PackingCategory.Documents => "fa-passport",
-            PackingCategory.Health => "fa-medkit",
-            PackingCategory.Accessories => "fa-glasses",
-            PackingCategory.Outdoor => "fa-hiking",
-            PackingCategory.Food => "fa-utensils",
-            PackingCategory.Entertainment => "fa-gamepad",
-            PackingCategory.Miscellaneous => "fa-box",
-            _ => "fa-box"
-        };
     }
 
     private void HandleKeyboardNavigation(KeyboardEventArgs e)

@@ -88,9 +88,10 @@
                 var groupItems = Items.Where(i => string.Equals(i.Item.Category, category, StringComparison.OrdinalIgnoreCase))
                                       .Where(i => !(_hideCheckedItems && i.IsChecked && !i.IsAnimating)) // Keep animating items visible
                                       .ToList();
-                                      
                 if (!groupItems.Any())
                     continue;
+
+                var totalCount = Items.Where(i => string.Equals(i.Item.Category, category, StringComparison.OrdinalIgnoreCase)).Count();
 
                 var allChecked = IsAllChecked(category);
                 var collapsed = IsCollapsed(category);
@@ -100,7 +101,7 @@
                     <div class="category-header" role="button" @onclick="() => ToggleCategory(category)" aria-expanded="@(!collapsed)">
                         <span class="chev @(collapsed ? "collapsed" : "")" aria-hidden="true">▾</span>
                         <h4 id="@categoryId" class="category-title @(allChecked && !_hideCheckedItems ? "checked" : "")">@category</h4>
-                        <span class="count">(@groupItems.Count(i => i.IsChecked)/@groupItems.Count)</span>
+                        <span class="count">@(totalCount - groupItems.Count())/@totalCount</span>
                     </div>
 
                     <ul class="category-content @(collapsed ? "hidden" : "")">
@@ -257,7 +258,13 @@
         {
             _currentActivity = await PackingRepository.GetByIdAsync(id) ?? new Storage.PackingActivity(){ Name = AppResources.PackingActivity };
             var itemsFromRepo = await PackingRepository.GetItemsForActivityAsync(id);
-            Items = itemsFromRepo.Select(pi => new PackingItemView(pi)).ToList();
+            
+            // Map items from repository and restore their packed state
+            Items = itemsFromRepo.Select(pi => new PackingItemView(pi) 
+            { 
+                IsChecked = pi.IsPacked  // Restore the packed state from database
+            }).ToList();
+            
             _categoryOrder = Items.Select(i => i.Item.Category).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
 
             if (!_categoryOrder.Any())
@@ -267,7 +274,11 @@
 
             _manualOverride.Clear();
             foreach (var cat in _categoryOrder)
-                _manualOverride[cat] = false; // Expand all categories in packing mode
+            {
+                // If all items in category are checked, collapse it
+                var allChecked = IsAllChecked(cat);
+                _manualOverride[cat] = allChecked ? true : false;
+            }
         }
         catch
         {

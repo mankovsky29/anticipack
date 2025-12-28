@@ -101,7 +101,7 @@
                     <div class="category-header" role="button" @onclick="() => ToggleCategory(category)" aria-expanded="@(!collapsed)">
                         <span class="chev @(collapsed ? "collapsed" : "")" aria-hidden="true">▾</span>
                         <h4 id="@categoryId" class="category-title @(allChecked && !_hideCheckedItems ? "checked" : "")">@category</h4>
-                        <span class="count">@(totalCount - groupItems.Count())/@totalCount</span>
+                        <span class="count">@(_hideCheckedItems? totalCount - groupItems.Count() : groupItems.Count(x=>x.IsChecked))/@totalCount</span>
                     </div>
 
                     <ul class="category-content @(collapsed ? "hidden" : "")">
@@ -258,13 +258,13 @@
         {
             _currentActivity = await PackingRepository.GetByIdAsync(id) ?? new Storage.PackingActivity(){ Name = AppResources.PackingActivity };
             var itemsFromRepo = await PackingRepository.GetItemsForActivityAsync(id);
-            
+
             // Map items from repository and restore their packed state
             Items = itemsFromRepo.Select(pi => new PackingItemView(pi) 
             { 
                 IsChecked = pi.IsPacked  // Restore the packed state from database
             }).ToList();
-            
+
             _categoryOrder = Items.Select(i => i.Item.Category).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
 
             if (!_categoryOrder.Any())
@@ -332,7 +332,7 @@
         var allChecked = IsAllChecked(category);
 
         if (allChecked)
-            _manualOverride[category] = true; // Auto-collapse when all items checked
+            _manualOverride[category] = true; // Auto-collapse category when all its items are packed
 
         StateHasChanged();
 
@@ -453,7 +453,7 @@
     private async Task SwitchToEditMode()
     {
         _showActionsDropdown = false;
-        
+
         if(Items.Count(i => i.IsChecked) > 0)
         {
             bool confirm = await DialogService.ShowConfirmAsync(
@@ -461,7 +461,7 @@
                 AppResources.EditingMightAffectProgress, 
                 AppResources.ContinueToEdit, 
                 AppResources.Cancel);
-                
+
             if (confirm)
             {
                 NavigateToEditMode();
@@ -494,16 +494,25 @@
     private async Task ConfirmResetAllItems()
     {
         _showActionsDropdown = false;
-        
+
         bool confirm = await DialogService.ShowConfirmAsync(
             AppResources.ResetPackingList, 
             AppResources.ConfirmResetAllItems, 
             AppResources.ResetAll, 
             AppResources.Cancel);
-            
+
         if (confirm)
         {
             await ResetAllItems();
+            ExpandAllCategories();
+        }
+    }
+
+    private void ExpandAllCategories()
+    {
+        foreach (var key in _manualOverride.Keys)
+        {
+            _manualOverride[key] = false; // false it is expanded
         }
     }
 

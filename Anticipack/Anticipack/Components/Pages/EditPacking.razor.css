@@ -120,7 +120,7 @@
 
 .category-icon-btn:focus {
     outline: none;
-    box-shadow: 0 0 0 2px var(--primary-light-bg), 0 0 0 4px rgba(var(--primary-rgb, 99, 102, 241), 0.2);
+    box-shadow: 0 0 0 2px var(--primary-light-bg), 0 0 0 4px rgba(var(--primary-rgb, 99, 102,241), 0.2);
 }
 
 .category-icon {
@@ -246,30 +246,46 @@
 
 /* Buttons base style */
 .activity-actions .icon-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    border: none;
     cursor: pointer;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    background: transparent;
-    color: var(--text-secondary);
     flex-shrink: 0;
     font-size: 15px;
 }
 
+.activity-actions .icon-btn:hover {
+    background: var(--hover-bg);
+    border-color: var(--text-secondary);
+    color: var(--text-primary);
+}
+
+.activity-actions .icon-btn:active {
+    transform: scale(0.95);
+}
+
+.activity-actions .icon-btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--primary-light-bg), 0 0 0 4px rgba(var(--primary-rgb, 99, 102, 241), 0.2);
+    border-color: var(--primary);
+}
+
 /* Play button - balanced size */
 .activity-actions .icon-btn.play {
-    min-width: 46px;
+    width: 40px;
     height: 40px;
-    padding: 0 14px;
-    border-radius: 12px;
+    border-radius: 10px;
     background: linear-gradient(135deg, var(--success, #10b981) 0%, var(--success-dark, #059669) 100%);
     color: white;
     box-shadow: 0 2px 6px rgba(16, 185, 129, 0.25);
-    gap: 8px;
-    font-weight: 700;
-    letter-spacing: 0.2px;
+    border: none;
 }
 
 .activity-actions .icon-btn.play i {
@@ -293,6 +309,18 @@
 .activity-actions .icon-btn.play:focus {
     outline: none;
     box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2), 0 2px 6px rgba(16, 185, 129, 0.25);
+}
+
+/* Delete button styling */
+.activity-actions .icon-btn.delete-item {
+    border-color: rgba(239, 68, 68, 0.3);
+    color: var(--danger, #ef4444);
+}
+
+.activity-actions .icon-btn.delete-item:hover {
+    background: rgba(239, 68, 68, 0.1);
+    border-color: var(--danger, #ef4444);
+    color: var(--danger, #ef4444);
 }
 
 @media (max-width: 520px) {
@@ -602,7 +630,7 @@
 
 /* Content Area */
 .content-area {
-    padding: var(--space-lg);
+    padding: var(--space-sm);
     background-color: var(--surface);
     border-radius: var(--border-radius);
     box-shadow: var(--shadow);
@@ -1768,113 +1796,4 @@ body.dragging-active::before {
     clip: rect(0, 0, 0, 0) !important;
     white-space: nowrap !important;
     border-width: 0 !important;
-}/* Edit mode button styling */
-.activity-actions .icon-btn.edit-mode {
-    min-width: 46px;
-    height: 40px;
-    padding: 0 14px;
-    border-radius: 12px;
-    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-    color: white;
-    box-shadow: 0 2px 6px rgba(var(--primary-rgb, 99, 102, 241), 0.25);
-    gap: 8px;
-    font-weight: 700;
-    letter-spacing: 0.2px;
-}
-
-.activity-actions .icon-btn.edit-mode i {
-    font-size: 15px;
-}
-
-.activity-actions .icon-btn.edit-mode .play-label {
-    font-size: 14px;
-    line-height: 1;
-}
-
-.activity-actions .icon-btn.edit-mode:hover {
-    transform: translateY(-1px) scale(1.03);
-    box-shadow: 0 3px 10px rgba(var(--primary-rgb, 99, 102, 241), 0.35);
-}
-
-.activity-actions .icon-btn.edit-mode:active {
-    transform: translateY(0) scale(1);
-}
-
-.activity-actions .icon-btn.edit-mode:focus {
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(var(--primary-rgb, 99, 102, 241), 0.2), 0 2px 6px rgba(var(--primary-rgb, 99, 102, 241), 0.25);
-}
-
-/* Packing mode styles */
-.packing-row-content.packing-mode {
-    cursor: pointer;
-    user-select: none;
-    -webkit-user-select: none;
-}
-
-.packing-row-content.packing-mode:active {
-    background: var(--hover-bg);
-    transform: scale(0.99);
-}
-
-.checkbox-wrapper {
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.custom-checkbox {
-    width: 28px;
-    height: 28px;
-    border: 2px solid var(--border-color);
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: var(--surface);
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.custom-checkbox.checked {
-    background: var(--success);
-    border-color: var(--success);
-    transform: scale(1.05);
-}
-
-.custom-checkbox i {
-    color: white;
-    font-size: 14px;
-    font-weight: bold;
-}
-
-.packing-mode .item-text.checked {
-    text-decoration: line-through;
-    opacity: 0.5;
-    color: var(--text-secondary);
-}
-
-.packing-mode .notes {
-    opacity: 0.7;
-}
-
-/* Hide swipe indicators in packing mode */
-.packing-row-content.packing-mode::after {
-    display: none;
-}
-
-/* Responsive for edit mode button */
-@media (max-width: 520px) {
-    .activity-actions .icon-btn.edit-mode {
-        padding: 0;
-        width: 40px;
-        height: 40px;
-        border-radius: 10px;
-        gap: 0;
-        justify-content: center;
-    }
-
-    .activity-actions .icon-btn.edit-mode .play-label {
-        display: none;
-    }
 }

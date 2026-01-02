@@ -9,12 +9,14 @@
 @using Microsoft.JSInterop
 @using Anticipack.Components.Shared.DialogComponent
 @using Anticipack.Components.Shared.ToastComponent
+@using Anticipack.Components.Shared.SidebarTextComponent
 @using Anticipack.Resources.Localization
 @inject NavigationManager Navigation
 @inject IPackingRepository PackingRepository
 @inject IJSRuntime JSRuntime
 @inject IDialogService DialogService
 @inject IToastService ToastService
+@inject ISidebarTextService SidebarTextService
 @implements IDisposable
 @inject IKeyboardService KeyboardService
 @inject ILocalizationService LocalizationService
@@ -23,63 +25,26 @@
 
 <div class="page-container with-fixed-navbar" @onclick="HandlePageClick">
     <header class="activity-header" role="banner" aria-label="@AppResources.PackingActivity">
-        <div class="header-left-section">
+        <div class="activity-actions" role="group" aria-label="@AppResources.PackingDialogMenu">
             <!-- Primary action: Play button -->
             <button class="icon-btn play" @onclick="SwitchToPackingMode" @onclick:stopPropagation aria-label="@AppResources.StartPacking">
                 <i class="fa fa-play" aria-hidden="true"></i>
             </button>
 
-            <div class="title-wrap">
-                <h1 class="activity-title">
-                    @if (_isEditingName)
-                    {
-                        <input type="text" @bind="_currentActivity.Name" @bind:event="oninput"
-                               class="activity-name-input"
-                               @onblur="() => _isEditingName = false"
-                               @onfocus="async () => await SelectAllText(inputElement)"
-                               @ref="inputElement"
-                               placeholder="@AppResources.EnterActivityName" />
-                    }
-                    else
-                    {
-                        @if (string.IsNullOrWhiteSpace(_currentActivity.Name))
-                        {
-                            _isEditingName = true;
-                        }
-                        <button type="button" class="packing-name-display-btn" @onclick="() => _isEditingName = true" aria-label="@AppResources.EditActivity">
-                            <span class="packing-name-text">@_currentActivity.Name</span>
-                            <i class="edit-icon fa fa-pencil" aria-hidden="true"></i>
-                        </button>
-                    }
-                </h1>
-            </div>
-        </div>
+            <!-- Copy button -->
+            <button class="icon-btn" @onclick="CopyPacking" @onclick:stopPropagation title="@AppResources.CopyTitle">
+                <i class="fa fa-copy" aria-hidden="true"></i>
+            </button>
 
-        <div class="activity-actions" role="group" aria-label="@AppResources.PackingDialogMenu">
-            <!-- Overflow menu for secondary actions -->
-            <div class="actions-overflow">
-                <button class="icon-btn overflow-btn" @onclick="ToggleActionsDropdown" @onclick:stopPropagation aria-haspopup="true" aria-expanded="@_showActionsDropdown" title="@AppResources.PackingDialogMenu">
-                    <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
-                </button>
+            <!-- Add item button -->
+            <button class="icon-btn" @onclick="ShowAddItemForm" @onclick:stopPropagation title="@AppResources.AddItem">
+                <i class="fa fa-plus" aria-hidden="true"></i>
+            </button>
 
-                @if (_showActionsDropdown)
-                {
-                    <div class="action-dropdown" @onclick:stopPropagation>
-                        <button class="dropdown-item" @onclick="CopyPacking" @onclick:stopPropagation>
-                            <i class="fa fa-copy"></i>
-                            <span>@AppResources.CopyTitle</span>
-                        </button>
-                        <button class="dropdown-item" @onclick="ShowAddItemForm" @onclick:stopPropagation>
-                            <i class="fa fa-plus"></i>
-                            <span>@AppResources.AddItem</span>
-                        </button>
-                        <button class="dropdown-item delete-item" @onclick="PromptDeleteActivity" @onclick:stopPropagation>
-                            <i class="fa fa-trash"></i>
-                            <span>@AppResources.DeleteActivity</span>
-                        </button>
-                    </div>
-                }
-            </div>
+            <!-- Delete activity button -->
+            <button class="icon-btn delete-item" @onclick="PromptDeleteActivity" @onclick:stopPropagation title="@AppResources.DeleteActivity">
+                <i class="fa fa-trash" aria-hidden="true"></i>
+            </button>
         </div>
     </header>
 
@@ -328,19 +293,12 @@
         public bool IsChecked { get; set; }
     }
 
-    private bool _isEditingName = false;
-    private ElementReference inputElement;
-    private ElementReference bulkItemsTextarea;
     private PackingItemView? _editingItem = null;
     private ElementReference itemEditInputElement;
+    private ElementReference bulkItemsTextarea;
     
     private ElementReference _quickAddInputRef;
     private ElementReference _quickAddContainerRef;
-
-    private async ValueTask SelectAllText(ElementReference inputElement)
-    {
-        await JSRuntime.InvokeVoidAsync("selectAllText", inputElement);
-    } 
 
     private List<PackingItemView> Items { get; set; } = new();
     private List<string> _categoryOrder = new();
@@ -437,15 +395,6 @@
     {
         // Blur the quick-add input to hide keyboard when clicking outside
         _ = JSRuntime.InvokeVoidAsync("blurQuickAddInput");
-        // Close overflow menu when user clicks away
-        _showActionsDropdown = false;
-    }
-    
-    private bool _showActionsDropdown = false;
-
-    private void ToggleActionsDropdown()
-    {
-        _showActionsDropdown = !_showActionsDropdown;
     }
 
     protected override async Task OnInitializedAsync()
@@ -481,6 +430,8 @@
         try
         {
             _currentActivity = await PackingRepository.GetByIdAsync(id) ?? new Storage.PackingActivity(){ Name = AppResources.NewPackingActivity };
+            SidebarTextService.SetPackingId(_currentActivity.Id);
+            SidebarTextService.SetText(_currentActivity.Name ?? "");
             var itemsFromRepo = await PackingRepository.GetItemsForActivityAsync(id);
             Items = itemsFromRepo.Select(pi => new PackingItemView(pi)).ToList();
             _categoryOrder = Items.Select(i => i.Item.Category).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
@@ -610,6 +561,18 @@
         _isAddingItem = false;
         _bulkItemsText = string.Empty;
         StateHasChanged();
+    }
+
+    private void OnKeyboardVisibilityChanged(bool isVisible, double height)
+    {
+        _keyboardVisible = isVisible;
+        _keyboardHeight = height;
+
+        if (isVisible)
+        {
+            // Ensure the quick add input is not covered by the keyboard
+            _ = JSRuntime.InvokeVoidAsync("scrollIntoView", _quickAddContainerRef);
+        }
     }
 
     private string GetBulkAddPlaceholder()
@@ -854,11 +817,11 @@
         if (categoryChanged)
         {
             var localizedNewCategory = GetLocalizedCategoryName(target.Item.Category);
-            ToastService.ShowSuccess($"? Moved to {localizedNewCategory}");
+            ToastService.ShowSuccess($"?? Moved to {localizedNewCategory}");
         }
         else
         {
-            ToastService.ShowSuccess("? Item reordered");
+            ToastService.ShowSuccess("?? Item reordered");
         }
 
         // Persist the change
@@ -1024,35 +987,6 @@
         }
     }
 
-    private void OnKeyboardVisibilityChanged(bool visible, double height)
-    {
-        _keyboardVisible = visible;
-        _keyboardHeight = height;
-        if (visible)
-        {
-            _showQuickCategoryDropdown = false;
-            _ = JSRuntime.InvokeVoidAsync("handleKeyboardVisibility", true, height);
-        }
-        else
-        {
-            _ = JSRuntime.InvokeVoidAsync("handleKeyboardVisibility", false, height);
-        }
-        
-        _ = InvokeAsync(StateHasChanged);
-    }
-
-    public void Dispose()
-    {
-        try
-        {
-            if (KeyboardService != null)
-            {
-                KeyboardService.KeyboardVisibilityChanged -= OnKeyboardVisibilityChanged;
-            }
-        }
-        catch { }
-    }
-
     private void HandleItemEditKeyDown(KeyboardEventArgs e, PackingItemView item)
     {
         if (e.Key == "Escape")
@@ -1085,5 +1019,17 @@
     {
         _quickAddCategory = category;
         _showQuickCategoryDropdown = false;
+    }
+
+    public void Dispose()
+    {
+        try
+        {
+            if (KeyboardService != null)
+            {
+                KeyboardService.KeyboardVisibilityChanged -= OnKeyboardVisibilityChanged;
+            }
+        }
+        catch { }
     }
 }

@@ -1,0 +1,118 @@
+@using Anticipack.Components.Shared.SidebarTextComponent
+@using Anticipack.Components.Shared.DialogComponent
+@using Anticipack.Storage
+@using Microsoft.AspNetCore.Components
+@implements IDisposable
+@inject ISidebarTextService SidebarTextService
+@inject IDialogService DialogService
+@inject IPackingRepository PackingRepository
+
+@if (!_isNavMenuExpanded)
+{
+    <div class="sidebar-text-container">
+        @if (!string.IsNullOrWhiteSpace(_displayText))
+        {
+            <button class="sidebar-text-button" @onclick="HandleTextClick" title="Click to edit">
+                <span class="sidebar-text">@_displayText</span>
+                <i class="fa fa-pencil sidebar-text-icon" aria-hidden="true"></i>
+            </button>
+        }
+    </div>
+}
+
+@code {
+    private string _displayText = string.Empty;
+    private string? _packingId;
+    private bool _isNavMenuExpanded = false;
+
+    protected override void OnInitialized()
+    {
+        // Subscribe to service events
+        if (SidebarTextService is SidebarTextService service)
+        {
+            service.OnTextChanged += UpdateText;
+            service.OnPackingIdChanged += UpdatePackingId;
+            service.OnNavMenuToggled += UpdateNavMenuState;
+            
+            // Initialize with current values
+            _displayText = service.GetText();
+            _packingId = service.GetPackingId();
+            _isNavMenuExpanded = service.IsNavMenuExpanded();
+        }
+    }
+
+    private void UpdateText(string text)
+    {
+        _displayText = text;
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void UpdatePackingId(string? packingId)
+    {
+        _packingId = packingId;
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void UpdateNavMenuState(bool isExpanded)
+    {
+        _isNavMenuExpanded = isExpanded;
+        InvokeAsync(StateHasChanged);
+    }
+
+    private async Task HandleTextClick()
+    {
+        if (string.IsNullOrWhiteSpace(_packingId))
+        {
+            await DialogService.ShowAlertAsync("No Packing Selected", "Please select a packing activity first.", "OK");
+            return;
+        }
+
+        // Load the packing activity
+        var packing = await PackingRepository.GetByIdAsync(_packingId);
+        if (packing == null)
+        {
+            await DialogService.ShowAlertAsync("Error", "Could not find the packing activity.", "OK");
+            return;
+        }
+
+        // Create a render fragment with the edit form
+        RenderFragment editForm = builder =>
+        {
+            builder.OpenComponent<EditPackingForm>(0);
+            builder.AddAttribute(1, "Packing", packing);
+            builder.AddAttribute(2, "OnSave", EventCallback.Factory.Create<PackingActivity>(this, HandlePackingSave));
+            builder.AddAttribute(3, "OnCancel", EventCallback.Factory.Create(this, HandlePackingCancel));
+            builder.CloseComponent();
+        };
+
+        await DialogService.ShowCustomAsync($"Edit: {packing.Name}", editForm);
+    }
+
+    private async Task HandlePackingSave(PackingActivity packing)
+    {
+        // Save the updated packing
+        await PackingRepository.AddOrUpdateAsync(packing);
+        
+        // Update the sidebar text if needed
+        SidebarTextService.SetText(packing.Name);
+        
+        // Close the dialog
+        await DialogService.CloseAsync();
+    }
+
+    private async Task HandlePackingCancel()
+    {
+        await DialogService.CloseAsync();
+    }
+
+    void IDisposable.Dispose()
+    {
+        // Unsubscribe from events
+        if (SidebarTextService is SidebarTextService service)
+        {
+            service.OnTextChanged -= UpdateText;
+            service.OnPackingIdChanged -= UpdatePackingId;
+            service.OnNavMenuToggled -= UpdateNavMenuState;
+        }
+    }
+}

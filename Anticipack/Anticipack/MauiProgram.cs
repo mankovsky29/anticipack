@@ -1,5 +1,6 @@
 ﻿using Anticipack.Components.Shared.DialogComponent;
 using Anticipack.Components.Shared.ToastComponent;
+using Anticipack.Components.Shared.SidebarTextComponent;
 using Anticipack.Storage;
 using Anticipack.Services;
 using Microsoft.Extensions.Logging;
@@ -58,6 +59,7 @@ namespace Anticipack
 
             builder.Services.AddScoped<IDialogService, DialogService>();
             builder.Services.AddScoped<IToastService, ToastService>();
+            builder.Services.AddSingleton<ISidebarTextService, SidebarTextService>();
 
             var app = builder.Build();
 

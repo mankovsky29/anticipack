@@ -1,4 +1,5 @@
 ﻿@page "/play-packing/{id}"
+@using Anticipack.Components.Shared.SidebarTextComponent
 @using Anticipack.Packing
 @using Anticipack.Storage
 @using System.Threading
@@ -14,6 +15,7 @@
 @inject IJSRuntime JSRuntime
 @inject IDialogService DialogService
 @inject IToastService ToastService
+@inject ISidebarTextService SidebarTextService
 @implements IDisposable
 
 <div class="page-container with-fixed-navbar">
@@ -257,6 +259,8 @@
         try
         {
             _currentActivity = await PackingRepository.GetByIdAsync(id) ?? new Storage.PackingActivity(){ Name = AppResources.PackingActivity };
+            SidebarTextService.SetPackingId(_currentActivity.Id);
+            SidebarTextService.SetText(_currentActivity.Name ?? "");
             var itemsFromRepo = await PackingRepository.GetItemsForActivityAsync(id);
 
             // Map items from repository and restore their packed state

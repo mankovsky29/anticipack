@@ -1,0 +1,70 @@
+@using Anticipack.Storage
+@using Microsoft.AspNetCore.Components
+
+<div class="edit-packing-form">
+    <div class="form-group">
+        <label for="packing-name">Name:</label>
+        <input 
+            id="packing-name" 
+            type="text" 
+            class="form-control" 
+            @bind="_localPacking.Name" 
+            placeholder="Enter packing name" />
+    </div>
+
+    <div class="form-actions">
+        <button class="btn btn-cancel" @onclick="Cancel">
+            <i class="fa fa-times"></i>
+            Cancel
+        </button>
+        <button class="btn btn-primary" @onclick="Save">
+            <i class="fa fa-save"></i>
+            Save
+        </button>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public PackingActivity Packing { get; set; } = default!;
+
+    [Parameter]
+    public EventCallback<PackingActivity> OnSave { get; set; }
+
+    [Parameter]
+    public EventCallback OnCancel { get; set; }
+
+    private PackingActivity _localPacking = new();
+
+    protected override void OnParametersSet()
+    {
+        // Create a copy to avoid modifying the original until save
+        _localPacking = new PackingActivity
+        {
+            Id = Packing.Id,
+            Name = Packing.Name,
+            LastPacked = Packing.LastPacked,
+            RunCount = Packing.RunCount,
+            IsShared = Packing.IsShared,
+            Items = Packing.Items
+        };
+    }
+
+    private async Task Save()
+    {
+        if (string.IsNullOrWhiteSpace(_localPacking.Name))
+        {
+            return; // Don't save if name is empty
+        }
+
+        // Update the original packing with edited values
+        Packing.Name = _localPacking.Name;
+
+        await OnSave.InvokeAsync(Packing);
+    }
+
+    private async Task Cancel()
+    {
+        await OnCancel.InvokeAsync();
+    }
+}

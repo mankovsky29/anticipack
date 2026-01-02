@@ -52,6 +52,15 @@
     background-color: var(--surface);
     display: flex;
     align-items: center;
+    position: relative;
+    z-index: 1001;
+}
+
+.top-row .container-fluid {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
 }
 
 /* leave some space so brand isn't overlapped by toggler */
@@ -131,14 +140,15 @@
 .nav-menu-expanded {
     display: block;
     position: fixed;
-    top: 3.5rem;
+    top: 0;
     left: 0;
     right: 0;
     bottom: 0;
     background-color: var(--surface);
     z-index: 1000;
-    padding-top: 1rem;
+    padding-top: 3.5rem;
     animation: slideIn 0.3s ease-out;
+    overflow-y: auto;
 }
 
 @keyframes slideIn {
@@ -161,6 +171,8 @@
 @media (min-width: 641px) {
     .nav-container {
         width: 250px;
+        min-width: 250px;
+        flex-shrink: 0;
         height: 100vh;
     }
     

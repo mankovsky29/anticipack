@@ -122,18 +122,37 @@
     flex-shrink: 0;
 }
 
-/* Buttons base style */
+/* Icon buttons base style */
 .activity-actions .icon-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    border: none;
     cursor: pointer;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    background: transparent;
-    color: var(--text-secondary);
     flex-shrink: 0;
     font-size: 15px;
+}
+
+.activity-actions .icon-btn:hover {
+    background: var(--hover-bg);
+    border-color: var(--text-secondary);
+    color: var(--text-primary);
+}
+
+.activity-actions .icon-btn:active {
+    transform: scale(0.95);
+}
+
+.activity-actions .icon-btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--primary-light-bg), 0 0 0 4px rgba(var(--primary-rgb, 99, 102, 241), 0.2);
+    border-color: var(--primary);
 }
 
 /* Toggle visibility button - primary action */

@@ -20,11 +20,6 @@
 
 <div class="page-container with-fixed-navbar">
     <div class="activity-header">
-        <div class="header-left-section">
-            <h3 class="activity-title">
-                @_currentActivity.Name
-            </h3>
-        </div>  
         <div class="activity-actions" role="group" aria-label="@AppResources.PackingDialogMenu">
             <!-- Primary action: Show/Hide toggle -->
             <button class="toggle-visibility-btn @(_hideCheckedItems ? "filtering" : "")" 
@@ -33,35 +28,26 @@
                 <i class="fa @(_hideCheckedItems ? "fa-eye-slash" : "fa-eye")" aria-hidden="true"></i>
             </button>
 
-            <!-- Overflow menu for secondary actions -->
-            <div class="actions-overflow">
-                <button class="icon-btn overflow-btn" 
-                        @onclick="ToggleActionsDropdown" 
-                        @onclick:stopPropagation 
-                        aria-haspopup="true" 
-                        aria-expanded="@_showActionsDropdown" 
-                        title="@AppResources.PackingDialogMenu">
-                    <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
-                </button>
+            <!-- History toggle button -->
+            <button class="icon-btn" 
+                    @onclick="ToggleHistory" 
+                    title="@(_showHistory ? AppResources.HideHistory : AppResources.ShowHistory)">
+                <i class="fa @(_showHistory ? "fa-chevron-down" : "fa-list-ul")" aria-hidden="true"></i>
+            </button>
 
-                @if (_showActionsDropdown)
-                {
-                    <div class="action-dropdown" @onclick:stopPropagation>
-                        <button class="dropdown-item" @onclick="ToggleHistory" @onclick:stopPropagation>
-                            <i class="fa @(_showHistory ? "fa-chevron-down" : "fa-list-ul")"></i>
-                            <span>@(_showHistory ? AppResources.HideHistory : AppResources.ShowHistory)</span>
-                        </button>
-                        <button class="dropdown-item" @onclick="ConfirmResetAllItems" @onclick:stopPropagation>
-                            <i class="fa fa-undo-alt"></i>
-                            <span>@AppResources.ResetAllItems</span>
-                        </button>
-                        <button class="dropdown-item" @onclick="SwitchToEditMode" @onclick:stopPropagation>
-                            <i class="fa fa-edit"></i>
-                            <span>@AppResources.EditActivity</span>
-                        </button>
-                    </div>
-                }
-            </div>
+            <!-- Reset all items button -->
+            <button class="icon-btn" 
+                    @onclick="ConfirmResetAllItems" 
+                    title="@AppResources.ResetAllItems">
+                <i class="fa fa-undo-alt" aria-hidden="true"></i>
+            </button>
+
+            <!-- Edit mode button -->
+            <button class="icon-btn" 
+                    @onclick="SwitchToEditMode" 
+                    title="@AppResources.EditActivity">
+                <i class="fa fa-edit" aria-hidden="true"></i>
+            </button>
         </div>
     </div>
 
@@ -220,7 +206,6 @@
     private bool _showHistory = false;
     private bool _completionAcknowledged = false;
     private bool _hideCheckedItems = true;
-    private bool _showActionsDropdown = false;
 
     private Storage.PackingActivity _currentActivity = new Storage.PackingActivity();
 
@@ -394,12 +379,6 @@
     private void ToggleHistory()
     {
         _showHistory = !_showHistory;
-        _showActionsDropdown = false;
-    }
-
-    private void ToggleActionsDropdown()
-    {
-        _showActionsDropdown = !_showActionsDropdown;
     }
 
     private int GetCompletionPercentage() => 
@@ -456,8 +435,6 @@
 
     private async Task SwitchToEditMode()
     {
-        _showActionsDropdown = false;
-
         if(Items.Count(i => i.IsChecked) > 0)
         {
             bool confirm = await DialogService.ShowConfirmAsync(
@@ -497,8 +474,6 @@
 
     private async Task ConfirmResetAllItems()
     {
-        _showActionsDropdown = false;
-
         bool confirm = await DialogService.ShowConfirmAsync(
             AppResources.ResetPackingList, 
             AppResources.ConfirmResetAllItems, 

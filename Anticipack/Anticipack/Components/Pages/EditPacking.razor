@@ -1,4 +1,4 @@
-@page "/edit-packing/{id}"
+﻿@page "/edit-packing/{id}"
 @using Anticipack.Packing
 @using Anticipack.Services
 @using Anticipack.Storage
@@ -25,7 +25,7 @@
 
 <div class="page-container with-fixed-navbar" @onclick="HandlePageClick">
     <header class="activity-header" role="banner" aria-label="@AppResources.PackingActivity">
-        <div class="activity-actions" role="group" aria-label="@AppResources.PackingDialogMenu">
+        <div class="activity-actions activity-actions-left" role="group" aria-label="@AppResources.PackingDialogMenu">
             <!-- Primary action: Play button -->
             <button class="icon-btn play" @onclick="SwitchToPackingMode" @onclick:stopPropagation aria-label="@AppResources.StartPacking">
                 <i class="fa fa-play" aria-hidden="true"></i>
@@ -40,7 +40,9 @@
             <button class="icon-btn" @onclick="ShowAddItemForm" @onclick:stopPropagation title="@AppResources.AddItem">
                 <i class="fa fa-plus" aria-hidden="true"></i>
             </button>
+        </div>
 
+        <div class="activity-actions activity-actions-right" role="group">
             <!-- Delete activity button -->
             <button class="icon-btn delete-item" @onclick="PromptDeleteActivity" @onclick:stopPropagation title="@AppResources.DeleteActivity">
                 <i class="fa fa-trash" aria-hidden="true"></i>
@@ -817,11 +819,11 @@
         if (categoryChanged)
         {
             var localizedNewCategory = GetLocalizedCategoryName(target.Item.Category);
-            ToastService.ShowSuccess($"?? Moved to {localizedNewCategory}");
+            ToastService.ShowSuccess($"📦 Moved to {localizedNewCategory}");
         }
         else
         {
-            ToastService.ShowSuccess("?? Item reordered");
+            ToastService.ShowSuccess("↕️ Item reordered");
         }
 
         // Persist the change

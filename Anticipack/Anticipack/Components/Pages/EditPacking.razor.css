@@ -76,7 +76,8 @@
     align-items: center;
     justify-content: space-between;
     gap: 8px;
-    padding: 10px 12px;
+    padding: var(--space-sm);
+    margin: var(--space-sm);
     background: linear-gradient(135deg, rgba(var(--primary-rgb, 99,102,241), 0.04), rgba(var(--primary-rgb, 99,102,241), 0.01));
     border-radius: 12px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
@@ -279,9 +280,10 @@
 
 /* Play button - balanced size */
 .activity-actions .icon-btn.play {
-    width: 40px;
-    height: 40px;
-    border-radius: 10px;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    padding: var(--space-sm);
     background: linear-gradient(135deg, var(--success, #10b981) 0%, var(--success-dark, #059669) 100%);
     color: white;
     box-shadow: 0 2px 6px rgba(16, 185, 129, 0.25);
@@ -292,18 +294,13 @@
     font-size: 15px;
 }
 
-.activity-actions .icon-btn.play .play-label {
-    font-size: 14px;
-    line-height: 1;
-}
-
 .activity-actions .icon-btn.play:hover {
     transform: translateY(-1px) scale(1.03);
     box-shadow: 0 3px 10px rgba(16, 185, 129, 0.35);
 }
 
 .activity-actions .icon-btn.play:active {
-    transform: translateY(0) scale(1);
+    transform: translateY(0) scale(0.95);
 }
 
 .activity-actions .icon-btn.play:focus {
@@ -452,7 +449,7 @@
 /* Responsive adjustments */
 @media (max-width: 480px) {
     .activity-header {
-        padding: 8px 10px;
+        padding: var(--space-sm);
         gap: 6px;
         min-height: 52px;
     }
@@ -485,7 +482,7 @@
 
 @media (max-width: 360px) {
     .activity-header {
-        padding: 6px 8px;
+        padding: var(--space-sm);
     }
     
     .activity-title {
@@ -502,7 +499,7 @@
 /* Large screens - more breathing room */
 @media (min-width: 768px) {
     .activity-header {
-        padding: 12px 16px;
+        padding: var(--space-sm);
         gap: 12px;
     }
     

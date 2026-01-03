@@ -9,6 +9,9 @@ namespace Anticipack.Components.Shared.DialogComponent
         Task<bool> ShowConfirmAsync(string title, string message,
             string confirmText = "Confirm", string cancelText = "Cancel");
 
+        Task<bool> ShowConfirmAsync(string title, RenderFragment content,
+            string confirmText = "Confirm", string cancelText = "Cancel");
+
         Task ShowCustomAsync(string title, RenderFragment content);
 
         Task CloseAsync();

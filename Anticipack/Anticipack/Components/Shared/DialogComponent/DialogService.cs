@@ -18,6 +18,8 @@ namespace Anticipack.Components.Shared.DialogComponent
                 Title = title,
                 Message = message,
                 OkText = okText,
+                ConfirmText = string.Empty,
+                CancelText = string.Empty,
                 DialogType = DialogType.Info,
                 ShowCloseButton = true,
                 OnConfirmCallback = _ => { } // Empty callback for alert
@@ -57,6 +59,36 @@ namespace Anticipack.Components.Shared.DialogComponent
             return tcs.Task;
         }
 
+        public Task<bool> ShowConfirmAsync(string title, RenderFragment content,
+            string confirmText = "Confirm", string cancelText = "Cancel")
+        {
+            // Cancel any previous task completion source
+            _currentConfirmTcs?.TrySetCanceled();
+            
+            var tcs = new TaskCompletionSource<bool>();
+            _currentConfirmTcs = tcs;
+
+            var options = new DialogOptions
+            {
+                Title = title,
+                ContentTemplate = content,
+                ConfirmText = confirmText,
+                CancelText = cancelText,
+                DialogType = DialogType.Default,
+                OkText = string.Empty,
+                ShowCloseButton = true,
+                CloseOnOverlayClick = false, // Prevent accidentally closing
+                OnConfirmCallback = result =>
+                {
+                    tcs.TrySetResult(result);
+                    _currentConfirmTcs = null;
+                }
+            };
+
+            OnDialogShow?.Invoke(options);
+            return tcs.Task;
+        }
+
         public Task ShowCustomAsync(string title, RenderFragment content)
         {
             var options = new DialogOptions
@@ -64,7 +96,7 @@ namespace Anticipack.Components.Shared.DialogComponent
                 Title = title,
                 ContentTemplate = content,
                 DialogType = DialogType.Default,
-                OkText = "OK",
+                OkText = string.Empty,
                 ShowCloseButton = true
             };
 
@@ -91,7 +123,10 @@ namespace Anticipack.Components.Shared.DialogComponent
                 Title = title,
                 Message = message,
                 OkText = okText,
-                DialogType = DialogType.Success
+                ConfirmText = string.Empty,
+                CancelText = string.Empty,
+                DialogType = DialogType.Success,
+                ShowCloseButton = true
             };
 
             OnDialogShow?.Invoke(options);
@@ -105,7 +140,10 @@ namespace Anticipack.Components.Shared.DialogComponent
                 Title = title,
                 Message = message,
                 OkText = okText,
-                DialogType = DialogType.Error
+                ConfirmText = string.Empty,
+                CancelText = string.Empty,
+                DialogType = DialogType.Error,
+                ShowCloseButton = true
             };
 
             OnDialogShow?.Invoke(options);

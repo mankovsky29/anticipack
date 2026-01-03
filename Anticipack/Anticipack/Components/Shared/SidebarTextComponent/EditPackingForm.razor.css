@@ -1,6 +1,7 @@
 .edit-packing-form {
     padding: 1rem;
-    min-width: 400px;
+    width: 100%;
+    max-width: 100%;
 }
 
 .form-group {
@@ -11,7 +12,7 @@
     display: block;
     margin-bottom: 0.5rem;
     font-weight: 600;
-    color: #333;
+    color: var(--text-primary);
     font-size: 0.9rem;
 }
 
@@ -23,6 +24,7 @@
     font-size: 1rem;
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
     font-family: inherit;
+    box-sizing: border-box;
 }
 
 .form-control:focus {
@@ -43,6 +45,7 @@ textarea.form-control {
     margin-top: 2rem;
     padding-top: 1rem;
     border-top: 1px solid #eee;
+    flex-wrap: wrap;
 }
 
 .btn {
@@ -56,6 +59,7 @@ textarea.form-control {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
+    white-space: nowrap;
 }
 
 .btn:hover {
@@ -87,4 +91,47 @@ textarea.form-control {
 
 .btn i {
     font-size: 0.85rem;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+    .edit-packing-form {
+        padding: 0.75rem;
+    }
+
+    .form-group {
+        margin-bottom: 1rem;
+    }
+
+    .form-control {
+        padding: 0.625rem;
+        font-size: 0.95rem;
+    }
+
+    .form-actions {
+        gap: 0.5rem;
+        margin-top: 1.5rem;
+        padding-top: 0.75rem;
+    }
+
+    .btn {
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+        flex: 1;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .edit-packing-form {
+        padding: 0.5rem;
+    }
+
+    .form-actions {
+        flex-direction: column-reverse;
+    }
+
+    .btn {
+        width: 100%;
+    }
 }

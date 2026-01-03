@@ -28,7 +28,7 @@
             {
                 <button class="dialog-button button-confirm" @onclick="HandleConfirm">@ConfirmText</button>
             }
-            @if (!string.IsNullOrEmpty(OkText))
+            @if (!string.IsNullOrEmpty(OkText) && string.IsNullOrEmpty(ConfirmText))
             {
                 <button class="dialog-button button-primary" @onclick="HandleClose">@OkText</button>
             }

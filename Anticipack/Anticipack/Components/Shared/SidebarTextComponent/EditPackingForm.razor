@@ -5,23 +5,28 @@
     <div class="form-group">
         <label for="packing-name">Name:</label>
         <input 
+            @ref="_nameInput"
             id="packing-name" 
             type="text" 
             class="form-control" 
-            @bind="_localPacking.Name" 
+            value="@_localPacking.Name"
+            @oninput="OnNameInput"
             placeholder="Enter packing name" />
     </div>
 
-    <div class="form-actions">
-        <button class="btn btn-cancel" @onclick="Cancel">
-            <i class="fa fa-times"></i>
-            Cancel
-        </button>
-        <button class="btn btn-primary" @onclick="Save">
-            <i class="fa fa-save"></i>
-            Save
-        </button>
-    </div>
+    @if (ShowFormActions)
+    {
+        <div class="form-actions">
+            <button class="btn btn-cancel" @onclick="Cancel">
+                <i class="fa fa-times"></i>
+                Cancel
+            </button>
+            <button class="btn btn-primary" @onclick="Save">
+                <i class="fa fa-save"></i>
+                Save
+            </button>
+        </div>
+    }
 </div>
 
 @code {
@@ -34,7 +39,14 @@
     [Parameter]
     public EventCallback OnCancel { get; set; }
 
+    [Parameter]
+    public bool ShowFormActions { get; set; } = true;
+
     private PackingActivity _localPacking = new();
+    private ElementReference _nameInput;
+
+    [Inject]
+    private IJSRuntime JSRuntime { get; set; } = default!;
 
     protected override void OnParametersSet()
     {
@@ -50,21 +62,60 @@
         };
     }
 
-    private async Task Save()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await FocusAndSelectInput();
+        }
+    }
+
+    private void OnNameInput(ChangeEventArgs e)
+    {
+        _localPacking.Name = e.Value?.ToString() ?? string.Empty;
+    }
+
+    private async Task FocusAndSelectInput()
+    {
+        try
+        {
+            await JSRuntime.InvokeVoidAsync("eval", 
+                $"document.getElementById('packing-name')?.focus(); document.getElementById('packing-name')?.select();");
+        }
+        catch
+        {
+            // Ignore if JS interop fails
+        }
+    }
+
+    public async Task<bool> ValidateAndSave()
     {
         if (string.IsNullOrWhiteSpace(_localPacking.Name))
         {
-            return; // Don't save if name is empty
+            return false; // Don't save if name is empty
         }
 
         // Update the original packing with edited values
         Packing.Name = _localPacking.Name;
 
         await OnSave.InvokeAsync(Packing);
+        return true;
+    }
+
+    private async Task Save()
+    {
+        await ValidateAndSave();
     }
 
     private async Task Cancel()
     {
         await OnCancel.InvokeAsync();
+    }
+
+    public PackingActivity GetUpdatedPacking()
+    {
+        // Update and return the packing
+        Packing.Name = _localPacking.Name;
+        return Packing;
     }
 }

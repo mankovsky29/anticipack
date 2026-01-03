@@ -75,17 +75,37 @@
             return;
         }
 
+        // Store reference to form component
+        EditPackingForm? formRef = null;
+
         // Create a render fragment with the edit form
         RenderFragment editForm = builder =>
         {
             builder.OpenComponent<EditPackingForm>(0);
             builder.AddAttribute(1, "Packing", packing);
-            builder.AddAttribute(2, "OnSave", EventCallback.Factory.Create<PackingActivity>(this, HandlePackingSave));
-            builder.AddAttribute(3, "OnCancel", EventCallback.Factory.Create(this, HandlePackingCancel));
+            builder.AddAttribute(2, "ShowFormActions", false); // Hide form's own buttons
+            builder.AddComponentReferenceCapture(3, comp => formRef = (EditPackingForm)comp);
             builder.CloseComponent();
         };
 
-        await DialogService.ShowCustomAsync($"Edit: {packing.Name}", editForm);
+        // Show confirm dialog with custom content
+        bool confirmed = await DialogService.ShowConfirmAsync(
+            $"Edit: {packing.Name}", 
+            editForm,
+            "Save", 
+            "Cancel");
+
+        if (confirmed && formRef != null)
+        {
+            // Get the updated packing from the form
+            var updatedPacking = formRef.GetUpdatedPacking();
+            
+            // Save the updated packing
+            await PackingRepository.AddOrUpdateAsync(updatedPacking);
+            
+            // Update the sidebar text
+            SidebarTextService.SetText(updatedPacking.Name);
+        }
     }
 
     private async Task HandlePackingSave(PackingActivity packing)
@@ -95,14 +115,11 @@
         
         // Update the sidebar text if needed
         SidebarTextService.SetText(packing.Name);
-        
-        // Close the dialog
-        await DialogService.CloseAsync();
     }
 
     private async Task HandlePackingCancel()
     {
-        await DialogService.CloseAsync();
+        // Just close - nothing to do
     }
 
     void IDisposable.Dispose()

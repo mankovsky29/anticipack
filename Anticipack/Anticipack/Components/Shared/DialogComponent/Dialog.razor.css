@@ -223,11 +223,17 @@
 
 /* Responsive adjustments */
 @media (max-width: 576px) {
+    .dialog-overlay {
+        align-items: flex-start;
+        padding-top: 20px;
+        overflow-y: auto;
+    }
+
     .dialog {
-        width: 92%;
+        width: calc(100% - 32px);
         max-width: none;
-        max-height: 80vh;
-        margin: 16px;
+        max-height: calc(100vh - 40px);
+        margin: 0 16px 20px;
         border-radius: 10px;
     }
 
@@ -235,8 +241,14 @@
         padding: 16px 20px;
     }
 
+    .dialog-title {
+        font-size: 1.15rem;
+    }
+
     .dialog-content {
         padding: 20px;
+        max-height: calc(100vh - 200px);
+        overflow-y: auto;
     }
 
     .dialog-footer {
@@ -257,6 +269,31 @@
 
     .button-cancel {
         order: 2;
+    }
+
+    .button-primary {
+        order: 1;
+    }
+}
+
+/* Ensure dialog doesn't get cut off on very small screens */
+@media (max-height: 600px) {
+    .dialog {
+        max-height: 90vh;
+    }
+
+    .dialog-content {
+        max-height: calc(90vh - 180px);
+        overflow-y: auto;
+    }
+}
+
+/* Better touch targets for mobile */
+@media (max-width: 576px) {
+    .close-button {
+        width: 40px;
+        height: 40px;
+        font-size: 1.75rem;
     }
 }
 

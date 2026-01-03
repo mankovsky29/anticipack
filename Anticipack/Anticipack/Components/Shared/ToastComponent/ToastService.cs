@@ -9,7 +9,7 @@ namespace Anticipack.Components.Shared.ToastComponent
         public event Action? OnHide;
         private System.Timers.Timer? _countdown;
 
-        public void Show(string message, ToastLevel level = ToastLevel.Info, int durationMs = 3000)
+        public void Show(string message, ToastLevel level = ToastLevel.Info, int durationMs = 1000)
         {
             DisposeTimer();
 
@@ -21,16 +21,16 @@ namespace Anticipack.Components.Shared.ToastComponent
             OnShow?.Invoke(message, level, durationMs);
         }
 
-        public void ShowSuccess(string message, int durationMs = 2000)
+        public void ShowSuccess(string message, int durationMs = 1000)
             => Show(message, ToastLevel.Success, durationMs);
 
-        public void ShowError(string message, int durationMs = 3000)
+        public void ShowError(string message, int durationMs = 1000)
             => Show(message, ToastLevel.Error, durationMs);
 
-        public void ShowInfo(string message, int durationMs = 2000)
+        public void ShowInfo(string message, int durationMs = 1000)
             => Show(message, ToastLevel.Info, durationMs);
 
-        public void ShowWarning(string message, int durationMs = 3000)
+        public void ShowWarning(string message, int durationMs = 1000)
             => Show(message, ToastLevel.Warning, durationMs);
 
         private void HideToast(object? source, ElapsedEventArgs args)

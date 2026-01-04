@@ -158,74 +158,62 @@
                                 @ondrop:preventDefault
                                 @ondrop="@((DragEventArgs e) => OnDrop(e, item))">
                                 
-                                <!-- Swipe wrapper to contain row and buttons -->
-                                <div class="swipe-wrapper">
-                                    <!-- Swipe action buttons (positioned behind) -->
-                                    <div class="swipe-actions">
-                                        <button class="swipe-action-btn edit" 
-                                                @onclick="() => StartEditingItemFromSwipe(item)"
-                                                @onclick:stopPropagation>
-                                            <i class="fa fa-edit"></i>
-                                        </button>
-                                        <button class="swipe-action-btn delete" 
-                                                @onclick="() => PromptDelete(item)"
-                                                @onclick:stopPropagation>
-                                            <i class="fa fa-trash"></i>
-                                        </button>
+                                @if (_editingItem == item)
+                                {
+                                    <div class="item-edit-container">
+                                        <div class="item-edit-header">
+                                            <input type="text" 
+                                                   value="@item.Item.Name" 
+                                                   @oninput="@((e) => UpdateItemName(item, e.Value?.ToString()))"
+                                                   @onfocus="@(e => SelectAllInputText(e))"
+                                                   @ref="itemEditInputElement"
+                                                   class="edit-item-input"
+                                                   @onkeydown="@(e => HandleItemEditKeyDown(e, item))"
+                                                   placeholder="@AppResources.ItemName"
+                                                   @onclick:stopPropagation />
+                                        </div>
+    
+                                        <div class="edit-notes">
+                                            <textarea placeholder="@AppResources.AddNotesAboutItem" 
+                                                      @bind="item.Item.Notes"
+                                                      @bind:event="oninput"
+                                                      rows="2"
+                                                      class="edit-notes-textarea"></textarea>
+                                        </div>
+    
+                                        <div class="item-edit-actions">
+                                            <button class="btn secondary btn-sm" @onclick="() => CancelItemEdit(item)" @onclick:stopPropagation title="@AppResources.Cancel">
+                                                <i class="fa fa-times"></i> @AppResources.Cancel
+                                            </button>
+                                            <button class="btn primary btn-sm" @onclick="() => SaveItemChanges(item)" @onclick:stopPropagation title="@AppResources.Save">
+                                                <i class="fa fa-check"></i> @AppResources.Save
+                                            </button>
+                                        </div>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="item-display" @onclick="() => StartEditingItem(item)" @onclick:stopPropagation>
+                                        <span class="item-text">
+                                            @item.Item.Name
+                                        </span>
+                                        
+                                        @if (!string.IsNullOrWhiteSpace(item.Item.Notes))
+                                        {
+                                            <div class="notes">
+                                                @item.Item.Notes
+                                            </div>
+                                        }
                                     </div>
                                     
-                                    <!-- Row content that swipes -->
-                                    <div class="packing-row-content" data-preview-text="@(_draggedItem?.Item.Name ?? "")">
-                                        @if (_editingItem == item)
-                                        {
-                                            <div class="item-edit-container">
-                                                <div class="item-edit-header">
-                                                    <input type="text" 
-                                                           value="@item.Item.Name" 
-                                                           @oninput="@((e) => UpdateItemName(item, e.Value?.ToString()))"
-                                                           @onfocus="@(e => SelectAllInputText(e))"
-                                                           @ref="itemEditInputElement"
-                                                           class="edit-item-input"
-                                                           @onkeydown="@(e => HandleItemEditKeyDown(e, item))"
-                                                           placeholder="@AppResources.ItemName"
-                                                           @onclick:stopPropagation />
-                                                </div>
-            
-                                                <div class="edit-notes">
-                                                    <textarea placeholder="@AppResources.AddNotesAboutItem" 
-                                                              @bind="item.Item.Notes"
-                                                              @bind:event="oninput"
-                                                              rows="2"
-                                                              class="edit-notes-textarea"></textarea>
-                                                </div>
-            
-                                                <div class="item-edit-actions">
-                                                    <button class="btn secondary btn-sm" @onclick="() => CancelItemEdit(item)" title="@AppResources.Cancel">
-                                                        <i class="fa fa-times"></i> @AppResources.Cancel
-                                                    </button>
-                                                    <button class="btn primary btn-sm" @onclick="() => SaveItemChanges(item)" title="@AppResources.Save">
-                                                        <i class="fa fa-check"></i> @AppResources.Save
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        }
-                                        else
-                                        {
-                                            <div class="item-display">
-                                                <span class="item-text">
-                                                    @item.Item.Name
-                                                </span>
-                                                
-                                                @if (!string.IsNullOrWhiteSpace(item.Item.Notes))
-                                                {
-                                                    <div class="notes">
-                                                        @item.Item.Notes
-                                                    </div>
-                                                }
-                                            </div>
-                                        }
-                                    </div>
-                                </div>
+                                    <button class="item-delete-btn" 
+                                            @onclick="() => PromptDelete(item)"
+                                            @onclick:stopPropagation
+                                            title="@AppResources.DeleteItemTitle"
+                                            aria-label="@string.Format(AppResources.DeleteItemMessage, item.Item.Name)">
+                                        <i class="fa fa-trash" aria-hidden="true"></i>
+                                    </button>
+                                }
                             </li>
                         }
                     </ul>
@@ -309,10 +297,9 @@
     private string _newCategory = string.Empty;
     private string _bulkItemsText = string.Empty;
 
-    private PackingItemView? _pendingDeleteItem;
-
     private PackingItemView? _draggedItem;
     private PackingItemView? _dragOverItem;
+    private bool _isDragging = false;
 
     private bool _showCategorySelector = false;
 
@@ -346,8 +333,6 @@
         if (firstRender)
         {
             KeyboardService.Initialize(this);
-            // Initialize swipe handlers
-            await JSRuntime.InvokeVoidAsync("initializeSwipeHandlers");
         }
 
         await base.OnAfterRenderAsync(firstRender);
@@ -585,39 +570,19 @@
 
     private async Task PromptDelete(PackingItemView item)
     {
-        _pendingDeleteItem = item;
-        
-        bool confirm = await DialogService.ShowConfirmAsync(
-            AppResources.DeleteItemTitle,
-            string.Format(AppResources.DeleteItemMessage, item.Item.Name),
-            AppResources.Delete,
-            AppResources.Cancel);
-            
-        if (confirm)
-        {
-            await ConfirmDeleteAsync();
-        }
-    }
-
-    private async Task ConfirmDeleteAsync()
-    {
-        if (_pendingDeleteItem is null || string.IsNullOrWhiteSpace(Id))
+        if (string.IsNullOrWhiteSpace(Id))
             return;
-
-        var toRemove = _pendingDeleteItem;
 
         try
         {
-            await PackingRepository.DeleteItemAsync(toRemove.Item.Id);
+            await PackingRepository.DeleteItemAsync(item.Item.Id);
             await LoadItemsForPackingAsync(Id);
-            ToastService.ShowSuccess(string.Format(AppResources.ItemDeleted, toRemove.Item.Name));
+            ToastService.ShowSuccess(string.Format(AppResources.ItemDeleted, item.Item.Name));
         }
         catch (Exception ex)
         {
             ToastService.ShowError(string.Format(AppResources.FailedToDeleteItem, ex.Message));
         }
-
-        _pendingDeleteItem = null;
     }
 
     private async Task CopyPacking()
@@ -673,6 +638,7 @@
     {
         _draggedItem = item;
         _dragOverItem = null;
+        _isDragging = true;
         StateHasChanged();
 
         try
@@ -703,6 +669,7 @@
         // Reset drag state
         _draggedItem = null;
         _dragOverItem = null;
+        _isDragging = false;
         StateHasChanged();
     }
 
@@ -814,6 +781,7 @@
 
         _draggedItem = null;
         _dragOverItem = null;
+        _isDragging = false;
 
         // Show toast notification for category changes
         if (categoryChanged)
@@ -899,27 +867,22 @@
         return categoryString;
     }
 
-    private void StartEditingItem(PackingItemView item)
+    private async Task StartEditingItem(PackingItemView item)
     {
-        _editingItem = item;
-        StateHasChanged();
-    }
-    
-    private async Task StartEditingItemFromSwipe(PackingItemView item)
-    {
-        // Close any swiped items first
-        await JSRuntime.InvokeVoidAsync("closeSwipedItems");
+        // Don't trigger edit if we're currently dragging
+        if (_isDragging)
+            return;
+
         _editingItem = item;
         StateHasChanged();
         
         // Delay to ensure DOM is ready and rendered
-        await Task.Delay(150);
+        await Task.Delay(100);
         
-        // Focus on the edit input (best-effort) - swallow errors if element is not available yet
+        // Focus on the edit input
         try
         {
             await JSRuntime.InvokeVoidAsync("focusElement", itemEditInputElement);
-            // Ensure the input is visible above keyboard
             await Task.Delay(50);
             await JSRuntime.InvokeVoidAsync("ensureElementVisible", itemEditInputElement, _keyboardHeight);
         }
@@ -928,7 +891,7 @@
             // ignore - element may not be present in DOM
         }
     }
-
+    
     private async Task SelectAllInputText(FocusEventArgs e)
     {
         try
@@ -966,9 +929,6 @@
 
             await PackingRepository.AddOrUpdateItemAsync(item.Item);
             ToastService.ShowSuccess(AppResources.ItemUpdated);
-            
-            // Close any swiped items
-            await JSRuntime.InvokeVoidAsync("closeSwipedItems");
         }
         catch (Exception ex)
         {
@@ -1004,8 +964,6 @@
     private async Task CancelItemEdit(PackingItemView item)
     {
         _editingItem = null;
-        // Close any swiped items
-        await JSRuntime.InvokeVoidAsync("closeSwipedItems");
         StateHasChanged();
     }
 

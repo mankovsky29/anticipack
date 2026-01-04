@@ -309,15 +309,30 @@
 }
 
 /* Delete button styling */
-.activity-actions .icon-btn.delete-item {
-    border-color: rgba(239, 68, 68, 0.3);
+/* Delete button - clean, minimal, right-aligned, red */
+.item-delete-btn {
+    flex-shrink: 0;
+    width: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
     color: var(--danger, #ef4444);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    opacity: 0.7;
 }
 
-.activity-actions .icon-btn.delete-item:hover {
-    background: rgba(239, 68, 68, 0.1);
-    border-color: var(--danger, #ef4444);
+.item-delete-btn:hover {
+    background: rgba(239, 68, 68, 0.15);
     color: var(--danger, #ef4444);
+    opacity: 1;
+}
+
+.item-delete-btn:active {
+    transform: scale(0.9);
+    background: rgba(239, 68, 68, 0.25);
 }
 
 @media (max-width: 520px) {
@@ -810,203 +825,118 @@ ul.category-content {
 }
 
 /* ============================================
-   PACKING ROW ITEMS - SWIPE-TO-REVEAL PATTERN
-   Enhanced UX with better visual hierarchy and spacing
+   PACKING ROW ITEMS - SIMPLIFIED CLEAN DESIGN
    ============================================ */
 
 .packing-row {
-    display: block;
+    display: flex;
+    align-items: stretch;
     position: relative;
     margin: 0;
     background: var(--surface);
+    min-height: 56px;
+    border-bottom: 1px solid var(--border-color);
+    transition: all 0.2s ease;
 }
 
 .packing-row:last-child {
     border-bottom: none;
 }
 
-/* Swipe wrapper - contains both buttons and content */
-.swipe-wrapper {
-    position: relative;
-    display: flex;
-    align-items: stretch;
-    overflow: hidden;
-    min-height: 56px;
+.packing-row:hover:not(.dragging):not(.editing) {
+    background: var(--hover-bg);
 }
 
-/* Container for swipe actions that stay fixed on the right */
-.swipe-actions {
-    position: absolute;
-    right: 0;
-    top: 0;
-    bottom: 0;
-    display: flex;
-    align-items: stretch;
-    gap: 0;
-    z-index: 1;
-    background: var(--background);
-}
-
-.swipe-action-btn {
-    height: 100%;
-    width: 64px;
-    border: none;
+/* Item display - clickable and takes most space */
+.item-display {
+    flex: 1;
+    min-width: 0;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
     gap: 6px;
-    color: white;
+    padding: 14px 16px;
     cursor: pointer;
+    user-select: none;
     transition: all 0.2s ease;
-    flex-shrink: 0;
-    padding: 10px 8px;
-    position: relative;
 }
 
-.swipe-action-btn.edit {
-    background: var(--primary);
-    border-top-left-radius: 8px;
-    border-bottom-left-radius: 8px;
+.item-display:active {
+    transform: scale(0.98);
 }
 
-.swipe-action-btn.edit:hover {
-    background: var(--primary-dark);
-}
-
-.swipe-action-btn.delete {
-    background: var(--danger);
-    border-top-right-radius: 8px;
-    border-bottom-right-radius: 8px;
-}
-
-.swipe-action-btn.delete:hover {
-    background: var(--danger-dark, #dc2626);
-}
-
-.swipe-action-btn i {
-    font-size: 18px;
-}
-
-/* Row content that swipes over the buttons */
-.packing-row-content {
-    position: relative;
-    z-index: 2;
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    padding: 16px 18px;
-    background: var(--surface);
+.item-text {
+    font-size: 15.5px;
+    font-weight: 500;
     color: var(--text-primary);
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s ease;
-    width: 100%;
-    min-height: 56px;
-    /* Hardware acceleration */
-    backface-visibility: hidden;
-    -webkit-backface-visibility: hidden;
-    transform: translateZ(0);
-    border-radius: 0;
-    /* Add subtle separator */
-    box-shadow: inset 0 -1px 0 0 var(--border-color);
+    line-height: 1.5;
+    word-wrap: break-word;
+    letter-spacing: 0.2px;
 }
 
-/* Swipe indicator - subtle hint on the right side */
-.packing-row-content::after {
-    content: '‹ ‹ ‹';
-    position: absolute;
-    right: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 20px;
-    font-weight: bold;
+/* Notes styling */
+.notes {
+    font-size: 13px;
     color: var(--text-secondary);
-    opacity: 0.4;
-    pointer-events: none;
-    transition: opacity 0.3s ease, transform 0.3s ease, right 0.3s ease;
-    letter-spacing: -2px;
+    line-height: 1.6;
+    padding: 8px 12px;
+    background: var(--background);
+    border-left: 3px solid var(--primary-light-bg);
+    border-radius: 6px;
+    margin-top: 2px;
 }
 
-.packing-row-content:hover::after {
-    opacity: 0.7;
-    transform: translateY(-50%) scale(1.1);
-}
-
-/* Move chevrons left when row is active/pressed */
-.packing-row:active:not(.dragging):not(.swiped-left) .packing-row-content::after {
-    right: 20px;
-    opacity: 0.9;
-    transform: translateY(-50%) scale(1.15);
-    color: var(--primary);
-}
-
-/* Enhanced animation to draw attention when first loading */
-.packing-row:nth-child(-n+1) .packing-row-content::after {
-    animation: swipeHintEnhanced 2.5s ease-in-out 0.4s 2;
-}
-
-@keyframes swipeHintEnhanced {
-    0%, 100% {
-        right: 12px;
-        opacity: 0.4;
-        transform: translateY(-50%) scale(1);
-    }
-    50% {
-        right: 22px;
-        opacity: 0.8;
-        transform: translateY(-50%) scale(1.15);
-    }
-}
-
-/* Hide indicators when swiped, editing, or dragging */
-.packing-row.swiped-left .packing-row-content::after,
-.packing-row.editing .packing-row-content::after,
-.packing-row.dragging .packing-row-content::after {
+.notes:empty {
     display: none;
 }
 
-/* Swiping state - disable transition for smooth following */
-.packing-row.swiping-left .packing-row-content {
-    transition: none;
+/* Delete button - clean, minimal, right-aligned, red */
+/* Delete button - clean, minimal, right-aligned, red */
+.item-delete-btn {
+    flex-shrink: 0;
+    width: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    color: var(--danger, #ef4444);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    opacity: 0.7;
 }
 
-/* Swiped state - content moved to the left */
-.packing-row.swiped-left .packing-row-content {
-    transform: translateX(-128px) translateZ(0);  /* 64px * 2 buttons = 128px */
-    box-shadow: -2px 0 8px rgba(0, 0, 0, 0.08), inset 0 -1px 0 0 var(--border-color);
+.item-delete-btn:hover {
+    background: rgba(239, 68, 68, 0.15);
+    color: var(--danger, #ef4444);
+    opacity: 1;
 }
 
-/* Remove hover effects for touch devices */
-@media (hover: hover) {
-    .packing-row-content {
-        cursor: grab;
-    }
-    
-    .packing-row:hover:not(.dragging):not(.drag-over):not(.swiped-left) .packing-row-content {
-        background: var(--hover-bg);
-        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06), inset 0 -1px 0 0 var(--border-color);
-    }
+.item-delete-btn:active {
+    transform: scale(0.9);
+    background: rgba(239, 68, 68, 0.25);
 }
 
-.packing-row:active .packing-row-content {
-    cursor: grabbing;
+/* Hide delete button when editing */
+.packing-row.editing .item-delete-btn {
+    display: none;
 }
 
 /* Dragging state */
-.packing-row.dragging .packing-row-content {
+.packing-row.dragging {
     opacity: 0.6;
-    transform: scale(0.97) translateZ(0);
+    transform: scale(0.97);
     cursor: grabbing;
     filter: grayscale(40%);
-    transition: all 0.2s ease;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15), inset 0 -1px 0 0 var(--border-color);
-}
-
-.packing-row.dragging {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
     z-index: 1000;
 }
 
+.packing-row.dragging .item-display {
+    cursor: grabbing;
+}
+
 /* Drop target - elegant preview */
-.packing-row.drag-over .packing-row-content {
+.packing-row.drag-over {
     border: 2px solid var(--primary);
     border-left: 5px solid var(--primary);
     border-radius: 8px;
@@ -1015,69 +945,19 @@ ul.category-content {
         rgba(var(--primary-rgb, 99, 102, 241), 0.02) 100%);
     box-shadow: 
         0 0 0 3px rgba(var(--primary-rgb, 99, 102, 241), 0.1),
-        0 6px 20px rgba(var(--primary-rgb, 99, 102, 241), 0.2),
-        inset 0 1px 0 rgba(255, 255, 255, 0.6);
-    padding: 18px;
-    min-height: 64px;
-    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-    transform: scale(1.02) translateZ(0);
-}
-
-.packing-row.drag-over {
+        0 6px 20px rgba(var(--primary-rgb, 99, 102, 241), 0.2);
+    transform: scale(1.02);
     z-index: 100;
+    margin: 4px 0;
 }
 
-/* Fade out original content */
-.packing-row.drag-over .item-display {
-    opacity: 0.12;
-    filter: blur(3px);
-    pointer-events: none;
-    transition: all 0.3s ease;
-}
-
-/* Preview overlay */
-.packing-row.drag-over .packing-row-content::before {
-    content: attr(data-preview-text);
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 16px;
-    font-weight: 600;
-    color: var(--primary);
-    z-index: 10;
-    padding: 14px 24px;
-    background: white;
-    border-radius: 10px;
-    box-shadow: 
-        0 3px 16px rgba(0, 0, 0, 0.1),
-        0 1px 4px rgba(0, 0, 0, 0.08);
-    text-align: center;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: calc(100% - 48px);
-    animation: previewSlideIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-    border: 2px solid var(--primary);
-}
-
-@keyframes previewSlideIn {
-    from {
-        opacity: 0;
-        transform: translate(-50%, -50%) scale(0.8);
-    }
-    to {
-        opacity: 1;
-        transform: translate(-50%, -50%) scale(1);
-    }
-}
-
-.packing-row.editing .packing-row-content {
+/* Editing state */
+.packing-row.editing {
     background: var(--background);
-    padding: 0;
+    padding: 16px;
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1), inset 0 0 0 2px var(--primary);
     border-radius: 8px;
-    /* Ensure proper visibility when keyboard is shown */
+    margin: 8px 0;
     position: relative;
     z-index: 15;
 }
@@ -1087,22 +967,18 @@ body.dragging-active .packing-row:not(.dragging):not(.drag-over) {
     opacity: 0.35;
     filter: blur(0.5px) grayscale(30%);
     transform: scale(0.99);
-    transition: opacity 0.2s ease, filter 0.2s ease, transform 0.2s ease;
-    will-change: opacity, filter, transform;
 }
 
 body.dragging-active .category:not(.drag-target) {
     opacity: 0.4;
     filter: grayscale(60%) brightness(0.95);
     transform: scale(0.99);
-    transition: opacity 0.2s ease, filter 0.2s ease, transform 0.2s ease;
 }
 
 body.dragging-active .category.drag-target {
     opacity: 1;
     filter: none;
     transform: scale(1.01);
-    transition: transform 0.2s ease;
 }
 
 /* Add overlay hint when dragging starts */
@@ -1125,59 +1001,7 @@ body.dragging-active::before {
 }
 
 /* ============================================
-   ITEM DISPLAY - IMPROVED LAYOUT & TYPOGRAPHY
-   ============================================ */
-
-.item-display {
-    flex: 1;
-    min-width: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.item-text {
-    font-size: 15.5px;
-    font-weight: 500;
-    color: var(--text-primary);
-    line-height: 1.5;
-    word-wrap: break-word;
-    transition: color 0.2s ease;
-    padding: 0;
-    letter-spacing: 0.2px;
-}
-
-/* Notes styling - more refined design */
-.notes {
-    font-size: 13px;
-    color: var(--text-secondary);
-    font-style: normal;
-    line-height: 1.6;
-    padding: 10px 14px;
-    background: var(--background);
-    border-left: 3px solid var(--primary-light-bg);
-    border-radius: 6px;
-    margin-top: 2px;
-    transition: all 0.2s ease;
-    position: relative;
-    padding-left: 18px;
-}
-
-.notes::before {
-    content: '💭';
-    position: absolute;
-    left: 6px;
-    top: 10px;
-    font-size: 11px;
-    opacity: 0.5;
-}
-
-.notes:empty {
-    display: none;
-}
-
-/* ============================================
-   ITEM EDITING MODE - ENHANCED UX
+   ITEM EDITING MODE
    ============================================ */
 
 .item-edit-container {

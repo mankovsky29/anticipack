@@ -146,12 +146,14 @@
                     <ul class="category-content @(collapsed ? "hidden" : "")">
                         @foreach (var item in groupItems)
                         {
+                            var itemId = $"item-{item.Item.Id}";
                             <li class="@GetPackingRowClass(item)"
+                                id="@itemId"
                                 draggable="true"
                                 @ondragstart="@((DragEventArgs e) => OnDragStart(e, item))"
                                 @ondragend="@((DragEventArgs e) => OnDragEnd(e, item))"
                                 @ondragover:preventDefault
-                                @ondragover="@((DragEventArgs e) => OnDragOver(e, item))"
+                                @ondragover="@(async (DragEventArgs e) => await OnDragOver(e, item))"
                                 @ondragenter:preventDefault
                                 @ondragenter="@((DragEventArgs e) => OnDragEnter(e, item))"
                                 @ondragleave="@((DragEventArgs e) => OnDragLeave(e, item))"
@@ -300,6 +302,7 @@
     private PackingItemView? _draggedItem;
     private PackingItemView? _dragOverItem;
     private bool _isDragging = false;
+    private string _dropLinePosition = ""; // "before" or "after"
 
     private bool _showCategorySelector = false;
 
@@ -673,12 +676,25 @@
         StateHasChanged();
     }
 
-    private void OnDragOver(DragEventArgs e, PackingItemView item)
+    private async Task OnDragOver(DragEventArgs e, PackingItemView item)
     {
         try
         {
             if (e.DataTransfer is not null)
                 e.DataTransfer.DropEffect = "move";
+            
+            // Update drop line position based on mouse Y coordinate
+            if (_draggedItem != null && !ReferenceEquals(_draggedItem, item) && e.ClientY > 0)
+            {
+                var itemId = $"item-{item.Item.Id}";
+                var position = await JSRuntime.InvokeAsync<string>("getDropLinePosition", itemId, e.ClientY);
+                
+                if (_dropLinePosition != position)
+                {
+                    _dropLinePosition = position;
+                    StateHasChanged();
+                }
+            }
         }
         catch { }
     }
@@ -688,6 +704,11 @@
         if (_draggedItem != null && !ReferenceEquals(_draggedItem, item))
         {
             _dragOverItem = item;
+            // Position will be set by OnDragOver
+            if (string.IsNullOrEmpty(_dropLinePosition))
+            {
+                _dropLinePosition = "after";
+            }
             StateHasChanged();
         }
     }
@@ -697,6 +718,7 @@
         if (ReferenceEquals(_dragOverItem, item))
         {
             _dragOverItem = null;
+            _dropLinePosition = "";
             StateHasChanged();
         }
     }
@@ -707,7 +729,7 @@
         if (ReferenceEquals(item, _draggedItem))
             return $"{baseClass} dragging";
         if (ReferenceEquals(item, _dragOverItem))
-            return $"{baseClass} drag-over";
+            return $"{baseClass} drag-over drop-line-{_dropLinePosition}";
         if (ReferenceEquals(item, _editingItem))
             return $"{baseClass} editing";
         return baseClass;
@@ -730,6 +752,7 @@
         {
             _draggedItem = null;
             _dragOverItem = null;
+            _dropLinePosition = "";
             return;
         }
 
@@ -747,7 +770,15 @@
             }
             else
             {
-                Items.Insert(targetIndex, dragged);
+                // Respect the drop line position (before/after)
+                if (_dropLinePosition == "before")
+                {
+                    Items.Insert(targetIndex, dragged);
+                }
+                else
+                {
+                    Items.Insert(targetIndex + 1, dragged);
+                }
             }
         }
         else
@@ -781,6 +812,7 @@
 
         _draggedItem = null;
         _dragOverItem = null;
+        _dropLinePosition = "";
         _isDragging = false;
 
         // Show toast notification for category changes

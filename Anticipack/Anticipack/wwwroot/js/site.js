@@ -426,3 +426,17 @@ if (document.readyState === 'loading') {
 } else {
     window.themeManager.init();
 }
+
+/**
+ * Smart drop line positioning based on mouse position
+ */
+window.getDropLinePosition = function(element, clientY) {
+    if (!element) return 'after';
+    
+    const rect = element.getBoundingClientRect();
+    const relativeY = clientY - rect.top;
+    const halfHeight = rect.height / 2;
+    
+    // If mouse is in top half, show line before; otherwise after
+    return relativeY < halfHeight ? 'before' : 'after';
+};

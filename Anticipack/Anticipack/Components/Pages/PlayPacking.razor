@@ -206,6 +206,7 @@
     private bool _showHistory = false;
     private bool _completionAcknowledged = false;
     private bool _hideCheckedItems = true;
+    private bool _wasCompleteOnLoad = false; // Track if all items were already checked when page loaded
 
     private Storage.PackingActivity _currentActivity = new Storage.PackingActivity();
 
@@ -254,6 +255,13 @@
                 IsChecked = pi.IsPacked  // Restore the packed state from database
             }).ToList();
 
+            // Check if all items were already complete when loaded
+            _wasCompleteOnLoad = Items.Any() && Items.All(i => i.IsChecked);
+            if (_wasCompleteOnLoad)
+            {
+                _completionAcknowledged = true; // Don't show modal for already completed packing
+            }
+
             _categoryOrder = Items.Select(i => i.Item.Category).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
 
             if (!_categoryOrder.Any())
@@ -268,6 +276,9 @@
                 var allChecked = IsAllChecked(cat);
                 _manualOverride[cat] = allChecked ? true : false;
             }
+
+            // Check if packing was already complete on load
+            _wasCompleteOnLoad = Items.All(i => i.IsChecked);
         }
         catch
         {
@@ -505,6 +516,10 @@
             item.IsChecked = false;
             item.Item.IsPacked = false;
         }
+        
+        // Reset completion acknowledgment so modal can show again if user completes it
+        _completionAcknowledged = false;
+        _wasCompleteOnLoad = false;
         
         // Save to repository
         if (!string.IsNullOrEmpty(Id))

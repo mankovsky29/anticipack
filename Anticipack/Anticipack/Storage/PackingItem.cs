@@ -13,5 +13,6 @@ namespace Anticipack.Storage
         public bool IsPacked { get; set; }
         public string Category { get; set; }
         public string Notes { get; set; }
+        public int SortOrder { get; set; } // Order of the item within its category
     }
 }

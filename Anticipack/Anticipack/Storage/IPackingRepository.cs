@@ -1,5 +1,4 @@
-﻿
-namespace Anticipack.Storage
+﻿namespace Anticipack.Storage
 {
     public interface IPackingRepository
     {
@@ -8,6 +7,7 @@ namespace Anticipack.Storage
         Task<PackingActivity?> GetByIdAsync(string id);
         Task AddOrUpdateAsync(PackingActivity packing);
         Task AddOrUpdateItemAsync(PackingItem item);
+        Task UpdateItemsSortOrderAsync(IEnumerable<PackingItem> items);
         Task<string> CopyPackingAsync(string packingId);
         Task DeleteAsync(string id);
 

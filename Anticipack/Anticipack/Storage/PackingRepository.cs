@@ -50,12 +50,23 @@ namespace Anticipack.Storage
 
         public async Task<List<PackingItem>> GetItemsForActivityAsync(string activityId)
         {
-            return await _db.Table<PackingItem>().Where(x => x.ActivityId == activityId).ToListAsync();
+            return await _db.Table<PackingItem>()
+                .Where(x => x.ActivityId == activityId)
+                .OrderBy(x => x.SortOrder)
+                .ToListAsync();
         }
 
         public async Task AddItemToActivityAsync(string activityId, PackingItem item)
         {
             item.ActivityId = activityId;
+            
+            // Get the maximum sort order for this activity and assign the next value
+            var existingItems = await _db.Table<PackingItem>()
+                .Where(x => x.ActivityId == activityId)
+                .ToListAsync();
+            
+            item.SortOrder = existingItems.Any() ? existingItems.Max(x => x.SortOrder) + 1 : 0;
+            
             await _db.InsertAsync(item);
         }
 
@@ -76,21 +87,16 @@ namespace Anticipack.Storage
                 RunCount = 0
             };
 
-            var packingItems = await _db.Table<PackingItem>().Where(packing => packingId == packing.ActivityId).ToListAsync();
+            var packingItems = await _db.Table<PackingItem>()
+                .Where(packing => packingId == packing.ActivityId)
+                .OrderBy(x => x.SortOrder)
+                .ToListAsync();
 
             foreach (var item in packingItems)
             {
-                //var newItem = new PackingItem
-                //{
-                //    Id = Guid.NewGuid().ToString(),
-                //    ActivityId = newPackingActivity.Id,
-                //    Name = item.Name,
-                //    IsPacked = false,
-                //    Category = item.Category,
-                //    Notes = item.Notes
-                //};
                 item.Id = Guid.NewGuid().ToString();
                 item.ActivityId = newPackingActivity.Id;
+                // SortOrder is preserved from the original item
 
                 await _db.InsertAsync(item);
             }
@@ -102,6 +108,17 @@ namespace Anticipack.Storage
         public Task AddOrUpdateItemAsync(PackingItem item)
         {
             return _db.InsertOrReplaceAsync(item);
+        }
+
+        public async Task UpdateItemsSortOrderAsync(IEnumerable<PackingItem> items)
+        {
+            await _db.RunInTransactionAsync((connection) =>
+            {
+                foreach (var item in items)
+                {
+                    connection.Update(item);
+                }
+            });
         }
     }
 }

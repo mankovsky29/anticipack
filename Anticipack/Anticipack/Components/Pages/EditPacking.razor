@@ -158,7 +158,7 @@
                                 @ondragenter="@((DragEventArgs e) => OnDragEnter(e, item))"
                                 @ondragleave="@((DragEventArgs e) => OnDragLeave(e, item))"
                                 @ondrop:preventDefault
-                                @ondrop="@((DragEventArgs e) => OnDrop(e, item))">
+                                @ondrop="@(async (DragEventArgs e) => await OnDrop(e, item))">
                                 
                                 @if (_editingItem == item)
                                 {
@@ -735,7 +735,7 @@
         return baseClass;
     }
 
-    private void OnDrop(DragEventArgs e, PackingItemView target)
+    private async Task OnDrop(DragEventArgs e, PackingItemView target)
     {
         try
         {
@@ -826,8 +826,8 @@
             ToastService.ShowSuccess("↕️ Item reordered");
         }
 
-        // Persist the change
-        _ = PackingRepository.AddOrUpdateItemAsync(dragged.Item);
+        // Update sort order for all items and persist to database
+        await UpdateAndSaveItemsOrder();
 
         StateHasChanged();
     }
@@ -846,7 +846,13 @@
         try
         {
             context.PreventNavigation();
+            
+            // Save activity details
             await PackingRepository.AddOrUpdateAsync(_currentActivity);
+            
+            // Save items order before navigating
+            await UpdateAndSaveItemsOrder();
+            
             Navigation.NavigateTo(context.TargetLocation);
         }
         finally
@@ -1011,6 +1017,28 @@
     {
         _quickAddCategory = category;
         _showQuickCategoryDropdown = false;
+    }
+
+    private async Task UpdateAndSaveItemsOrder()
+    {
+        // Update SortOrder for all items based on their current position in the Items list
+        for (int i = 0; i < Items.Count; i++)
+        {
+            Items[i].Item.SortOrder = i;
+        }
+
+        // Save all items to database with their new sort order
+        if (!string.IsNullOrWhiteSpace(Id))
+        {
+            try
+            {
+                await PackingRepository.UpdateItemsSortOrderAsync(Items.Select(x => x.Item));
+            }
+            catch (Exception ex)
+            {
+                ToastService.ShowError($"Failed to save item order: {ex.Message}");
+            }
+        }
     }
 
     public void Dispose()

@@ -1287,5 +1287,131 @@ namespace Anticipack.Resources.Localization {
                 return ResourceManager.GetString("FailedToAddItems", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Start Dictation.
+        /// </summary>
+        public static string StartDictation {
+            get {
+                return ResourceManager.GetString("StartDictation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Stop Dictation.
+        /// </summary>
+        public static string StopDictation {
+            get {
+                return ResourceManager.GetString("StopDictation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Listening....
+        /// </summary>
+        public static string Listening {
+            get {
+                return ResourceManager.GetString("Listening", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Speech recognition is not supported in your browser.
+        /// </summary>
+        public static string SpeechNotSupported {
+            get {
+                return ResourceManager.GetString("SpeechNotSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Speech recognition error: {0}.
+        /// </summary>
+        public static string SpeechError {
+            get {
+                return ResourceManager.GetString("SpeechError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Microphone permission denied.
+        /// </summary>
+        public static string MicrophonePermissionDenied {
+            get {
+                return ResourceManager.GetString("MicrophonePermissionDenied", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Please allow microphone access in your browser settings to use voice dictation.
+        /// </summary>
+        public static string MicrophonePermissionHelp {
+            get {
+                return ResourceManager.GetString("MicrophonePermissionHelp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No speech detected. Please try speaking again..
+        /// </summary>
+        public static string NoSpeechDetected {
+            get {
+                return ResourceManager.GetString("NoSpeechDetected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unable to capture audio. Please check your microphone..
+        /// </summary>
+        public static string AudioCaptureError {
+            get {
+                return ResourceManager.GetString("AudioCaptureError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Network error. Please check your internet connection..
+        /// </summary>
+        public static string NetworkErrorSpeech {
+            get {
+                return ResourceManager.GetString("NetworkErrorSpeech", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Grant Microphone Permission.
+        /// </summary>
+        public static string GrantMicrophonePermission {
+            get {
+                return ResourceManager.GetString("GrantMicrophonePermission", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Speech recognition is not supported for the selected language. Falling back to English..
+        /// </summary>
+        public static string LanguageNotSupported {
+            get {
+                return ResourceManager.GetString("LanguageNotSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Speech Recognition Language.
+        /// </summary>
+        public static string SpeechRecognitionLanguage {
+            get {
+                return ResourceManager.GetString("SpeechRecognitionLanguage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Use app language for speech recognition.
+        /// </summary>
+        public static string UseAppLanguage {
+            get {
+                return ResourceManager.GetString("UseAppLanguage", resourceCulture);
+            }
+        }
     }
 }

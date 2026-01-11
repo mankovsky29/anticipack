@@ -60,6 +60,8 @@ namespace Anticipack
             builder.Services.AddScoped<IDialogService, DialogService>();
             builder.Services.AddScoped<IToastService, ToastService>();
             builder.Services.AddSingleton<ISidebarTextService, SidebarTextService>();
+            builder.Services.AddSingleton<IMicrophonePermissionService, MicrophonePermissionService>();
+            builder.Services.AddScoped<MicrophonePermissionBridge>();
 
             var app = builder.Build();
 

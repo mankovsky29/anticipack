@@ -459,4 +459,48 @@ Shampoo</value>
   <data name="FailedToAddItems" xml:space="preserve">
     <value>Failed to add {0} items</value>
   </data>
+  
+  <!-- Speech to Text -->
+  <data name="StartDictation" xml:space="preserve">
+    <value>Start Dictation</value>
+  </data>
+  <data name="StopDictation" xml:space="preserve">
+    <value>Stop Dictation</value>
+  </data>
+  <data name="Listening" xml:space="preserve">
+    <value>Listening...</value>
+  </data>
+  <data name="SpeechNotSupported" xml:space="preserve">
+    <value>Speech recognition is not supported in your browser</value>
+  </data>
+  <data name="SpeechError" xml:space="preserve">
+    <value>Speech recognition error: {0}</value>
+  </data>
+  <data name="MicrophonePermissionDenied" xml:space="preserve">
+    <value>Microphone permission denied</value>
+  </data>
+  <data name="MicrophonePermissionHelp" xml:space="preserve">
+    <value>Please allow microphone access in your browser settings to use voice dictation</value>
+  </data>
+  <data name="NoSpeechDetected" xml:space="preserve">
+    <value>No speech detected. Please try speaking again.</value>
+  </data>
+  <data name="AudioCaptureError" xml:space="preserve">
+    <value>Unable to capture audio. Please check your microphone.</value>
+  </data>
+  <data name="NetworkErrorSpeech" xml:space="preserve">
+    <value>Network error. Please check your internet connection.</value>
+  </data>
+  <data name="GrantMicrophonePermission" xml:space="preserve">
+    <value>Grant Microphone Permission</value>
+  </data>
+  <data name="LanguageNotSupported" xml:space="preserve">
+    <value>Speech recognition is not supported for the selected language. Falling back to English.</value>
+  </data>
+  <data name="SpeechRecognitionLanguage" xml:space="preserve">
+    <value>Speech Recognition Language</value>
+  </data>
+  <data name="UseAppLanguage" xml:space="preserve">
+    <value>Use app language for speech recognition</value>
+  </data>
 </root>

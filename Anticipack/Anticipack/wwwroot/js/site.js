@@ -440,3 +440,90 @@ window.getDropLinePosition = function(element, clientY) {
     // If mouse is in top half, show line before; otherwise after
     return relativeY < halfHeight ? 'before' : 'after';
 };
+
+function selectAllText(inputId) {
+    const input = document.getElementById(inputId);
+    if (input) {
+        input.select();
+    }
+}
+
+// Speech Recognition for bulk add textarea
+let recognition = null;
+let isRecognitionActive = false;
+
+window.initializeSpeechRecognition = function (textareaRef, dotNetHelper) {
+    // Check browser support
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    
+    if (!SpeechRecognition) {
+        return { success: false, error: 'not-supported' };
+    }
+
+    recognition = new SpeechRecognition();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.lang = navigator.language || 'en-US';
+
+    let finalTranscript = '';
+    let interimTranscript = '';
+
+    recognition.onstart = function () {
+        isRecognitionActive = true;
+        dotNetHelper.invokeMethodAsync('OnSpeechRecognitionStarted');
+    };
+
+    recognition.onresult = function (event) {
+        interimTranscript = '';
+        
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+            const transcript = event.results[i][0].transcript;
+            
+            if (event.results[i].isFinal) {
+                finalTranscript += transcript + '\n';
+            } else {
+                interimTranscript += transcript;
+            }
+        }
+
+        dotNetHelper.invokeMethodAsync('OnSpeechRecognitionResult', finalTranscript, interimTranscript);
+    };
+
+    recognition.onerror = function (event) {
+        console.error('Speech recognition error:', event.error);
+        dotNetHelper.invokeMethodAsync('OnSpeechRecognitionError', event.error);
+        isRecognitionActive = false;
+    };
+
+    recognition.onend = function () {
+        isRecognitionActive = false;
+        dotNetHelper.invokeMethodAsync('OnSpeechRecognitionStopped');
+    };
+
+    return { success: true };
+};
+
+window.startSpeechRecognition = function () {
+    if (recognition && !isRecognitionActive) {
+        try {
+            recognition.start();
+            return { success: true };
+        } catch (error) {
+            console.error('Error starting speech recognition:', error);
+            return { success: false, error: error.message };
+        }
+    }
+    return { success: false, error: 'already-active' };
+};
+
+window.stopSpeechRecognition = function () {
+    if (recognition && isRecognitionActive) {
+        recognition.stop();
+        return { success: true };
+    }
+    return { success: false };
+};
+
+window.isSpeechRecognitionSupported = function () {
+    return !!(window.SpeechRecognition || window.webkitSpeechRecognition);
+};

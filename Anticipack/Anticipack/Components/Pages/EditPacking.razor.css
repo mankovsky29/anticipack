@@ -1624,3 +1624,133 @@ ul.category-content {
     white-space: nowrap !important;
     border-width: 0 !important;
 }
+
+/* Speech Recognition Styles */
+.textarea-container {
+    position: relative;
+}
+
+.speech-btn {
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 2px solid var(--primary);
+    background: white;
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    font-size: 18px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    z-index: 2;
+}
+
+.speech-btn:hover {
+    background: var(--primary-light-bg);
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.speech-btn:active {
+    transform: scale(0.95);
+}
+
+.speech-btn.listening {
+    background: var(--primary);
+    color: white;
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+.speech-btn .pulse-ring {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border: 2px solid var(--primary);
+    border-radius: 50%;
+    animation: pulse-ring 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+@keyframes pulse-ring {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1.5);
+        opacity: 0;
+    }
+}
+
+.interim-transcript {
+    position: absolute;
+    bottom: 60px;
+    left: 12px;
+    right: 12px;
+    background: var(--primary-light-bg);
+    border: 2px solid var(--primary);
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 14px;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    z-index: 2;
+    animation: fadeIn 0.2s ease-in;
+}
+
+.interim-transcript i {
+    color: var(--primary);
+    animation: pulse 1s ease-in-out infinite;
+}
+
+.listening-hint {
+    background: var(--success-light-bg, #e8f5e9);
+    border-color: var(--success, #4caf50);
+    animation: fadeIn 0.3s ease-in;
+}
+
+.listening-hint i {
+    color: var(--success, #4caf50);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Dark mode adjustments for speech recognition */
+@media (prefers-color-scheme: dark) {
+    .speech-btn {
+        background: var(--surface);
+        border-color: var(--primary);
+    }
+    
+    .speech-btn:hover {
+        background: var(--hover-bg);
+    }
+    
+    .interim-transcript {
+        background: var(--surface);
+    }
+}

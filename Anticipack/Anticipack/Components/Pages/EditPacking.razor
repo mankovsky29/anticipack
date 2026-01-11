@@ -3,6 +3,7 @@
 @using Anticipack.Services
 @using Anticipack.Storage
 @using System.Threading
+@using System.Text.Json
 @using Microsoft.AspNetCore.Components.Web
 @using Microsoft.AspNetCore.Components
 @using Microsoft.AspNetCore.Components.Routing
@@ -20,6 +21,7 @@
 @implements IDisposable
 @inject IKeyboardService KeyboardService
 @inject ILocalizationService LocalizationService
+@inject MicrophonePermissionBridge PermissionBridge
 
 <NavigationLock OnBeforeInternalNavigation="OnBeforeInternalNavigation" />
 
@@ -93,18 +95,50 @@
                                 <i class="fa fa-list-ul"></i>
                                 @AppResources.EnterItemName
                             </label>
-                            <textarea id="bulk-textarea"
-                                   class="bulk-textarea" 
-                                   placeholder="@GetBulkAddPlaceholder()" 
-                                   @bind="_bulkItemsText" 
-                                   @bind:event="oninput"
-                                   @ref="bulkItemsTextarea"
-                                   rows="8"
-                                   @onkeydown="HandleBulkTextareaKeyDown"></textarea>
+                            <div class="textarea-container">
+                                <textarea id="bulk-textarea"
+                                       class="bulk-textarea" 
+                                       placeholder="@GetBulkAddPlaceholder()" 
+                                       @bind="_bulkItemsText" 
+                                       @bind:event="oninput"
+                                       @ref="bulkItemsTextarea"
+                                       rows="8"
+                                       @onkeydown="HandleBulkTextareaKeyDown"></textarea>
+                                
+                                @if (_isSpeechRecognitionSupported)
+                                {
+                                    <button type="button" 
+                                            class="speech-btn @(_isListening ? "listening" : "")" 
+                                            @onclick="ToggleSpeechRecognition"
+                                            @onclick:stopPropagation
+                                            title="@(_isListening ? AppResources.StopDictation : AppResources.StartDictation)">
+                                        <i class="fa @(_isListening ? "fa-stop" : "fa-microphone")" aria-hidden="true"></i>
+                                        @if (_isListening)
+                                        {
+                                            <span class="pulse-ring"></span>
+                                        }
+                                    </button>
+                                }
+                                
+                                @if (!string.IsNullOrWhiteSpace(_interimTranscript))
+                                {
+                                    <div class="interim-transcript">
+                                        <i class="fa fa-microphone"></i>
+                                        <span>@_interimTranscript</span>
+                                    </div>
+                                }
+                            </div>
                             <div class="form-hint">
                                 <i class="fa fa-info-circle"></i>
                                 <span>@AppResources.BulkAddHint</span>
                             </div>
+                            @if (_isListening)
+                            {
+                                <div class="form-hint listening-hint">
+                                    <i class="fa fa-microphone"></i>
+                                    <span>@AppResources.Listening</span>
+                                </div>
+                            }
                         </div>
                     </div>
                     
@@ -312,6 +346,12 @@
     private string _dropdownPosition = "down";
     private ElementReference dropdownElement;
     private bool _showQuickCategoryDropdown = false;
+    
+    // Speech recognition state
+    private bool _isSpeechRecognitionSupported = false;
+    private bool _isListening = false;
+    private DotNetObjectReference<EditPacking>? _dotNetHelper;
+    private string _interimTranscript = string.Empty;
 
     private void ToggleQuickCategoryDropdown()
     {
@@ -336,6 +376,16 @@
         if (firstRender)
         {
             KeyboardService.Initialize(this);
+            
+            // Check if speech recognition is supported
+            try
+            {
+                _isSpeechRecognitionSupported = await JSRuntime.InvokeAsync<bool>("isSpeechRecognitionSupported");
+            }
+            catch
+            {
+                _isSpeechRecognitionSupported = false;
+            }
         }
 
         await base.OnAfterRenderAsync(firstRender);
@@ -1041,6 +1091,127 @@
         }
     }
 
+    // Speech recognition methods
+    private async Task ToggleSpeechRecognition()
+    {
+        if (!_isSpeechRecognitionSupported)
+        {
+            ToastService.ShowError(AppResources.SpeechNotSupported);
+            return;
+        }
+
+        if (_isListening)
+        {
+            await StopSpeechRecognition();
+        }
+        else
+        {
+            await StartSpeechRecognition();
+        }
+    }
+
+    private async Task StartSpeechRecognition()
+    {
+        try
+        {
+            // Request microphone permission before starting speech recognition
+            var hasPermission = await PermissionBridge.RequestPermissionAsync();
+            
+            if (!hasPermission)
+            {
+                ToastService.ShowError($"{AppResources.MicrophonePermissionDenied}. {AppResources.MicrophonePermissionHelp}");
+                _isListening = false;
+                StateHasChanged();
+                return;
+            }
+
+            _dotNetHelper = DotNetObjectReference.Create(this);
+            
+            // Get the speech recognition language based on current app language
+            var speechLanguage = SpeechRecognitionLanguageHelper.GetSpeechRecognitionLanguage(LocalizationService.CurrentCulture);
+            
+            var initResult = await JSRuntime.InvokeAsync<object>("initializeSpeechRecognition", bulkItemsTextarea, _dotNetHelper, speechLanguage);
+            
+            // Note: startSpeechRecognition is now async in JavaScript
+            var startResult = await JSRuntime.InvokeAsync<JsonElement>("startSpeechRecognition");
+            
+            // Check if permission was denied at browser level
+            if (startResult.TryGetProperty("needsPermission", out var needsPermission) && needsPermission.GetBoolean())
+            {
+                ToastService.ShowError($"{AppResources.MicrophonePermissionDenied}. {AppResources.MicrophonePermissionHelp}");
+                _isListening = false;
+                StateHasChanged();
+            }
+            // Result handling will be done through callbacks
+        }
+        catch (Exception ex)
+        {
+            ToastService.ShowError(string.Format(AppResources.SpeechError, ex.Message));
+            _isListening = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task StopSpeechRecognition()
+    {
+        try
+        {
+            await JSRuntime.InvokeVoidAsync("stopSpeechRecognition");
+            _isListening = false;
+            _interimTranscript = string.Empty;
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            ToastService.ShowError(string.Format(AppResources.SpeechError, ex.Message));
+        }
+    }
+
+    [JSInvokable]
+    public void OnSpeechRecognitionStarted()
+    {
+        _isListening = true;
+        StateHasChanged();
+    }
+
+    [JSInvokable]
+    public void OnSpeechRecognitionStopped()
+    {
+        _isListening = false;
+        _interimTranscript = string.Empty;
+        StateHasChanged();
+    }
+
+    [JSInvokable]
+    public void OnSpeechRecognitionResult(string finalTranscript, string interimTranscript)
+    {
+        // Update textbox in real-time with final transcript
+        _bulkItemsText = finalTranscript;
+        _interimTranscript = interimTranscript;
+        StateHasChanged();
+    }
+
+    [JSInvokable]
+    public void OnSpeechRecognitionError(string error)
+    {
+        _isListening = false;
+        _interimTranscript = string.Empty;
+        
+        var errorMessage = error switch
+        {
+            "not-allowed" or "permission-denied" => $"{AppResources.MicrophonePermissionDenied}. {AppResources.MicrophonePermissionHelp}",
+            "not-supported" => AppResources.SpeechNotSupported,
+            "no-speech" => AppResources.NoSpeechDetected,
+            "audio-capture" => AppResources.AudioCaptureError,
+            "network" => AppResources.NetworkErrorSpeech,
+            "language-not-supported" => AppResources.LanguageNotSupported,
+            _ => string.Format(AppResources.SpeechError, error)
+        };
+        
+        ToastService.ShowError(errorMessage);
+        StateHasChanged();
+    }
+
     public void Dispose()
     {
         try
@@ -1049,6 +1220,15 @@
             {
                 KeyboardService.KeyboardVisibilityChanged -= OnKeyboardVisibilityChanged;
             }
+            
+            // Stop speech recognition if active
+            if (_isListening)
+            {
+                _ = JSRuntime.InvokeVoidAsync("stopSpeechRecognition");
+            }
+            
+            // Dispose DotNetObjectReference
+            _dotNetHelper?.Dispose();
         }
         catch { }
     }

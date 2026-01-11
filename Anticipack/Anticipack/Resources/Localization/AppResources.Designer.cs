@@ -19,7 +19,7 @@ namespace Anticipack.Resources.Localization {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "18.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     public class AppResources {
@@ -88,7 +88,7 @@ namespace Anticipack.Resources.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Add Item.
+        ///   Looks up a localized string similar to Add.
         /// </summary>
         public static string AddItem {
             get {
@@ -97,11 +97,11 @@ namespace Anticipack.Resources.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Add New Item.
+        ///   Looks up a localized string similar to Add New Items.
         /// </summary>
-        public static string AddNewItem {
+        public static string AddNewItems {
             get {
-                return ResourceManager.GetString("AddNewItem", resourceCulture);
+                return ResourceManager.GetString("AddNewItems", resourceCulture);
             }
         }
         
@@ -120,6 +120,15 @@ namespace Anticipack.Resources.Localization {
         public static string Appearance {
             get {
                 return ResourceManager.GetString("Appearance", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unable to capture audio. Please check your microphone..
+        /// </summary>
+        public static string AudioCaptureError {
+            get {
+                return ResourceManager.GetString("AudioCaptureError", resourceCulture);
             }
         }
         
@@ -156,6 +165,26 @@ namespace Anticipack.Resources.Localization {
         public static string AvgTime {
             get {
                 return ResourceManager.GetString("AvgTime", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Separate items by new line or comma. All items will be added to the selected category..
+        /// </summary>
+        public static string BulkAddHint {
+            get {
+                return ResourceManager.GetString("BulkAddHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Toothbrush, Toothpaste
+        ///Shampoo
+        ///Soap, Towel.
+        /// </summary>
+        public static string BulkAddPlaceholder {
+            get {
+                return ResourceManager.GetString("BulkAddPlaceholder", resourceCulture);
             }
         }
         
@@ -584,6 +613,15 @@ namespace Anticipack.Resources.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Failed to add {0} items.
+        /// </summary>
+        public static string FailedToAddItems {
+            get {
+                return ResourceManager.GetString("FailedToAddItems", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Failed to copy packing activity: {0}.
         /// </summary>
         public static string FailedToCopyActivity {
@@ -665,6 +703,15 @@ namespace Anticipack.Resources.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Grant Microphone Permission.
+        /// </summary>
+        public static string GrantMicrophonePermission {
+            get {
+                return ResourceManager.GetString("GrantMicrophonePermission", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Great!.
         /// </summary>
         public static string Great {
@@ -737,6 +784,15 @@ namespace Anticipack.Resources.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {0} items added.
+        /// </summary>
+        public static string ItemsAdded {
+            get {
+                return ResourceManager.GetString("ItemsAdded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {0}/{1} items packed.
         /// </summary>
         public static string ItemsPacked {
@@ -769,6 +825,15 @@ namespace Anticipack.Resources.Localization {
         public static string Language {
             get {
                 return ResourceManager.GetString("Language", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Speech recognition is not supported for the selected language. Falling back to English..
+        /// </summary>
+        public static string LanguageNotSupported {
+            get {
+                return ResourceManager.GetString("LanguageNotSupported", resourceCulture);
             }
         }
         
@@ -818,6 +883,15 @@ namespace Anticipack.Resources.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Listening....
+        /// </summary>
+        public static string Listening {
+            get {
+                return ResourceManager.GetString("Listening", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Loading activities....
         /// </summary>
         public static string Loading {
@@ -854,6 +928,24 @@ namespace Anticipack.Resources.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Microphone permission denied.
+        /// </summary>
+        public static string MicrophonePermissionDenied {
+            get {
+                return ResourceManager.GetString("MicrophonePermissionDenied", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Please allow microphone access in your browser settings to use voice dictation.
+        /// </summary>
+        public static string MicrophonePermissionHelp {
+            get {
+                return ResourceManager.GetString("MicrophonePermissionHelp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to ~{0} min remaining.
         /// </summary>
         public static string MinRemaining {
@@ -881,6 +973,15 @@ namespace Anticipack.Resources.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Network error. Please check your internet connection..
+        /// </summary>
+        public static string NetworkErrorSpeech {
+            get {
+                return ResourceManager.GetString("NetworkErrorSpeech", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to New Packing Activity.
         /// </summary>
         public static string NewPackingActivity {
@@ -904,6 +1005,15 @@ namespace Anticipack.Resources.Localization {
         public static string NoActivitiesDescription {
             get {
                 return ResourceManager.GetString("NoActivitiesDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No speech detected. Please try speaking again..
+        /// </summary>
+        public static string NoSpeechDetected {
+            get {
+                return ResourceManager.GetString("NoSpeechDetected", resourceCulture);
             }
         }
         
@@ -1169,11 +1279,56 @@ namespace Anticipack.Resources.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Speech recognition error: {0}.
+        /// </summary>
+        public static string SpeechError {
+            get {
+                return ResourceManager.GetString("SpeechError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Speech recognition is not supported in your browser.
+        /// </summary>
+        public static string SpeechNotSupported {
+            get {
+                return ResourceManager.GetString("SpeechNotSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Speech Recognition Language.
+        /// </summary>
+        public static string SpeechRecognitionLanguage {
+            get {
+                return ResourceManager.GetString("SpeechRecognitionLanguage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Start Dictation.
+        /// </summary>
+        public static string StartDictation {
+            get {
+                return ResourceManager.GetString("StartDictation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Start Packing.
         /// </summary>
         public static string StartPacking {
             get {
                 return ResourceManager.GetString("StartPacking", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Stop Dictation.
+        /// </summary>
+        public static string StopDictation {
+            get {
+                return ResourceManager.GetString("StopDictation", resourceCulture);
             }
         }
         
@@ -1232,6 +1387,15 @@ namespace Anticipack.Resources.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Use app language for speech recognition.
+        /// </summary>
+        public static string UseAppLanguage {
+            get {
+                return ResourceManager.GetString("UseAppLanguage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Version.
         /// </summary>
         public static string Version {
@@ -1246,171 +1410,6 @@ namespace Anticipack.Resources.Localization {
         public static string YouPackedItems {
             get {
                 return ResourceManager.GetString("YouPackedItems", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Enter items (one per line):
-        ///Toothbrush
-        ///Toothpaste
-        ///Shampoo.
-        /// </summary>
-        public static string BulkAddPlaceholder {
-            get {
-                return ResourceManager.GetString("BulkAddPlaceholder", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Enter one item per line. All items will be added to the selected category..
-        /// </summary>
-        public static string BulkAddHint {
-            get {
-                return ResourceManager.GetString("BulkAddHint", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to {0} items added.
-        /// </summary>
-        public static string ItemsAdded {
-            get {
-                return ResourceManager.GetString("ItemsAdded", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Failed to add {0} items.
-        /// </summary>
-        public static string FailedToAddItems {
-            get {
-                return ResourceManager.GetString("FailedToAddItems", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Start Dictation.
-        /// </summary>
-        public static string StartDictation {
-            get {
-                return ResourceManager.GetString("StartDictation", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Stop Dictation.
-        /// </summary>
-        public static string StopDictation {
-            get {
-                return ResourceManager.GetString("StopDictation", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Listening....
-        /// </summary>
-        public static string Listening {
-            get {
-                return ResourceManager.GetString("Listening", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Speech recognition is not supported in your browser.
-        /// </summary>
-        public static string SpeechNotSupported {
-            get {
-                return ResourceManager.GetString("SpeechNotSupported", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Speech recognition error: {0}.
-        /// </summary>
-        public static string SpeechError {
-            get {
-                return ResourceManager.GetString("SpeechError", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Microphone permission denied.
-        /// </summary>
-        public static string MicrophonePermissionDenied {
-            get {
-                return ResourceManager.GetString("MicrophonePermissionDenied", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Please allow microphone access in your browser settings to use voice dictation.
-        /// </summary>
-        public static string MicrophonePermissionHelp {
-            get {
-                return ResourceManager.GetString("MicrophonePermissionHelp", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to No speech detected. Please try speaking again..
-        /// </summary>
-        public static string NoSpeechDetected {
-            get {
-                return ResourceManager.GetString("NoSpeechDetected", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Unable to capture audio. Please check your microphone..
-        /// </summary>
-        public static string AudioCaptureError {
-            get {
-                return ResourceManager.GetString("AudioCaptureError", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Network error. Please check your internet connection..
-        /// </summary>
-        public static string NetworkErrorSpeech {
-            get {
-                return ResourceManager.GetString("NetworkErrorSpeech", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Grant Microphone Permission.
-        /// </summary>
-        public static string GrantMicrophonePermission {
-            get {
-                return ResourceManager.GetString("GrantMicrophonePermission", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Speech recognition is not supported for the selected language. Falling back to English..
-        /// </summary>
-        public static string LanguageNotSupported {
-            get {
-                return ResourceManager.GetString("LanguageNotSupported", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Speech Recognition Language.
-        /// </summary>
-        public static string SpeechRecognitionLanguage {
-            get {
-                return ResourceManager.GetString("SpeechRecognitionLanguage", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Use app language for speech recognition.
-        /// </summary>
-        public static string UseAppLanguage {
-            get {
-                return ResourceManager.GetString("UseAppLanguage", resourceCulture);
             }
         }
     }

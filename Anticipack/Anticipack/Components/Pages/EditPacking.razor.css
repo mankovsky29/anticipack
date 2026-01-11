@@ -1209,10 +1209,22 @@ ul.category-content {
     gap: 24px;
 }
 
+/* Compact variant for tighter spacing */
+.form-body.compact,
+.form-body:has(.form-section.compact) {
+    padding: 16px;
+    gap: 16px;
+}
+
 .form-section {
     display: flex;
     flex-direction: column;
     gap: 12px;
+}
+
+/* Compact form sections */
+.form-section.compact {
+    gap: 8px;
 }
 
 .form-label {
@@ -1237,6 +1249,12 @@ ul.category-content {
     gap: 12px;
 }
 
+/* Compact category grid */
+.category-grid.compact {
+    grid-template-columns: repeat(auto-fill, minmax(75px, 1fr));
+    gap: 8px;
+}
+
 .category-card {
     display: flex;
     flex-direction: column;
@@ -1252,6 +1270,13 @@ ul.category-content {
     text-align: center;
     position: relative;
     overflow: hidden;
+}
+
+/* Compact category card */
+.category-card.compact {
+    padding: 10px 6px;
+    gap: 6px;
+    border-radius: 10px;
 }
 
 .category-card::before {
@@ -1290,6 +1315,11 @@ ul.category-content {
     z-index: 1;
 }
 
+/* Compact category icon */
+.category-card.compact i {
+    font-size: 20px;
+}
+
 .category-card.selected i {
     color: white;
     transform: scale(1.1);
@@ -1308,9 +1338,20 @@ ul.category-content {
     max-width: 100%;
 }
 
+/* Compact category name */
+.category-card.compact .category-name {
+    font-size: 11px;
+}
+
 .category-card.selected .category-name {
     color: white;
     font-weight: 600;
+}
+
+/* Textarea Container with Speech Button */
+.textarea-container {
+    position: relative;
+    width: 100%;
 }
 
 /* Bulk Textarea Improvements */
@@ -1329,6 +1370,14 @@ ul.category-content {
     transition: all var(--transition);
 }
 
+/* Compact textarea */
+.bulk-textarea.compact {
+    padding: 12px;
+    padding-right: 60px; /* Make room for speech button */
+    min-height: 100px;
+    font-size: 14px;
+}
+
 .bulk-textarea::placeholder {
     color: var(--text-light);
     font-style: italic;
@@ -1339,6 +1388,110 @@ ul.category-content {
     border-color: var(--primary);
     box-shadow: 0 0 0 4px var(--input-focus-shadow);
     background: var(--surface);
+}
+
+/* Speech Recognition Button */
+.speech-btn {
+    position: absolute;
+    right: 8px;
+    top: 8px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    background: var(--primary);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 8px rgba(var(--primary-rgb, 99, 102, 241), 0.3);
+    z-index: 2;
+}
+
+.speech-btn:hover {
+    background: var(--primary-dark);
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(var(--primary-rgb, 99, 102, 241), 0.4);
+}
+
+.speech-btn:active {
+    transform: scale(0.95);
+}
+
+.speech-btn.listening {
+    background: var(--danger, #ef4444);
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+    }
+    50% {
+        box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+    }
+}
+
+.speech-btn i {
+    font-size: 18px;
+}
+
+.pulse-ring {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 2px solid white;
+    animation: pulseRing 1.5s ease-out infinite;
+}
+
+@keyframes pulseRing {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1.5);
+        opacity: 0;
+    }
+}
+
+/* Interim Transcript Display */
+.interim-transcript {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: rgba(var(--primary-rgb, 99, 102, 241), 0.1);
+    border-left: 3px solid var(--primary);
+    border-radius: 6px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    font-style: italic;
+    margin-top: 8px;
+}
+
+.interim-transcript i {
+    color: var(--primary);
+    animation: blink 1s ease-in-out infinite;
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+}
+
+/* Listening Hint */
+.listening-hint {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(239, 68, 68, 0.05) 100%);
+    border-left-color: var(--danger, #ef4444);
+}
+
+.listening-hint i {
+    color: var(--danger, #ef4444);
+    animation: blink 1s ease-in-out infinite;
 }
 
 /* Form Hint */
@@ -1355,6 +1508,12 @@ ul.category-content {
     line-height: 1.5;
 }
 
+/* Compact form hint */
+.form-hint.compact {
+    padding: 8px 12px;
+    font-size: 12px;
+}
+
 .form-hint i {
     color: var(--primary);
     margin-top: 2px;
@@ -1369,6 +1528,12 @@ ul.category-content {
     padding: 20px 24px;
     background: var(--background);
     border-top: 1px solid var(--border-color);
+}
+
+/* Compact form actions */
+.form-actions.compact {
+    padding: 12px 16px;
+    gap: 8px;
 }
 
 .btn {
@@ -1500,257 +1665,140 @@ ul.category-content {
     height: 46px;
     border-radius: 23px;
     border: none;
-    background: var(--primary);
+    background: var(--success, #10b981);
     color: white;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 18px;
+    font-size: 20px;
     cursor: pointer;
     transition: all var(--transition);
     flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
 }
 
 .quick-add-btn:hover:not(.disabled) {
-    background: var(--primary-dark);
+    background: var(--success-dark, #059669);
     transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
 }
 
-.quick-add-btn.disabled {
-    background: var(--disabled-bg);
-    color: var(--disabled-text);
-    cursor: not-allowed;
-    opacity: 0.7;
-}
-
-.options-dropdown {
-    position: absolute;
-    width: 220px;
-    max-height: 320px;
-    overflow-y: auto;
-    background: var(--surface);
-    border-radius: 12px;
-    box-shadow: var(--shadow-lg);
-    z-index: 110;
-    border: 1px solid var(--border-color);
-    right: 0;
-    padding: 8px 0;
-}
-
-.options-dropdown.dropdown-up {
-    bottom: calc(100% + 8px);
-}
-
-.options-dropdown.dropdown-down {
-    top: calc(100% + 8px);
-}
-
-.dropdown-heading {
-    padding: 6px 16px;
-    font-size: 12px;
-    font-weight: 600;
-    text-transform: uppercase;
-    color: var(--text-secondary);
-    border-bottom: 1px solid var(--border-color);
-    margin-bottom: 4px;
-}
-
-.option {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px 16px;
-    transition: all 0.2s ease;
-    border-left: 3px solid transparent;
-}
-
-.option:hover {
-    background: var(--hover-bg);
-    border-left-color: var(--primary);
-}
-
-.option.selected {
-    background: var(--primary-light-bg);
-    border-left-color: var(--primary);
-    font-weight: 500;
-}
-
-.option i {
-    font-size: 16px;
-    color: var(--text-secondary);
-}
-
-.option.selected i {
-    color: var(--primary);
-}
-
-/* Responsive adjustments for forms */
-@media (max-width: 768px) {
-    .category-grid {
-        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-        gap: 10px;
-    }
-    
-    .category-card {
-        padding: 12px 6px;
-    }
-    
-    .category-card i {
-        font-size: 20px;
-    }
-    
-    .category-card .category-name {
-        font-size: 12px;
-    }
-    
-    .form-actions {
-        flex-direction: column-reverse;
-    }
-    
-    .btn {
-        width: 100%;
-    }
-}
-
-/* Accessibility */
-.sr-only {
-    position: absolute !important;
-    width: 1px !important;
-    height: 1px !important;
-    padding: 0 !important;
-    margin: -1px !important;
-    overflow: hidden !important;
-    clip: rect(0, 0, 0, 0) !important;
-    white-space: nowrap !important;
-    border-width: 0 !important;
-}
-
-/* Speech Recognition Styles */
-.textarea-container {
-    position: relative;
-}
-
-.speech-btn {
-    position: absolute;
-    bottom: 12px;
-    right: 12px;
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    border: 2px solid var(--primary);
-    background: white;
-    color: var(--primary);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    font-size: 18px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    z-index: 2;
-}
-
-.speech-btn:hover {
-    background: var(--primary-light-bg);
-    transform: scale(1.05);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.speech-btn:active {
+.quick-add-btn:active:not(.disabled) {
     transform: scale(0.95);
 }
 
-.speech-btn.listening {
-    background: var(--primary);
-    color: white;
-    animation: pulse 1.5s ease-in-out infinite;
+.quick-add-btn.disabled,
+.quick-add-btn:disabled {
+    background: var(--disabled-bg);
+    color: var(--disabled-text);
+    cursor: not-allowed;
+    opacity: 0.5;
+    box-shadow: none;
 }
 
-.speech-btn .pulse-ring {
+/* Quick Category Dropdown */
+.options-dropdown {
     position: absolute;
-    width: 100%;
-    height: 100%;
-    border: 2px solid var(--primary);
-    border-radius: 50%;
-    animation: pulse-ring 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    background: var(--surface);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08);
+    padding: 8px;
+    min-width: 200px;
+    z-index: 1000;
+    animation: dropdownSlideIn 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-@keyframes pulse {
-    0%, 100% {
-        transform: scale(1);
-    }
-    50% {
-        transform: scale(1.05);
-    }
+.options-dropdown.dropdown-down {
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
 }
 
-@keyframes pulse-ring {
-    0% {
-        transform: scale(1);
-        opacity: 1;
-    }
-    100% {
-        transform: scale(1.5);
-        opacity: 0;
-    }
+.options-dropdown.dropdown-up {
+    top: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
 }
 
-.interim-transcript {
-    position: absolute;
-    bottom: 60px;
-    left: 12px;
-    right: 12px;
-    background: var(--primary-light-bg);
-    border: 2px solid var(--primary);
-    border-radius: 8px;
-    padding: 8px 12px;
-    font-size: 14px;
+.dropdown-heading {
+    font-size: 12px;
+    font-weight: 600;
     color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 8px 12px;
+    margin-bottom: 4px;
+}
+
+.options-dropdown .option {
     display: flex;
     align-items: center;
-    gap: 8px;
-    z-index: 2;
-    animation: fadeIn 0.2s ease-in;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    background: transparent;
 }
 
-.interim-transcript i {
+.options-dropdown .option:hover {
+    background: var(--hover-bg);
+}
+
+.options-dropdown .option.selected {
+    background: var(--primary-light-bg);
     color: var(--primary);
-    animation: pulse 1s ease-in-out infinite;
+    font-weight: 600;
 }
 
-.listening-hint {
-    background: var(--success-light-bg, #e8f5e9);
-    border-color: var(--success, #4caf50);
-    animation: fadeIn 0.3s ease-in;
+.options-dropdown .option i {
+    font-size: 18px;
+    color: var(--text-secondary);
+    transition: color 0.15s ease;
 }
 
-.listening-hint i {
-    color: var(--success, #4caf50);
+.options-dropdown .option:hover i,
+.options-dropdown .option.selected i {
+    color: var(--primary);
 }
 
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(-5px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+.options-dropdown .option span {
+    font-size: 14px;
 }
 
-/* Dark mode adjustments for speech recognition */
-@media (prefers-color-scheme: dark) {
-    .speech-btn {
-        background: var(--surface);
-        border-color: var(--primary);
+/* Responsive adjustments for quick add */
+@media (max-width: 480px) {
+    .quick-add-container {
+        padding: 12px 10px;
     }
     
-    .speech-btn:hover {
-        background: var(--hover-bg);
+    .quick-add-form {
+        gap: 8px;
     }
     
-    .interim-transcript {
-        background: var(--surface);
+    .quick-add-input {
+        padding: 10px 14px;
+        font-size: 15px;
+    }
+    
+    .category-btn,
+    .quick-add-btn {
+        width: 42px;
+        height: 42px;
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    .speech-btn,
+    .speech-btn.listening,
+    .pulse-ring,
+    .interim-transcript i,
+    .listening-hint i,
+    .quick-add-btn,
+    .category-btn,
+    .options-dropdown {
+        animation: none;
     }
 }

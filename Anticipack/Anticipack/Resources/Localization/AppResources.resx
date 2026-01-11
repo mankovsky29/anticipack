@@ -346,10 +346,10 @@
     <value>Start Packing</value>
   </data>
   <data name="AddItem" xml:space="preserve">
-    <value>Add Item</value>
+    <value>Add</value>
   </data>
-  <data name="AddNewItem" xml:space="preserve">
-    <value>Add New Item</value>
+  <data name="AddNewItems" xml:space="preserve">
+    <value>Add New Items</value>
   </data>
   <data name="EnterActivityName" xml:space="preserve">
     <value>Enter activity name...</value>
@@ -445,13 +445,12 @@ This action cannot be undone.</value>
 
   <!-- Bulk Add Items -->
   <data name="BulkAddPlaceholder" xml:space="preserve">
-    <value>Enter items (one per line):
-Toothbrush
-Toothpaste
-Shampoo</value>
+    <value>Toothbrush, Toothpaste
+Shampoo
+Soap, Towel</value>
   </data>
   <data name="BulkAddHint" xml:space="preserve">
-    <value>Enter one item per line. All items will be added to the selected category.</value>
+    <value>Separate items by new line or comma. All items will be added to the selected category.</value>
   </data>
   <data name="ItemsAdded" xml:space="preserve">
     <value>{0} items added</value>

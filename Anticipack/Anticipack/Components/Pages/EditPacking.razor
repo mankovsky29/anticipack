@@ -67,7 +67,7 @@
                 <div class="add-item-form">
                     <div class="form-header">
                         <div class="form-title-row">
-                            <h4>@AppResources.AddNewItem</h4>
+                            <h4>@AppResources.AddNewItems</h4>
                             <button class="close-form-btn" @onclick="CancelAdd" title="@AppResources.Cancel">
                                 <i class="fa fa-times"></i>
                             </button>
@@ -75,13 +75,13 @@
                     </div>
                     
                     <div class="form-body">
-                        <div class="form-section">
+                        <div class="form-section compact">
                             <label class="form-label">@AppResources.SelectCategory</label>
-                            <div class="category-grid">
+                            <div class="category-grid compact">
                                 @foreach (var category in Enum.GetValues<PackingCategory>())
                                 {
                                     <button type="button"
-                                            class="category-card @(_newCategory == category.ToString() ? "selected" : "")" 
+                                            class="category-card compact @(_newCategory == category.ToString() ? "selected" : "")" 
                                             @onclick="() => _newCategory = category.ToString()">
                                         <i class="fa @GetCategoryIcon(category)" aria-hidden="true"></i>
                                         <span class="category-name">@GetLocalizedCategoryName(category)</span>
@@ -90,19 +90,19 @@
                             </div>
                         </div>
                         
-                        <div class="form-section">
+                        <div class="form-section compact">
                             <label for="bulk-textarea" class="form-label">
                                 <i class="fa fa-list-ul"></i>
                                 @AppResources.EnterItemName
                             </label>
                             <div class="textarea-container">
                                 <textarea id="bulk-textarea"
-                                       class="bulk-textarea" 
+                                       class="bulk-textarea compact" 
                                        placeholder="@GetBulkAddPlaceholder()" 
                                        @bind="_bulkItemsText" 
                                        @bind:event="oninput"
                                        @ref="bulkItemsTextarea"
-                                       rows="8"
+                                       rows="4"
                                        @onkeydown="HandleBulkTextareaKeyDown"></textarea>
                                 
                                 @if (_isSpeechRecognitionSupported)
@@ -128,7 +128,7 @@
                                     </div>
                                 }
                             </div>
-                            <div class="form-hint">
+                            <div class="form-hint compact">
                                 <i class="fa fa-info-circle"></i>
                                 <span>@AppResources.BulkAddHint</span>
                             </div>
@@ -142,7 +142,7 @@
                         </div>
                     </div>
                     
-                    <div class="form-actions">
+                    <div class="form-actions compact">
                         <button class="btn btn-cancel" @onclick="CancelAdd">
                             <i class="fa fa-times"></i>
                             <span>@AppResources.Cancel</span>
@@ -542,13 +542,14 @@
 
         var category = string.IsNullOrWhiteSpace(_newCategory) ? PackingCategory.Miscellaneous.ToString() : _newCategory.Trim();
 
-        var lines = _bulkItemsText
-            .Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries)
+        // Split by both newlines and commas
+        var items = _bulkItemsText
+            .Split(new[] { "\r\n", "\r", "\n", "," }, StringSplitOptions.RemoveEmptyEntries)
             .Select(line => line.Trim())
             .Where(line => !string.IsNullOrWhiteSpace(line))
             .ToList();
 
-        if (!lines.Any())
+        if (!items.Any())
             return;
 
         int addedCount = 0;
@@ -556,7 +557,7 @@
 
         try
         {
-            foreach (var itemName in lines)
+            foreach (var itemName in items)
             {
                 try
                 {
@@ -583,7 +584,7 @@
             if (addedCount > 0)
             {
                 var message = addedCount == 1 
-                    ? string.Format(AppResources.ItemAdded, lines[0])
+                    ? string.Format(AppResources.ItemAdded, items[0])
                     : string.Format(AppResources.ItemsAdded, addedCount);
                 ToastService.ShowSuccess(message);
             }

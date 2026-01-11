@@ -422,10 +422,10 @@
     <value>Начать упаковку</value>
   </data>
   <data name="AddItem" xml:space="preserve">
-    <value>Добавить предмет</value>
+    <value>Добавить</value>
   </data>
-  <data name="AddNewItem" xml:space="preserve">
-    <value>Добавить новый предмет</value>
+  <data name="AddNewItems" xml:space="preserve">
+    <value>Добавить новые предметы</value>
   </data>
   <data name="EnterActivityName" xml:space="preserve">
     <value>Введите название активности...</value>

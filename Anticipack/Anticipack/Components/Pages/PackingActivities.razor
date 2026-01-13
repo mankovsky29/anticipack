@@ -23,11 +23,20 @@
     else
     {
         <div class="sticky-header">
-            <div class="search-bar @(_isSearchVisible ? "visible" : "hidden")">
-                <input type="text" class="search-input" placeholder="@Localizer["SearchPlaceholder"]" @bind="_searchTerm" @bind:event="oninput" />
-                <button class="search-close-btn" @onclick="ToggleSearchBar">
-                    <i class="fa fa-times"></i>
-                </button>
+            <!-- Always visible search bar -->
+            <div class="search-bar">
+                <i class="fa fa-search search-icon"></i>
+                <input type="text" 
+                       class="search-input" 
+                       placeholder="@Localizer["SearchPlaceholder"]" 
+                       @bind="_searchTerm" 
+                       @bind:event="oninput" />
+                @if (!string.IsNullOrWhiteSpace(_searchTerm))
+                {
+                    <button class="search-clear-btn" @onclick="ClearSearch">
+                        <i class="fa fa-times"></i>
+                    </button>
+                }
             </div>
 
             <!-- Filter Bar -->
@@ -52,41 +61,86 @@
             </div>
         </div>
         
-        @if (_activities.Any())
+        @if (FilteredActivities.Any())
         {
             <div class="activities-list">
                 @foreach (var activity in FilteredActivities)
                 {
-                    <div class="activity-card">
-                        <div class="activity-header">
-                            <div class="activity-title-row">
-                                <h3 @onclick="() => OpenActivityInEditMode(activity.Id)"  class="activity-name">@activity.Name</h3>
-                                @if (activity.IsShared)
-                                {
-                                    <div class="share-badge" title="@Localizer["SharedActivity"]">
-                                        <i class="fa fa-share-alt"></i>
-                                    </div>
-                                }
+                    var itemCount = _activityItemCounts.GetValueOrDefault(activity.Id, 0);
+                    var topCategories = _activityTopCategories.GetValueOrDefault(activity.Id, new List<string>());
+                    
+                    <div class="activity-card" @onclick="() => OpenActivityInEditMode(activity.Id)">
+                        <!-- Card Header with Title and Delete Button -->
+                        <div class="card-header">
+                            <div class="header-left">
+                                <div class="title-row">
+                                    <h3 class="activity-title">@activity.Name</h3>
+                                    @if (activity.IsShared)
+                                    {
+                                        <div class="shared-indicator" title="@Localizer["SharedActivity"]">
+                                            <i class="fa fa-share-alt"></i>
+                                        </div>
+                                    }
+                                </div>
+                                <div class="activity-subtitle">
+                                    <i class="fa fa-clock"></i>
+                                    <span>@GetRelativeTime(activity.LastPacked)</span>
+                                </div>
                             </div>
+                            <button class="btn-icon delete-btn" 
+                                    @onclick="() => PromptDeleteActivity(activity)"
+                                    @onclick:stopPropagation="true"
+                                    title="@Localizer["Delete"]">
+                                <i class="fa fa-trash"></i>
+                            </button>
                         </div>
 
-                        <div class="activity-info" @onclick="() => OpenActivityInEditMode(activity.Id)">
-                            <div class="activity-date">
-                                <i class="fa fa-calendar"></i> @Localizer["LastPacked"] @activity.LastPacked.ToString("MMM d, yyyy")
+                        <!-- Stats Row - Items and Runs in one line -->
+                        <div class="stats-row">
+                            <div class="stat-item">
+                                <div class="stat-icon items">
+                                    <i class="fa fa-box"></i>
+                                </div>
+                                <div class="stat-details">
+                                    <div class="stat-value">@itemCount</div>
+                                    <div class="stat-label">@Localizer["Items"]</div>
+                                </div>
                             </div>
+                            
+                            @if (activity.RunCount > 0)
+                            {
+                                <div class="stat-item">
+                                    <div class="stat-icon runs">
+                                        <i class="fa fa-redo"></i>
+                                    </div>
+                                    <div class="stat-details">
+                                        <div class="stat-value">@activity.RunCount</div>
+                                        <div class="stat-label">@Localizer["Runs"]</div>
+                                    </div>
+                                </div>
+                            }
+                            
+                            @if (topCategories.Any())
+                            {
+                                <div class="stat-item categories-count">
+                                    <div class="stat-icon categories">
+                                        <i class="fa fa-tags"></i>
+                                    </div>
+                                    <div class="stat-details">
+                                        <div class="stat-value">@topCategories.Count</div>
+                                        <div class="stat-label">@Localizer["Categories"]</div>
+                                    </div>
+                                </div>
+                            }
                         </div>
-                        
-                        <div class="activity-actions">
-                            <button class="action-btn play" @onclick="() => OpenActivityInPackingMode(activity.Id)" title="@Localizer["PackNow"]">
+
+                        <!-- Action Button - Single Primary Action -->
+                        <div class="card-actions">
+                            <button class="btn-primary pack-btn" 
+                                    @onclick="() => OpenActivityInPackingMode(activity.Id)"
+                                    @onclick:stopPropagation="true">
                                 <i class="fa fa-play"></i>
-                            </button>
-                            <button class="action-btn share @(activity.IsShared ? "shared" : "")" 
-                                    @onclick="() => ToggleActivityShare(activity)" 
-                                    title="@(activity.IsShared ? Localizer["MakePrivate"] : Localizer["MakeShared"])">
-                                <i class="fa @(activity.IsShared ? "fa-lock-open" : "fa-share-alt")"></i>
-                            </button>
-                            <button class="action-btn delete" @onclick="() => PromptDeleteActivity(activity)" title="@Localizer["Delete"]">
-                                <i class="fa fa-trash"></i>
+                                <span>@Localizer["PackNow"]</span>
                             </button>
                         </div>
                     </div>
@@ -107,23 +161,10 @@
             </div>
         }
         
-        <!-- Speed Dial FAB -->
-        <div class="speed-dial @(_isFabExpanded ? "expanded" : "")">
-            <div class="fab-backdrop @(_isFabExpanded ? "visible" : "")" @onclick="ToggleFab"></div>
-            
-            <div class="fab-options">
-                <button class="fab-option search-fab @(_isFabExpanded ? "visible" : "")" @onclick="OpenSearchBar" title="@Localizer["Search"]">
-                    <i class="fa fa-search"></i>
-                </button>
-                <button class="fab-option add-fab @(_isFabExpanded ? "visible" : "")" @onclick="AddNewActivity" title="@Localizer["AddActivity"]">
-                    <i class="fa fa-plus"></i>
-                </button>
-            </div>
-            
-            <button class="main-fab" @onclick="ToggleFab" aria-label="Actions menu">
-                <i class="fa @(_isFabExpanded ? "fa-times" : "fa-ellipsis-v")"></i>
-            </button>
-        </div>
+        <!-- Simplified FAB - Single Add Button -->
+        <button class="add-fab" @onclick="AddNewActivity" aria-label="@Localizer["AddActivity"]" title="@Localizer["AddActivity"]">
+            <i class="fa fa-plus"></i>
+        </button>
     }
 </div>
 
@@ -170,10 +211,10 @@
     }
 
     private List<Storage.PackingActivity> _activities = new();
+    private Dictionary<string, int> _activityItemCounts = new();
+    private Dictionary<string, List<string>> _activityTopCategories = new();
     private bool _isLoading = true;
     private string _searchTerm = string.Empty;
-    private bool _isSearchVisible = false;
-    private bool _isFabExpanded = false;
     private ShareFilterType _shareFilter = ShareFilterType.All;
 
     // Add dialog
@@ -201,24 +242,9 @@
         InvokeAsync(StateHasChanged);
     }
 
-    private void ToggleFab()
+    private void ClearSearch()
     {
-        _isFabExpanded = !_isFabExpanded;
-    }
-
-    private void OpenSearchBar()
-    {
-        _isSearchVisible = true;
-        _isFabExpanded = false;
-    }
-
-    private void ToggleSearchBar()
-    {
-        _isSearchVisible = !_isSearchVisible;
-        if (_isSearchVisible)
-        {
-            _isFabExpanded = false;
-        }
+        _searchTerm = string.Empty;
     }
 
     private void SetShareFilter(ShareFilterType filterType)
@@ -235,6 +261,26 @@
         {
             _activities = await PackingRepository.GetAllAsync();
             _activities = _activities.OrderByDescending(a => a.LastPacked).ThenBy(a => a.RunCount).ToList();
+
+            // Load metadata for each activity
+            _activityItemCounts.Clear();
+            _activityTopCategories.Clear();
+            
+            foreach (var activity in _activities)
+            {
+                var items = await PackingRepository.GetItemsForActivityAsync(activity.Id);
+                _activityItemCounts[activity.Id] = items.Count;
+                
+                // Get top categories by count
+                var topCategories = items
+                    .GroupBy(i => i.Category)
+                    .OrderByDescending(g => g.Count())
+                    .Select(g => g.Key)
+                    .Where(c => !string.IsNullOrEmpty(c))
+                    .ToList();
+                    
+                _activityTopCategories[activity.Id] = topCategories;
+            }
         }
         catch
         {
@@ -270,12 +316,49 @@
         }
     }
 
+    private string GetRelativeTime(DateTime dateTime)
+    {
+        var timeSpan = DateTime.Now - dateTime;
+        
+        if (timeSpan.TotalMinutes < 1)
+            return Localizer["JustNow"];
+        if (timeSpan.TotalHours < 1)
+            return string.Format(Localizer["MinutesAgo"], (int)timeSpan.TotalMinutes);
+        if (timeSpan.TotalDays < 1)
+            return string.Format(Localizer["HoursAgo"], (int)timeSpan.TotalHours);
+        if (timeSpan.TotalDays < 7)
+            return string.Format(Localizer["DaysAgo"], (int)timeSpan.TotalDays);
+        if (timeSpan.TotalDays < 30)
+            return string.Format(Localizer["WeeksAgo"], (int)(timeSpan.TotalDays / 7));
+        if (timeSpan.TotalDays < 365)
+            return string.Format(Localizer["MonthsAgo"], (int)(timeSpan.TotalDays / 30));
+        
+        return dateTime.ToString("MMM d, yyyy");
+    }
+
+    private string GetCategoryIcon(string category)
+    {
+        return category switch
+        {
+            "Clothing" => "fa fa-tshirt",
+            "Shoes" => "fa fa-shoe-prints",
+            "Toiletries" => "fa fa-pump-soap",
+            "Electronics" => "fa fa-plug",
+            "Documents" => "fa fa-file-alt",
+            "Health" => "fa fa-heartbeat",
+            "Accessories" => "fa fa-ring",
+            "Outdoor" => "fa fa-campground",
+            "Food" => "fa fa-utensils",
+            "Entertainment" => "fa fa-gamepad",
+            _ => "fa fa-box"
+        };
+    }
+
     private void AddNewActivity()
     {
         _newActivityName = "New Packing Activity";
         _newActivityIsShared = false;
         _showAddDialog = true;
-        _isFabExpanded = false;
     }
 
     private void CancelAddActivity()

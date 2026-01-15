@@ -26,31 +26,44 @@
 <NavigationLock OnBeforeInternalNavigation="OnBeforeInternalNavigation" />
 
 <div class="page-container with-fixed-navbar" @onclick="HandlePageClick">
+<div class="sticky-header">
     <header class="activity-header" role="banner" aria-label="@AppResources.PackingActivity">
-        <div class="activity-actions activity-actions-left" role="group" aria-label="@AppResources.PackingDialogMenu">
-            <!-- Primary action: Play button -->
-            <button class="icon-btn play" @onclick="SwitchToPackingMode" @onclick:stopPropagation aria-label="@AppResources.StartPacking">
-                <i class="fa fa-play" aria-hidden="true"></i>
-            </button>
-
-            <!-- Copy button -->
-            <button class="icon-btn" @onclick="CopyPacking" @onclick:stopPropagation title="@AppResources.CopyTitle">
-                <i class="fa fa-copy" aria-hidden="true"></i>
-            </button>
-
-            <!-- Add item button -->
-            <button class="icon-btn" @onclick="ShowAddItemForm" @onclick:stopPropagation title="@AppResources.AddItem">
-                <i class="fa fa-plus" aria-hidden="true"></i>
-            </button>
+        <div class="header-left-section">
+            <input type="text" 
+                   class="activity-name-input" 
+                   @bind="_activityName" 
+                   @bind:event="oninput"
+                   @onblur="SaveActivityNameAsync"
+                   placeholder="@AppResources.EnterActivityName" />
         </div>
+            
+        <div class="header-actions">
+            <div class="activity-actions activity-actions-left" role="group" aria-label="@AppResources.PackingDialogMenu">
+                <!-- Primary action: Play button -->
+                <button class="icon-btn play" @onclick="SwitchToPackingMode" @onclick:stopPropagation aria-label="@AppResources.StartPacking">
+                    <i class="fa fa-play" aria-hidden="true"></i>
+                </button>
 
-        <div class="activity-actions activity-actions-right" role="group">
-            <!-- Delete activity button -->
-            <button class="icon-btn delete-item" @onclick="PromptDeleteActivity" @onclick:stopPropagation title="@AppResources.DeleteActivity">
-                <i class="fa fa-trash" aria-hidden="true"></i>
-            </button>
+                <!-- Copy button -->
+                <button class="icon-btn" @onclick="CopyPacking" @onclick:stopPropagation title="@AppResources.CopyTitle">
+                    <i class="fa fa-copy" aria-hidden="true"></i>
+                </button>
+
+                <!-- Add item button -->
+                <button class="icon-btn" @onclick="ShowAddItemForm" @onclick:stopPropagation title="@AppResources.AddItem">
+                    <i class="fa fa-plus" aria-hidden="true"></i>
+                </button>
+            </div>
+
+            <div class="activity-actions activity-actions-right" role="group">
+                <!-- Delete activity button -->
+                <button class="icon-btn delete-item" @onclick="PromptDeleteActivity" @onclick:stopPropagation title="@AppResources.DeleteActivity">
+                    <i class="fa fa-trash" aria-hidden="true"></i>
+                </button>
+            </div>
         </div>
     </header>
+</div>
 
     <main class="content-area">
         @if (_isLoading)
@@ -311,6 +324,7 @@
     private bool _keyboardVisible;
     private double _keyboardHeight;
     private Storage.PackingActivity _currentActivity = new Storage.PackingActivity();
+    private string _activityName = string.Empty;
 
     private sealed class PackingItemView
     {
@@ -456,6 +470,7 @@
     private void InitializeDefaultItems()
     {
         _currentActivity = new Storage.PackingActivity { Name = AppResources.NewPackingActivity };
+        _activityName = _currentActivity.Name;
         Items = new List<PackingItemView>();
         _categoryOrder = Items.Select(i => i.Item.Category).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
         foreach (var cat in _categoryOrder)
@@ -470,6 +485,7 @@
         try
         {
             _currentActivity = await PackingRepository.GetByIdAsync(id) ?? new Storage.PackingActivity(){ Name = AppResources.NewPackingActivity };
+            _activityName = _currentActivity.Name ?? AppResources.NewPackingActivity;
             SidebarTextService.SetPackingId(_currentActivity.Id);
             SidebarTextService.SetText(_currentActivity.Name ?? "");
             var itemsFromRepo = await PackingRepository.GetItemsForActivityAsync(id);
@@ -684,6 +700,34 @@
         catch (Exception ex)
         {
             ToastService.ShowError(string.Format(AppResources.FailedToDeleteActivity, ex.Message));
+        }
+    }
+
+    private async Task SaveActivityNameAsync()
+    {
+        if (string.IsNullOrWhiteSpace(Id))
+            return;
+
+        // Trim the activity name
+        _activityName = _activityName?.Trim() ?? string.Empty;
+
+        // Don't save if name is empty or unchanged
+        if (string.IsNullOrWhiteSpace(_activityName) || _activityName == _currentActivity?.Name)
+            return;
+
+        try
+        {
+            _currentActivity.Name = _activityName;
+            await PackingRepository.AddOrUpdateAsync(_currentActivity);
+            SidebarTextService.SetText(_activityName);
+            ToastService.ShowSuccess(AppResources.ItemUpdated);
+        }
+        catch (Exception ex)
+        {
+            ToastService.ShowError(string.Format(AppResources.FailedToUpdateItem, ex.Message));
+            // Revert to original name on error
+            _activityName = _currentActivity?.Name ?? AppResources.NewPackingActivity;
+            StateHasChanged();
         }
     }
 

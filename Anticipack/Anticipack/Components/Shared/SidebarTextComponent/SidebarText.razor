@@ -1,21 +1,15 @@
 @using Anticipack.Components.Shared.SidebarTextComponent
-@using Anticipack.Components.Shared.DialogComponent
-@using Anticipack.Storage
-@using Microsoft.AspNetCore.Components
 @implements IDisposable
 @inject ISidebarTextService SidebarTextService
-@inject IDialogService DialogService
-@inject IPackingRepository PackingRepository
 
 @if (!_isNavMenuExpanded)
 {
     <div class="sidebar-text-container">
         @if (!string.IsNullOrWhiteSpace(_displayText))
         {
-            <button class="sidebar-text-button" @onclick="HandleTextClick" title="Click to edit">
+            <div class="sidebar-text-display">
                 <span class="sidebar-text">@_displayText</span>
-                <i class="fa fa-pencil sidebar-text-icon" aria-hidden="true"></i>
-            </button>
+            </div>
         }
     </div>
 }
@@ -57,69 +51,6 @@
     {
         _isNavMenuExpanded = isExpanded;
         InvokeAsync(StateHasChanged);
-    }
-
-    private async Task HandleTextClick()
-    {
-        if (string.IsNullOrWhiteSpace(_packingId))
-        {
-            await DialogService.ShowAlertAsync("No Packing Selected", "Please select a packing activity first.", "OK");
-            return;
-        }
-
-        // Load the packing activity
-        var packing = await PackingRepository.GetByIdAsync(_packingId);
-        if (packing == null)
-        {
-            await DialogService.ShowAlertAsync("Error", "Could not find the packing activity.", "OK");
-            return;
-        }
-
-        // Store reference to form component
-        EditPackingForm? formRef = null;
-
-        // Create a render fragment with the edit form
-        RenderFragment editForm = builder =>
-        {
-            builder.OpenComponent<EditPackingForm>(0);
-            builder.AddAttribute(1, "Packing", packing);
-            builder.AddAttribute(2, "ShowFormActions", false); // Hide form's own buttons
-            builder.AddComponentReferenceCapture(3, comp => formRef = (EditPackingForm)comp);
-            builder.CloseComponent();
-        };
-
-        // Show confirm dialog with custom content
-        bool confirmed = await DialogService.ShowConfirmAsync(
-            $"Edit: {packing.Name}", 
-            editForm,
-            "Save", 
-            "Cancel");
-
-        if (confirmed && formRef != null)
-        {
-            // Get the updated packing from the form
-            var updatedPacking = formRef.GetUpdatedPacking();
-            
-            // Save the updated packing
-            await PackingRepository.AddOrUpdateAsync(updatedPacking);
-            
-            // Update the sidebar text
-            SidebarTextService.SetText(updatedPacking.Name);
-        }
-    }
-
-    private async Task HandlePackingSave(PackingActivity packing)
-    {
-        // Save the updated packing
-        await PackingRepository.AddOrUpdateAsync(packing);
-        
-        // Update the sidebar text if needed
-        SidebarTextService.SetText(packing.Name);
-    }
-
-    private async Task HandlePackingCancel()
-    {
-        // Just close - nothing to do
     }
 
     void IDisposable.Dispose()

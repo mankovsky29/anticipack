@@ -13,6 +13,16 @@
     margin-top: 0;
 }
 
+/* Sticky header container */
+.sticky-header {
+    position: sticky;
+    top: 0;
+    z-index: 999;
+    background: var(--background);
+    padding-bottom: 2px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
 /* Header Styles */
 .top-header {
     display: flex;
@@ -70,29 +80,68 @@
     opacity: 1;
 }
 
-/* Activity Header - Optimized for maximum title space */
+/* Activity Header - Reorganized for sticky behavior */
 .activity-header {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
+    flex-direction: column;
     gap: 8px;
-    padding: var(--space-sm);
-    margin: var(--space-sm);
-    background: linear-gradient(135deg, rgba(var(--primary-rgb, 99,102,241), 0.04), rgba(var(--primary-rgb, 99,102,241), 0.01));
-    border-radius: 12px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-    border: 1px solid var(--border-color);
-    margin-bottom: var(--space-sm);
-    min-height: 56px;
+    padding: 12px;
+    background: var(--background);
+    border-bottom: 1px solid var(--border-color);
 }
 
-/* Left section: compact icon + flexible title */
+/* Header left section with title */
 .header-left-section {
     display: flex;
     align-items: center;
-    gap: 10px;
     min-width: 0;
     flex: 1;
+}
+
+/* Activity title styling */
+.activity-title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1.3;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Editable activity name input */
+.activity-name-input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    font-size: 18px;
+    font-weight: 700;
+    background: transparent;
+    color: var(--text-primary);
+    outline: none;
+    transition: all 0.2s ease;
+    line-height: 1.3;
+}
+
+.activity-name-input:hover {
+    background: var(--hover-bg);
+    border-color: var(--border-color);
+}
+
+.activity-name-input:focus {
+    background: var(--surface);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--input-focus-shadow);
+}
+
+/* Header actions container */
+.header-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
 }
 
 /* Compact category icon button */
@@ -309,6 +358,19 @@
 }
 
 /* Delete button styling */
+/* Delete button in header - danger color */
+.activity-actions .icon-btn.delete-item {
+    background: transparent;
+    border-color: var(--danger, #ef4444);
+    color: var(--danger, #ef4444);
+}
+
+.activity-actions .icon-btn.delete-item:hover {
+    background: var(--danger, #ef4444);
+    color: white;
+    border-color: var(--danger, #ef4444);
+}
+
 /* Delete button - clean, minimal, right-aligned, red */
 .item-delete-btn {
     flex-shrink: 0;

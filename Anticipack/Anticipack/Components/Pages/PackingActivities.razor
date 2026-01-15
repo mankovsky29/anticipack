@@ -5,11 +5,13 @@
 @using Anticipack.Services
 @using Microsoft.Extensions.Localization
 @using Anticipack.Resources.Localization
+@using Microsoft.JSInterop
 @inject IPackingRepository PackingRepository
 @inject NavigationManager Navigation
 @inject IDialogService DialogService
 @inject ILocalizationService LocalizationService
 @inject IStringLocalizer<AppResources> Localizer
+@inject IJSRuntime JSRuntime
 @implements IDisposable
 
 <div class="page-container with-fixed-navbar">
@@ -164,6 +166,14 @@
             </div>
         }
         
+        <!-- Scroll to Top Button -->
+        @if (_showScrollToTop)
+        {
+            <button class="scroll-to-top-fab" @onclick="ScrollToTopAsync" aria-label="Scroll to top" title="Scroll to top">
+                <i class="fa fa-arrow-up"></i>
+            </button>
+        }
+        
         <!-- Simplified FAB - Single Add Button -->
         <button class="add-fab" @onclick="AddNewActivity" aria-label="@Localizer["AddActivity"]" title="@Localizer["AddActivity"]">
             <i class="fa fa-plus"></i>
@@ -228,10 +238,36 @@ private ArchiveFilterType _archiveFilter = ArchiveFilterType.Active;
     private bool _showToast;
     private string _toastMessage = string.Empty;
     private System.Threading.CancellationTokenSource? _toastCts;
+    
+    // Scroll to top
+    private bool _showScrollToTop;
 
     protected override void OnInitialized()
     {
         LocalizationService.CultureChanged += OnCultureChanged;
+    }
+    
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JSRuntime.InvokeVoidAsync("initScrollToTopButton", DotNetObjectReference.Create(this));
+        }
+    }
+    
+    [JSInvokable]
+    public void UpdateScrollToTopVisibility(bool show)
+    {
+        if (_showScrollToTop != show)
+        {
+            _showScrollToTop = show;
+            StateHasChanged();
+        }
+    }
+    
+    private async Task ScrollToTopAsync()
+    {
+        await JSRuntime.InvokeVoidAsync("scrollToTop");
     }
 
     protected override async Task OnInitializedAsync()

@@ -8,6 +8,7 @@ public class PackingActivity
     public DateTime LastPacked { get; set; } = DateTime.UtcNow;
     public int RunCount { get; set; }
     public bool IsShared { get; set; }
+    public bool IsArchived { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
     

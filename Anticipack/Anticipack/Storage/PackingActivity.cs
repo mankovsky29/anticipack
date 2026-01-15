@@ -10,6 +10,7 @@ namespace Anticipack.Storage
         public DateTime LastPacked { get; set; }
         public int RunCount { get; set; }
         public bool IsShared { get; set; } = false; // New property for sharing capability
+        public bool IsArchived { get; set; } = false; // New property for archiving
 
         [Ignore] // Not mapped, for convenience
         public IReadOnlyCollection<PackingItem>? Items { get; set; }

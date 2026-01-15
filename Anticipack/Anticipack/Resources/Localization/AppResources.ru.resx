@@ -516,4 +516,103 @@
   <data name="SettingsMenu" xml:space="preserve">
     <value>Настройки</value>
   </data>
+  <data name="Items" xml:space="preserve">
+    <value>предметов</value>
+  </data>
+  <data name="Active" xml:space="preserve">
+    <value>Активные</value>
+  </data>
+  <data name="Archived" xml:space="preserve">
+    <value>Архивные</value>
+  </data>
+  <data name="Archive" xml:space="preserve">
+    <value>Архивировать</value>
+  </data>
+  <data name="Unarchive" xml:space="preserve">
+    <value>Разархивировать</value>
+  </data>
+  <data name="All" xml:space="preserve">
+    <value>Все</value>
+  </data>
+  <data name="Private" xml:space="preserve">
+    <value>Личные</value>
+  </data>
+  <data name="Shared" xml:space="preserve">
+    <value>Общие</value>
+  </data>
+  <data name="SharedActivity" xml:space="preserve">
+    <value>Общая активность</value>
+  </data>
+  <data name="MakeShared" xml:space="preserve">
+    <value>Сделать общей</value>
+  </data>
+  <data name="MakePrivate" xml:space="preserve">
+    <value>Сделать личной</value>
+  </data>
+  <data name="SharedActivityDescription" xml:space="preserve">
+    <value>Общие активности доступны другим пользователям</value>
+  </data>
+  <data name="ConfirmMakeShared" xml:space="preserve">
+    <value>Вы уверены, что хотите сделать "{0}" общей для других пользователей?</value>
+  </data>
+  <data name="ConfirmMakePrivate" xml:space="preserve">
+    <value>Вы уверены, что хотите сделать "{0}" личной?</value>
+  </data>
+  <data name="ConfirmArchive" xml:space="preserve">
+    <value>Вы уверены, что хотите архивировать "{0}"?</value>
+  </data>
+  <data name="ConfirmUnarchive" xml:space="preserve">
+    <value>Вы уверены, что хотите разархивировать "{0}"?</value>
+  </data>
+  <data name="ChangeShareStatus" xml:space="preserve">
+    <value>Изменить статус общего доступа</value>
+  </data>
+  <data name="ChangeArchiveStatus" xml:space="preserve">
+    <value>Изменить статус архива</value>
+  </data>
+  <data name="ActivityNowShared" xml:space="preserve">
+    <value>"{0}" теперь общая</value>
+  </data>
+  <data name="ActivityNowPrivate" xml:space="preserve">
+    <value>"{0}" теперь личная</value>
+  </data>
+  <data name="ActivityArchived" xml:space="preserve">
+    <value>"{0}" архивирована</value>
+  </data>
+  <data name="ActivityUnarchived" xml:space="preserve">
+    <value>"{0}" разархивирована</value>
+  </data>
+  <data name="FailedToUpdateShareStatus" xml:space="preserve">
+    <value>Ошибка изменения статуса общего доступа</value>
+  </data>
+  <data name="FailedToUpdateArchiveStatus" xml:space="preserve">
+    <value>Ошибка изменения статуса архива</value>
+  </data>
+  <data name="Runs" xml:space="preserve">
+    <value>запусков</value>
+  </data>
+  <data name="Categories" xml:space="preserve">
+    <value>категорий</value>
+  </data>
+  <data name="JustNow" xml:space="preserve">
+    <value>Только что</value>
+  </data>
+  <data name="MinutesAgo" xml:space="preserve">
+    <value>{0} минут назад</value>
+  </data>
+  <data name="HoursAgo" xml:space="preserve">
+    <value>{0} часов назад</value>
+  </data>
+  <data name="DaysAgo" xml:space="preserve">
+    <value>{0} дней назад</value>
+  </data>
+  <data name="WeeksAgo" xml:space="preserve">
+    <value>{0} недель назад</value>
+  </data>
+  <data name="MonthsAgo" xml:space="preserve">
+    <value>{0} месяцев назад</value>
+  </data>
+  <data name="Confirm" xml:space="preserve">
+    <value>Подтвердить</value>
+  </data>
 </root>

@@ -109,6 +109,18 @@
   <data name="Items" xml:space="preserve">
     <value>items</value>
   </data>
+  <data name="Active" xml:space="preserve">
+    <value>Active</value>
+  </data>
+  <data name="Archived" xml:space="preserve">
+    <value>Archived</value>
+  </data>
+  <data name="Archive" xml:space="preserve">
+    <value>Archive</value>
+  </data>
+  <data name="Unarchive" xml:space="preserve">
+    <value>Unarchive</value>
+  </data>
   <data name="All" xml:space="preserve">
     <value>All</value>
   </data>
@@ -136,8 +148,17 @@
   <data name="ConfirmMakePrivate" xml:space="preserve">
     <value>Are you sure you want to make "{0}" private?</value>
   </data>
+  <data name="ConfirmArchive" xml:space="preserve">
+    <value>Are you sure you want to archive "{0}"?</value>
+  </data>
+  <data name="ConfirmUnarchive" xml:space="preserve">
+    <value>Are you sure you want to unarchive "{0}"?</value>
+  </data>
   <data name="ChangeShareStatus" xml:space="preserve">
     <value>Change Share Status</value>
+  </data>
+  <data name="ChangeArchiveStatus" xml:space="preserve">
+    <value>Change Archive Status</value>
   </data>
   <data name="ActivityNowShared" xml:space="preserve">
     <value>"{0}" is now shared</value>
@@ -145,8 +166,17 @@
   <data name="ActivityNowPrivate" xml:space="preserve">
     <value>"{0}" is now private</value>
   </data>
+  <data name="ActivityArchived" xml:space="preserve">
+    <value>"{0}" has been archived</value>
+  </data>
+  <data name="ActivityUnarchived" xml:space="preserve">
+    <value>"{0}" has been unarchived</value>
+  </data>
   <data name="FailedToUpdateShareStatus" xml:space="preserve">
     <value>Failed to update share status</value>
+  </data>
+  <data name="FailedToUpdateArchiveStatus" xml:space="preserve">
+    <value>Failed to update archive status</value>
   </data>
   <data name="Confirm" xml:space="preserve">
     <value>Confirm</value>

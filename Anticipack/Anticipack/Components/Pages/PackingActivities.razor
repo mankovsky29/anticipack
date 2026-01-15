@@ -42,20 +42,15 @@
             <!-- Filter Bar -->
             <div class="filter-bar">
                 <div class="filter-chips">
-                    <button class="filter-chip @(_shareFilter == ShareFilterType.All ? "active" : "")" 
-                            @onclick="() => SetShareFilter(ShareFilterType.All)">
+                    <button class="filter-chip @(_archiveFilter == ArchiveFilterType.Active ? "active" : "")" 
+                            @onclick="() => SetArchiveFilter(ArchiveFilterType.Active)">
                         <i class="fa fa-layer-group"></i>
-                        <span>@Localizer["All"]</span>
+                        <span>@Localizer["Active"]</span>
                     </button>
-                    <button class="filter-chip @(_shareFilter == ShareFilterType.Private ? "active" : "")" 
-                            @onclick="() => SetShareFilter(ShareFilterType.Private)">
-                        <i class="fa fa-lock"></i>
-                        <span>@Localizer["Private"]</span>
-                    </button>
-                    <button class="filter-chip @(_shareFilter == ShareFilterType.Shared ? "active" : "")" 
-                            @onclick="() => SetShareFilter(ShareFilterType.Shared)">
-                        <i class="fa fa-share-alt"></i>
-                        <span>@Localizer["Shared"]</span>
+                    <button class="filter-chip @(_archiveFilter == ArchiveFilterType.Archived ? "active" : "")" 
+                            @onclick="() => SetArchiveFilter(ArchiveFilterType.Archived)">
+                        <i class="fa fa-archive"></i>
+                        <span>@Localizer["Archived"]</span>
                     </button>
                 </div>
             </div>
@@ -70,7 +65,7 @@
                     var topCategories = _activityTopCategories.GetValueOrDefault(activity.Id, new List<string>());
                     
                     <div class="activity-card" @onclick="() => OpenActivityInEditMode(activity.Id)">
-                        <!-- Card Header with Title and Delete Button -->
+                        <!-- Card Header with Title and Action Buttons -->
                         <div class="card-header">
                             <div class="header-left">
                                 <div class="title-row">
@@ -87,12 +82,20 @@
                                     <span>@GetRelativeTime(activity.LastPacked)</span>
                                 </div>
                             </div>
-                            <button class="btn-icon delete-btn" 
-                                    @onclick="() => PromptDeleteActivity(activity)"
-                                    @onclick:stopPropagation="true"
-                                    title="@Localizer["Delete"]">
-                                <i class="fa fa-trash"></i>
-                            </button>
+                            <div class="card-header-actions">
+                                <button class="btn-icon archive-btn" 
+                                        @onclick="() => ToggleArchiveActivity(activity)"
+                                        @onclick:stopPropagation="true"
+                                        title="@(activity.IsArchived ? Localizer["Unarchive"] : Localizer["Archive"])">
+                                    <i class="fa @(activity.IsArchived ? "fa-box-open" : "fa-archive")"></i>
+                                </button>
+                                <button class="btn-icon delete-btn" 
+                                        @onclick="() => PromptDeleteActivity(activity)"
+                                        @onclick:stopPropagation="true"
+                                        title="@Localizer["Delete"]">
+                                    <i class="fa fa-trash"></i>
+                                </button>
+                            </div>
                         </div>
 
                         <!-- Stats Row - Items and Runs in one line -->
@@ -203,19 +206,18 @@
 </div>
 
 @code {
-    private enum ShareFilterType
-    {
-        All,
-        Private,
-        Shared
-    }
+private enum ArchiveFilterType
+{
+    Active,
+    Archived
+}
 
-    private List<Storage.PackingActivity> _activities = new();
-    private Dictionary<string, int> _activityItemCounts = new();
-    private Dictionary<string, List<string>> _activityTopCategories = new();
-    private bool _isLoading = true;
-    private string _searchTerm = string.Empty;
-    private ShareFilterType _shareFilter = ShareFilterType.All;
+private List<Storage.PackingActivity> _activities = new();
+private Dictionary<string, int> _activityItemCounts = new();
+private Dictionary<string, List<string>> _activityTopCategories = new();
+private bool _isLoading = true;
+private string _searchTerm = string.Empty;
+private ArchiveFilterType _archiveFilter = ArchiveFilterType.Active;
 
     // Add dialog
     private bool _showAddDialog;
@@ -247,9 +249,9 @@
         _searchTerm = string.Empty;
     }
 
-    private void SetShareFilter(ShareFilterType filterType)
+    private void SetArchiveFilter(ArchiveFilterType filterType)
     {
-        _shareFilter = filterType;
+        _archiveFilter = filterType;
     }
 
     private async Task LoadActivitiesAsync()
@@ -304,11 +306,11 @@
                 filtered = filtered.Where(a => a.Name.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase));
             }
 
-            // Apply share filter
-            filtered = _shareFilter switch
+            // Apply archive filter
+            filtered = _archiveFilter switch
             {
-                ShareFilterType.Private => filtered.Where(a => !a.IsShared),
-                ShareFilterType.Shared => filtered.Where(a => a.IsShared),
+                ArchiveFilterType.Active => filtered.Where(a => !a.IsArchived),
+                ArchiveFilterType.Archived => filtered.Where(a => a.IsArchived),
                 _ => filtered
             };
             
@@ -394,15 +396,15 @@
         }
     }
 
-    private async Task ToggleActivityShare(Storage.PackingActivity activity)
+    private async Task ToggleArchiveActivity(Storage.PackingActivity activity)
     {
-        var newShareState = !activity.IsShared;
-        var confirmMessage = newShareState 
-            ? string.Format(Localizer["ConfirmMakeShared"], activity.Name)
-            : string.Format(Localizer["ConfirmMakePrivate"], activity.Name);
+        var newArchiveState = !activity.IsArchived;
+        var confirmMessage = newArchiveState 
+            ? string.Format(Localizer["ConfirmArchive"], activity.Name)
+            : string.Format(Localizer["ConfirmUnarchive"], activity.Name);
         
         var result = await DialogService.ShowConfirmAsync(
-            Localizer["ChangeShareStatus"], 
+            Localizer["ChangeArchiveStatus"], 
             confirmMessage,
             Localizer["Confirm"],
             Localizer["Cancel"]);
@@ -410,20 +412,20 @@
         if (!result) 
             return;
             
-        activity.IsShared = newShareState;
+        activity.IsArchived = newArchiveState;
         
         try
         {
             await PackingRepository.AddOrUpdateAsync(activity);
-            var message = activity.IsShared 
-                ? string.Format(Localizer["ActivityNowShared"], activity.Name)
-                : string.Format(Localizer["ActivityNowPrivate"], activity.Name);
+            var message = activity.IsArchived 
+                ? string.Format(Localizer["ActivityArchived"], activity.Name)
+                : string.Format(Localizer["ActivityUnarchived"], activity.Name);
             ShowToast(message);
             await LoadActivitiesAsync();
         }
         catch
         {
-            ShowToast(Localizer["FailedToUpdateShareStatus"]);
+            ShowToast(Localizer["FailedToUpdateArchiveStatus"]);
         }
     }
 

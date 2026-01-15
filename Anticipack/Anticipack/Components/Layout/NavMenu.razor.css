@@ -168,12 +168,63 @@
     color: var(--text-primary)
 }
 
-@media (min-width: 641px) {
+/* Tablet breakpoint: 641px - 1023px */
+@media (min-width: 641px) and (max-width: 1023px) {
+    .nav-container {
+        width: 200px;
+        min-width: 200px;
+        flex-shrink: 0;
+        height: 100vh;
+    }
+    
+    /* Hide the top row entirely on tablets */
+    .top-row {
+        display: none;
+    }
+    
+    .navbar-toggler {
+        display: none;
+    }
+    
+    .nav-menu-collapsed,
+    .nav-menu-expanded {
+        /* Always show sidebar on tablets */
+        display: block;
+        position: relative;
+        top: unset;
+        bottom: unset;
+        left: unset;
+        right: unset;
+        height: 100vh; /* Full height since top-row is hidden */
+        overflow-y: auto;
+        background-color: var(--background);
+    }
+    
+    .nav-item ::deep .nav-link {
+        padding: 0 1rem;
+        height: 3rem;
+        font-size: 0.9rem;
+    }
+    
+    .oi {
+        width: 1.5rem;
+        font-size: 1rem;
+        margin-right: 0.5rem;
+    }
+}
+
+/* Desktop breakpoint: 1024px+ */
+@media (min-width: 1024px) {
     .nav-container {
         width: 250px;
         min-width: 250px;
         flex-shrink: 0;
         height: 100vh;
+    }
+    
+    /* Hide the top row entirely on desktop */
+    .top-row {
+        display: none;
     }
     
     .navbar-toggler {
@@ -189,8 +240,8 @@
         bottom: unset;
         left: unset;
         right: unset;
-        height: calc(100vh - 3.5rem);
+        height: 100vh; /* Full height since top-row is hidden */
         overflow-y: auto;
-        background-color: var(--background)
+        background-color: var(--background);
     }
 }

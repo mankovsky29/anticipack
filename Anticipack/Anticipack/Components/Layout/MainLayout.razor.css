@@ -17,7 +17,22 @@ main {
     padding: 1rem;
 }
 
-@media (min-width: 641px) {
+/* Tablet breakpoint: 641px - 1023px */
+@media (min-width: 641px) and (max-width: 1023px) {
+    .page {
+        flex-direction: row;
+    }
+
+    .sidebar {
+        width: 200px;
+        height: 100vh;
+        position: sticky;
+        top: 0;
+    }
+}
+
+/* Desktop breakpoint: 1024px+ */
+@media (min-width: 1024px) {
     .page {
         flex-direction: row;
     }

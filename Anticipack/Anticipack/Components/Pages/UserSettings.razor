@@ -1,9 +1,11 @@
 ﻿@page "/user-settings"
 @using Anticipack.Services
 @using Anticipack.Resources.Localization
+@using Anticipack.Components.Shared.NavigationHeaderComponent
 @inject IJSRuntime JSRuntime
 @using System.Globalization
 @inject ILocalizationService LocalizationService
+@inject INavigationHeaderService NavigationHeaderService
 @implements IDisposable
 
 <div class="settings-page">
@@ -134,6 +136,8 @@
 
     protected override async Task OnInitializedAsync()
     {
+        NavigationHeaderService.SetText(AppResources.Settings);
+        
         try
         {
             CurrentTheme = await JSRuntime.InvokeAsync<string>("themeManager.getTheme");

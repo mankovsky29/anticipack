@@ -10,14 +10,14 @@
 @using Microsoft.JSInterop
 @using Anticipack.Components.Shared.DialogComponent
 @using Anticipack.Components.Shared.ToastComponent
-@using Anticipack.Components.Shared.SidebarTextComponent
+@using Anticipack.Components.Shared.NavigationHeaderComponent
 @using Anticipack.Resources.Localization
 @inject NavigationManager Navigation
 @inject IPackingRepository PackingRepository
 @inject IJSRuntime JSRuntime
 @inject IDialogService DialogService
 @inject IToastService ToastService
-@inject ISidebarTextService SidebarTextService
+@inject INavigationHeaderService NavigationHeaderService
 @implements IDisposable
 @inject IKeyboardService KeyboardService
 @inject ILocalizationService LocalizationService
@@ -486,8 +486,7 @@
         {
             _currentActivity = await PackingRepository.GetByIdAsync(id) ?? new Storage.PackingActivity(){ Name = AppResources.NewPackingActivity };
             _activityName = _currentActivity.Name ?? AppResources.NewPackingActivity;
-            SidebarTextService.SetPackingId(_currentActivity.Id);
-            SidebarTextService.SetText(_currentActivity.Name ?? "");
+            NavigationHeaderService.SetText(_currentActivity.Name ?? "");
             var itemsFromRepo = await PackingRepository.GetItemsForActivityAsync(id);
             Items = itemsFromRepo.Select(pi => new PackingItemView(pi)).ToList();
             _categoryOrder = Items.Select(i => i.Item.Category).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
@@ -719,7 +718,7 @@
         {
             _currentActivity.Name = _activityName;
             await PackingRepository.AddOrUpdateAsync(_currentActivity);
-            SidebarTextService.SetText(_activityName);
+            NavigationHeaderService.SetText(_activityName);
             ToastService.ShowSuccess(AppResources.ItemUpdated);
         }
         catch (Exception ex)

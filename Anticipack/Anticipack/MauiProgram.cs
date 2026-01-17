@@ -1,6 +1,6 @@
 ﻿using Anticipack.Components.Shared.DialogComponent;
 using Anticipack.Components.Shared.ToastComponent;
-using Anticipack.Components.Shared.SidebarTextComponent;
+using Anticipack.Components.Shared.NavigationHeaderComponent;
 using Anticipack.Storage;
 using Anticipack.Services;
 using Microsoft.Extensions.Logging;
@@ -59,7 +59,7 @@ namespace Anticipack
 
             builder.Services.AddScoped<IDialogService, DialogService>();
             builder.Services.AddScoped<IToastService, ToastService>();
-            builder.Services.AddSingleton<ISidebarTextService, SidebarTextService>();
+            builder.Services.AddSingleton<INavigationHeaderService, NavigationHeaderService>();
             builder.Services.AddSingleton<IMicrophonePermissionService, MicrophonePermissionService>();
             builder.Services.AddScoped<MicrophonePermissionBridge>();
 

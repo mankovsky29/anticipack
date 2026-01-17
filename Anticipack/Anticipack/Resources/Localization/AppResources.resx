@@ -601,4 +601,27 @@ Soap, Towel</value>
   <data name="UseAppLanguage" xml:space="preserve">
     <value>Use app language for speech recognition</value>
   </data>
+  
+  <!-- Donate Page -->
+  <data name="Donate" xml:space="preserve">
+    <value>Donate</value>
+  </data>
+  <data name="DonateTitle" xml:space="preserve">
+    <value>Support Anticipack</value>
+  </data>
+  <data name="DonateDescription" xml:space="preserve">
+    <value>Your support helps us continue developing and improving Anticipack. Thank you for considering a donation!</value>
+  </data>
+  <data name="SelectAmount" xml:space="preserve">
+    <value>Select an amount</value>
+  </data>
+  <data name="CustomAmount" xml:space="preserve">
+    <value>Or enter a custom amount</value>
+  </data>
+  <data name="DonateNow" xml:space="preserve">
+    <value>Donate</value>
+  </data>
+  <data name="DonateThankYou" xml:space="preserve">
+    <value>Every contribution, big or small, makes a difference. Thank you for your support!</value>
+  </data>
 </root>

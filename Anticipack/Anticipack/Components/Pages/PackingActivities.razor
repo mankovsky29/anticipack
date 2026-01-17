@@ -1,5 +1,6 @@
 @page "/packing-activities"
 @using Anticipack.Components.Shared.DialogComponent
+@using Anticipack.Components.Shared.NavigationHeaderComponent
 @using Anticipack.Storage
 @using Anticipack.Packing
 @using Anticipack.Services
@@ -11,6 +12,7 @@
 @inject IDialogService DialogService
 @inject ILocalizationService LocalizationService
 @inject IStringLocalizer<AppResources> Localizer
+@inject INavigationHeaderService NavigationHeaderService
 @inject IJSRuntime JSRuntime
 @implements IDisposable
 
@@ -265,6 +267,7 @@ private ArchiveFilterType _archiveFilter = ArchiveFilterType.Active;
 
     protected override async Task OnInitializedAsync()
     {
+        NavigationHeaderService.SetText(Localizer["PackingActivitiesMenu"]);
         await LoadActivitiesAsync();
     }
 

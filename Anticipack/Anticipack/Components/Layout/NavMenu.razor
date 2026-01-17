@@ -1,10 +1,10 @@
-﻿@using Anticipack.Resources.Localization
-@using Anticipack.Components.Shared.SidebarTextComponent
+@using Anticipack.Resources.Localization
+@using Anticipack.Components.Shared.NavigationHeaderComponent
 @using Microsoft.Extensions.Localization
 @using Microsoft.JSInterop
 
 @inject IStringLocalizer<AppResources> L
-@inject ISidebarTextService SidebarTextService
+@inject INavigationHeaderService NavigationHeaderService
 @inject IJSRuntime JSRuntime
 
 <div class="nav-container">
@@ -13,7 +13,7 @@
             <button title="@L["NavigationMenu"]" class="navbar-toggler" @onclick="ToggleNavMenu">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <SidebarText />
+            <NavigationHeader />
         </div>
     </div>
 
@@ -54,7 +54,7 @@
             collapseNavMenu = !collapseNavMenu;
             
             // Notify the service about the nav menu state
-            SidebarTextService.SetNavMenuExpanded(!collapseNavMenu);
+            NavigationHeaderService.SetNavMenuExpanded(!collapseNavMenu);
         }
     }
 }

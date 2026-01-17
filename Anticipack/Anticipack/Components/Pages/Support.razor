@@ -1,8 +1,10 @@
 @page "/support"
 @using Microsoft.JSInterop
 @using Anticipack.Resources.Localization
+@using Anticipack.Components.Shared.NavigationHeaderComponent
 @using Microsoft.Extensions.Localization
 @inject IStringLocalizer<AppResources> L
+@inject INavigationHeaderService NavigationHeaderService
 @implements IAsyncDisposable
 
 <div class="support-container">
@@ -167,6 +169,8 @@
     {
         if (firstRender)
         {
+            NavigationHeaderService.SetText(L["Support"]);
+            
             _dotNetRef = DotNetObjectReference.Create(this);
             await JS.InvokeVoidAsync("supportPage.attach", messageInput, _dotNetRef, messagesContainer);
             

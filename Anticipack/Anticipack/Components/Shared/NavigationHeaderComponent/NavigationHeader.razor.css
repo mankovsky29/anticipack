@@ -1,0 +1,90 @@
+.navigation-header-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    flex: 1;
+    min-width: 0;
+}
+
+.navigation-header-text {
+    flex: 1;
+    min-width: 0;
+    height: 3rem;
+    min-height: 3rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+    padding: 0.5rem 0.75rem;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    text-align: left;
+    order: 1;
+}
+
+.navigation-header-text span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.donate-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 3rem;
+    height: 3rem;
+    min-width: 3rem;
+    flex-shrink: 0;
+    background-color: var(--surface);
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    box-shadow: var(--shadow-sm);
+    order: 2;
+    margin-left: auto;
+}
+
+.donate-button:hover {
+    background-color: var(--hover-bg);
+    border-color: var(--primary);
+    box-shadow: var(--shadow);
+    transform: translateY(-1px);
+}
+
+.donate-button:active {
+    background-color: var(--primary-light-bg);
+    transform: scale(0.95);
+}
+
+.donate-button .oi {
+    font-size: 1.3rem;
+    margin: 0;
+    width: auto;
+}
+
+/* Mobile: hide donate button when NavMenu is expanded */
+.donate-hidden-mobile {
+    display: none;
+}
+
+.donate-visible {
+    display: flex;
+}
+
+/* Tablet and larger: always show donate button */
+@media (min-width: 641px) {
+    .donate-button {
+        display: flex !important;
+    }
+    
+    .donate-hidden-mobile,
+    .donate-visible {
+        display: flex !important;
+    }
+}

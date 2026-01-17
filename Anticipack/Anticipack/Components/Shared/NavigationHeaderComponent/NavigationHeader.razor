@@ -1,0 +1,72 @@
+@using Anticipack.Components.Shared.NavigationHeaderComponent
+@using Anticipack.Resources.Localization
+@using Microsoft.Extensions.Localization
+@implements IDisposable
+@inject INavigationHeaderService NavigationHeaderService
+@inject NavigationManager NavigationManager
+@inject IStringLocalizer<AppResources> L
+
+<div class="navigation-header-container">
+    @if (!string.IsNullOrWhiteSpace(_displayText))
+    {
+        <div class="navigation-header-text">
+            <span>@_displayText</span>
+        </div>
+    }
+    
+    <button class="donate-button @GetDonateButtonVisibilityClass()" 
+            @onclick="NavigateToDonate"
+            title="@L["Donate"]">
+        <span class="oi oi-gift" aria-hidden="true"></span>
+    </button>
+</div>
+
+@code {
+    private string _displayText = string.Empty;
+    private bool _isNavMenuExpanded = false;
+
+    protected override void OnInitialized()
+    {
+        // Subscribe to service events
+        if (NavigationHeaderService is NavigationHeaderService concreteService)
+        {
+            concreteService.OnTextChanged += UpdateText;
+            concreteService.OnNavMenuToggled += UpdateNavMenuState;
+            
+            // Initialize with current values
+            _displayText = NavigationHeaderService.GetText();
+            _isNavMenuExpanded = NavigationHeaderService.IsNavMenuExpanded();
+        }
+    }
+
+    private void UpdateText(string text)
+    {
+        _displayText = text;
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void UpdateNavMenuState(bool isExpanded)
+    {
+        _isNavMenuExpanded = isExpanded;
+        InvokeAsync(StateHasChanged);
+    }
+
+    private string GetDonateButtonVisibilityClass()
+    {
+        // On mobile: visible only when NavMenu is hidden (collapsed)
+        // On tablet+: always visible
+        return _isNavMenuExpanded ? "donate-hidden-mobile" : "donate-visible";
+    }
+
+    private void NavigateToDonate()
+    {
+        NavigationManager.NavigateTo("/donate");
+    }
+
+    void IDisposable.Dispose()
+    {
+        // Unsubscribe from events
+        NavigationHeaderService.OnTextChanged -= UpdateText;
+        NavigationHeaderService.OnNavMenuToggled -= UpdateNavMenuState;
+    }
+}

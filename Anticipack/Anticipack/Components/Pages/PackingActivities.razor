@@ -1,4 +1,4 @@
-﻿@page "/packing-activities"
+@page "/packing-activities"
 @using Anticipack.Components.Shared.DialogComponent
 @using Anticipack.Storage
 @using Anticipack.Packing
@@ -66,7 +66,7 @@
                     var itemCount = _activityItemCounts.GetValueOrDefault(activity.Id, 0);
                     var topCategories = _activityTopCategories.GetValueOrDefault(activity.Id, new List<string>());
                     
-                    <div class="activity-card" @onclick="() => OpenActivityInEditMode(activity.Id)">
+                    <div class="activity-card">
                         <!-- Card Header with Title and Action Buttons -->
                         <div class="card-header">
                             <div class="header-left">
@@ -85,15 +85,18 @@
                                 </div>
                             </div>
                             <div class="card-header-actions">
+                                <button class="btn-icon edit-btn" 
+                                        @onclick="() => OpenActivityInEditMode(activity.Id)"
+                                        title="@Localizer["Edit"]">
+                                    <i class="fa fa-edit"></i>
+                                </button>
                                 <button class="btn-icon archive-btn" 
                                         @onclick="() => ToggleArchiveActivity(activity)"
-                                        @onclick:stopPropagation="true"
                                         title="@(activity.IsArchived ? Localizer["Unarchive"] : Localizer["Archive"])">
                                     <i class="fa @(activity.IsArchived ? "fa-box-open" : "fa-archive")"></i>
                                 </button>
                                 <button class="btn-icon delete-btn" 
                                         @onclick="() => PromptDeleteActivity(activity)"
-                                        @onclick:stopPropagation="true"
                                         title="@Localizer["Delete"]">
                                     <i class="fa fa-trash"></i>
                                 </button>
@@ -133,8 +136,7 @@
                         <!-- Action Button - Single Primary Action -->
                         <div class="card-actions">
                             <button class="btn-primary pack-btn" 
-                                    @onclick="() => OpenActivityInPackingMode(activity.Id)"
-                                    @onclick:stopPropagation="true">
+                                    @onclick="() => OpenActivityInPackingMode(activity.Id)">
                                 <i class="fa fa-play"></i>
                                 <span>@Localizer["PackNow"]</span>
                             </button>

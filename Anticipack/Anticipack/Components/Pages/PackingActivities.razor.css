@@ -252,6 +252,11 @@
     transform: scale(1.08);
 }
 
+.btn-icon.edit-btn:hover {
+    background: var(--primary);
+    color: white;
+}
+
 .btn-icon.archive-btn:hover {
     background: var(--primary);
     color: white;

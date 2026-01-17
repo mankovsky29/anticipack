@@ -150,6 +150,7 @@
     {
         CurrentTheme = theme;
         await JSRuntime.InvokeVoidAsync("themeManager.setTheme", theme);
+        StateHasChanged(); // Force UI update
     }
 
     private bool IsCurrentLanguage(string culture)

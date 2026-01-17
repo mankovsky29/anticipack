@@ -1,9 +1,11 @@
 ﻿@using Anticipack.Resources.Localization
 @using Anticipack.Components.Shared.SidebarTextComponent
 @using Microsoft.Extensions.Localization
+@using Microsoft.JSInterop
 
 @inject IStringLocalizer<AppResources> L
 @inject ISidebarTextService SidebarTextService
+@inject IJSRuntime JSRuntime
 
 <div class="nav-container">
     <div class="top-row navbar navbar-dark">
@@ -41,11 +43,18 @@
 
     private string NavMenuCssClass => collapseNavMenu ? "nav-menu-collapsed" : "nav-menu-expanded";
 
-    private void ToggleNavMenu()
+    private async Task ToggleNavMenu()
     {
-        collapseNavMenu = !collapseNavMenu;
+        // Check if we're on mobile screen (< 641px)
+        // Only toggle on mobile - on tablet/desktop the menu is always visible
+        var isMobile = await JSRuntime.InvokeAsync<bool>("eval", "window.innerWidth < 641");
         
-        // Notify the service about the nav menu state
-        SidebarTextService.SetNavMenuExpanded(!collapseNavMenu);
+        if (isMobile)
+        {
+            collapseNavMenu = !collapseNavMenu;
+            
+            // Notify the service about the nav menu state
+            SidebarTextService.SetNavMenuExpanded(!collapseNavMenu);
+        }
     }
 }

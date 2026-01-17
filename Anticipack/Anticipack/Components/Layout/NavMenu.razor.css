@@ -198,6 +198,12 @@
         height: 100vh; /* Full height since top-row is hidden */
         overflow-y: auto;
         background-color: var(--background);
+        pointer-events: none; /* Disable click-through on the container */
+    }
+    
+    .nav-menu-collapsed nav,
+    .nav-menu-expanded nav {
+        pointer-events: auto; /* Re-enable clicks on the actual nav items */
     }
     
     .nav-item ::deep .nav-link {
@@ -243,5 +249,11 @@
         height: 100vh; /* Full height since top-row is hidden */
         overflow-y: auto;
         background-color: var(--background);
+        pointer-events: none; /* Disable click-through on the container */
+    }
+    
+    .nav-menu-collapsed nav,
+    .nav-menu-expanded nav {
+        pointer-events: auto; /* Re-enable clicks on the actual nav items */
     }
 }

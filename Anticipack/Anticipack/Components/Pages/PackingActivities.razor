@@ -66,82 +66,61 @@
                 @foreach (var activity in FilteredActivities)
                 {
                     var itemCount = _activityItemCounts.GetValueOrDefault(activity.Id, 0);
-                    var topCategories = _activityTopCategories.GetValueOrDefault(activity.Id, new List<string>());
                     
                     <div class="activity-card">
-                        <!-- Card Header with Title and Action Buttons -->
+                        <button class="btn-play" 
+                                @onclick="() => OpenActivityInPackingMode(activity.Id)"
+                                title="@Localizer["PackNow"]">
+                            <i class="fa fa-play"></i>
+                        </button>
+                        
                         <div class="card-header">
-                            <div class="header-left">
+                            <div class="header-content">
                                 <div class="title-row">
                                     <h3 class="activity-title">@activity.Name</h3>
                                     @if (activity.IsShared)
                                     {
-                                        <div class="shared-indicator" title="@Localizer["SharedActivity"]">
+                                        <span class="shared-badge" title="@Localizer["SharedActivity"]">
                                             <i class="fa fa-share-alt"></i>
-                                        </div>
+                                        </span>
                                     }
                                 </div>
-                                <div class="activity-subtitle">
-                                    <i class="fa fa-clock"></i>
-                                    <span>@GetRelativeTime(activity.LastPacked)</span>
+                                <div class="activity-meta">
+                                    <span class="meta-item">
+                                        <i class="fa fa-clock"></i>
+                                        @GetRelativeTime(activity.LastPacked)
+                                    </span>
+                                    <span class="meta-separator">•</span>
+                                    <span class="meta-item">
+                                        <i class="fa fa-box"></i>
+                                        @itemCount @GetItemsText()
+                                    </span>
                                 </div>
                             </div>
-                            <div class="card-header-actions">
-                                <button class="btn-icon edit-btn" 
-                                        @onclick="() => OpenActivityInEditMode(activity.Id)"
-                                        title="@Localizer["Edit"]">
-                                    <i class="fa fa-edit"></i>
+                            <div class="card-menu">
+                                <button class="btn-menu" 
+                                        @onclick="() => ToggleMenu(activity.Id)"
+                                        title="@Localizer["More"]">
+                                    <i class="fa fa-ellipsis-v"></i>
                                 </button>
-                                <button class="btn-icon archive-btn" 
-                                        @onclick="() => ToggleArchiveActivity(activity)"
-                                        title="@(activity.IsArchived ? Localizer["Unarchive"] : Localizer["Archive"])">
-                                    <i class="fa @(activity.IsArchived ? "fa-box-open" : "fa-archive")"></i>
-                                </button>
-                                <button class="btn-icon delete-btn" 
-                                        @onclick="() => PromptDeleteActivity(activity)"
-                                        title="@Localizer["Delete"]">
-                                    <i class="fa fa-trash"></i>
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Stats Row - Items and Runs in one line -->
-                        <div class="stats-row">
-                            <div class="stat-item" title="@Localizer["Items"]">
-                                <div class="stat-icon items">
-                                    <i class="fa fa-box"></i>
-                                </div>
-                                <div class="stat-value">@itemCount</div>
-                            </div>
-                            
-                            @if (activity.RunCount > 0)
-                            {
-                                <div class="stat-item" title="@Localizer["Runs"]">
-                                    <div class="stat-icon runs">
-                                        <i class="fa fa-redo"></i>
+                                @if (_openMenuId == activity.Id)
+                                {
+                                    <div class="menu-dropdown">
+                                        <button class="menu-item" @onclick="() => OpenActivityInEditMode(activity.Id)">
+                                            <i class="fa fa-edit"></i>
+                                            <span>@Localizer["Edit"]</span>
+                                        </button>
+                                        <button class="menu-item" @onclick="() => ToggleArchiveActivity(activity)">
+                                            <i class="fa @(activity.IsArchived ? "fa-box-open" : "fa-archive")"></i>
+                                            <span>@(activity.IsArchived ? Localizer["Unarchive"] : Localizer["Archive"])</span>
+                                        </button>
+                                        <button class="menu-item danger" @onclick="() => PromptDeleteActivity(activity)">
+                                            <i class="fa fa-trash"></i>
+                                            <span>@Localizer["Delete"]</span>
+                                        </button>
                                     </div>
-                                    <div class="stat-value">@activity.RunCount</div>
-                                </div>
-                            }
-                            
-                            @if (topCategories.Any())
-                            {
-                                <div class="stat-item categories-count" title="@Localizer["Categories"]">
-                                    <div class="stat-icon categories">
-                                        <i class="fa fa-tags"></i>
-                                    </div>
-                                    <div class="stat-value">@topCategories.Count</div>
-                                </div>
-                            }
-                        </div>
-
-                        <!-- Action Button - Single Primary Action -->
-                        <div class="card-actions">
-                            <button class="btn-primary pack-btn" 
-                                    @onclick="() => OpenActivityInPackingMode(activity.Id)">
-                                <i class="fa fa-play"></i>
-                                <span>@Localizer["PackNow"]</span>
-                            </button>
+                                }
+                            </div>
                         </div>
                     </div>
                 }
@@ -223,6 +202,7 @@ private Dictionary<string, List<string>> _activityTopCategories = new();
 private bool _isLoading = true;
 private string _searchTerm = string.Empty;
 private ArchiveFilterType _archiveFilter = ArchiveFilterType.Active;
+private string? _openMenuId;
 
     // Add dialog
     private bool _showAddDialog;
@@ -284,6 +264,16 @@ private ArchiveFilterType _archiveFilter = ArchiveFilterType.Active;
     private void SetArchiveFilter(ArchiveFilterType filterType)
     {
         _archiveFilter = filterType;
+    }
+
+    private void ToggleMenu(string activityId)
+    {
+        _openMenuId = _openMenuId == activityId ? null : activityId;
+    }
+
+    private void CloseMenu()
+    {
+        _openMenuId = null;
     }
 
     private async Task LoadActivitiesAsync()
@@ -370,6 +360,11 @@ private ArchiveFilterType _archiveFilter = ArchiveFilterType.Active;
         return dateTime.ToString("MMM d, yyyy");
     }
 
+    private string GetItemsText()
+    {
+        return Localizer["Items"].Value.ToString().ToLower();
+    }
+
     private string GetCategoryIcon(string category)
     {
         return category switch
@@ -430,6 +425,7 @@ private ArchiveFilterType _archiveFilter = ArchiveFilterType.Active;
 
     private async Task ToggleArchiveActivity(Storage.PackingActivity activity)
     {
+        CloseMenu();
         var newArchiveState = !activity.IsArchived;
         var confirmMessage = newArchiveState 
             ? string.Format(Localizer["ConfirmArchive"], activity.Name)
@@ -463,6 +459,7 @@ private ArchiveFilterType _archiveFilter = ArchiveFilterType.Active;
 
     private async Task PromptDeleteActivity(Storage.PackingActivity activity)
     {
+        CloseMenu();
         var message = string.Format(Localizer["DeleteActivityMessage"], activity.Name);
         var result = await DialogService.ShowConfirmAsync(Localizer["DeleteActivityTitle"], message);
         
@@ -493,6 +490,7 @@ private ArchiveFilterType _archiveFilter = ArchiveFilterType.Active;
 
     private void OpenActivityInEditMode(string id)
     {
+        CloseMenu();
         Navigation.NavigateTo($"/packing-activity?id={id}&mode=edit");
     }
 

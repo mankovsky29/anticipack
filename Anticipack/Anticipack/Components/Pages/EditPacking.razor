@@ -26,43 +26,45 @@
 <NavigationLock OnBeforeInternalNavigation="OnBeforeInternalNavigation" />
 
 <div class="page-container with-fixed-navbar" @onclick="HandlePageClick">
-<div class="sticky-header">
-    <header class="activity-header" role="banner" aria-label="@AppResources.PackingActivity">
-        <div class="header-left-section">
-            <input type="text" 
-                   class="activity-name-input" 
-                   @bind="_activityName" 
-                   @bind:event="oninput"
-                   @onblur="SaveActivityNameAsync"
-                   placeholder="@AppResources.EnterActivityName" />
+<div class="activity-header" role="banner" aria-label="@AppResources.PackingActivity">
+    <!-- Actions on second line -->
+    <div class="header-actions">
+        <div class="activity-actions activity-actions-left" role="group" aria-label="@AppResources.PackingDialogMenu">
+            <!-- Primary action: Play button -->
+            <button class="icon-btn play" @onclick="SwitchToPackingMode" @onclick:stopPropagation aria-label="@AppResources.StartPacking">
+                <i class="fa fa-play" aria-hidden="true"></i>
+            </button>
+
+            <!-- Copy button -->
+            <button class="icon-btn" @onclick="CopyPacking" @onclick:stopPropagation title="@AppResources.CopyTitle">
+                <i class="fa fa-copy" aria-hidden="true"></i>
+            </button>
+
+            <!-- Add item button -->
+            <button class="icon-btn" @onclick="ShowAddItemForm" @onclick:stopPropagation title="@AppResources.AddItem">
+                <i class="fa fa-plus" aria-hidden="true"></i>
+            </button>
         </div>
-            
-        <div class="header-actions">
-            <div class="activity-actions activity-actions-left" role="group" aria-label="@AppResources.PackingDialogMenu">
-                <!-- Primary action: Play button -->
-                <button class="icon-btn play" @onclick="SwitchToPackingMode" @onclick:stopPropagation aria-label="@AppResources.StartPacking">
-                    <i class="fa fa-play" aria-hidden="true"></i>
-                </button>
 
-                <!-- Copy button -->
-                <button class="icon-btn" @onclick="CopyPacking" @onclick:stopPropagation title="@AppResources.CopyTitle">
-                    <i class="fa fa-copy" aria-hidden="true"></i>
-                </button>
-
-                <!-- Add item button -->
-                <button class="icon-btn" @onclick="ShowAddItemForm" @onclick:stopPropagation title="@AppResources.AddItem">
-                    <i class="fa fa-plus" aria-hidden="true"></i>
-                </button>
-            </div>
-
-            <div class="activity-actions activity-actions-right" role="group">
-                <!-- Delete activity button -->
-                <button class="icon-btn delete-item" @onclick="PromptDeleteActivity" @onclick:stopPropagation title="@AppResources.DeleteActivity">
-                    <i class="fa fa-trash" aria-hidden="true"></i>
-                </button>
-            </div>
+        <div class="activity-actions activity-actions-right" role="group">
+            <!-- Delete activity button -->
+            <button class="icon-btn delete-item" @onclick="PromptDeleteActivity" @onclick:stopPropagation title="@AppResources.DeleteActivity">
+                <i class="fa fa-trash" aria-hidden="true"></i>
+            </button>
         </div>
-    </header>
+    </div>
+</div>
+
+<div class="activity-header" role="banner" aria-label="@AppResources.PackingActivity">
+    <!-- Title on first line -->
+    <div class="header-left-section">
+        <input type="text"
+                class="activity-name-input"
+                @bind="_activityName"
+                @bind:event="oninput"
+                @onblur="SaveActivityNameAsync"
+                placeholder="@AppResources.EnterActivityName" />
+    </div>
 </div>
 
     <main class="content-area">

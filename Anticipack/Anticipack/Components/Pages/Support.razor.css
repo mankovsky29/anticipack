@@ -68,7 +68,7 @@
 /* Quick Help Section */
 .quick-help-section {
     max-width: 900px;
-    margin: var(--space-md) var(--space-xs) 0;
+    margin: var(--space-xs);
     padding: 0 var(--space-md);
 }
 
@@ -394,7 +394,8 @@
     bottom: 0;
     background-color: var(--background);
     border-top: 1px solid var(--border-color);
-    padding: var(--space-sm) var(--space-md);
+    padding: var(--space-sm);
+    margin: var(--space-xs);
     box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.05);
     backdrop-filter: blur(10px);
     z-index: 100;

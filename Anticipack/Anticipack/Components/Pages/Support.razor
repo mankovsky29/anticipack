@@ -8,44 +8,20 @@
 @implements IAsyncDisposable
 
 <div class="support-container">
-    <!-- Header -->
-    <div class="support-header">
-        <div class="header-content">
-            <i class="fa fa-life-ring"></i>
-            <div>
-                <h2>@L["Support"]</h2>
-                <p>@L["HowCanWeHelp"]</p>
-            </div>
+    <!-- Contact Info -->
+    <div class="contact-info">
+        <h3>@L["OtherWaysToReach"]</h3>
+        <div class="contact-methods">
+            <a href="mailto:support@anticipack.com" class="contact-method">
+                <i class="fa fa-envelope"></i>
+                <div>
+                    <strong>@L["Email"]</strong>
+                    <span>support@anticipack.com</span>
+                </div>
+            </a>
         </div>
     </div>
 
-    <!-- Quick Help Section -->
-    <div class="quick-help-section">
-        <h3>@L["QuickHelp"]</h3>
-        <div class="help-cards">
-            <button class="help-card" @onclick='() => InsertTemplate("bug")'>
-                <i class="fa fa-bug"></i>
-                <div class="help-card-content">
-                    <h4>@L["ReportBug"]</h4>
-                    <p>@L["ReportBugDescription"]</p>
-                </div>
-            </button>
-            <button class="help-card" @onclick='() => InsertTemplate("feature")'>
-                <i class="fa fa-lightbulb"></i>
-                <div class="help-card-content">
-                    <h4>@L["SuggestFeature"]</h4>
-                    <p>@L["SuggestFeatureDescription"]</p>
-                </div>
-            </button>
-            <button class="help-card" @onclick='() => InsertTemplate("question")'>
-                <i class="fa fa-question-circle"></i>
-                <div class="help-card-content">
-                    <h4>@L["AskQuestion"]</h4>
-                    <p>@L["AskQuestionDescription"]</p>
-                </div>
-            </button>
-        </div>
-    </div>
 
     <!-- Messages Container -->
     <div class="messages-section">
@@ -107,27 +83,6 @@
         </div>
     </div>
 
-    <!-- Contact Info -->
-    <div class="contact-info">
-        <h3>@L["OtherWaysToReach"]</h3>
-        <div class="contact-methods">
-            <a href="mailto:support@anticipack.com" class="contact-method">
-                <i class="fa fa-envelope"></i>
-                <div>
-                    <strong>@L["Email"]</strong>
-                    <span>support@anticipack.com</span>
-                </div>
-            </a>
-            <a href="https://github.com/mankovsky29/anticipack/issues" target="_blank" class="contact-method">
-                <i class="fa fa-github"></i>
-                <div>
-                    <strong>GitHub</strong>
-                    <span>@L["ReportOnGitHub"]</span>
-                </div>
-            </a>
-        </div>
-    </div>
-
     <!-- Message Input -->
     <div class="message-input-section">
         <div class="input-wrapper">
@@ -186,18 +141,6 @@
             StateHasChanged();
             await ScrollToBottom();
         }
-    }
-
-    private void InsertTemplate(string templateType)
-    {
-        currentMessage = templateType switch
-        {
-            "bug" => $"{L["BugReportTemplate"]}\n\n{L["BugReportTemplateContent"]}",
-            "feature" => $"{L["FeatureRequestTemplate"]}\n\n{L["FeatureRequestTemplateContent"]}",
-            "question" => $"{L["QuestionTemplate"]}\n\n",
-            _ => currentMessage
-        };
-        StateHasChanged();
     }
 
     private async Task SendMessage()

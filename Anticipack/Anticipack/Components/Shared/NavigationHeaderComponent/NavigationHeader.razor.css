@@ -52,7 +52,7 @@
 
 .donate-button:hover {
     background-color: var(--hover-bg);
-    border-color: var(--primary);
+    border-color: #FFD700;
     box-shadow: var(--shadow);
     transform: translateY(-1px);
 }
@@ -62,10 +62,14 @@
     transform: scale(0.95);
 }
 
-.donate-button .oi {
-    font-size: 1.3rem;
+.donate-icon {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #FFD700;
     margin: 0;
     width: auto;
+    line-height: 1;
+    font-family: system-ui, -apple-system, sans-serif;
 }
 
 /* Mobile: hide donate button when NavMenu is expanded */

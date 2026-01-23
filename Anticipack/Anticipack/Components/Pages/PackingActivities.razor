@@ -157,29 +157,55 @@
 
 @if (_showAddDialog)
 {
-    <div class="modal-overlay" @onclick="CancelAddActivity">
+    <div class="modal-overlay" @onclick="CancelAddActivity" @onkeydown="HandleDialogKeyDown">
         <div class="modal-content" @onclick:stopPropagation>
+            <button class="modal-close-btn" @onclick="CancelAddActivity" aria-label="Close" title="@Localizer["Cancel"]">
+                <i class="fa fa-times"></i>
+            </button>
+            
+            <div class="modal-icon">
+                <i class="fa fa-plus-circle"></i>
+            </div>
+            
             <h4 class="modal-header">@Localizer["NewPackingActivity"]</h4>
             
             <div class="form-row">
                 <label for="activity-name">@Localizer["Name"]</label>
-                <input id="activity-name" @bind="_newActivityName" />
-            </div>
-
-            <div class="form-row checkbox-row">
-                <label class="checkbox-label">
-                    <input type="checkbox" @bind="_newActivityIsShared" />
-                    <span class="checkbox-text">
-                        <i class="fa fa-share-alt"></i>
-                        @Localizer["MakeShared"]
+                <input id="activity-name" 
+                       type="text"
+                       class="@(string.IsNullOrWhiteSpace(_newActivityName) && _hasAttemptedSubmit ? "input-error" : "")"
+                       placeholder="@Localizer["EnterActivityName"]"
+                       @bind="_newActivityName" 
+                       @bind:event="oninput"
+                       @onkeydown="HandleInputKeyDown"
+                       @ref="_activityNameInput" />
+                @if (string.IsNullOrWhiteSpace(_newActivityName) && _hasAttemptedSubmit)
+                {
+                    <span class="error-message">
+                        <i class="fa fa-exclamation-circle"></i>
+                        @Localizer["NameRequired"]
                     </span>
-                </label>
-                <p class="help-text">@Localizer["SharedActivityDescription"]</p>
+                }
             </div>
 
             <div class="form-actions">
-                <button class="btn cancel" @onclick="CancelAddActivity">@Localizer["Cancel"]</button>
-                <button class="btn primary" @onclick="ConfirmAddActivityAsync">@Localizer["Create"]</button>
+                <button class="btn cancel" @onclick="CancelAddActivity" disabled="@_isCreating">
+                    @Localizer["Cancel"]
+                </button>
+                <button class="btn primary" 
+                        @onclick="ConfirmAddActivityAsync" 
+                        disabled="@(_isCreating || string.IsNullOrWhiteSpace(_newActivityName))">
+                    @if (_isCreating)
+                    {
+                        <span class="btn-spinner"></span>
+                        <span>@Localizer["Creating"]</span>
+                    }
+                    else
+                    {
+                        <i class="fa fa-check"></i>
+                        <span>@Localizer["Create"]</span>
+                    }
+                </button>
             </div>
         </div>
     </div>
@@ -207,7 +233,9 @@ private string? _openMenuId;
     // Add dialog
     private bool _showAddDialog;
     private string _newActivityName = string.Empty;
-    private bool _newActivityIsShared = false;
+    private bool _hasAttemptedSubmit = false;
+    private bool _isCreating = false;
+    private ElementReference _activityNameInput;
 
     // Toast
     private bool _showToast;
@@ -227,6 +255,16 @@ private string? _openMenuId;
         if (firstRender)
         {
             await JSRuntime.InvokeVoidAsync("initScrollToTopButton", DotNetObjectReference.Create(this));
+        }
+        
+        // Auto-focus the input when dialog opens
+        if (_showAddDialog && _activityNameInput.Id != null)
+        {
+            try
+            {
+                await JSRuntime.InvokeVoidAsync("focusElement", _activityNameInput);
+            }
+            catch { }
         }
     }
     
@@ -385,32 +423,47 @@ private string? _openMenuId;
 
     private void AddNewActivity()
     {
-        _newActivityName = "New Packing Activity";
-        _newActivityIsShared = false;
+        _newActivityName = string.Empty;
+        _hasAttemptedSubmit = false;
+        _isCreating = false;
         _showAddDialog = true;
     }
 
     private void CancelAddActivity()
     {
+        if (_isCreating) return; // Prevent closing while creating
         _showAddDialog = false;
+        _hasAttemptedSubmit = false;
+        _newActivityName = string.Empty;
     }
 
     private async Task ConfirmAddActivityAsync()
     {
+        _hasAttemptedSubmit = true;
+        
         if (string.IsNullOrWhiteSpace(_newActivityName))
+        {
+            StateHasChanged();
             return;
+        }
+
+        _isCreating = true;
+        StateHasChanged();
 
         var newActivity = new Storage.PackingActivity
         {
-            Name = _newActivityName,
+            Name = _newActivityName.Trim(),
             LastPacked = DateTime.Now,
-            IsShared = _newActivityIsShared
+            IsShared = false // Will be implemented later with user-specific sharing
         };
 
         try
         {
             await PackingRepository.AddOrUpdateAsync(newActivity);
             ShowToast(Localizer["ActivityCreated"]);
+            _showAddDialog = false;
+            _hasAttemptedSubmit = false;
+            _newActivityName = string.Empty;
             await LoadActivitiesAsync();
         }
         catch
@@ -419,7 +472,8 @@ private string? _openMenuId;
         }
         finally
         {
-            _showAddDialog = false;
+            _isCreating = false;
+            StateHasChanged();
         }
     }
 
@@ -522,6 +576,26 @@ private string? _openMenuId;
         }
         catch (System.Threading.Tasks.TaskCanceledException)
         {
+        }
+    }
+
+    private void HandleInputKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter" && !string.IsNullOrWhiteSpace(_newActivityName))
+        {
+            _ = ConfirmAddActivityAsync();
+        }
+        else if (e.Key == "Escape")
+        {
+            CancelAddActivity();
+        }
+    }
+    
+    private void HandleDialogKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Escape")
+        {
+            CancelAddActivity();
         }
     }
 

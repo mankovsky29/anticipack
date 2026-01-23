@@ -7,6 +7,15 @@ function selectAllText(inputId) {
 
 function focusElement(element) {
     if (element) {
+        setTimeout(() => {
+            element.focus();
+        }, 100);
+    }
+}
+
+
+function focusElement(element) {
+    if (element) {
         element.focus();
     }
 }

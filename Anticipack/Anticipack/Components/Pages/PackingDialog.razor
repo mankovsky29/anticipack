@@ -1,6 +1,8 @@
 ﻿@page "/packing-dialog"
 @using Microsoft.JSInterop
 @using Anticipack.Resources.Localization
+@using Anticipack.Services
+@inject IKeyboardService KeyboardService
 @implements IAsyncDisposable
 
 <div class="chat-container">
@@ -28,24 +30,51 @@
 </div>
 
 @code {
-    [Inject] private IJSRuntime JS { get; set; } = default!;
+[Inject] private IJSRuntime JS { get; set; } = default!;
 
-    private ElementReference messageInput;
-    private ElementReference messagesContainer;
-    private DotNetObjectReference<PackingDialog>? _dotNetRef;
+private ElementReference messageInput;
+private ElementReference messagesContainer;
+private DotNetObjectReference<PackingDialog>? _dotNetRef;
 
-    private string currentMessage = string.Empty;
+private string currentMessage = string.Empty;
 
-    private List<ChatMessage> messages = new();
+private List<ChatMessage> messages = new();
+    
+// Keyboard
+private bool _keyboardVisible;
+private double _keyboardHeight;
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+protected override async Task OnAfterRenderAsync(bool firstRender)
+{
+    if (firstRender)
     {
-        if (firstRender)
+        KeyboardService.Initialize(this);
+        KeyboardService.KeyboardVisibilityChanged += OnKeyboardVisibilityChanged;
+            
+        // create a DotNet reference so JS can call back when Enter is pressed
+        _dotNetRef = DotNetObjectReference.Create(this);
+        await JS.InvokeVoidAsync("packingDialog.attach", messageInput, _dotNetRef, messagesContainer);
+        await messageInput.FocusAsync();
+    }
+}
+    
+    private void OnKeyboardVisibilityChanged(bool isVisible, double height)
+    {
+        _keyboardVisible = isVisible;
+        _keyboardHeight = height;
+
+        if (isVisible)
         {
-            // create a DotNet reference so JS can call back when Enter is pressed
-            _dotNetRef = DotNetObjectReference.Create(this);
-            await JS.InvokeVoidAsync("packingDialog.attach", messageInput, _dotNetRef, messagesContainer);
-            await messageInput.FocusAsync();
+            // Adjust page padding to account for keyboard height
+            _ = JS.InvokeVoidAsync("adjustPageForKeyboard", height);
+            
+            // Scroll the active input into view to ensure it's not covered by the keyboard
+            _ = JS.InvokeVoidAsync("scrollActiveElementIntoView");
+        }
+        else
+        {
+            // Remove padding when keyboard hides
+            _ = JS.InvokeVoidAsync("adjustPageForKeyboard", 0);
         }
     }
 
@@ -78,6 +107,8 @@
 
     public async ValueTask DisposeAsync()
     {
+        KeyboardService.KeyboardVisibilityChanged -= OnKeyboardVisibilityChanged;
+        
         if (_dotNetRef is not null)
         {
             _dotNetRef.Dispose();

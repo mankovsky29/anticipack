@@ -5,18 +5,73 @@ function selectAllText(inputId) {
     }
 }
 
-function focusElement(element) {
+function scrollIntoView(element) {
     if (element) {
-        setTimeout(() => {
-            element.focus();
-        }, 100);
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
 }
-
 
 function focusElement(element) {
     if (element) {
         element.focus();
+    }
+}
+
+function blurQuickAddInput() {
+    const activeElement = document.activeElement;
+    if (activeElement && activeElement.tagName === 'INPUT') {
+        activeElement.blur();
+    }
+}
+
+function scrollActiveElementIntoView() {
+    const activeElement = document.activeElement;
+    if (activeElement && (activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA')) {
+        setTimeout(() => {
+            // Check if element is inside a modal/popup - don't scroll the background page
+            const isInModal = activeElement.closest('.modal-overlay, .modal-content, .add-item-form');
+            if (isInModal) {
+                // For modals, just ensure element is visible within the modal
+                activeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return;
+            }
+            
+            // If element is in a fixed positioned container (like quick-add), don't scroll
+            const isInFixedContainer = activeElement.closest('.quick-add-container, .quick-add-form');
+            if (isInFixedContainer) {
+                // Don't scroll - fixed elements manage their own position
+                return;
+            }
+            
+            // Get element position
+            const rect = activeElement.getBoundingClientRect();
+            const absoluteTop = rect.top + window.pageYOffset;
+            
+            // Calculate scroll position to place input at 1/3 from top of viewport
+            // This gives enough space above for context and keeps it well above keyboard
+            const viewportHeight = window.innerHeight;
+            const targetPosition = absoluteTop - (viewportHeight / 3);
+            
+            // Scroll to calculated position
+            window.scrollTo({
+                top: Math.max(0, targetPosition),
+                behavior: 'smooth'
+            });
+        }, 350); // Delay to allow keyboard animation to complete
+    }
+}
+
+// New function to adjust page padding for keyboard
+function adjustPageForKeyboard(keyboardHeightDp) {
+    const pageContainer = document.querySelector('.page-container');
+    if (pageContainer) {
+        if (keyboardHeightDp > 0) {
+            // Add bottom padding equal to keyboard height
+            pageContainer.style.paddingBottom = `${keyboardHeightDp}px`;
+        } else {
+            // Remove padding when keyboard hides
+            pageContainer.style.paddingBottom = '';
+        }
     }
 }
 

@@ -14,6 +14,7 @@
 @inject IStringLocalizer<AppResources> Localizer
 @inject INavigationHeaderService NavigationHeaderService
 @inject IJSRuntime JSRuntime
+@inject IKeyboardService KeyboardService
 @implements IDisposable
 
 <div class="page-container with-fixed-navbar">
@@ -244,16 +245,22 @@ private string? _openMenuId;
     
     // Scroll to top
     private bool _showScrollToTop;
+    
+    // Keyboard
+    private bool _keyboardVisible;
+    private double _keyboardHeight;
 
     protected override void OnInitialized()
     {
         LocalizationService.CultureChanged += OnCultureChanged;
+        KeyboardService.KeyboardVisibilityChanged += OnKeyboardVisibilityChanged;
     }
     
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
+            KeyboardService.Initialize(this);
             await JSRuntime.InvokeVoidAsync("initScrollToTopButton", DotNetObjectReference.Create(this));
         }
         
@@ -598,10 +605,31 @@ private string? _openMenuId;
             CancelAddActivity();
         }
     }
+    
+    private void OnKeyboardVisibilityChanged(bool isVisible, double height)
+    {
+        _keyboardVisible = isVisible;
+        _keyboardHeight = height;
+
+        if (isVisible)
+        {
+            // Adjust page padding to account for keyboard height
+            _ = JSRuntime.InvokeVoidAsync("adjustPageForKeyboard", height);
+            
+            // Scroll the active input into view to ensure it's not covered by the keyboard
+            _ = JSRuntime.InvokeVoidAsync("scrollActiveElementIntoView");
+        }
+        else
+        {
+            // Remove padding when keyboard hides
+            _ = JSRuntime.InvokeVoidAsync("adjustPageForKeyboard", 0);
+        }
+    }
 
     public void Dispose()
     {
         LocalizationService.CultureChanged -= OnCultureChanged;
+        KeyboardService.KeyboardVisibilityChanged -= OnKeyboardVisibilityChanged;
         _toastCts?.Cancel();
         _toastCts?.Dispose();
     }

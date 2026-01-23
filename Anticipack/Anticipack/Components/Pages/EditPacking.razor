@@ -628,8 +628,16 @@
 
         if (isVisible)
         {
-            // Ensure the quick add input is not covered by the keyboard
-            _ = JSRuntime.InvokeVoidAsync("scrollIntoView", _quickAddContainerRef);
+            // Adjust page padding to account for keyboard height
+            _ = JSRuntime.InvokeVoidAsync("adjustPageForKeyboard", height);
+            
+            // Scroll the active input into view to ensure it's not covered by the keyboard
+            _ = JSRuntime.InvokeVoidAsync("scrollActiveElementIntoView");
+        }
+        else
+        {
+            // Remove padding when keyboard hides
+            _ = JSRuntime.InvokeVoidAsync("adjustPageForKeyboard", 0);
         }
     }
 

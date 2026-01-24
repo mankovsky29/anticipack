@@ -1206,11 +1206,11 @@ ul.category-content {
 
 .add-item-form {
     border: none;
-    border-radius: 16px;
-    background: linear-gradient(135deg, var(--surface) 0%, var(--background) 100%);
+    border-radius: 12px;
+    background: var(--surface);
     padding: 0;
-    margin-bottom: 24px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+    margin-bottom: 16px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
     width: 100%;
     display: flex;
     flex-direction: column;
@@ -1237,6 +1237,23 @@ ul.category-content {
     color: white;
 }
 
+/* Inline header for compact form */
+.form-header-inline {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.form-header-inline h4 {
+    color: var(--text-primary);
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0;
+}
+
 .form-title-row {
     display: flex;
     justify-content: space-between;
@@ -1254,49 +1271,62 @@ ul.category-content {
 }
 
 .close-form-btn {
-    background: rgba(255, 255, 255, 0.2);
+    background: transparent;
     border: none;
-    width: 32px;
-    height: 32px;
+    width: 28px;
+    height: 28px;
     border-radius: 50%;
-    color: white;
+    color: var(--text-secondary);
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     transition: all var(--transition);
-    font-size: 16px;
+    font-size: 14px;
 }
 
 .close-form-btn:hover {
-    background: rgba(255, 255, 255, 0.3);
+    background: var(--hover-bg);
+    color: var(--text-primary);
     transform: rotate(90deg);
+}
+
+.form-header .close-form-btn {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    width: 32px;
+    height: 32px;
+    font-size: 16px;
+}
+
+.form-header .close-form-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
 }
 
 .form-body {
     width: 100%;
     display: flex;
     flex-direction: column;
-    padding: 24px;
-    gap: 24px;
+    padding: 16px;
+    gap: 12px;
 }
 
 /* Compact variant for tighter spacing */
 .form-body.compact,
 .form-body:has(.form-section.compact) {
-    padding: 16px;
-    gap: 16px;
+    padding: 12px;
+    gap: 10px;
 }
 
 .form-section {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 8px;
 }
 
 /* Compact form sections */
 .form-section.compact {
-    gap: 8px;
+    gap: 6px;
 }
 
 .form-label {
@@ -1309,9 +1339,45 @@ ul.category-content {
     margin: 0;
 }
 
-.form-label i {
+.form-label-inline {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 500;
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.form-label i,
+.form-label-inline i {
     color: var(--primary);
-    font-size: 16px;
+    font-size: 14px;
+}
+
+/* Category Select Dropdown */
+.category-select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-primary);
+    background: var(--input-bg);
+    cursor: pointer;
+    transition: all var(--transition);
+}
+
+.category-select:hover {
+    border-color: var(--primary);
+}
+
+.category-select:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--input-focus-shadow);
+    background: var(--surface);
 }
 
 /* Category Grid Layout */
@@ -1429,12 +1495,12 @@ ul.category-content {
 /* Bulk Textarea Improvements */
 .bulk-textarea {
     width: 100%;
-    padding: 16px;
+    padding: 12px;
     border: 2px solid var(--border-color);
-    border-radius: 12px;
-    font-size: 15px;
-    line-height: 1.6;
-    min-height: 160px;
+    border-radius: 8px;
+    font-size: 14px;
+    line-height: 1.5;
+    min-height: 70px;
     resize: vertical;
     background: var(--input-bg);
     color: var(--text-primary);
@@ -1444,10 +1510,26 @@ ul.category-content {
 
 /* Compact textarea */
 .bulk-textarea.compact {
-    padding: 12px;
-    padding-right: 60px; /* Make room for speech button */
-    min-height: 100px;
+    padding: 10px;
+    padding-right: 50px; /* Make room for speech button */
+    min-height: 60px;
     font-size: 14px;
+}
+
+/* Auto-grow textarea */
+.bulk-textarea.auto-grow {
+    resize: none;
+    overflow-y: hidden;
+    max-height: 200px;
+}
+
+@media (max-width: 768px) {
+    .bulk-textarea.compact {
+        min-height: 55px;
+        padding: 8px;
+        padding-right: 45px;
+        font-size: 13px;
+    }
 }
 
 .bulk-textarea::placeholder {
@@ -1465,10 +1547,10 @@ ul.category-content {
 /* Speech Recognition Button */
 .speech-btn {
     position: absolute;
-    right: 8px;
-    top: 8px;
-    width: 40px;
-    height: 40px;
+    right: 6px;
+    top: 6px;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
     border: none;
     background: var(--primary);
@@ -1480,6 +1562,15 @@ ul.category-content {
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: 0 2px 8px rgba(var(--primary-rgb, 99, 102, 241), 0.3);
     z-index: 2;
+}
+
+@media (max-width: 768px) {
+    .speech-btn {
+        width: 32px;
+        height: 32px;
+        right: 5px;
+        top: 5px;
+    }
 }
 
 .speech-btn:hover {
@@ -1586,6 +1677,36 @@ ul.category-content {
     font-size: 12px;
 }
 
+/* Mini form hint - even more compact */
+.form-hint-mini {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    background: var(--primary-light-bg);
+    border-left: 2px solid var(--primary);
+    border-radius: 6px;
+    font-size: 11px;
+    color: var(--text-secondary);
+    line-height: 1.4;
+}
+
+.form-hint-mini i {
+    font-size: 12px;
+}
+
+@media (max-width: 768px) {
+    .form-hint-mini {
+        padding: 5px 8px;
+        font-size: 10px;
+        gap: 5px;
+    }
+    
+    .form-hint-mini i {
+        font-size: 11px;
+    }
+}
+
 .form-hint i {
     color: var(--primary);
     margin-top: 2px;
@@ -1596,35 +1717,63 @@ ul.category-content {
 .form-actions {
     display: flex;
     justify-content: flex-end;
-    gap: 12px;
-    padding: 20px 24px;
+    gap: 8px;
+    padding: 12px 16px;
     background: var(--background);
     border-top: 1px solid var(--border-color);
 }
 
 /* Compact form actions */
 .form-actions.compact {
-    padding: 12px 16px;
+    padding: 10px 12px;
     gap: 8px;
+}
+
+@media (max-width: 768px) {
+    .form-actions.compact {
+        padding: 8px 10px;
+        gap: 6px;
+    }
 }
 
 .btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    padding: 12px 24px;
-    border-radius: 10px;
+    gap: 6px;
+    padding: 10px 20px;
+    border-radius: 8px;
     border: none;
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     white-space: nowrap;
 }
 
+.btn.compact {
+    padding: 8px 16px;
+    font-size: 13px;
+    gap: 5px;
+}
+
 .btn i {
-    font-size: 14px;
+    font-size: 13px;
+}
+
+.btn.compact i {
+    font-size: 12px;
+}
+
+@media (max-width: 768px) {
+    .btn.compact {
+        padding: 7px 12px;
+        font-size: 12px;
+    }
+    
+    .btn.compact i {
+        font-size: 11px;
+    }
 }
 
 .btn-cancel {

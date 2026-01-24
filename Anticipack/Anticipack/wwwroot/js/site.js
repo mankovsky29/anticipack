@@ -168,3 +168,12 @@ if (document.readyState === 'loading') {
     const theme = window.themeManager.getTheme();
     window.themeManager.setTheme(theme);
 }
+
+
+// Auto-grow textarea functionality
+function autoGrowTextarea(textarea) {
+    if (textarea) {
+        textarea.style.height = 'auto';
+        textarea.style.height = textarea.scrollHeight + 'px';
+    }
+}

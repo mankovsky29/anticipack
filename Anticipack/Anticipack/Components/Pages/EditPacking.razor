@@ -80,44 +80,42 @@
             @if (_isAddingItem)
             {
                 <div class="add-item-form">
-                    <div class="form-header">
-                        <div class="form-title-row">
-                            <h4>@AppResources.AddNewItems</h4>
-                            <button class="close-form-btn" @onclick="CancelAdd" title="@AppResources.Cancel">
-                                <i class="fa fa-times"></i>
-                            </button>
-                        </div>
+                    <div class="form-header-inline">
+                        <h4>@AppResources.AddNewItems</h4>
+                        <button class="close-form-btn" @onclick="CancelAdd" title="@AppResources.Cancel">
+                            <i class="fa fa-times"></i>
+                        </button>
                     </div>
                     
                     <div class="form-body">
                         <div class="form-section compact">
-                            <label class="form-label">@AppResources.SelectCategory</label>
-                            <div class="category-grid compact">
+                            <label for="category-select" class="form-label-inline">
+                                @AppResources.SelectCategory
+                            </label>
+                            <select id="category-select" 
+                                    class="category-select" 
+                                    @bind="_newCategory">
                                 @foreach (var category in Enum.GetValues<PackingCategory>())
                                 {
-                                    <button type="button"
-                                            class="category-card compact @(_newCategory == category.ToString() ? "selected" : "")" 
-                                            @onclick="() => _newCategory = category.ToString()">
-                                        <i class="fa @GetCategoryIcon(category)" aria-hidden="true"></i>
-                                        <span class="category-name">@GetLocalizedCategoryName(category)</span>
-                                    </button>
+                                    <option value="@category.ToString()">@GetLocalizedCategoryName(category)</option>
                                 }
-                            </div>
+                            </select>
                         </div>
                         
                         <div class="form-section compact">
-                            <label for="bulk-textarea" class="form-label">
+                            <label for="bulk-textarea" class="form-label-inline">
                                 <i class="fa fa-list-ul"></i>
                                 @AppResources.EnterItemName
                             </label>
                             <div class="textarea-container">
                                 <textarea id="bulk-textarea"
-                                       class="bulk-textarea compact" 
+                                       class="bulk-textarea compact auto-grow" 
                                        placeholder="@GetBulkAddPlaceholder()" 
                                        @bind="_bulkItemsText" 
                                        @bind:event="oninput"
+                                       @bind:after="HandleTextareaAutoGrow"
                                        @ref="bulkItemsTextarea"
-                                       rows="4"
+                                       rows="3"
                                        @onkeydown="HandleBulkTextareaKeyDown"></textarea>
                                 
                                 @if (_isSpeechRecognitionSupported)
@@ -143,13 +141,16 @@
                                     </div>
                                 }
                             </div>
-                            <div class="form-hint compact">
-                                <i class="fa fa-info-circle"></i>
-                                <span>@AppResources.BulkAddHint</span>
-                            </div>
+                            @if (!_isListening && string.IsNullOrWhiteSpace(_bulkItemsText))
+                            {
+                                <div class="form-hint-mini">
+                                    <i class="fa fa-info-circle"></i>
+                                    <span>@AppResources.BulkAddHint</span>
+                                </div>
+                            }
                             @if (_isListening)
                             {
-                                <div class="form-hint listening-hint">
+                                <div class="form-hint-mini listening-hint">
                                     <i class="fa fa-microphone"></i>
                                     <span>@AppResources.Listening</span>
                                 </div>
@@ -158,11 +159,11 @@
                     </div>
                     
                     <div class="form-actions compact">
-                        <button class="btn btn-cancel" @onclick="CancelAdd">
+                        <button class="btn btn-cancel compact" @onclick="CancelAdd">
                             <i class="fa fa-times"></i>
                             <span>@AppResources.Cancel</span>
                         </button>
-                        <button class="btn btn-primary" 
+                        <button class="btn btn-primary compact" 
                                 @onclick="ConfirmBulkAddAsync" 
                                 disabled="@(string.IsNullOrWhiteSpace(_bulkItemsText))">
                             <i class="fa fa-check"></i>
@@ -1114,6 +1115,18 @@
         if (e.Key == "Enter" && (e.CtrlKey || e.MetaKey))
         {
             _ = ConfirmBulkAddAsync();
+        }
+    }
+
+    private async Task HandleTextareaAutoGrow()
+    {
+        try
+        {
+            await JSRuntime.InvokeVoidAsync("autoGrowTextarea", bulkItemsTextarea);
+        }
+        catch
+        {
+            // Silently fail if JS function not available
         }
     }
 

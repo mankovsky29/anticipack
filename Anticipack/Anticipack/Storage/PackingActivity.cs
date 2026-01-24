@@ -11,6 +11,7 @@ namespace Anticipack.Storage
         public int RunCount { get; set; }
         public bool IsShared { get; set; } = false; // New property for sharing capability
         public bool IsArchived { get; set; } = false; // New property for archiving
+        public bool IsFinished { get; set; } = false; // Track if packing was finished (manually or by completing all items)
 
         [Ignore] // Not mapped, for convenience
         public IReadOnlyCollection<PackingItem>? Items { get; set; }

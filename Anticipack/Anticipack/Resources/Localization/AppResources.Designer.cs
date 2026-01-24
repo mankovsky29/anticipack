@@ -721,6 +721,42 @@ namespace Anticipack.Resources.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Finish Packing.
+        /// </summary>
+        public static string FinishPacking {
+            get {
+                return ResourceManager.GetString("FinishPacking", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You packed {0} out of {1} items. Are you sure you want to finish packing?.
+        /// </summary>
+        public static string ConfirmFinishPacking {
+            get {
+                return ResourceManager.GetString("ConfirmFinishPacking", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Finish Now.
+        /// </summary>
+        public static string FinishNow {
+            get {
+                return ResourceManager.GetString("FinishNow", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Packing Finished!.
+        /// </summary>
+        public static string PackingFinished {
+            get {
+                return ResourceManager.GetString("PackingFinished", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Hide Checked Items.
         /// </summary>
         public static string HideCheckedItems {

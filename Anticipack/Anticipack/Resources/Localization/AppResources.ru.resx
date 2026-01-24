@@ -357,6 +357,18 @@
   <data name="Great" xml:space="preserve">
     <value>Отлично!</value>
   </data>
+  <data name="FinishPacking" xml:space="preserve">
+    <value>Завершить упаковку</value>
+  </data>
+  <data name="ConfirmFinishPacking" xml:space="preserve">
+    <value>Вы упаковали {0} из {1} предметов. Вы уверены, что хотите завершить упаковку?</value>
+  </data>
+  <data name="FinishNow" xml:space="preserve">
+    <value>Завершить сейчас</value>
+  </data>
+  <data name="PackingFinished" xml:space="preserve">
+    <value>Упаковка завершена!</value>
+  </data>
   <data name="ShowCheckedItems" xml:space="preserve">
     <value>Показать</value>
   </data>

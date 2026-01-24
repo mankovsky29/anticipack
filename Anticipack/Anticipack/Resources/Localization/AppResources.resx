@@ -379,6 +379,18 @@
   <data name="Great" xml:space="preserve">
     <value>Great!</value>
   </data>
+  <data name="FinishPacking" xml:space="preserve">
+    <value>Finish Packing</value>
+  </data>
+  <data name="ConfirmFinishPacking" xml:space="preserve">
+    <value>You packed {0} out of {1} items. Are you sure you want to finish packing?</value>
+  </data>
+  <data name="FinishNow" xml:space="preserve">
+    <value>Finish Now</value>
+  </data>
+  <data name="PackingFinished" xml:space="preserve">
+    <value>Packing Finished!</value>
+  </data>
   <data name="ShowCheckedItems" xml:space="preserve">
     <value>Show</value>
   </data>

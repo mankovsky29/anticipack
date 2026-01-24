@@ -150,13 +150,23 @@ Jabon, Toalla</value>
     <value>Separa los articulos por linea nueva o coma. Todos los articulos se agregaran a la categoria seleccionada.</value>
   </data>
   
-  <!-- Bulk Add Items - Spanish -->
-  <data name="BulkAddPlaceholder" xml:space="preserve">
-    <value>Cepillo de dientes, Pasta dental
-Champu
-Jabon, Toalla</value>
+  <!-- PlayPacking Page - Spanish -->
+  <data name="PackingComplete" xml:space="preserve">
+    <value>¡Empaque Completo!</value>
   </data>
-  <data name="BulkAddHint" xml:space="preserve">
-    <value>Separa los articulos por linea nueva o coma. Todos los articulos se agregaran a la categoria seleccionada.</value>
+  <data name="Great" xml:space="preserve">
+    <value>¡Genial!</value>
+  </data>
+  <data name="FinishPacking" xml:space="preserve">
+    <value>Terminar Empaque</value>
+  </data>
+  <data name="ConfirmFinishPacking" xml:space="preserve">
+    <value>Empacaste {0} de {1} artículos. ¿Estás seguro de que quieres terminar el empaque?</value>
+  </data>
+  <data name="FinishNow" xml:space="preserve">
+    <value>Terminar Ahora</value>
+  </data>
+  <data name="PackingFinished" xml:space="preserve">
+    <value>¡Empaque Terminado!</value>
   </data>
 </root>

@@ -37,6 +37,14 @@
                 <i class="fa @(_showHistory ? "fa-chevron-down" : "fa-list-ul")" aria-hidden="true"></i>
             </button>
 
+            <!-- Finish Packing button -->
+            <button class="icon-btn" 
+                    @onclick="ConfirmFinishPacking" 
+                    disabled="@(!CanFinishPacking())"
+                    title="@AppResources.FinishPacking">
+                <i class="fa fa-check-circle" aria-hidden="true"></i>
+            </button>
+
             <!-- Reset all items button -->
             <button class="icon-btn" 
                     @onclick="ConfirmResetAllItems" 
@@ -181,10 +189,6 @@
             
             <div class="completion-stats">
                 <div class="stat">
-                    <span class="label">@AppResources.Efficiency</span>
-                    <span class="value">@_completionEfficiency</span>
-                </div>
-                <div class="stat">
                     <span class="label">@AppResources.ComparedToLastTime</span>
                     <span class="value @(_timeComparison?.IsFaster == true ? "better" : "slower")">@(_timeComparison?.FormattedDifference ?? "")</span>
                 </div>
@@ -216,7 +220,6 @@
     private List<Storage.PackingHistoryEntry> _recentHistory = new();
     private string _averagePackingTime = "-";
     private string _lastPackedDate = "-";
-    private string _completionEfficiency = "0%";
     private PackingTimeComparison? _timeComparison;
 
     private sealed class PackingItemView
@@ -257,14 +260,31 @@
             NavigationHeaderService.SetText(_currentActivity.Name ?? "");
             var itemsFromRepo = await PackingRepository.GetItemsForActivityAsync(id);
 
-            // Map items from repository and restore their packed state
+            // If activity was previously finished, reset all items to unchecked
+            bool shouldResetItems = _currentActivity.IsFinished;
+
+            // Map items from repository and restore/reset their packed state
             Items = itemsFromRepo.Select(pi => new PackingItemView(pi) 
             { 
-                IsChecked = pi.IsPacked  // Restore the packed state from database
+                IsChecked = shouldResetItems ? false : pi.IsPacked  // Reset if finished, otherwise restore state
             }).ToList();
 
-            // Check if all items were already complete when loaded
-            _wasCompleteOnLoad = Items.Any() && Items.All(i => i.IsChecked);
+            // If we reset items, mark activity as not finished and save
+            if (shouldResetItems)
+            {
+                _currentActivity.IsFinished = false;
+                await PackingRepository.AddOrUpdateAsync(_currentActivity);
+                
+                // Also update items in repository
+                foreach (var item in Items)
+                {
+                    item.Item.IsPacked = false;
+                    await PackingRepository.AddOrUpdateItemAsync(item.Item);
+                }
+            }
+
+            // Check if all items were already complete when loaded (only relevant if not reset)
+            _wasCompleteOnLoad = !shouldResetItems && Items.Any() && Items.All(i => i.IsChecked);
             if (_wasCompleteOnLoad)
             {
                 _completionAcknowledged = true; // Don't show modal for already completed packing
@@ -284,9 +304,6 @@
                 var allChecked = IsAllChecked(cat);
                 _manualOverride[cat] = allChecked ? true : false;
             }
-
-            // Check if packing was already complete on load
-            _wasCompleteOnLoad = Items.All(i => i.IsChecked);
             
             // Load history data
             await LoadHistoryDataAsync(id);
@@ -466,9 +483,6 @@
             var endTime = DateTime.Now;
             var packedItems = Items.Count(i => i.IsChecked);
             
-            // Calculate efficiency
-            _completionEfficiency = $"{PackingHistoryService.GetPackingEfficiency(packedItems, Items.Count)}%";
-            
             // Compare with average
             _timeComparison = await PackingHistoryService.CompareWithAverageAsync(Id, endTime - _packingStartTime);
             
@@ -484,6 +498,7 @@
             // Update activity
             _currentActivity.LastPacked = endTime;
             _currentActivity.RunCount++;
+            _currentActivity.IsFinished = true; // Mark as finished
 
             // Save to repository
             if (!string.IsNullOrWhiteSpace(Id))
@@ -676,6 +691,75 @@
             {
                 await InvokeAsync(StateHasChanged);
             }
+        }
+    }
+
+    private bool CanFinishPacking()
+    {
+        var checkedCount = Items.Count(i => i.IsChecked);
+        var totalCount = Items.Count;
+        
+        // Can finish if at least one item is checked AND not all items are checked
+        return checkedCount > 0 && checkedCount < totalCount;
+    }
+
+    private async Task ConfirmFinishPacking()
+    {
+        var packedCount = Items.Count(i => i.IsChecked);
+        var totalCount = Items.Count;
+        
+        bool confirm = await DialogService.ShowConfirmAsync(
+            AppResources.FinishPacking,
+            string.Format(AppResources.ConfirmFinishPacking, packedCount, totalCount),
+            AppResources.FinishNow,
+            AppResources.Cancel);
+
+        if (confirm)
+        {
+            await FinishPackingNow();
+        }
+    }
+
+    private async Task FinishPackingNow()
+    {
+        try
+        {
+            var endTime = DateTime.Now;
+            var packedItems = Items.Count(i => i.IsChecked);
+            
+            // Compare with average
+            _timeComparison = await PackingHistoryService.CompareWithAverageAsync(Id, endTime - _packingStartTime);
+            
+            // Record completion in history with actual packed items
+            await PackingHistoryService.RecordPackingSessionAsync(
+                Id, 
+                _packingStartTime, 
+                endTime, 
+                Items.Count, 
+                packedItems
+            );
+            
+            // Update activity
+            _currentActivity.LastPacked = endTime;
+            _currentActivity.RunCount++;
+            _currentActivity.IsFinished = true; // Mark as finished
+
+            // Save to repository
+            if (!string.IsNullOrWhiteSpace(Id))
+            {
+                await PackingRepository.AddOrUpdateAsync(_currentActivity);
+                
+                // Reload history data
+                await LoadHistoryDataAsync(Id);
+            }
+            
+            // Show completion modal
+            _completionAcknowledged = false;
+            await InvokeAsync(StateHasChanged);
+        }
+        catch (Exception ex)
+        {
+            ToastService.ShowError($"Error finishing packing: {ex.Message}");
         }
     }
 }

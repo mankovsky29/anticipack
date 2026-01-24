@@ -15,5 +15,10 @@
 
         Task AddItemToActivityAsync(string activityId, PackingItem item);
         Task DeleteItemAsync(string itemId);
+
+        // History methods
+        Task AddHistoryEntryAsync(PackingHistoryEntry entry);
+        Task<List<PackingHistoryEntry>> GetHistoryForActivityAsync(string activityId, int? limit = null);
+        Task DeleteHistoryForActivityAsync(string activityId);
     }
 }

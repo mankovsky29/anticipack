@@ -62,6 +62,7 @@ namespace Anticipack
             builder.Services.AddSingleton<INavigationHeaderService, NavigationHeaderService>();
             builder.Services.AddSingleton<IMicrophonePermissionService, MicrophonePermissionService>();
             builder.Services.AddScoped<MicrophonePermissionBridge>();
+            builder.Services.AddScoped<Anticipack.Services.Packing.IPackingHistoryService, Anticipack.Services.Packing.PackingHistoryService>();
 
             var app = builder.Build();
 

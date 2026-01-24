@@ -15,7 +15,7 @@ namespace Anticipack.Storage
         {
             //await _db.CreateTableAsync<PackingItem>();
             //await _db.CreateTableAsync<PackingActivity>();
-            await _db.CreateTablesAsync(CreateFlags.None, typeof(PackingItem), typeof(PackingActivity));
+            await _db.CreateTablesAsync(CreateFlags.None, typeof(PackingItem), typeof(PackingActivity), typeof(PackingHistoryEntry));
         }
 
         public async Task<List<PackingActivity>> GetAllAsync()
@@ -43,6 +43,9 @@ namespace Anticipack.Storage
                 {
                     await _db.DeleteAsync(item);
                 }
+
+                // Delete history entries
+                await DeleteHistoryForActivityAsync(id);
 
                 await _db.DeleteAsync(packing);
             }
@@ -119,6 +122,37 @@ namespace Anticipack.Storage
                     connection.Update(item);
                 }
             });
+        }
+
+        public async Task AddHistoryEntryAsync(PackingHistoryEntry entry)
+        {
+            await _db.InsertAsync(entry);
+        }
+
+        public async Task<List<PackingHistoryEntry>> GetHistoryForActivityAsync(string activityId, int? limit = null)
+        {
+            var query = _db.Table<PackingHistoryEntry>()
+                .Where(x => x.ActivityId == activityId)
+                .OrderByDescending(x => x.CompletedDate);
+
+            if (limit.HasValue)
+            {
+                return await query.Take(limit.Value).ToListAsync();
+            }
+
+            return await query.ToListAsync();
+        }
+
+        public async Task DeleteHistoryForActivityAsync(string activityId)
+        {
+            var historyEntries = await _db.Table<PackingHistoryEntry>()
+                .Where(x => x.ActivityId == activityId)
+                .ToListAsync();
+
+            foreach (var entry in historyEntries)
+            {
+                await _db.DeleteAsync(entry);
+            }
         }
     }
 }

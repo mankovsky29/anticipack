@@ -1,4 +1,4 @@
-﻿@page "/play-packing/{id}"
+@page "/play-packing/{id}"
 @using Anticipack.Components.Shared.NavigationHeaderComponent
 @using Anticipack.Packing
 @using Anticipack.Storage
@@ -10,12 +10,14 @@
 @using Anticipack.Components.Shared.DialogComponent
 @using Anticipack.Components.Shared.ToastComponent
 @using Anticipack.Resources.Localization
+@using Anticipack.Services.Packing
 @inject NavigationManager Navigation
 @inject IPackingRepository PackingRepository
 @inject IJSRuntime JSRuntime
 @inject IDialogService DialogService
 @inject IToastService ToastService
 @inject INavigationHeaderService NavigationHeaderService
+@inject IPackingHistoryService PackingHistoryService
 @implements IDisposable
 
 <div class="page-container with-fixed-navbar">
@@ -141,11 +143,11 @@
                     <span class="stat-label">@AppResources.TimesPacked</span>
                 </div>
                 <div class="stat-card">
-                    <span class="stat-value">@(GetAveragePackingTime())</span>
+                    <span class="stat-value">@_averagePackingTime</span>
                     <span class="stat-label">@AppResources.AvgTime</span>
                 </div>
                 <div class="stat-card">
-                    <span class="stat-value">@(GetLastPackedDate())</span>
+                    <span class="stat-value">@_lastPackedDate</span>
                     <span class="stat-label">@AppResources.LastPackedLabel</span>
                 </div>
             </div>
@@ -153,11 +155,11 @@
             <div class="history-timeline">
                 <h5>@AppResources.RecentActivity</h5>
                 <ul class="timeline-list">
-                    @foreach (var entry in GetRecentPackingHistory())
+                    @foreach (var entry in _recentHistory)
                     {
                         <li class="timeline-item">
-                            <span class="timeline-date">@entry.Date.ToString("MMM d, HH:mm")</span>
-                            <span class="timeline-action">@entry.Action</span>
+                            <span class="timeline-date">@entry.CompletedDate.ToString("MMM d, HH:mm")</span>
+                            <span class="timeline-action">@GetHistoryEntryDescription(entry)</span>
                         </li>
                     }
                 </ul>
@@ -180,11 +182,11 @@
             <div class="completion-stats">
                 <div class="stat">
                     <span class="label">@AppResources.Efficiency</span>
-                    <span class="value">@GetPackingEfficiency()</span>
+                    <span class="value">@_completionEfficiency</span>
                 </div>
                 <div class="stat">
                     <span class="label">@AppResources.ComparedToLastTime</span>
-                    <span class="value @GetComparisonClass()">@GetComparisonText()</span>
+                    <span class="value @(_timeComparison?.IsFaster == true ? "better" : "slower")">@(_timeComparison?.FormattedDifference ?? "")</span>
                 </div>
             </div>
             
@@ -209,6 +211,13 @@
     private bool _wasCompleteOnLoad = false; // Track if all items were already checked when page loaded
 
     private Storage.PackingActivity _currentActivity = new Storage.PackingActivity();
+    
+    // History data
+    private List<Storage.PackingHistoryEntry> _recentHistory = new();
+    private string _averagePackingTime = "-";
+    private string _lastPackedDate = "-";
+    private string _completionEfficiency = "0%";
+    private PackingTimeComparison? _timeComparison;
 
     private sealed class PackingItemView
     {
@@ -278,6 +287,9 @@
 
             // Check if packing was already complete on load
             _wasCompleteOnLoad = Items.All(i => i.IsChecked);
+            
+            // Load history data
+            await LoadHistoryDataAsync(id);
         }
         catch
         {
@@ -287,6 +299,33 @@
         {
             _isLoading = false;
             await InvokeAsync(StateHasChanged);
+        }
+    }
+    
+    private async Task LoadHistoryDataAsync(string activityId)
+    {
+        try
+        {
+            // Load recent history
+            _recentHistory = await PackingHistoryService.GetRecentHistoryAsync(activityId, 5);
+            
+            // Load average packing time
+            var avgTime = await PackingHistoryService.GetAveragePackingTimeAsync(activityId);
+            _averagePackingTime = avgTime is null 
+                ? "-" 
+                : $"{(int)avgTime.Value.TotalMinutes} min";
+            
+            // Load last packed date
+            var lastSession = await PackingHistoryService.GetLastPackingSessionAsync(activityId);
+            _lastPackedDate = lastSession != null 
+                ? lastSession.CompletedDate.ToString("MMM d") 
+                : "-";
+        }
+        catch
+        {
+            // Silently fail if history loading fails
+            _averagePackingTime = "-";
+            _lastPackedDate = "-";
         }
     }
 
@@ -337,7 +376,8 @@
 
         if (GetCompletionPercentage() == 100 && !_completionAcknowledged)
         {
-            StateHasChanged(); // Trigger completion modal
+            // Trigger completion modal - data calculated in AcknowledgeCompletion
+            StateHasChanged();
         }
     }
 
@@ -397,27 +437,21 @@
     private string GetEstimatedTimeRemaining()
     {
         var itemsLeft = Items.Count(i => !i.IsChecked);
-        // Estimate 30 seconds per remaining item
-        var minutesLeft = Math.Ceiling(itemsLeft * 0.5);
-        return minutesLeft > 0 ? string.Format(AppResources.MinRemaining, minutesLeft) : AppResources.Done;
+        
+        if (itemsLeft == 0)
+            return AppResources.Done;
+        
+        // Use default estimation: 30 seconds per item
+        // Cannot use async calls in synchronous rendering methods - causes deadlocks
+        var defaultMinutes = Math.Ceiling(itemsLeft * 0.5);
+        return string.Format(AppResources.MinRemaining, defaultMinutes);
     }
 
-    private string GetAveragePackingTime() => "15 min";
-
-    private string GetLastPackedDate() => _currentActivity.LastPacked.ToString("MMM d");
-
-    private class HistoryEntry
+    private string GetHistoryEntryDescription(Storage.PackingHistoryEntry entry)
     {
-        public DateTime Date = DateTime.Now;
-        public string Action { get; set; } = "Packed items";
+        var durationMinutes = (int)(entry.DurationSeconds / 60.0);
+        return $"Packed {entry.PackedItems} items in {durationMinutes} minutes";
     }
-
-    // This would be replaced with actual history data from storage
-    private List<HistoryEntry> GetRecentPackingHistory() => new()
-    {
-        new HistoryEntry { Date = DateTime.Now.AddDays(-5), Action = "Packed 15 items in 12 minutes" },
-        new HistoryEntry { Date = DateTime.Now.AddDays(-12), Action = "Packed 18 items in 15 minutes" }
-    };
 
     private string GetPackingDuration()
     {
@@ -425,21 +459,48 @@
         return $"{(int)duration.TotalMinutes} minutes";
     }
 
-    private string GetPackingEfficiency() => "95%"; // Placeholder
-    private string GetComparisonClass() => "better"; // Placeholder
-    private string GetComparisonText() => "2 minutes faster"; // Placeholder
-
     private async Task AcknowledgeCompletion()
     {
-        _completionAcknowledged = true;
-        // Record completion
-        _currentActivity.LastPacked = DateTime.Now;
-        _currentActivity.RunCount++;
-
-        // Save to repository
-        if (!string.IsNullOrWhiteSpace(Id))
+        try
         {
-            await PackingRepository.AddOrUpdateAsync(_currentActivity);
+            var endTime = DateTime.Now;
+            var packedItems = Items.Count(i => i.IsChecked);
+            
+            // Calculate efficiency
+            _completionEfficiency = $"{PackingHistoryService.GetPackingEfficiency(packedItems, Items.Count)}%";
+            
+            // Compare with average
+            _timeComparison = await PackingHistoryService.CompareWithAverageAsync(Id, endTime - _packingStartTime);
+            
+            // Record completion in history
+            await PackingHistoryService.RecordPackingSessionAsync(
+                Id, 
+                _packingStartTime, 
+                endTime, 
+                Items.Count, 
+                packedItems
+            );
+            
+            // Update activity
+            _currentActivity.LastPacked = endTime;
+            _currentActivity.RunCount++;
+
+            // Save to repository
+            if (!string.IsNullOrWhiteSpace(Id))
+            {
+                await PackingRepository.AddOrUpdateAsync(_currentActivity);
+                
+                // Reload history data
+                await LoadHistoryDataAsync(Id);
+            }
+            
+            _completionAcknowledged = true;
+            await InvokeAsync(StateHasChanged);
+        }
+        catch (Exception ex)
+        {
+            ToastService.ShowError($"Error saving completion: {ex.Message}");
+            _completionAcknowledged = true;
         }
     }
 
@@ -519,6 +580,9 @@
         // Reset completion acknowledgment so modal can show again if user completes it
         _completionAcknowledged = false;
         _wasCompleteOnLoad = false;
+
+        // Reset packing start time for fresh duration tracking
+        _packingStartTime = DateTime.Now;
         
         // Save to repository
         if (!string.IsNullOrEmpty(Id))

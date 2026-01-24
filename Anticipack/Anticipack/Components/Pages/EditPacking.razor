@@ -275,8 +275,8 @@
     </main>
 </div>
 
-<div class="quick-add-container" @onclick:stopPropagation @ref="_quickAddContainerRef">
-    <div class="quick-add-form">
+<div class="quick-add-container" @onclick:stopPropagation @ref="_quickAddContainerRef" style="bottom: @(_keyboardHeight)px;">
+<div class="quick-add-form">
         <input type="text" 
                @bind="_quickAddName" 
                @bind:event="oninput"
@@ -640,6 +640,9 @@
             // Remove padding when keyboard hides
             _ = JSRuntime.InvokeVoidAsync("adjustPageForKeyboard", 0);
         }
+        
+        // Trigger UI update to reposition quick-add-container
+        StateHasChanged();
     }
 
     private string GetBulkAddPlaceholder()

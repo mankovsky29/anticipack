@@ -92,6 +92,15 @@
     min-height: 56px;
 }
 
+/* Header actions container */
+.header-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+}
+
 /* Left section: flexible title */
 .header-left-section {
     display: flex;
@@ -120,7 +129,6 @@
     align-items: center;
     gap: 6px;
     flex-shrink: 0;
-    margin-left: auto;
 }
 
 /* Icon buttons base style */

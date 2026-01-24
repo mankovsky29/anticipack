@@ -22,27 +22,21 @@
 
 <div class="page-container with-fixed-navbar">
     <div class="activity-header">
-        <div class="activity-actions" role="group" aria-label="@AppResources.PackingDialogMenu">
-            <!-- Primary action: Show/Hide toggle -->
+        <div class="activity-actions activity-actions-left" role="group" aria-label="@AppResources.PackingDialogMenu">
+            <!-- Edit mode button -->
+            <button class="icon-btn" 
+                    @onclick="SwitchToEditMode" 
+                    title="@AppResources.EditActivity">
+                <i class="fa fa-edit" aria-hidden="true"></i>
+            </button>
+        </div>
+
+        <div class="activity-actions activity-actions-right" role="group">
+            <!-- Show/Hide toggle -->
             <button class="toggle-visibility-btn @(_hideCheckedItems ? "filtering" : "")" 
                     @onclick="ToggleItemVisibility" 
                     title="@(_hideCheckedItems ? AppResources.ShowAllItems : AppResources.HideCheckedItems)">
                 <i class="fa @(_hideCheckedItems ? "fa-eye-slash" : "fa-eye")" aria-hidden="true"></i>
-            </button>
-
-            <!-- History toggle button -->
-            <button class="icon-btn" 
-                    @onclick="ToggleHistory" 
-                    title="@(_showHistory ? AppResources.HideHistory : AppResources.ShowHistory)">
-                <i class="fa @(_showHistory ? "fa-chevron-down" : "fa-list-ul")" aria-hidden="true"></i>
-            </button>
-
-            <!-- Finish Packing button -->
-            <button class="icon-btn" 
-                    @onclick="ConfirmFinishPacking" 
-                    disabled="@(!CanFinishPacking())"
-                    title="@AppResources.FinishPacking">
-                <i class="fa fa-check-circle" aria-hidden="true"></i>
             </button>
 
             <!-- Reset all items button -->
@@ -52,11 +46,12 @@
                 <i class="fa fa-undo-alt" aria-hidden="true"></i>
             </button>
 
-            <!-- Edit mode button -->
+            <!-- Finish Packing button -->
             <button class="icon-btn" 
-                    @onclick="SwitchToEditMode" 
-                    title="@AppResources.EditActivity">
-                <i class="fa fa-edit" aria-hidden="true"></i>
+                    @onclick="ConfirmFinishPacking" 
+                    disabled="@(!CanFinishPacking())"
+                    title="@AppResources.FinishPacking">
+                <i class="fa fa-check-circle" aria-hidden="true"></i>
             </button>
         </div>
     </div>

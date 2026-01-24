@@ -63,6 +63,7 @@
                 @bind="_activityName"
                 @bind:event="oninput"
                 @onblur="SaveActivityNameAsync"
+                @onclick:stopPropagation
                 placeholder="@AppResources.EnterActivityName" />
     </div>
 </div>
@@ -275,12 +276,14 @@
     </main>
 </div>
 
-<div class="quick-add-container" @onclick:stopPropagation @ref="_quickAddContainerRef" style="bottom: @(_keyboardHeight)px;">
+<div class="quick-add-container" @onclick:stopPropagation @ref="_quickAddContainerRef" style="bottom: @(_isQuickAddFocused ? _keyboardHeight : 0)px;">
 <div class="quick-add-form">
         <input type="text" 
                @bind="_quickAddName" 
                @bind:event="oninput"
                @ref="_quickAddInputRef"
+               @onfocus="OnQuickAddFocused"
+               @onblur="OnQuickAddBlurred"
                placeholder="@AppResources.TypeItemNameForQuickAdd" 
                class="quick-add-input" />
                
@@ -342,6 +345,7 @@
     
     private ElementReference _quickAddInputRef;
     private ElementReference _quickAddContainerRef;
+    private bool _isQuickAddFocused = false;
 
     private List<PackingItemView> Items { get; set; } = new();
     private List<string> _categoryOrder = new();
@@ -1137,6 +1141,18 @@
     {
         _quickAddCategory = category;
         _showQuickCategoryDropdown = false;
+    }
+
+    private void OnQuickAddFocused()
+    {
+        _isQuickAddFocused = true;
+        StateHasChanged();
+    }
+
+    private void OnQuickAddBlurred()
+    {
+        _isQuickAddFocused = false;
+        StateHasChanged();
     }
 
     private async Task UpdateAndSaveItemsOrder()

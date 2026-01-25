@@ -269,6 +269,8 @@ private string? _openMenuId;
         {
             try
             {
+                // Longer delay for Android to ensure modal is fully rendered
+                await Task.Delay(200);
                 await JSRuntime.InvokeVoidAsync("focusElement", _activityNameInput);
             }
             catch { }
@@ -613,8 +615,11 @@ private string? _openMenuId;
 
         if (isVisible)
         {
-            // Adjust page padding to account for keyboard height
-            _ = JSRuntime.InvokeVoidAsync("adjustPageForKeyboard", height);
+            // Only adjust page padding if not in a modal
+            if (!_showAddDialog)
+            {
+                _ = JSRuntime.InvokeVoidAsync("adjustPageForKeyboard", height);
+            }
             
             // Scroll the active input into view to ensure it's not covered by the keyboard
             _ = JSRuntime.InvokeVoidAsync("scrollActiveElementIntoView");

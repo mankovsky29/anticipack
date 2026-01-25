@@ -25,39 +25,68 @@ function blurQuickAddInput() {
 }
 
 function scrollActiveElementIntoView() {
-    const activeElement = document.activeElement;
-    if (activeElement && (activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA')) {
-        setTimeout(() => {
-            // Check if element is inside a modal/popup - don't scroll the background page
-            const isInModal = activeElement.closest('.modal-overlay, .modal-content, .add-item-form');
-            if (isInModal) {
-                // For modals, just ensure element is visible within the modal
-                activeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                return;
-            }
+const activeElement = document.activeElement;
+if (activeElement && (activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA')) {
+    setTimeout(() => {
+        // Check if element is inside a modal/popup
+        const modalOverlay = activeElement.closest('.modal-overlay');
+        const modalContent = activeElement.closest('.modal-content');
             
-            // If element is in a fixed positioned container (like quick-add), don't scroll
-            const isInFixedContainer = activeElement.closest('.quick-add-container, .quick-add-form');
-            if (isInFixedContainer) {
-                // Don't scroll - fixed elements manage their own position
-                return;
-            }
-            
-            // Get element position
-            const rect = activeElement.getBoundingClientRect();
-            const absoluteTop = rect.top + window.pageYOffset;
-            
-            // Calculate scroll position to place input at 1/3 from top of viewport
-            // This gives enough space above for context and keeps it well above keyboard
+        if (modalOverlay && modalContent) {
+            // For modals on mobile, ensure proper scrolling
+            const inputRect = activeElement.getBoundingClientRect();
             const viewportHeight = window.innerHeight;
-            const targetPosition = absoluteTop - (viewportHeight / 3);
+                
+            // Estimate keyboard height (typically 40-50% of viewport on mobile)
+            const keyboardHeight = viewportHeight * 0.5;
+            const visibleAreaBottom = viewportHeight - keyboardHeight;
+                
+            // Check if input is hidden by keyboard
+            if (inputRect.bottom > visibleAreaBottom || inputRect.top < 100) {
+                // Calculate how much we need to scroll
+                // Position input at about 30% from top of visible area
+                const targetTop = 100; // 100px from top
+                const currentTop = inputRect.top;
+                const scrollAmount = currentTop - targetTop;
+                    
+                // Scroll the modal overlay
+                modalOverlay.scrollBy({
+                    top: scrollAmount,
+                    behavior: 'smooth'
+                });
+            }
+            return;
+        }
             
-            // Scroll to calculated position
-            window.scrollTo({
-                top: Math.max(0, targetPosition),
-                behavior: 'smooth'
-            });
-        }, 350); // Delay to allow keyboard animation to complete
+        // Check for other form containers
+        const isInFormModal = activeElement.closest('.add-item-form');
+        if (isInFormModal) {
+            activeElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            return;
+        }
+            
+        // If element is in a fixed positioned container (like quick-add), don't scroll
+        const isInFixedContainer = activeElement.closest('.quick-add-container, .quick-add-form');
+        if (isInFixedContainer) {
+            // Don't scroll - fixed elements manage their own position
+            return;
+        }
+            
+        // Get element position
+        const rect = activeElement.getBoundingClientRect();
+        const absoluteTop = rect.top + window.pageYOffset;
+            
+        // Calculate scroll position to place input at 1/3 from top of viewport
+        // This gives enough space above for context and keeps it well above keyboard
+        const viewportHeight = window.innerHeight;
+        const targetPosition = absoluteTop - (viewportHeight / 3);
+            
+        // Scroll to calculated position
+        window.scrollTo({
+            top: Math.max(0, targetPosition),
+            behavior: 'smooth'
+        });
+    }, 300); // Reduced delay for faster response
     }
 }
 

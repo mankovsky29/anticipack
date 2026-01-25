@@ -385,6 +385,9 @@
   <data name="ConfirmFinishPacking" xml:space="preserve">
     <value>You packed {0} out of {1} items. Are you sure you want to finish packing?</value>
   </data>
+  <data name="ConfirmFinishPackingWithAutoCheck" xml:space="preserve">
+    <value>You have packed {0} out of {1} items. The remaining {2} item(s) will be automatically checked. Do you want to finish packing?</value>
+  </data>
   <data name="FinishNow" xml:space="preserve">
     <value>Finish Now</value>
   </data>

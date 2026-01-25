@@ -702,10 +702,11 @@
     {
         var packedCount = Items.Count(i => i.IsChecked);
         var totalCount = Items.Count;
+        var remainingCount = totalCount - packedCount;
         
         bool confirm = await DialogService.ShowConfirmAsync(
             AppResources.FinishPacking,
-            string.Format(AppResources.ConfirmFinishPacking, packedCount, totalCount),
+            string.Format(AppResources.ConfirmFinishPackingWithAutoCheck, packedCount, totalCount, remainingCount),
             AppResources.FinishNow,
             AppResources.Cancel);
 
@@ -719,13 +720,22 @@
     {
         try
         {
+            // Automatically check all remaining unchecked items
+            var uncheckedItems = Items.Where(i => !i.IsChecked).ToList();
+            foreach (var item in uncheckedItems)
+            {
+                item.IsChecked = true;
+                item.Item.IsPacked = true;
+                await PackingRepository.AddOrUpdateItemAsync(item.Item);
+            }
+            
             var endTime = DateTime.Now;
-            var packedItems = Items.Count(i => i.IsChecked);
+            var packedItems = Items.Count; // All items are now packed
             
             // Compare with average
             _timeComparison = await PackingHistoryService.CompareWithAverageAsync(Id, endTime - _packingStartTime);
             
-            // Record completion in history with actual packed items
+            // Record completion in history with all items packed
             await PackingHistoryService.RecordPackingSessionAsync(
                 Id, 
                 _packingStartTime, 
@@ -746,6 +756,12 @@
                 
                 // Reload history data
                 await LoadHistoryDataAsync(Id);
+            }
+            
+            // Update UI state for all categories
+            foreach (var category in _categoryOrder)
+            {
+                UpdateCategoryStateAfterItemChange(category);
             }
             
             // Show completion modal

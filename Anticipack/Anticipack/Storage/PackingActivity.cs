@@ -12,6 +12,7 @@ namespace Anticipack.Storage
         public bool IsShared { get; set; } = false; // New property for sharing capability
         public bool IsArchived { get; set; } = false; // New property for archiving
         public bool IsFinished { get; set; } = false; // Track if packing was finished (manually or by completing all items)
+        public bool IsRecurring { get; set; } = true; // True for recurring activities, false for one-time activities
 
         [Ignore] // Not mapped, for convenience
         public IReadOnlyCollection<PackingItem>? Items { get; set; }

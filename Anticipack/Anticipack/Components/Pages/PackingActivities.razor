@@ -188,6 +188,40 @@
                     </span>
                 }
             </div>
+            
+            <div class="form-row">
+                <label>@Localizer["ActivityType"]</label>
+                <div class="radio-group">
+                    <label class="radio-option">
+                        <input type="radio" 
+                               name="activity-type" 
+                               value="recurring" 
+                               checked="@_isRecurringActivity"
+                               @onchange="() => _isRecurringActivity = true" />
+                        <span class="radio-label">
+                            <i class="fa fa-sync-alt"></i>
+                            <div>
+                                <strong>@Localizer["RecurringActivity"]</strong>
+                                <small>@Localizer["RecurringActivityDescription"]</small>
+                            </div>
+                        </span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" 
+                               name="activity-type" 
+                               value="one-time" 
+                               checked="@(!_isRecurringActivity)"
+                               @onchange="() => _isRecurringActivity = false" />
+                        <span class="radio-label">
+                            <i class="fa fa-calendar-check"></i>
+                            <div>
+                                <strong>@Localizer["OneTimeActivity"]</strong>
+                                <small>@Localizer["OneTimeActivityDescription"]</small>
+                            </div>
+                        </span>
+                    </label>
+                </div>
+            </div>
 
             <div class="form-actions">
                 <button class="btn cancel" @onclick="CancelAddActivity" disabled="@_isCreating">
@@ -234,9 +268,11 @@ private string? _openMenuId;
     // Add dialog
     private bool _showAddDialog;
     private string _newActivityName = string.Empty;
+    private bool _isRecurringActivity = true; // Default to recurring
     private bool _hasAttemptedSubmit = false;
     private bool _isCreating = false;
     private ElementReference _activityNameInput;
+    private bool _hasDialogFocused = false;
 
     // Toast
     private bool _showToast;
@@ -264,14 +300,15 @@ private string? _openMenuId;
             await JSRuntime.InvokeVoidAsync("initScrollToTopButton", DotNetObjectReference.Create(this));
         }
         
-        // Auto-focus the input when dialog opens
-        if (_showAddDialog && _activityNameInput.Id != null)
+        // Auto-focus the input when dialog opens (only once per dialog session)
+        if (_showAddDialog && !_hasDialogFocused && _activityNameInput.Id != null)
         {
             try
             {
                 // Longer delay for Android to ensure modal is fully rendered
                 await Task.Delay(200);
                 await JSRuntime.InvokeVoidAsync("focusElement", _activityNameInput);
+                _hasDialogFocused = true;
             }
             catch { }
         }
@@ -433,8 +470,10 @@ private string? _openMenuId;
     private void AddNewActivity()
     {
         _newActivityName = string.Empty;
+        _isRecurringActivity = true;
         _hasAttemptedSubmit = false;
         _isCreating = false;
+        _hasDialogFocused = false; // Reset focus flag for new dialog session
         _showAddDialog = true;
     }
 
@@ -444,6 +483,7 @@ private string? _openMenuId;
         _showAddDialog = false;
         _hasAttemptedSubmit = false;
         _newActivityName = string.Empty;
+        _isRecurringActivity = true;
     }
 
     private async Task ConfirmAddActivityAsync()
@@ -463,7 +503,8 @@ private string? _openMenuId;
         {
             Name = _newActivityName.Trim(),
             LastPacked = DateTime.Now,
-            IsShared = false // Will be implemented later with user-specific sharing
+            IsShared = false, // Will be implemented later with user-specific sharing
+            IsRecurring = _isRecurringActivity
         };
 
         try
@@ -473,6 +514,7 @@ private string? _openMenuId;
             _showAddDialog = false;
             _hasAttemptedSubmit = false;
             _newActivityName = string.Empty;
+            _isRecurringActivity = true;
             await LoadActivitiesAsync();
         }
         catch

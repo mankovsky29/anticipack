@@ -494,6 +494,12 @@
             _currentActivity.LastPacked = endTime;
             _currentActivity.RunCount++;
             _currentActivity.IsFinished = true; // Mark as finished
+            
+            // For one-time activities, automatically archive after completion
+            if (!_currentActivity.IsRecurring)
+            {
+                _currentActivity.IsArchived = true;
+            }
 
             // Save to repository
             if (!string.IsNullOrWhiteSpace(Id))
@@ -748,6 +754,12 @@
             _currentActivity.LastPacked = endTime;
             _currentActivity.RunCount++;
             _currentActivity.IsFinished = true; // Mark as finished
+            
+            // For one-time activities, automatically archive after completion
+            if (!_currentActivity.IsRecurring)
+            {
+                _currentActivity.IsArchived = true;
+            }
 
             // Save to repository
             if (!string.IsNullOrWhiteSpace(Id))

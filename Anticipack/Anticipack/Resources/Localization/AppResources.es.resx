@@ -795,4 +795,19 @@ Jabón, Toalla</value>
   <data name="DonateThankYou" xml:space="preserve">
     <value>Cada contribución, grande o pequeña, hace la diferencia. ¡Gracias por tu apoyo!</value>
   </data>
+  <data name="ActivityType" xml:space="preserve">
+    <value>Tipo de Actividad</value>
+  </data>
+  <data name="RecurringActivity" xml:space="preserve">
+    <value>Recurrente</value>
+  </data>
+  <data name="RecurringActivityDescription" xml:space="preserve">
+    <value>Se reinicia después de cada uso (ej. viajes de negocios)</value>
+  </data>
+  <data name="OneTimeActivity" xml:space="preserve">
+    <value>Una vez</value>
+  </data>
+  <data name="OneTimeActivityDescription" xml:space="preserve">
+    <value>Se archiva automáticamente después de completarse</value>
+  </data>
 </root>

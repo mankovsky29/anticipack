@@ -1078,3 +1078,90 @@
     justify-content: center;
     gap: 8px;
 }
+
+/* Radio Group Styles */
+.radio-group {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 8px;
+}
+
+.radio-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 16px;
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: var(--card-bg);
+}
+
+.radio-option:hover {
+    border-color: var(--primary-light);
+    background: var(--hover-bg);
+}
+
+.radio-option input[type="radio"] {
+    margin-top: 2px;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    accent-color: var(--primary);
+}
+
+.radio-option:has(input[type="radio"]:checked) {
+    border-color: var(--primary);
+    background: var(--primary-light-bg);
+    box-shadow: 0 0 0 3px rgba(75, 137, 220, 0.1);
+}
+
+[data-theme="dark"] .radio-option:has(input[type="radio"]:checked) {
+    box-shadow: 0 0 0 3px rgba(93, 156, 236, 0.1);
+}
+
+.radio-label {
+    flex: 1;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    cursor: pointer;
+}
+
+.radio-label i {
+    font-size: 20px;
+    margin-top: 2px;
+    color: var(--text-secondary);
+    transition: color 0.2s ease;
+}
+
+.radio-option:has(input[type="radio"]:checked) .radio-label i {
+    color: var(--primary);
+}
+
+.radio-label div {
+    flex: 1;
+}
+
+.radio-label strong {
+    display: block;
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 4px;
+    color: var(--text);
+    transition: color 0.2s ease;
+}
+
+.radio-option:has(input[type="radio"]:checked) .radio-label strong {
+    color: var(--primary);
+}
+
+.radio-label small {
+    display: block;
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.4;
+}
+

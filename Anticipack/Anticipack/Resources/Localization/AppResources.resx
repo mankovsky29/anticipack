@@ -714,4 +714,19 @@ Soap, Towel</value>
   <data name="DonateThankYou" xml:space="preserve">
     <value>Every contribution, big or small, makes a difference. Thank you for your support!</value>
   </data>
+  <data name="ActivityType" xml:space="preserve">
+    <value>Activity Type</value>
+  </data>
+  <data name="RecurringActivity" xml:space="preserve">
+    <value>Recurring</value>
+  </data>
+  <data name="RecurringActivityDescription" xml:space="preserve">
+    <value>Resets after each use (e.g., business trips)</value>
+  </data>
+  <data name="OneTimeActivity" xml:space="preserve">
+    <value>One-time</value>
+  </data>
+  <data name="OneTimeActivityDescription" xml:space="preserve">
+    <value>Archives automatically after completion</value>
+  </data>
 </root>

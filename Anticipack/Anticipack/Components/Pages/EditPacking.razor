@@ -12,6 +12,7 @@
 @using Anticipack.Components.Shared.ToastComponent
 @using Anticipack.Components.Shared.NavigationHeaderComponent
 @using Anticipack.Resources.Localization
+@using Microsoft.Extensions.Localization
 @inject NavigationManager Navigation
 @inject IPackingRepository PackingRepository
 @inject IJSRuntime JSRuntime
@@ -22,6 +23,7 @@
 @inject IKeyboardService KeyboardService
 @inject ILocalizationService LocalizationService
 @inject MicrophonePermissionBridge PermissionBridge
+@inject IStringLocalizer<AppResources> Localizer
 
 <NavigationLock OnBeforeInternalNavigation="OnBeforeInternalNavigation" />
 
@@ -55,17 +57,101 @@
     </div>
 </div>
 
-<div class="activity-header" role="banner" aria-label="@AppResources.PackingActivity">
-    <!-- Title on first line -->
-    <div class="header-left-section">
-        <input type="text"
-                class="activity-name-input"
-                @bind="_activityName"
-                @bind:event="oninput"
-                @onblur="SaveActivityNameAsync"
-                @onclick:stopPropagation
-                placeholder="@AppResources.EnterActivityName" />
+<!-- Collapsible Activity Settings Panel -->
+<div class="settings-panel @(_isSettingsExpanded ? "expanded" : "collapsed")">
+    <div class="settings-header" @onclick="ToggleSettings" @onclick:stopPropagation>
+        <div class="settings-summary">
+            <i class="fa @(_isSettingsExpanded ? "fa-chevron-down" : "fa-chevron-right") settings-chevron" aria-hidden="true"></i>
+            <span class="activity-name-summary">@(_activityName ?? AppResources.NewPackingActivity)</span>
+            @if (!_isSettingsExpanded)
+            {
+                <div class="settings-badges">
+                    @if (_currentActivity.IsRecurring)
+                    {
+                        <span class="badge badge-recurring">
+                            <i class="fa fa-sync-alt"></i>
+                            @Localizer["RecurringActivity"]
+                        </span>
+                    }
+                    else
+                    {
+                        <span class="badge badge-one-time">
+                            <i class="fa fa-calendar-check"></i>
+                            @Localizer["OneTimeActivity"]
+                        </span>
+                    }
+                    @if (_currentActivity.IsArchived)
+                    {
+                        <span class="badge badge-archived">
+                            <i class="fa fa-archive"></i>
+                            @Localizer["Archived"]
+                        </span>
+                    }
+                </div>
+            }
+        </div>
     </div>
+    
+    @if (_isSettingsExpanded)
+    {
+        <div class="settings-content">
+            <!-- Activity Name -->
+            <div class="setting-row">
+                <label for="activity-name-input" class="setting-label">
+                    <i class="fa fa-tag"></i>
+                    @Localizer["Name"]
+                </label>
+                <input id="activity-name-input"
+                       type="text"
+                       class="setting-input"
+                       @bind="_activityName"
+                       @bind:event="oninput"
+                       @onblur="SaveActivityNameAsync"
+                       @onclick:stopPropagation
+                       placeholder="@AppResources.EnterActivityName" />
+            </div>
+            
+            <!-- Activity Type -->
+            <div class="setting-row">
+                <label class="setting-label">
+                    <i class="fa fa-repeat"></i>
+                    @Localizer["ActivityType"]
+                </label>
+                <div class="segmented-control">
+                    <button class="segment @(_currentActivity.IsRecurring ? "active" : "")"
+                            @onclick="() => SetActivityType(true)"
+                            @onclick:stopPropagation
+                            type="button">
+                        <i class="fa fa-sync-alt"></i>
+                        <span>@Localizer["RecurringActivity"]</span>
+                    </button>
+                    <button class="segment @(!_currentActivity.IsRecurring ? "active" : "")"
+                            @onclick="() => SetActivityType(false)"
+                            @onclick:stopPropagation
+                            type="button">
+                        <i class="fa fa-calendar-check"></i>
+                        <span>@Localizer["OneTimeActivity"]</span>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Archive Toggle -->
+            <div class="setting-row">
+                <label class="setting-label">
+                    <i class="fa fa-archive"></i>
+                    @Localizer["Archive"]
+                </label>
+                <label class="toggle-switch">
+                    <input type="checkbox"
+                           @bind="_currentActivity.IsArchived"
+                           @bind:after="SaveArchiveStatusAsync"
+                           @onclick:stopPropagation />
+                    <span class="toggle-slider"></span>
+                    <span class="toggle-label">@(_currentActivity.IsArchived ? Localizer["Archived"] : Localizer["Active"])</span>
+                </label>
+            </div>
+        </div>
+    }
 </div>
 
     <main class="content-area">
@@ -331,6 +417,7 @@
     private double _keyboardHeight;
     private Storage.PackingActivity _currentActivity = new Storage.PackingActivity();
     private string _activityName = string.Empty;
+    private bool _isSettingsExpanded = false; // Collapsed by default
 
     private sealed class PackingItemView
     {
@@ -624,6 +711,50 @@
         _isAddingItem = false;
         _bulkItemsText = string.Empty;
         StateHasChanged();
+    }
+
+    private void ToggleSettings()
+    {
+        _isSettingsExpanded = !_isSettingsExpanded;
+    }
+
+    private async Task SetActivityType(bool isRecurring)
+    {
+        if (_currentActivity.IsRecurring == isRecurring)
+            return;
+
+        _currentActivity.IsRecurring = isRecurring;
+        await SaveActivityAsync();
+        
+        var message = isRecurring 
+            ? $"✓ {Localizer["RecurringActivity"]}" 
+            : $"✓ {Localizer["OneTimeActivity"]}";
+        ToastService.ShowSuccess(message);
+    }
+
+    private async Task SaveArchiveStatusAsync()
+    {
+        await SaveActivityAsync();
+        
+        var archiveText = _currentActivity.IsArchived 
+            ? Localizer["Archived"] 
+            : Localizer["Active"];
+        ToastService.ShowSuccess($"✓ {archiveText}");
+    }
+
+    private async Task SaveActivityAsync()
+    {
+        if (string.IsNullOrWhiteSpace(Id))
+            return;
+
+        try
+        {
+            await PackingRepository.AddOrUpdateAsync(_currentActivity);
+        }
+        catch (Exception ex)
+        {
+            ToastService.ShowError(string.Format(AppResources.FailedToUpdateItem, ex.Message));
+        }
     }
 
     private void OnKeyboardVisibilityChanged(bool isVisible, double height)

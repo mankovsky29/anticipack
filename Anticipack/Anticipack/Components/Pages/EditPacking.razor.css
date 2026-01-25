@@ -2023,3 +2023,319 @@ ul.category-content {
         animation: none;
     }
 }
+
+/* Settings Panel Styles */
+.settings-panel {
+    background: var(--surface);
+    border-radius: 12px;
+    margin: 12px 0px;
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.settings-header {
+    padding: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--background);
+    transition: background 0.2s ease;
+    user-select: none;
+}
+
+.settings-header:hover {
+    background: var(--hover-bg);
+}
+
+.settings-header:active {
+    background: var(--hover-bg-light);
+}
+
+.settings-chevron {
+    font-size: 14px;
+    color: var(--text-secondary);
+    transition: transform 0.3s ease;
+}
+
+.settings-panel.expanded .settings-chevron {
+    transform: rotate(0deg);
+}
+
+.settings-panel.collapsed .settings-chevron {
+    transform: rotate(-90deg);
+}
+
+.settings-summary {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+    flex-wrap: wrap;
+}
+
+.activity-name-summary {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text);
+    flex-shrink: 0;
+}
+
+.settings-badges {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.badge i {
+    font-size: 11px;
+}
+
+.badge-recurring {
+    background: rgba(93, 156, 236, 0.15);
+    color: var(--primary);
+}
+
+.badge-one-time {
+    background: rgba(54, 215, 183, 0.15);
+    color: var(--accent);
+}
+
+.badge-archived {
+    background: rgba(127, 140, 141, 0.15);
+    color: var(--secondary);
+}
+
+.settings-content {
+    padding: 0 16px 16px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.setting-row {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.setting-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+.setting-label i {
+    font-size: 14px;
+    width: 16px;
+    text-align: center;
+}
+
+.setting-input {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 15px;
+    color: var(--text);
+    background: var(--input-bg);
+    transition: all 0.2s ease;
+}
+
+.setting-input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--input-focus-shadow);
+}
+
+.setting-input::placeholder {
+    color: var(--text-light);
+}
+
+/* Segmented Control */
+.segmented-control {
+    display: flex;
+    background: var(--background);
+    border-radius: 10px;
+    padding: 4px;
+    gap: 4px;
+}
+
+.segment {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--text-secondary);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.segment i {
+    font-size: 13px;
+}
+
+.segment:hover:not(.active) {
+    background: var(--hover-bg);
+    color: var(--text);
+}
+
+.segment.active {
+    background: var(--primary);
+    color: white;
+    box-shadow: var(--shadow-sm);
+}
+
+.segment:active {
+    transform: scale(0.98);
+}
+
+/* Toggle Switch */
+.toggle-switch {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.toggle-switch input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-slider {
+    position: relative;
+    width: 48px;
+    height: 28px;
+    background: var(--border-color);
+    border-radius: 14px;
+    transition: background 0.3s ease;
+}
+
+.toggle-slider::after {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 22px;
+    height: 22px;
+    background: white;
+    border-radius: 50%;
+    transition: transform 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.toggle-switch input:checked ~ .toggle-slider {
+    background: var(--primary);
+}
+
+.toggle-switch input:checked ~ .toggle-slider::after {
+    transform: translateX(20px);
+}
+
+.toggle-switch:hover .toggle-slider {
+    opacity: 0.9;
+}
+
+.toggle-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+}
+
+/* Mobile Responsive */
+@media (max-width: 640px) {
+    .settings-panel {
+        margin: 4px 0px;
+    }
+    
+    .settings-header {
+        padding: 14px;
+    }
+    
+    .settings-content {
+        padding: 0 14px 14px 14px;
+    }
+    
+    .activity-name-summary {
+        font-size: 15px;
+    }
+    
+    .segment {
+        padding: 8px 12px;
+        font-size: 13px;
+    }
+    
+    .segment span {
+        display: none;
+    }
+    
+    .segment i {
+        font-size: 16px;
+    }
+    
+    .badge {
+        font-size: 11px;
+        padding: 3px 8px;
+    }
+}
+
+/* Dark theme adjustments */
+[data-theme="dark"] .settings-header {
+    background: var(--surface);
+}
+
+[data-theme="dark"] .settings-header:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+[data-theme="dark"] .badge-recurring {
+    background: rgba(93, 156, 236, 0.2);
+}
+
+[data-theme="dark"] .badge-one-time {
+    background: rgba(72, 228, 198, 0.2);
+}
+
+[data-theme="dark"] .badge-archived {
+    background: rgba(149, 165, 166, 0.2);
+}
+

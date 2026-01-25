@@ -442,9 +442,6 @@
   <data name="PackingActivity" xml:space="preserve">
     <value>Packing Activity</value>
   </data>
-  <data name="TypeMessage" xml:space="preserve">
-    <value>Type a message...</value>
-  </data>
   <data name="Send" xml:space="preserve">
     <value>Send</value>
   </data>
@@ -556,6 +553,84 @@ This action cannot be undone.</value>
   <data name="SettingsMenu" xml:space="preserve">
   <value>Settings</value>
 </data>
+
+  <data name="More" xml:space="preserve">
+    <value>More</value>
+  </data>
+
+  <data name="NameRequired" xml:space="preserve">
+    <value>Name is required</value>
+  </data>
+
+  <data name="Creating" xml:space="preserve">
+    <value>Creating...</value>
+  </data>
+
+  <!-- Support Page -->
+  <data name="Support" xml:space="preserve">
+    <value>Support</value>
+  </data>
+
+  <data name="SupportMenu" xml:space="preserve">
+    <value>Support</value>
+  </data>
+
+  <data name="OtherWaysToReach" xml:space="preserve">
+    <value>Other Ways to Reach Us</value>
+  </data>
+
+  <data name="Email" xml:space="preserve">
+    <value>Email</value>
+  </data>
+
+  <data name="YourMessages" xml:space="preserve">
+    <value>Your Messages</value>
+  </data>
+
+  <data name="NoMessagesYet" xml:space="preserve">
+    <value>No messages yet</value>
+  </data>
+
+  <data name="SendFirstMessage" xml:space="preserve">
+    <value>Send your first message to get help from our support team</value>
+  </data>
+
+  <data name="You" xml:space="preserve">
+    <value>You</value>
+  </data>
+
+  <data name="SupportTeam" xml:space="preserve">
+    <value>Support Team</value>
+  </data>
+
+  <data name="Sending" xml:space="preserve">
+    <value>Sending...</value>
+  </data>
+
+  <data name="Sent" xml:space="preserve">
+    <value>Sent</value>
+  </data>
+
+  <data name="SendFailed" xml:space="preserve">
+    <value>Failed to send</value>
+  </data>
+
+  <data name="TypeYourMessage" xml:space="preserve">
+    <value>Type your message...</value>
+  </data>
+
+  <data name="PrivacyNotice" xml:space="preserve">
+    <value>Your messages are encrypted and private</value>
+  </data>
+
+  <data name="WelcomeToSupport" xml:space="preserve">
+    <value>Welcome to Anticipack Support! How can we help you today?</value>
+  </data>
+
+  <data name="AutoReplyMessage" xml:space="preserve">
+    <value>Thank you for your message! Our support team will get back to you as soon as possible.</value>
+  </data>
+
 
   <!-- Bulk Add Items -->
   <data name="BulkAddPlaceholder" xml:space="preserve">

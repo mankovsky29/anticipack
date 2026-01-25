@@ -417,9 +417,6 @@
   <data name="PackingActivity" xml:space="preserve">
     <value>Активность упаковки</value>
   </data>
-  <data name="TypeMessage" xml:space="preserve">
-    <value>Введите сообщение...</value>
-  </data>
   <data name="Send" xml:space="preserve">
     <value>Отправить</value>
   </data>
@@ -626,5 +623,192 @@
   </data>
   <data name="Confirm" xml:space="preserve">
     <value>Подтвердить</value>
+  </data>
+
+  <!-- Missing keys added -->
+  <data name="More" xml:space="preserve">
+    <value>Ещё</value>
+  </data>
+
+  <data name="NameRequired" xml:space="preserve">
+    <value>Требуется название</value>
+  </data>
+
+  <data name="Creating" xml:space="preserve">
+    <value>Создание...</value>
+  </data>
+
+  <!-- Support Page -->
+  <data name="Support" xml:space="preserve">
+    <value>Поддержка</value>
+  </data>
+
+  <data name="SupportMenu" xml:space="preserve">
+    <value>Поддержка</value>
+  </data>
+
+  <data name="OtherWaysToReach" xml:space="preserve">
+    <value>Другие способы связи</value>
+  </data>
+
+  <data name="Email" xml:space="preserve">
+    <value>Электронная почта</value>
+  </data>
+
+  <data name="YourMessages" xml:space="preserve">
+    <value>Ваши сообщения</value>
+  </data>
+
+  <data name="NoMessagesYet" xml:space="preserve">
+    <value>Пока нет сообщений</value>
+  </data>
+
+  <data name="SendFirstMessage" xml:space="preserve">
+    <value>Отправьте первое сообщение, чтобы получить помощь от нашей команды поддержки</value>
+  </data>
+
+  <data name="You" xml:space="preserve">
+    <value>Вы</value>
+  </data>
+
+  <data name="SupportTeam" xml:space="preserve">
+    <value>Команда поддержки</value>
+  </data>
+
+  <data name="Sending" xml:space="preserve">
+    <value>Отправка...</value>
+  </data>
+
+  <data name="Sent" xml:space="preserve">
+    <value>Отправлено</value>
+  </data>
+
+  <data name="SendFailed" xml:space="preserve">
+    <value>Не удалось отправить</value>
+  </data>
+
+  <data name="TypeYourMessage" xml:space="preserve">
+    <value>Введите ваше сообщение...</value>
+  </data>
+
+  <data name="PrivacyNotice" xml:space="preserve">
+    <value>Ваши сообщения зашифрованы и конфиденциальны</value>
+  </data>
+
+  <data name="WelcomeToSupport" xml:space="preserve">
+    <value>Добро пожаловать в службу поддержки Anticipack! Как мы можем помочь вам сегодня?</value>
+  </data>
+
+  <data name="AutoReplyMessage" xml:space="preserve">
+    <value>Спасибо за ваше сообщение! Наша команда поддержки свяжется с вами как можно скорее.</value>
+  </data>
+
+  <!-- Bulk Add Items -->
+  <data name="BulkAddPlaceholder" xml:space="preserve">
+    <value>Зубная щётка, Зубная паста
+Шампунь
+Мыло, Полотенце</value>
+  </data>
+
+  <data name="BulkAddHint" xml:space="preserve">
+    <value>Разделяйте предметы новой строкой или запятой. Все предметы будут добавлены в выбранную категорию.</value>
+  </data>
+
+  <data name="ItemsAdded" xml:space="preserve">
+    <value>Добавлено {0} предметов</value>
+  </data>
+
+  <data name="FailedToAddItems" xml:space="preserve">
+    <value>Не удалось добавить {0} предметов</value>
+  </data>
+
+  <data name="ConfirmFinishPackingWithAutoCheck" xml:space="preserve">
+    <value>Вы упаковали {0} из {1} предметов. Оставшиеся {2} предмет(ов) будут автоматически отмечены. Хотите завершить упаковку?</value>
+  </data>
+
+  <!-- Speech to Text -->
+  <data name="StartDictation" xml:space="preserve">
+    <value>Начать диктовку</value>
+  </data>
+
+  <data name="StopDictation" xml:space="preserve">
+    <value>Остановить диктовку</value>
+  </data>
+
+  <data name="Listening" xml:space="preserve">
+    <value>Слушаю...</value>
+  </data>
+
+  <data name="SpeechNotSupported" xml:space="preserve">
+    <value>Распознавание речи не поддерживается в вашем браузере</value>
+  </data>
+
+  <data name="SpeechError" xml:space="preserve">
+    <value>Ошибка распознавания речи: {0}</value>
+  </data>
+
+  <data name="MicrophonePermissionDenied" xml:space="preserve">
+    <value>Отказано в доступе к микрофону</value>
+  </data>
+
+  <data name="MicrophonePermissionHelp" xml:space="preserve">
+    <value>Пожалуйста, разрешите доступ к микрофону в настройках браузера, чтобы использовать голосовую диктовку</value>
+  </data>
+
+  <data name="NoSpeechDetected" xml:space="preserve">
+    <value>Речь не обнаружена. Пожалуйста, попробуйте снова.</value>
+  </data>
+
+  <data name="AudioCaptureError" xml:space="preserve">
+    <value>Не удалось захватить аудио. Пожалуйста, проверьте микрофон.</value>
+  </data>
+
+  <data name="NetworkErrorSpeech" xml:space="preserve">
+    <value>Ошибка сети. Пожалуйста, проверьте подключение к интернету.</value>
+  </data>
+
+  <data name="GrantMicrophonePermission" xml:space="preserve">
+    <value>Предоставить доступ к микрофону</value>
+  </data>
+
+  <data name="LanguageNotSupported" xml:space="preserve">
+    <value>Распознавание речи не поддерживается для выбранного языка. Переключение на английский.</value>
+  </data>
+
+  <data name="SpeechRecognitionLanguage" xml:space="preserve">
+    <value>Язык распознавания речи</value>
+  </data>
+
+  <data name="UseAppLanguage" xml:space="preserve">
+    <value>Использовать язык приложения для распознавания речи</value>
+  </data>
+
+  <!-- Donate Page -->
+  <data name="Donate" xml:space="preserve">
+    <value>Пожертвовать</value>
+  </data>
+
+  <data name="DonateTitle" xml:space="preserve">
+    <value>Поддержать Anticipack</value>
+  </data>
+
+  <data name="DonateDescription" xml:space="preserve">
+    <value>Ваша поддержка помогает нам продолжать разработку и улучшение Anticipack. Спасибо, что рассматриваете возможность пожертвования!</value>
+  </data>
+
+  <data name="SelectAmount" xml:space="preserve">
+    <value>Выберите сумму</value>
+  </data>
+
+  <data name="CustomAmount" xml:space="preserve">
+    <value>Или введите свою сумму</value>
+  </data>
+
+  <data name="DonateNow" xml:space="preserve">
+    <value>Пожертвовать</value>
+  </data>
+
+  <data name="DonateThankYou" xml:space="preserve">
+    <value>Каждый вклад, большой или маленький, имеет значение. Спасибо за вашу поддержку!</value>
   </data>
 </root>

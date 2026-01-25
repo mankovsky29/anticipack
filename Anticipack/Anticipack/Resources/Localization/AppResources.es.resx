@@ -133,26 +133,331 @@
     <value>Crear Actividad de Empaque</value>
   </data>
   <data name="LastPacked" xml:space="preserve">
-    <value>Ultimo empaque:</value>
+    <value>Último empaque:</value>
   </data>
   <data name="PackNow" xml:space="preserve">
     <value>Empacar Ahora</value>
   </data>
+  <data name="Edit" xml:space="preserve">
+    <value>Editar</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>Eliminar</value>
+  </data>
+  <data name="Search" xml:space="preserve">
+    <value>Buscar</value>
+  </data>
+  <data name="AddActivity" xml:space="preserve">
+    <value>Agregar Actividad</value>
+  </data>
+  <data name="NewPackingActivity" xml:space="preserve">
+    <value>Nueva Actividad de Empaque</value>
+  </data>
+  <data name="Name" xml:space="preserve">
+    <value>Nombre</value>
+  </data>
+  <data name="Category" xml:space="preserve">
+    <value>Categoría</value>
+  </data>
+  <data name="Categories" xml:space="preserve">
+    <value>Categorías</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Cancelar</value>
+  </data>
+  <data name="Create" xml:space="preserve">
+    <value>Crear</value>
+  </data>
+  <data name="DeleteActivityTitle" xml:space="preserve">
+    <value>¿Eliminar Actividad?</value>
+  </data>
+  <data name="DeleteActivityMessage" xml:space="preserve">
+    <value>¿Estás seguro de que quieres eliminar "{0}"? Esta acción no se puede deshacer.</value>
+  </data>
+  <data name="ActivityCreated" xml:space="preserve">
+    <value>Actividad creada exitosamente</value>
+  </data>
+  <data name="ActivityDeleted" xml:space="preserve">
+    <value>Actividad eliminada exitosamente</value>
+  </data>
+  <data name="FailedToLoad" xml:space="preserve">
+    <value>Error al cargar actividades</value>
+  </data>
+  <data name="FailedToCreate" xml:space="preserve">
+    <value>Error al crear actividad</value>
+  </data>
+  <data name="FailedToDelete" xml:space="preserve">
+    <value>Error al eliminar actividad</value>
+  </data>
+  <data name="Items" xml:space="preserve">
+    <value>artículos</value>
+  </data>
+  <data name="Active" xml:space="preserve">
+    <value>Activas</value>
+  </data>
+  <data name="Archived" xml:space="preserve">
+    <value>Archivadas</value>
+  </data>
+  <data name="Archive" xml:space="preserve">
+    <value>Archivar</value>
+  </data>
+  <data name="Unarchive" xml:space="preserve">
+    <value>Desarchivar</value>
+  </data>
+  <data name="All" xml:space="preserve">
+    <value>Todas</value>
+  </data>
+  <data name="Private" xml:space="preserve">
+    <value>Privadas</value>
+  </data>
+  <data name="Shared" xml:space="preserve">
+    <value>Compartidas</value>
+  </data>
+  <data name="SharedActivity" xml:space="preserve">
+    <value>Actividad Compartida</value>
+  </data>
+  <data name="MakeShared" xml:space="preserve">
+    <value>Hacer Compartida</value>
+  </data>
+  <data name="MakePrivate" xml:space="preserve">
+    <value>Hacer Privada</value>
+  </data>
+  <data name="SharedActivityDescription" xml:space="preserve">
+    <value>Las actividades compartidas pueden ser accedidas por otros usuarios</value>
+  </data>
+  <data name="ConfirmMakeShared" xml:space="preserve">
+    <value>¿Estás seguro de que quieres hacer "{0}" compartida con otros usuarios?</value>
+  </data>
+  <data name="ConfirmMakePrivate" xml:space="preserve">
+    <value>¿Estás seguro de que quieres hacer "{0}" privada?</value>
+  </data>
+  <data name="ConfirmArchive" xml:space="preserve">
+    <value>¿Estás seguro de que quieres archivar "{0}"?</value>
+  </data>
+  <data name="ConfirmUnarchive" xml:space="preserve">
+    <value>¿Estás seguro de que quieres desarchivar "{0}"?</value>
+  </data>
+  <data name="ChangeShareStatus" xml:space="preserve">
+    <value>Cambiar Estado de Compartir</value>
+  </data>
+  <data name="ChangeArchiveStatus" xml:space="preserve">
+    <value>Cambiar Estado de Archivo</value>
+  </data>
+  <data name="ActivityNowShared" xml:space="preserve">
+    <value>"{0}" ahora está compartida</value>
+  </data>
+  <data name="ActivityNowPrivate" xml:space="preserve">
+    <value>"{0}" ahora es privada</value>
+  </data>
+  <data name="ActivityArchived" xml:space="preserve">
+    <value>"{0}" ha sido archivada</value>
+  </data>
+  <data name="ActivityUnarchived" xml:space="preserve">
+    <value>"{0}" ha sido desarchivada</value>
+  </data>
+  <data name="FailedToUpdateShareStatus" xml:space="preserve">
+    <value>Error al actualizar estado de compartir</value>
+  </data>
+  <data name="FailedToUpdateArchiveStatus" xml:space="preserve">
+    <value>Error al actualizar estado de archivo</value>
+  </data>
+  <data name="Confirm" xml:space="preserve">
+    <value>Confirmar</value>
+  </data>
+  <data name="JustNow" xml:space="preserve">
+    <value>Justo ahora</value>
+  </data>
+  <data name="MinutesAgo" xml:space="preserve">
+    <value>hace {0} minutos</value>
+  </data>
+  <data name="HoursAgo" xml:space="preserve">
+    <value>hace {0} horas</value>
+  </data>
+  <data name="DaysAgo" xml:space="preserve">
+    <value>hace {0} días</value>
+  </data>
+  <data name="WeeksAgo" xml:space="preserve">
+    <value>hace {0} semanas</value>
+  </data>
+  <data name="MonthsAgo" xml:space="preserve">
+    <value>hace {0} meses</value>
+  </data>
 
-  
-  <!-- Bulk Add Items - Spanish -->
-  <data name="BulkAddPlaceholder" xml:space="preserve">
-    <value>Cepillo de dientes, Pasta dental
-Champu
-Jabon, Toalla</value>
+  <!-- UserSettings Page -->
+  <data name="Settings" xml:space="preserve">
+    <value>Configuración</value>
   </data>
-  <data name="BulkAddHint" xml:space="preserve">
-    <value>Separa los articulos por linea nueva o coma. Todos los articulos se agregaran a la categoria seleccionada.</value>
+  <data name="CustomizeExperience" xml:space="preserve">
+    <value>Personaliza tu experiencia</value>
   </data>
-  
-  <!-- PlayPacking Page - Spanish -->
+  <data name="Appearance" xml:space="preserve">
+    <value>Apariencia</value>
+  </data>
+  <data name="PersonalizeAppLooks" xml:space="preserve">
+    <value>Personaliza cómo se ve y se siente la aplicación</value>
+  </data>
+  <data name="Theme" xml:space="preserve">
+    <value>Tema</value>
+  </data>
+  <data name="LightTheme" xml:space="preserve">
+    <value>Claro</value>
+  </data>
+  <data name="DarkTheme" xml:space="preserve">
+    <value>Oscuro</value>
+  </data>
+  <data name="AutoTheme" xml:space="preserve">
+    <value>Automático</value>
+  </data>
+  <data name="LightThemeTitle" xml:space="preserve">
+    <value>Tema claro</value>
+  </data>
+  <data name="DarkThemeTitle" xml:space="preserve">
+    <value>Tema oscuro</value>
+  </data>
+  <data name="AutoThemeTitle" xml:space="preserve">
+    <value>Tema automático basado en preferencias del sistema</value>
+  </data>
+  <data name="AutoThemeHint" xml:space="preserve">
+    <value>La aplicación se ajustará automáticamente al tema del sistema de tu dispositivo</value>
+  </data>
+  <data name="DarkThemeHint" xml:space="preserve">
+    <value>El tema oscuro reduce la fatiga visual en ambientes con poca luz</value>
+  </data>
+  <data name="LightThemeHint" xml:space="preserve">
+    <value>El tema claro es ideal para ambientes brillantes</value>
+  </data>
+  <data name="Notifications" xml:space="preserve">
+    <value>Notificaciones</value>
+  </data>
+  <data name="ManageNotificationPreferences" xml:space="preserve">
+    <value>Administra tus preferencias de notificaciones</value>
+  </data>
+  <data name="PushNotifications" xml:space="preserve">
+    <value>Notificaciones Push</value>
+  </data>
+  <data name="NotifiedAboutUpdates" xml:space="preserve">
+    <value>Recibe notificaciones sobre actualizaciones importantes</value>
+  </data>
+  <data name="ComingSoon" xml:space="preserve">
+    <value>Próximamente</value>
+  </data>
+  <data name="DataStorage" xml:space="preserve">
+    <value>Datos y Almacenamiento</value>
+  </data>
+  <data name="ManageAppData" xml:space="preserve">
+    <value>Administra los datos de tu aplicación</value>
+  </data>
+  <data name="ClearCache" xml:space="preserve">
+    <value>Limpiar Caché</value>
+  </data>
+  <data name="FreeUpStorage" xml:space="preserve">
+    <value>Liberar espacio de almacenamiento</value>
+  </data>
+  <data name="Language" xml:space="preserve">
+    <value>Idioma</value>
+  </data>
+  <data name="ChoosePreferredLanguage" xml:space="preserve">
+    <value>Elige tu idioma preferido</value>
+  </data>
+  <data name="Version" xml:space="preserve">
+    <value>Versión</value>
+  </data>
+
+  <!-- Packing Categories -->
+  <data name="Category_Clothing" xml:space="preserve">
+    <value>Ropa</value>
+  </data>
+  <data name="Category_Shoes" xml:space="preserve">
+    <value>Calzado</value>
+  </data>
+  <data name="Category_Toiletries" xml:space="preserve">
+    <value>Artículos de Aseo</value>
+  </data>
+  <data name="Category_Electronics" xml:space="preserve">
+    <value>Electrónicos</value>
+  </data>
+  <data name="Category_Documents" xml:space="preserve">
+    <value>Documentos</value>
+  </data>
+  <data name="Category_Health" xml:space="preserve">
+    <value>Salud</value>
+  </data>
+  <data name="Category_Accessories" xml:space="preserve">
+    <value>Accesorios</value>
+  </data>
+  <data name="Category_Outdoor" xml:space="preserve">
+    <value>Aire Libre</value>
+  </data>
+  <data name="Category_Food" xml:space="preserve">
+    <value>Comida</value>
+  </data>
+  <data name="Category_Entertainment" xml:space="preserve">
+    <value>Entretenimiento</value>
+  </data>
+  <data name="Category_Miscellaneous" xml:space="preserve">
+    <value>Varios</value>
+  </data>
+
+  <!-- PlayPacking Page -->
+  <data name="LoadingPacking" xml:space="preserve">
+    <value>Cargando empaque…</value>
+  </data>
+  <data name="ShowAllItems" xml:space="preserve">
+    <value>Mostrar Todos los Artículos</value>
+  </data>
+  <data name="HideCheckedItems" xml:space="preserve">
+    <value>Ocultar Artículos Marcados</value>
+  </data>
+  <data name="ShowHistory" xml:space="preserve">
+    <value>Mostrar Historial</value>
+  </data>
+  <data name="HideHistory" xml:space="preserve">
+    <value>Ocultar Historial</value>
+  </data>
+  <data name="ResetAllItems" xml:space="preserve">
+    <value>Restablecer Todos los Artículos</value>
+  </data>
+  <data name="EditActivity" xml:space="preserve">
+    <value>Editar Actividad</value>
+  </data>
+  <data name="ItemsPacked" xml:space="preserve">
+    <value>{0}/{1} artículos empacados</value>
+  </data>
+  <data name="MinRemaining" xml:space="preserve">
+    <value>~{0} min restantes</value>
+  </data>
+  <data name="Done" xml:space="preserve">
+    <value>¡Listo!</value>
+  </data>
+  <data name="PackingHistory" xml:space="preserve">
+    <value>Historial de Empaque</value>
+  </data>
+  <data name="TimesPacked" xml:space="preserve">
+    <value>Veces Empacado</value>
+  </data>
+  <data name="Runs" xml:space="preserve">
+    <value>Ejecuciones</value>
+  </data>
+  <data name="AvgTime" xml:space="preserve">
+    <value>Tiempo Promedio</value>
+  </data>
+  <data name="LastPackedLabel" xml:space="preserve">
+    <value>Último Empaque</value>
+  </data>
+  <data name="RecentActivity" xml:space="preserve">
+    <value>Actividad Reciente</value>
+  </data>
   <data name="PackingComplete" xml:space="preserve">
     <value>¡Empaque Completo!</value>
+  </data>
+  <data name="YouPackedItems" xml:space="preserve">
+    <value>Empacaste {0} artículos en {1}</value>
+  </data>
+  <data name="Efficiency" xml:space="preserve">
+    <value>Eficiencia</value>
+  </data>
+  <data name="ComparedToLastTime" xml:space="preserve">
+    <value>Comparado con la Última Vez</value>
   </data>
   <data name="Great" xml:space="preserve">
     <value>¡Genial!</value>
@@ -163,10 +468,331 @@ Jabon, Toalla</value>
   <data name="ConfirmFinishPacking" xml:space="preserve">
     <value>Empacaste {0} de {1} artículos. ¿Estás seguro de que quieres terminar el empaque?</value>
   </data>
+  <data name="ConfirmFinishPackingWithAutoCheck" xml:space="preserve">
+    <value>Has empacado {0} de {1} artículos. Los {2} artículo(s) restantes se marcarán automáticamente. ¿Quieres terminar el empaque?</value>
+  </data>
   <data name="FinishNow" xml:space="preserve">
     <value>Terminar Ahora</value>
   </data>
   <data name="PackingFinished" xml:space="preserve">
     <value>¡Empaque Terminado!</value>
+  </data>
+  <data name="ShowCheckedItems" xml:space="preserve">
+    <value>Mostrar</value>
+  </data>
+  <data name="HideLabel" xml:space="preserve">
+    <value>Ocultar</value>
+  </data>
+  <data name="SwitchToEditMode" xml:space="preserve">
+    <value>¿Cambiar a Modo de Edición?</value>
+  </data>
+  <data name="EditingMightAffectProgress" xml:space="preserve">
+    <value>Editar esta lista de empaque podría afectar tu progreso actual de empaque.</value>
+  </data>
+  <data name="ContinueToEdit" xml:space="preserve">
+    <value>Continuar Editando</value>
+  </data>
+  <data name="ResetPackingList" xml:space="preserve">
+    <value>Restablecer Lista de Empaque</value>
+  </data>
+  <data name="ConfirmResetAllItems" xml:space="preserve">
+    <value>¿Estás seguro de que quieres marcar todos los artículos como no empacados?</value>
+  </data>
+  <data name="ResetAll" xml:space="preserve">
+    <value>Restablecer Todo</value>
+  </data>
+  <data name="ResetItemsSuccess" xml:space="preserve">
+    <value>Restablecidos {0} artículos</value>
+  </data>
+  <data name="ItemPacked" xml:space="preserve">
+    <value>✓ {0} empacado</value>
+  </data>
+  <data name="ItemUnpacked" xml:space="preserve">
+    <value>◯ {0} desempacado</value>
+  </data>
+  <data name="FailedToLoadItems" xml:space="preserve">
+    <value>Error al cargar artículos</value>
+  </data>
+  <data name="ErrorSavingItemState" xml:space="preserve">
+    <value>Error al guardar estado del artículo: {0}</value>
+  </data>
+  <data name="ErrorResettingItems" xml:space="preserve">
+    <value>Error al restablecer artículos: {0}</value>
+  </data>
+  <data name="PackingCompletedRecorded" xml:space="preserve">
+    <value>¡Empaque completado y registrado!</value>
+  </data>
+  <data name="PackingActivity" xml:space="preserve">
+    <value>Actividad de Empaque</value>
+  </data>
+  <data name="Send" xml:space="preserve">
+    <value>Enviar</value>
+  </data>
+
+  <!-- EditPacking Page -->
+  <data name="DeleteTitle" xml:space="preserve">
+    <value>Eliminar</value>
+  </data>
+  <data name="CopyTitle" xml:space="preserve">
+    <value>Copiar</value>
+  </data>
+  <data name="StartPacking" xml:space="preserve">
+    <value>Comenzar Empaque</value>
+  </data>
+  <data name="AddItem" xml:space="preserve">
+    <value>Agregar</value>
+  </data>
+  <data name="AddNewItems" xml:space="preserve">
+    <value>Agregar Nuevos Artículos</value>
+  </data>
+  <data name="EnterActivityName" xml:space="preserve">
+    <value>Ingresa nombre de actividad...</value>
+  </data>
+  <data name="EnterItemName" xml:space="preserve">
+    <value>Ingresa nombre del artículo...</value>
+  </data>
+  <data name="SelectCategory" xml:space="preserve">
+    <value>Selecciona Categoría:</value>
+  </data>
+  <data name="NotesOptional" xml:space="preserve">
+    <value>Notas (opcional):</value>
+  </data>
+  <data name="AddNotesAboutItem" xml:space="preserve">
+    <value>Agrega notas sobre este artículo...</value>
+  </data>
+  <data name="ItemName" xml:space="preserve">
+    <value>Nombre del artículo...</value>
+  </data>
+  <data name="DeleteItem" xml:space="preserve">
+    <value>Eliminar artículo</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Guardar</value>
+  </data>
+  <data name="TypeItemNameForQuickAdd" xml:space="preserve">
+    <value>Escribe nombre del artículo para agregar rápido...</value>
+  </data>
+  <data name="EnterItemNameFirst" xml:space="preserve">
+    <value>Ingresa primero el nombre del artículo</value>
+  </data>
+  <data name="DeleteItemTitle" xml:space="preserve">
+    <value>Eliminar Artículo</value>
+  </data>
+  <data name="DeleteItemMessage" xml:space="preserve">
+    <value>¿Estás seguro de que quieres eliminar "{0}"?</value>
+  </data>
+  <data name="ItemDeleted" xml:space="preserve">
+    <value>Eliminado "{0}"</value>
+  </data>
+  <data name="FailedToDeleteItem" xml:space="preserve">
+    <value>Error al eliminar artículo: {0}</value>
+  </data>
+  <data name="PackingActivityCopied" xml:space="preserve">
+    <value>Actividad de empaque copiada exitosamente.</value>
+  </data>
+  <data name="FailedToCopyActivity" xml:space="preserve">
+    <value>Error al copiar actividad de empaque: {0}</value>
+  </data>
+  <data name="DeleteActivity" xml:space="preserve">
+    <value>Eliminar Actividad</value>
+  </data>
+  <data name="DeleteActivityConfirm" xml:space="preserve">
+    <value>¿Estás seguro de que quieres eliminar esta actividad de empaque?
+Esta acción no se puede deshacer.</value>
+  </data>
+  <data name="PackingActivityDeleted" xml:space="preserve">
+    <value>Actividad de empaque eliminada exitosamente.</value>
+  </data>
+  <data name="FailedToDeleteActivity" xml:space="preserve">
+    <value>Error al eliminar actividad de empaque: {0}</value>
+  </data>
+  <data name="ItemAdded" xml:space="preserve">
+    <value>Agregado {0}</value>
+  </data>
+  <data name="ErrorAddingItem" xml:space="preserve">
+    <value>Error al agregar artículo: {0}</value>
+  </data>
+  <data name="ItemUpdated" xml:space="preserve">
+    <value>Artículo actualizado</value>
+  </data>
+  <data name="FailedToUpdateItem" xml:space="preserve">
+    <value>Error al actualizar artículo: {0}</value>
+  </data>
+  <data name="UnnamedItem" xml:space="preserve">
+    <value>Artículo Sin Nombre</value>
+  </data>
+
+  <!-- Navigation Menu -->
+  <data name="NavigationMenu" xml:space="preserve">
+    <value>Menú de navegación</value>
+  </data>
+  <data name="PackingActivitiesMenu" xml:space="preserve">
+    <value>Actividades de Empaque</value>
+  </data>
+  <data name="PackingDialogMenu" xml:space="preserve">
+    <value>Diálogo de Empaque</value>
+  </data>
+  <data name="SettingsMenu" xml:space="preserve">
+    <value>Configuración</value>
+  </data>
+
+  <data name="More" xml:space="preserve">
+    <value>Más</value>
+  </data>
+
+  <data name="NameRequired" xml:space="preserve">
+    <value>Se requiere nombre</value>
+  </data>
+
+  <data name="Creating" xml:space="preserve">
+    <value>Creando...</value>
+  </data>
+
+  <!-- Support Page -->
+  <data name="Support" xml:space="preserve">
+    <value>Soporte</value>
+  </data>
+
+  <data name="SupportMenu" xml:space="preserve">
+    <value>Soporte</value>
+  </data>
+
+  <data name="OtherWaysToReach" xml:space="preserve">
+    <value>Otras Formas de Contactarnos</value>
+  </data>
+
+  <data name="Email" xml:space="preserve">
+    <value>Correo Electrónico</value>
+  </data>
+
+  <data name="YourMessages" xml:space="preserve">
+    <value>Tus Mensajes</value>
+  </data>
+
+  <data name="NoMessagesYet" xml:space="preserve">
+    <value>Aún no hay mensajes</value>
+  </data>
+
+  <data name="SendFirstMessage" xml:space="preserve">
+    <value>Envía tu primer mensaje para obtener ayuda de nuestro equipo de soporte</value>
+  </data>
+
+  <data name="You" xml:space="preserve">
+    <value>Tú</value>
+  </data>
+
+  <data name="SupportTeam" xml:space="preserve">
+    <value>Equipo de Soporte</value>
+  </data>
+
+  <data name="Sending" xml:space="preserve">
+    <value>Enviando...</value>
+  </data>
+
+  <data name="Sent" xml:space="preserve">
+    <value>Enviado</value>
+  </data>
+
+  <data name="SendFailed" xml:space="preserve">
+    <value>Error al enviar</value>
+  </data>
+
+  <data name="TypeYourMessage" xml:space="preserve">
+    <value>Escribe tu mensaje...</value>
+  </data>
+
+  <data name="PrivacyNotice" xml:space="preserve">
+    <value>Tus mensajes están encriptados y son privados</value>
+  </data>
+
+  <data name="WelcomeToSupport" xml:space="preserve">
+    <value>¡Bienvenido al Soporte de Anticipack! ¿Cómo podemos ayudarte hoy?</value>
+  </data>
+
+  <data name="AutoReplyMessage" xml:space="preserve">
+    <value>¡Gracias por tu mensaje! Nuestro equipo de soporte se pondrá en contacto contigo lo antes posible.</value>
+  </data>
+  
+  <!-- Bulk Add Items - Spanish -->
+  <data name="BulkAddPlaceholder" xml:space="preserve">
+    <value>Cepillo de dientes, Pasta dental
+Champú
+Jabón, Toalla</value>
+  </data>
+  <data name="BulkAddHint" xml:space="preserve">
+    <value>Separa los artículos por línea nueva o coma. Todos los artículos se agregarán a la categoría seleccionada.</value>
+  </data>
+  <data name="ItemsAdded" xml:space="preserve">
+    <value>{0} artículos agregados</value>
+  </data>
+  <data name="FailedToAddItems" xml:space="preserve">
+    <value>Error al agregar {0} artículos</value>
+  </data>
+
+  <!-- Speech to Text -->
+  <data name="StartDictation" xml:space="preserve">
+    <value>Iniciar Dictado</value>
+  </data>
+  <data name="StopDictation" xml:space="preserve">
+    <value>Detener Dictado</value>
+  </data>
+  <data name="Listening" xml:space="preserve">
+    <value>Escuchando...</value>
+  </data>
+  <data name="SpeechNotSupported" xml:space="preserve">
+    <value>El reconocimiento de voz no es compatible con tu navegador</value>
+  </data>
+  <data name="SpeechError" xml:space="preserve">
+    <value>Error de reconocimiento de voz: {0}</value>
+  </data>
+  <data name="MicrophonePermissionDenied" xml:space="preserve">
+    <value>Permiso de micrófono denegado</value>
+  </data>
+  <data name="MicrophonePermissionHelp" xml:space="preserve">
+    <value>Por favor permite el acceso al micrófono en la configuración de tu navegador para usar dictado por voz</value>
+  </data>
+  <data name="NoSpeechDetected" xml:space="preserve">
+    <value>No se detectó voz. Por favor intenta hablar nuevamente.</value>
+  </data>
+  <data name="AudioCaptureError" xml:space="preserve">
+    <value>No se pudo capturar audio. Por favor verifica tu micrófono.</value>
+  </data>
+  <data name="NetworkErrorSpeech" xml:space="preserve">
+    <value>Error de red. Por favor verifica tu conexión a internet.</value>
+  </data>
+  <data name="GrantMicrophonePermission" xml:space="preserve">
+    <value>Otorgar Permiso de Micrófono</value>
+  </data>
+  <data name="LanguageNotSupported" xml:space="preserve">
+    <value>El reconocimiento de voz no es compatible con el idioma seleccionado. Cambiando a inglés.</value>
+  </data>
+  <data name="SpeechRecognitionLanguage" xml:space="preserve">
+    <value>Idioma de Reconocimiento de Voz</value>
+  </data>
+  <data name="UseAppLanguage" xml:space="preserve">
+    <value>Usar idioma de la aplicación para reconocimiento de voz</value>
+  </data>
+
+  <!-- Donate Page -->
+  <data name="Donate" xml:space="preserve">
+    <value>Donar</value>
+  </data>
+  <data name="DonateTitle" xml:space="preserve">
+    <value>Apoyar Anticipack</value>
+  </data>
+  <data name="DonateDescription" xml:space="preserve">
+    <value>Tu apoyo nos ayuda a continuar desarrollando y mejorando Anticipack. ¡Gracias por considerar una donación!</value>
+  </data>
+  <data name="SelectAmount" xml:space="preserve">
+    <value>Selecciona una cantidad</value>
+  </data>
+  <data name="CustomAmount" xml:space="preserve">
+    <value>O ingresa una cantidad personalizada</value>
+  </data>
+  <data name="DonateNow" xml:space="preserve">
+    <value>Donar</value>
+  </data>
+  <data name="DonateThankYou" xml:space="preserve">
+    <value>Cada contribución, grande o pequeña, hace la diferencia. ¡Gracias por tu apoyo!</value>
   </data>
 </root>

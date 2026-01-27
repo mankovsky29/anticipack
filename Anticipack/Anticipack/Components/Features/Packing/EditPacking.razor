@@ -1,19 +1,6 @@
 ﻿@page "/edit-packing/{id}"
-@using Anticipack.Packing
-@using Anticipack.Services
-@using Anticipack.Services.Categories
-@using Anticipack.Storage
 @using System.Threading
-@using System.Text.Json
-@using Microsoft.AspNetCore.Components.Web
 @using Microsoft.AspNetCore.Components
-@using Microsoft.AspNetCore.Components.Routing
-@using Microsoft.JSInterop
-@using Anticipack.Components.Shared.DialogComponent
-@using Anticipack.Components.Shared.ToastComponent
-@using Anticipack.Components.Shared.NavigationHeaderComponent
-@using Anticipack.Resources.Localization
-@using Microsoft.Extensions.Localization
 @inject NavigationManager Navigation
 @inject IPackingRepository PackingRepository
 @inject IJSRuntime JSRuntime

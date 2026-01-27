@@ -51,6 +51,66 @@ The legacy `IPackingRepository` interface is maintained (marked as `[Obsolete]`)
 public interface IPackingRepository : IPackingActivityRepository, IPackingItemRepository, IPackingHistoryRepository
 ```
 
+---
+
+## Feature-Based Page Organization
+
+### Before (Flat Structure)
+```
+Components/Pages/
+├── Donate.razor
+├── Donate.razor.css
+├── EditPacking.razor
+├── EditPacking.razor.css
+├── PackingActivities.razor
+├── PackingActivities.razor.css
+├── PackingActivity.razor       (caused naming conflict)
+├── PackingDialog.razor
+├── PlayPacking.razor
+├── Support.razor
+└── UserSettings.razor
+```
+
+### After (Feature-Based Structure)
+```
+Components/
+├── Features/
+│   ├── Packing/
+│   │   ├── _Imports.razor          # Feature-specific imports
+│   │   ├── PackingActivities.razor
+│   │   ├── PackingActivities.razor.css
+│   │   ├── ActivityRedirect.razor  # Renamed to avoid conflict
+│   │   ├── EditPacking.razor
+│   │   ├── EditPacking.razor.css
+│   │   ├── PlayPacking.razor
+│   │   ├── PlayPacking.razor.css
+│   │   ├── PackingDialog.razor
+│   │   └── PackingDialog.razor.css
+│   │
+│   ├── Settings/
+│   │   ├── _Imports.razor
+│   │   ├── UserSettings.razor
+│   │   └── UserSettings.razor.css
+│   │
+│   └── Support/
+│       ├── _Imports.razor
+│       ├── Support.razor
+│       ├── Support.razor.css
+│       ├── Donate.razor
+│       └── Donate.razor.css
+│
+├── Shared/                         # Existing shared components
+└── Layout/                         # Existing layout
+```
+
+### Benefits of Feature Organization
+- **Discoverability** - All files for a feature are in one place
+- **Reduced Imports** - Feature-specific `_Imports.razor` files reduce duplication
+- **Scalability** - New features get their own folders
+- **Co-location** - CSS stays with its Razor component
+
+---
+
 ## New Architecture
 
 ```
@@ -75,6 +135,12 @@ Anticipack/
 │       ├── PackingActivityService.cs        # Business logic impl
 │       ├── IPackingHistoryService.cs        # History service (existing)
 │       └── PackingHistoryService.cs         # Updated to use new repos
+│
+└── Components/
+    └── Features/                            # Feature-based pages
+        ├── Packing/
+        ├── Settings/
+        └── Support/
 ```
 
 ## Dependency Injection Registration (MauiProgram.cs)
@@ -105,11 +171,13 @@ builder.Services.AddSingleton<ICategoryIconProvider, CategoryIconProvider>();
 - Smaller, focused interfaces (5-6 methods vs 12)
 - Clear separation of concerns
 - Self-documenting code structure
+- Feature-based organization makes navigation intuitive
 
 ### Maintainability
 - Changes to one area don't affect others
 - New categories can be added without modifying existing code
 - Legacy code continues to work during migration
+- Feature folders isolate changes
 
 ## Migration Path
 1. **Immediate:** Continue using `IPackingRepository` (no changes required)

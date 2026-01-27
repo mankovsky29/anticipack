@@ -1,8 +1,15 @@
-﻿using SQLite;
+﻿using Anticipack.Storage.Repositories;
+using SQLite;
 
 namespace Anticipack.Storage
 {
-    internal class PackingRepository : IPackingRepository
+    /// <summary>
+    /// Legacy repository implementation - maintained for backward compatibility.
+    /// New code should use specific repository interfaces (IPackingActivityRepository, etc.)
+    /// </summary>
+#pragma warning disable CS0618 // Type or member is obsolete - intentionally implementing legacy interface
+    public sealed class PackingRepository : IPackingRepository
+#pragma warning restore CS0618
     {
         private readonly SQLiteAsyncConnection _db;
 
@@ -13,11 +20,10 @@ namespace Anticipack.Storage
 
         public async Task InitializeAsync()
         {
-            //await _db.CreateTableAsync<PackingItem>();
-            //await _db.CreateTableAsync<PackingActivity>();
             await _db.CreateTablesAsync(CreateFlags.None, typeof(PackingItem), typeof(PackingActivity), typeof(PackingHistoryEntry));
         }
 
+        // IPackingActivityRepository implementation
         public async Task<List<PackingActivity>> GetAllAsync()
         {
             return await _db.Table<PackingActivity>().OrderByDescending(x => x.LastPacked).ToListAsync();
@@ -28,29 +34,70 @@ namespace Anticipack.Storage
             return await _db.Table<PackingActivity>().FirstOrDefaultAsync(x => x.Id == id);
         }
 
-        public async Task AddOrUpdateAsync(PackingActivity packing)
+        public async Task AddOrUpdateAsync(PackingActivity activity)
         {
-            await _db.InsertOrReplaceAsync(packing);
+            await _db.InsertOrReplaceAsync(activity);
         }
 
         public async Task DeleteAsync(string id)
         {
-            var packing = await GetByIdAsync(id);
-            if (packing != null)
+            var activity = await GetByIdAsync(id);
+            if (activity is null)
+                return;
+
+            var items = await GetItemsForActivityAsync(id);
+            foreach (var item in items)
             {
-                var items = await GetItemsForActivityAsync(id);
-                foreach (var item in items)
-                {
-                    await _db.DeleteAsync(item);
-                }
-
-                // Delete history entries
-                await DeleteHistoryForActivityAsync(id);
-
-                await _db.DeleteAsync(packing);
+                await _db.DeleteAsync(item);
             }
+
+            await DeleteHistoryForActivityAsync(id);
+            await _db.DeleteAsync(activity);
         }
 
+        public Task<string> CopyAsync(string activityId) => CopyPackingAsync(activityId);
+
+        public async Task<string> CopyPackingAsync(string packingId)
+        {
+            var activity = await _db.Table<PackingActivity>().Where(a => a.Id == packingId).FirstAsync();
+
+            var newActivity = new PackingActivity
+            {
+                Id = Guid.NewGuid().ToString(),
+                Name = activity.Name + " (Copy)",
+                LastPacked = DateTime.Now,
+                RunCount = 0,
+                IsRecurring = activity.IsRecurring,
+                IsArchived = false,
+                IsFinished = false,
+                IsShared = false
+            };
+
+            var items = await _db.Table<PackingItem>()
+                .Where(i => i.ActivityId == packingId)
+                .OrderBy(x => x.SortOrder)
+                .ToListAsync();
+
+            foreach (var item in items)
+            {
+                var newItem = new PackingItem
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    ActivityId = newActivity.Id,
+                    Name = item.Name,
+                    Category = item.Category,
+                    Notes = item.Notes,
+                    SortOrder = item.SortOrder,
+                    IsPacked = false
+                };
+                await _db.InsertAsync(newItem);
+            }
+
+            await _db.InsertAsync(newActivity);
+            return newActivity.Id;
+        }
+
+        // IPackingItemRepository implementation
         public async Task<List<PackingItem>> GetItemsForActivityAsync(string activityId)
         {
             return await _db.Table<PackingItem>()
@@ -62,60 +109,24 @@ namespace Anticipack.Storage
         public async Task AddItemToActivityAsync(string activityId, PackingItem item)
         {
             item.ActivityId = activityId;
-            
-            // Get the maximum sort order for this activity and assign the next value
+
             var existingItems = await _db.Table<PackingItem>()
                 .Where(x => x.ActivityId == activityId)
                 .ToListAsync();
-            
-            item.SortOrder = existingItems.Any() ? existingItems.Max(x => x.SortOrder) + 1 : 0;
-            
+
+            item.SortOrder = existingItems.Count > 0 ? existingItems.Max(x => x.SortOrder) + 1 : 0;
+
             await _db.InsertAsync(item);
         }
 
-        public Task DeleteItemAsync(string itemId)
+        public async Task AddOrUpdateItemAsync(PackingItem item)
         {
-            return _db.DeleteAsync(new PackingItem { Id = itemId });
-        }
-
-        public async Task<string> CopyPackingAsync(string packingId)
-        {
-            var packingActivity = await _db.Table<PackingActivity>().Where(packing => packingId == packing.Id).FirstAsync();
-
-            var newPackingActivity = new PackingActivity
-            {
-                Id = Guid.NewGuid().ToString(),
-                Name = packingActivity.Name + " (Copy)",
-                LastPacked = DateTime.Now,
-                RunCount = 0
-            };
-
-            var packingItems = await _db.Table<PackingItem>()
-                .Where(packing => packingId == packing.ActivityId)
-                .OrderBy(x => x.SortOrder)
-                .ToListAsync();
-
-            foreach (var item in packingItems)
-            {
-                item.Id = Guid.NewGuid().ToString();
-                item.ActivityId = newPackingActivity.Id;
-                // SortOrder is preserved from the original item
-
-                await _db.InsertAsync(item);
-            }
-
-            await _db.InsertAsync(newPackingActivity);
-            return newPackingActivity.Id.ToString();
-        }
-
-        public Task AddOrUpdateItemAsync(PackingItem item)
-        {
-            return _db.InsertOrReplaceAsync(item);
+            await _db.InsertOrReplaceAsync(item);
         }
 
         public async Task UpdateItemsSortOrderAsync(IEnumerable<PackingItem> items)
         {
-            await _db.RunInTransactionAsync((connection) =>
+            await _db.RunInTransactionAsync(connection =>
             {
                 foreach (var item in items)
                 {
@@ -124,6 +135,12 @@ namespace Anticipack.Storage
             });
         }
 
+        public async Task DeleteItemAsync(string itemId)
+        {
+            await _db.DeleteAsync(new PackingItem { Id = itemId });
+        }
+
+        // IPackingHistoryRepository implementation
         public async Task AddHistoryEntryAsync(PackingHistoryEntry entry)
         {
             await _db.InsertAsync(entry);
@@ -145,11 +162,11 @@ namespace Anticipack.Storage
 
         public async Task DeleteHistoryForActivityAsync(string activityId)
         {
-            var historyEntries = await _db.Table<PackingHistoryEntry>()
+            var entries = await _db.Table<PackingHistoryEntry>()
                 .Where(x => x.ActivityId == activityId)
                 .ToListAsync();
 
-            foreach (var entry in historyEntries)
+            foreach (var entry in entries)
             {
                 await _db.DeleteAsync(entry);
             }

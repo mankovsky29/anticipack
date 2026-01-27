@@ -1,14 +1,15 @@
 using Anticipack.Storage;
+using Anticipack.Storage.Repositories;
 
 namespace Anticipack.Services.Packing
 {
     public class PackingHistoryService : IPackingHistoryService
     {
-        private readonly IPackingRepository _repository;
+        private readonly IPackingHistoryRepository _historyRepository;
 
-        public PackingHistoryService(IPackingRepository repository)
+        public PackingHistoryService(IPackingHistoryRepository historyRepository)
         {
-            _repository = repository;
+            _historyRepository = historyRepository;
         }
 
         public async Task RecordPackingSessionAsync(string activityId, DateTime startTime, DateTime endTime, int totalItems, int packedItems)
@@ -24,12 +25,12 @@ namespace Anticipack.Services.Packing
                 DurationSeconds = (int)(endTime - startTime).TotalSeconds
             };
 
-            await _repository.AddHistoryEntryAsync(entry);
+            await _historyRepository.AddHistoryEntryAsync(entry);
         }
 
         public async Task<TimeSpan?> GetAveragePackingTimeAsync(string activityId)
         {
-            var history = await _repository.GetHistoryForActivityAsync(activityId);
+            var history = await _historyRepository.GetHistoryForActivityAsync(activityId);
             
             if (!history.Any())
                 return null;
@@ -40,12 +41,12 @@ namespace Anticipack.Services.Packing
 
         public async Task<List<PackingHistoryEntry>> GetRecentHistoryAsync(string activityId, int count = 10)
         {
-            return await _repository.GetHistoryForActivityAsync(activityId, count);
+            return await _historyRepository.GetHistoryForActivityAsync(activityId, count);
         }
 
         public async Task<PackingHistoryEntry?> GetLastPackingSessionAsync(string activityId)
         {
-            var history = await _repository.GetHistoryForActivityAsync(activityId, 1);
+            var history = await _historyRepository.GetHistoryForActivityAsync(activityId, 1);
             return history.FirstOrDefault();
         }
 
@@ -99,7 +100,7 @@ namespace Anticipack.Services.Packing
 
         public async Task<TimeSpan> EstimateRemainingTimeAsync(string activityId, int itemsRemaining)
         {
-            var history = await _repository.GetHistoryForActivityAsync(activityId);
+            var history = await _historyRepository.GetHistoryForActivityAsync(activityId);
             
             if (!history.Any())
             {

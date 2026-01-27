@@ -1,24 +1,15 @@
-﻿namespace Anticipack.Storage
+﻿using Anticipack.Storage.Repositories;
+
+namespace Anticipack.Storage
 {
-    public interface IPackingRepository
+    /// <summary>
+    /// Legacy facade interface that combines all repository operations.
+    /// Maintained for backward compatibility - prefer using specific repository interfaces.
+    /// </summary>
+    [Obsolete("Use IPackingActivityRepository, IPackingItemRepository, or IPackingHistoryRepository instead")]
+    public interface IPackingRepository : IPackingActivityRepository, IPackingItemRepository, IPackingHistoryRepository
     {
-        Task InitializeAsync();
-        Task<List<PackingActivity>> GetAllAsync();
-        Task<PackingActivity?> GetByIdAsync(string id);
-        Task AddOrUpdateAsync(PackingActivity packing);
-        Task AddOrUpdateItemAsync(PackingItem item);
-        Task UpdateItemsSortOrderAsync(IEnumerable<PackingItem> items);
+        // Legacy method - use CopyAsync from IPackingActivityRepository
         Task<string> CopyPackingAsync(string packingId);
-        Task DeleteAsync(string id);
-
-        Task<List<PackingItem>> GetItemsForActivityAsync(string activityId);
-
-        Task AddItemToActivityAsync(string activityId, PackingItem item);
-        Task DeleteItemAsync(string itemId);
-
-        // History methods
-        Task AddHistoryEntryAsync(PackingHistoryEntry entry);
-        Task<List<PackingHistoryEntry>> GetHistoryForActivityAsync(string activityId, int? limit = null);
-        Task DeleteHistoryForActivityAsync(string activityId);
     }
 }

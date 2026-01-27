@@ -1,6 +1,7 @@
 ﻿@page "/edit-packing/{id}"
 @using Anticipack.Packing
 @using Anticipack.Services
+@using Anticipack.Services.Categories
 @using Anticipack.Storage
 @using System.Threading
 @using System.Text.Json
@@ -24,6 +25,7 @@
 @inject ILocalizationService LocalizationService
 @inject MicrophonePermissionBridge PermissionBridge
 @inject IStringLocalizer<AppResources> Localizer
+@inject ICategoryIconProvider CategoryIconProvider
 
 <NavigationLock OnBeforeInternalNavigation="OnBeforeInternalNavigation" />
 
@@ -1116,21 +1118,7 @@
 
     private string GetCategoryIcon(PackingCategory category)
     {
-        return category switch
-        {
-            PackingCategory.Clothing => "fa-tshirt",
-            PackingCategory.Shoes => "fa-shoe-prints",
-            PackingCategory.Toiletries => "fa-toothbrush",
-            PackingCategory.Electronics => "fa-laptop",
-            PackingCategory.Documents => "fa-passport",
-            PackingCategory.Health => "fa-medkit",
-            PackingCategory.Accessories => "fa-glasses",
-            PackingCategory.Outdoor => "fa-hiking",
-            PackingCategory.Food => "fa-utensils",
-            PackingCategory.Entertainment => "fa-gamepad",
-            PackingCategory.Miscellaneous => "fa-box",
-            _ => "fa-box"
-        };
+        return CategoryIconProvider.GetIcon(category);
     }
 
     private string GetLocalizedCategoryName(PackingCategory category)

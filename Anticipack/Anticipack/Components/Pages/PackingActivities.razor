@@ -4,6 +4,7 @@
 @using Anticipack.Storage
 @using Anticipack.Packing
 @using Anticipack.Services
+@using Anticipack.Services.Categories
 @using Microsoft.Extensions.Localization
 @using Anticipack.Resources.Localization
 @using Microsoft.JSInterop
@@ -15,6 +16,7 @@
 @inject INavigationHeaderService NavigationHeaderService
 @inject IJSRuntime JSRuntime
 @inject IKeyboardService KeyboardService
+@inject ICategoryIconProvider CategoryIconProvider
 @implements IDisposable
 
 <div class="page-container with-fixed-navbar">
@@ -451,20 +453,7 @@ private string? _openMenuId;
 
     private string GetCategoryIcon(string category)
     {
-        return category switch
-        {
-            "Clothing" => "fa fa-tshirt",
-            "Shoes" => "fa fa-shoe-prints",
-            "Toiletries" => "fa fa-pump-soap",
-            "Electronics" => "fa fa-plug",
-            "Documents" => "fa fa-file-alt",
-            "Health" => "fa fa-heartbeat",
-            "Accessories" => "fa fa-ring",
-            "Outdoor" => "fa fa-campground",
-            "Food" => "fa fa-utensils",
-            "Entertainment" => "fa fa-gamepad",
-            _ => "fa fa-box"
-        };
+        return "fa " + CategoryIconProvider.GetIcon(category);
     }
 
     private void AddNewActivity()

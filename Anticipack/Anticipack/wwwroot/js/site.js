@@ -17,13 +17,6 @@ function focusElement(element) {
     }
 }
 
-function blurQuickAddInput() {
-    const activeElement = document.activeElement;
-    if (activeElement && activeElement.tagName === 'INPUT') {
-        activeElement.blur();
-    }
-}
-
 function scrollActiveElementIntoView() {
 const activeElement = document.activeElement;
 if (activeElement && (activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA')) {
@@ -64,14 +57,7 @@ if (activeElement && (activeElement.tagName === 'INPUT' || activeElement.tagName
             activeElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
             return;
         }
-            
-        // If element is in a fixed positioned container (like quick-add), don't scroll
-        const isInFixedContainer = activeElement.closest('.quick-add-container, .quick-add-form');
-        if (isInFixedContainer) {
-            // Don't scroll - fixed elements manage their own position
-            return;
-        }
-            
+
         // Get element position
         const rect = activeElement.getBoundingClientRect();
         const absoluteTop = rect.top + window.pageYOffset;

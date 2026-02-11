@@ -16,7 +16,7 @@
 
 <NavigationLock OnBeforeInternalNavigation="OnBeforeInternalNavigation" />
 
-<div class="page-container with-fixed-navbar" @onclick="HandlePageClick">
+<div class="page-container with-fixed-navbar">
 <div class="activity-header" role="banner" aria-label="@AppResources.PackingActivity">
     <!-- Actions on second line -->
     <div class="header-actions">
@@ -351,51 +351,6 @@
     </main>
 </div>
 
-<div class="quick-add-container" @onclick:stopPropagation @ref="_quickAddContainerRef" style="bottom: @(_isQuickAddFocused ? _keyboardHeight : 0)px;">
-<div class="quick-add-form">
-        <input type="text" 
-               @bind="_quickAddName" 
-               @bind:event="oninput"
-               @ref="_quickAddInputRef"
-               @onfocus="OnQuickAddFocused"
-               @onblur="OnQuickAddBlurred"
-               placeholder="@AppResources.TypeItemNameForQuickAdd" 
-               class="quick-add-input" />
-               
-        <div class="quick-category-select">
-            <button type="button" 
-                   class="category-btn" 
-                   title="@GetLocalizedCategoryName(_quickAddCategory)" 
-                   @onclick="ToggleQuickCategoryDropdown">
-                <i class="fa @GetCategoryIcon(Enum.Parse<PackingCategory>(_quickAddCategory))" aria-hidden="true"></i>
-            </button>
-            
-            @if (_showQuickCategoryDropdown)
-            {
-                <div class="options-dropdown @(_dropdownPosition == "up" ? "dropdown-up" : "dropdown-down")" @ref="dropdownElement">
-                    <div class="dropdown-heading">@AppResources.SelectCategory</div>
-                    @foreach (var category in Enum.GetValues<PackingCategory>())
-                    {
-                        <div class="option @(category.ToString() == _quickAddCategory ? "selected" : "")" 
-                             @onclick:stopPropagation
-                             @onclick="() => SelectQuickCategory(category.ToString())">
-                            <i class="fa @GetCategoryIcon(category)" aria-hidden="true"></i>
-                            <span>@GetLocalizedCategoryName(category)</span>
-                        </div>
-                    }
-                </div>
-            }
-        </div>
-        
-        <button class="quick-add-btn @(string.IsNullOrWhiteSpace(_quickAddName) ? "disabled" : "")" 
-                @onclick="QuickAddItem" 
-                disabled="@string.IsNullOrWhiteSpace(_quickAddName)"
-                title="@(string.IsNullOrWhiteSpace(_quickAddName) ? AppResources.EnterItemNameFirst : AppResources.AddItem)">
-            <i class="fa fa-plus"></i>
-        </button>
-    </div>
-</div>
-
 @code {
     [Parameter]
     public string Id { get; set; } = string.Empty;
@@ -418,10 +373,6 @@
     private PackingItemView? _editingItem = null;
     private ElementReference itemEditInputElement;
     private ElementReference bulkItemsTextarea;
-    
-    private ElementReference _quickAddInputRef;
-    private ElementReference _quickAddContainerRef;
-    private bool _isQuickAddFocused = false;
 
     private List<PackingItemView> Items { get; set; } = new();
     private List<string> _categoryOrder = new();
@@ -437,36 +388,11 @@
 
     private bool _showCategorySelector = false;
 
-    private string _quickAddName = string.Empty;
-    private string _quickAddCategory = PackingCategory.Miscellaneous.ToString();
-
-    private string _dropdownPosition = "down";
-    private ElementReference dropdownElement;
-    private bool _showQuickCategoryDropdown = false;
-    
     // Speech recognition state
     private bool _isSpeechRecognitionSupported = false;
     private bool _isListening = false;
     private DotNetObjectReference<EditPacking>? _dotNetHelper;
     private string _interimTranscript = string.Empty;
-
-    private void ToggleQuickCategoryDropdown()
-    {
-        _showQuickCategoryDropdown = !_showQuickCategoryDropdown;
-
-        if (_showQuickCategoryDropdown)
-        {
-            _ = DetermineDropdownPosition();
-        }
-    }
-
-    private async Task DetermineDropdownPosition()
-    {
-        await Task.Delay(1);
-        var shouldOpenUp = await JSRuntime.InvokeAsync<bool>("shouldOpenDropdownUp", dropdownElement);
-        _dropdownPosition = shouldOpenUp ? "up" : "down";
-        StateHasChanged();
-    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -486,52 +412,6 @@
         }
 
         await base.OnAfterRenderAsync(firstRender);
-    }
-
-    private async Task QuickAddItem()
-    {
-        var name = _quickAddName.Trim();
-
-        if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(Id))
-            return;
-
-        var newItem = new Storage.PackingItem 
-        { 
-            Name = name, 
-            Category = _quickAddCategory,
-            Notes = string.Empty,
-            ActivityId = Id 
-        };
-
-        try
-        {
-            await PackingRepository.AddItemToActivityAsync(Id, newItem);
-            var newItemView = new PackingItemView(newItem);
-            Items.Add(newItemView);
-
-            if (!_categoryOrder.Contains(_quickAddCategory, StringComparer.OrdinalIgnoreCase))
-            {
-                _categoryOrder.Add(_quickAddCategory);
-                _manualOverride[_quickAddCategory] = false;
-            }
-
-            _quickAddName = string.Empty;
-            StateHasChanged();
-            
-            // Keep focus on input to continue adding items
-            await Task.Delay(50); // Small delay to ensure state update
-            await JSRuntime.InvokeVoidAsync("focusElement", _quickAddInputRef);
-        }
-        catch (Exception ex)
-        {
-            ToastService.ShowError(string.Format(AppResources.ErrorAddingItem, ex.Message));
-        }
-    }
-
-    private void HandlePageClick()
-    {
-        // Blur the quick-add input to hide keyboard when clicking outside
-        _ = JSRuntime.InvokeVoidAsync("blurQuickAddInput");
     }
 
     protected override async Task OnInitializedAsync()
@@ -1241,24 +1121,6 @@
         {
             // Silently fail if JS function not available
         }
-    }
-
-    private void SelectQuickCategory(string category)
-    {
-        _quickAddCategory = category;
-        _showQuickCategoryDropdown = false;
-    }
-
-    private void OnQuickAddFocused()
-    {
-        _isQuickAddFocused = true;
-        StateHasChanged();
-    }
-
-    private void OnQuickAddBlurred()
-    {
-        _isQuickAddFocused = false;
-        StateHasChanged();
     }
 
     private async Task UpdateAndSaveItemsOrder()

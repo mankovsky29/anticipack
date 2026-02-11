@@ -183,18 +183,36 @@
 
                         <!-- Category Selection -->
                         <div class="form-section compact">
-                            <label for="category-select" class="form-label-inline">
+                            <label class="form-label-inline">
                                 <i class="fa fa-folder"></i>
                                 @AppResources.SelectCategory
                             </label>
-                            <select id="category-select" 
-                                    class="category-select" 
-                                    @bind="_newCategory">
-                                @foreach (var category in Enum.GetValues<PackingCategory>())
+                            <div class="custom-dropdown @(_isCategoryDropdownOpen ? "open" : "")" @onclick:stopPropagation>
+                                <button type="button" 
+                                        class="dropdown-trigger"
+                                        @onclick="ToggleCategoryDropdown">
+                                    <span class="dropdown-selected-text">@GetLocalizedCategoryName(Enum.TryParse<PackingCategory>(_newCategory, out var selectedCat) ? selectedCat : PackingCategory.Miscellaneous)</span>
+                                    <i class="fa fa-chevron-down dropdown-chevron" aria-hidden="true"></i>
+                                </button>
+                                @if (_isCategoryDropdownOpen)
                                 {
-                                    <option value="@category.ToString()">@GetLocalizedCategoryName(category)</option>
+                                    <div class="dropdown-menu">
+                                        @foreach (var category in Enum.GetValues<PackingCategory>())
+                                        {
+                                            var isSelected = _newCategory == category.ToString();
+                                            <button type="button" 
+                                                    class="dropdown-item @(isSelected ? "selected" : "")"
+                                                    @onclick="() => SelectCategoryFromDropdown(category)">
+                                                <span>@GetLocalizedCategoryName(category)</span>
+                                                @if (isSelected)
+                                                {
+                                                    <i class="fa fa-check dropdown-item-check" aria-hidden="true"></i>
+                                                }
+                                            </button>
+                                        }
+                                    </div>
                                 }
-                            </select>
+                            </div>
                         </div>
 
                         <!-- Input Section -->
@@ -450,7 +468,7 @@
 @code {
     [Parameter]
     public string Id { get; set; } = string.Empty;
-
+    private bool _isCategoryDropdownOpen = false;
     private bool _isAddingItem = false;
     private bool _isLoading;
     private bool _keyboardVisible;
@@ -538,6 +556,27 @@
         KeyboardService.KeyboardVisibilityChanged += OnKeyboardVisibilityChanged;
 
         await base.OnInitializedAsync();
+    }
+
+    private void ToggleCategoryDropdown()
+    {
+        _isCategoryDropdownOpen = !_isCategoryDropdownOpen;
+    }
+
+    private void SelectCategoryFromDropdown(PackingCategory category)
+    {
+        _newCategory = category.ToString();
+        _isCategoryDropdownOpen = false;
+    }
+
+    private void CancelAdd()
+    {
+        _isAddingItem = false;
+        _quickAddText = string.Empty;
+        _bulkItemsText = string.Empty;
+        _parsedItems = [];
+        _duplicateItems = [];
+        _isCategoryDropdownOpen = false;  // Add this line
     }
 
     private void InitializeDefaultItems()
@@ -628,13 +667,9 @@
         }
     }
 
-    private void CancelAdd()
+    private void SelectNewCategory(PackingCategory category)
     {
-        _isAddingItem = false;
-        _quickAddText = string.Empty;
-        _bulkItemsText = string.Empty;
-        _parsedItems = [];
-        _duplicateItems = [];
+        _newCategory = category.ToString();
     }
 
     private void SetAddMode(bool isQuickMode)
@@ -762,14 +797,6 @@
             await LoadItemsForPackingAsync(Id);
             _manualOverride[category] = false;
 
-            // Show feedback
-            if (addedCount > 0)
-            {
-                var message = addedCount == 1 
-                    ? string.Format(AppResources.ItemAdded, _parsedItems[0])
-                    : string.Format(AppResources.ItemsAdded, addedCount);
-                ToastService.ShowSuccess(message);
-            }
 
             if (skippedCount > 0)
             {

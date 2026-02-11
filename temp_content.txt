@@ -1,4 +1,4 @@
-using Anticipack.Components.Shared.DialogComponent;
+﻿using Anticipack.Components.Shared.DialogComponent;
 using Anticipack.Components.Shared.ToastComponent;
 using Anticipack.Components.Shared.NavigationHeaderComponent;
 using Anticipack.Storage;
@@ -6,8 +6,6 @@ using Anticipack.Storage.Repositories;
 using Anticipack.Services;
 using Anticipack.Services.Categories;
 using Anticipack.Services.Packing;
-using Anticipack.Services.Sync;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Localization;
 using System.Reflection;

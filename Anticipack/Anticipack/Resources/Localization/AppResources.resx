@@ -526,8 +526,52 @@ This action cannot be undone.</value>
   <data name="ItemAdded" xml:space="preserve">
     <value>Added {0}</value>
   </data>
+  <data name="ItemsAdded" xml:space="preserve">
+    <value>Added {0} items</value>
+  </data>
   <data name="ErrorAddingItem" xml:space="preserve">
     <value>Error adding item: {0}</value>
+  </data>
+  <data name="FailedToAddItems" xml:space="preserve">
+    <value>Failed to add {0} items</value>
+  </data>
+
+  <!-- Add Items Form -->
+  <data name="AddItems" xml:space="preserve">
+    <value>Add Items</value>
+  </data>
+  <data name="QuickAdd" xml:space="preserve">
+    <value>Quick Add</value>
+  </data>
+  <data name="BulkAdd" xml:space="preserve">
+    <value>Bulk Add</value>
+  </data>
+  <data name="EnterItemNamePlaceholder" xml:space="preserve">
+    <value>Enter item name...</value>
+  </data>
+  <data name="EnterItems" xml:space="preserve">
+    <value>Enter Items</value>
+  </data>
+  <data name="Preview" xml:space="preserve">
+    <value>Preview</value>
+  </data>
+  <data name="Item" xml:space="preserve">
+    <value>Item</value>
+  </data>
+  <data name="DuplicatesRemoved" xml:space="preserve">
+    <value>{0} duplicate(s) removed</value>
+  </data>
+  <data name="DuplicatesSkipped" xml:space="preserve">
+    <value>{0} existing item(s) skipped</value>
+  </data>
+  <data name="ItemAlreadyExists" xml:space="preserve">
+    <value>This item already exists in your list</value>
+  </data>
+  <data name="Add" xml:space="preserve">
+    <value>Add</value>
+  </data>
+  <data name="AddItemsCount" xml:space="preserve">
+    <value>Add {0} Items</value>
   </data>
   <data name="ItemUpdated" xml:space="preserve">
     <value>Item updated</value>

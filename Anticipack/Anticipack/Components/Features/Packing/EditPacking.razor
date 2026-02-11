@@ -156,16 +156,35 @@
             @if (_isAddingItem)
             {
                 <div class="add-item-form">
+                    <!-- Header with close button -->
                     <div class="form-header-inline">
-                        <h4>@AppResources.AddNewItems</h4>
+                        <h4>@Localizer["AddItems"]</h4>
                         <button class="close-form-btn" @onclick="CancelAdd" title="@AppResources.Cancel">
                             <i class="fa fa-times"></i>
                         </button>
                     </div>
-                    
+
                     <div class="form-body">
+                        <!-- Mode Toggle: Quick Add / Bulk Add -->
+                        <div class="add-mode-toggle">
+                            <button type="button" 
+                                    class="mode-btn @(_isQuickAddMode ? "active" : "")"
+                                    @onclick="() => SetAddMode(true)">
+                                <i class="fa fa-plus"></i>
+                                <span>@Localizer["QuickAdd"]</span>
+                            </button>
+                            <button type="button" 
+                                    class="mode-btn @(!_isQuickAddMode ? "active" : "")"
+                                    @onclick="() => SetAddMode(false)">
+                                <i class="fa fa-list"></i>
+                                <span>@Localizer["BulkAdd"]</span>
+                            </button>
+                        </div>
+
+                        <!-- Category Selection -->
                         <div class="form-section compact">
                             <label for="category-select" class="form-label-inline">
+                                <i class="fa fa-folder"></i>
                                 @AppResources.SelectCategory
                             </label>
                             <select id="category-select" 
@@ -177,53 +196,83 @@
                                 }
                             </select>
                         </div>
-                        
+
+                        <!-- Input Section -->
                         <div class="form-section compact">
-                            <label for="bulk-textarea" class="form-label-inline">
-                                <i class="fa fa-list-ul"></i>
-                                @AppResources.EnterItemName
-                            </label>
-                            <div class="textarea-container">
-                                <textarea id="bulk-textarea"
-                                       class="bulk-textarea compact auto-grow" 
-                                       placeholder="@GetBulkAddPlaceholder()" 
-                                       @bind="_bulkItemsText" 
-                                       @bind:event="oninput"
-                                       @bind:after="HandleTextareaAutoGrow"
-                                       @ref="bulkItemsTextarea"
-                                       rows="3"
-                                       @onkeydown="HandleBulkTextareaKeyDown"></textarea>
-                                
-                                @if (_isSpeechRecognitionSupported)
-                                {
-                                    <button type="button" 
-                                            class="speech-btn @(_isListening ? "listening" : "")" 
-                                            @onclick="ToggleSpeechRecognition"
-                                            @onclick:stopPropagation
-                                            title="@(_isListening ? AppResources.StopDictation : AppResources.StartDictation)">
-                                        <i class="fa @(_isListening ? "fa-stop" : "fa-microphone")" aria-hidden="true"></i>
-                                        @if (_isListening)
-                                        {
-                                            <span class="pulse-ring"></span>
-                                        }
-                                    </button>
-                                }
-                                
-                                @if (!string.IsNullOrWhiteSpace(_interimTranscript))
-                                {
-                                    <div class="interim-transcript">
-                                        <i class="fa fa-microphone"></i>
-                                        <span>@_interimTranscript</span>
-                                    </div>
-                                }
-                            </div>
-                            @if (!_isListening && string.IsNullOrWhiteSpace(_bulkItemsText))
+                            @if (_isQuickAddMode)
                             {
-                                <div class="form-hint-mini">
-                                    <i class="fa fa-info-circle"></i>
-                                    <span>@AppResources.BulkAddHint</span>
+                                <!-- Quick Add: Single item input -->
+                                <label for="quick-add-input" class="form-label-inline">
+                                    <i class="fa fa-tag"></i>
+                                    @Localizer["ItemName"]
+                                </label>
+                                <div class="quick-add-input-container">
+                                    <input id="quick-add-input"
+                                           type="text"
+                                           class="quick-add-input"
+                                           placeholder="@Localizer["EnterItemNamePlaceholder"]"
+                                           @bind="_quickAddText"
+                                           @bind:event="oninput"
+                                           @bind:after="OnInputChanged"
+                                           @ref="quickAddInputRef"
+                                           @onkeydown="HandleQuickAddKeyDown" />
+                                    @if (_isSpeechRecognitionSupported)
+                                    {
+                                        <button type="button" 
+                                                class="speech-btn-inline @(_isListening ? "listening" : "")" 
+                                                @onclick="ToggleSpeechRecognitionQuickAdd"
+                                                @onclick:stopPropagation
+                                                title="@(_isListening ? AppResources.StopDictation : AppResources.StartDictation)">
+                                            <i class="fa @(_isListening ? "fa-stop" : "fa-microphone")" aria-hidden="true"></i>
+                                        </button>
+                                    }
                                 </div>
                             }
+                            else
+                            {
+                                <!-- Bulk Add: Multi-line textarea -->
+                                <label for="bulk-textarea" class="form-label-inline">
+                                    <i class="fa fa-list-ul"></i>
+                                    @Localizer["EnterItems"]
+                                </label>
+                                <div class="textarea-container">
+                                    <textarea id="bulk-textarea"
+                                           class="bulk-textarea compact auto-grow" 
+                                           placeholder="@GetBulkAddPlaceholder()" 
+                                           @bind="_bulkItemsText" 
+                                           @bind:event="oninput"
+                                           @bind:after="OnBulkTextChanged"
+                                           @ref="bulkItemsTextarea"
+                                           rows="3"
+                                           @onkeydown="HandleBulkTextareaKeyDown"></textarea>
+
+                                    @if (_isSpeechRecognitionSupported)
+                                    {
+                                        <button type="button" 
+                                                class="speech-btn @(_isListening ? "listening" : "")" 
+                                                @onclick="ToggleSpeechRecognition"
+                                                @onclick:stopPropagation
+                                                title="@(_isListening ? AppResources.StopDictation : AppResources.StartDictation)">
+                                            <i class="fa @(_isListening ? "fa-stop" : "fa-microphone")" aria-hidden="true"></i>
+                                            @if (_isListening)
+                                            {
+                                                <span class="pulse-ring"></span>
+                                            }
+                                        </button>
+                                    }
+                                </div>
+                            }
+
+                            <!-- Interim transcript for speech -->
+                            @if (!string.IsNullOrWhiteSpace(_interimTranscript))
+                            {
+                                <div class="interim-transcript">
+                                    <i class="fa fa-microphone"></i>
+                                    <span>@_interimTranscript</span>
+                                </div>
+                            }
+
+                            <!-- Listening indicator -->
                             @if (_isListening)
                             {
                                 <div class="form-hint-mini listening-hint">
@@ -232,18 +281,65 @@
                                 </div>
                             }
                         </div>
+
+                        <!-- Preview Section -->
+                        @if (_parsedItems.Count > 0)
+                        {
+                            <div class="preview-section">
+                                <div class="preview-header">
+                                    <span class="preview-title">
+                                        <i class="fa fa-eye"></i>
+                                        @Localizer["Preview"] (@_parsedItems.Count @(_parsedItems.Count == 1 ? Localizer["Item"].Value.ToLower() : Localizer["Items"].Value.ToLower()))
+                                    </span>
+                                    @if (_duplicateItems.Count > 0)
+                                    {
+                                        <span class="duplicate-warning">
+                                            <i class="fa fa-exclamation-triangle"></i>
+                                            @string.Format(Localizer["DuplicatesRemoved"].Value, _duplicateItems.Count)
+                                        </span>
+                                    }
+                                </div>
+                                <div class="preview-items">
+                                    @foreach (var item in _parsedItems.Take(10))
+                                    {
+                                        var isDuplicate = _existingItemNames.Contains(item.ToLower());
+                                        <span class="preview-chip @(isDuplicate ? "existing" : "")">
+                                            @item
+                                            @if (isDuplicate)
+                                            {
+                                                <i class="fa fa-info-circle" title="@Localizer["ItemAlreadyExists"]"></i>
+                                            }
+                                        </span>
+                                    }
+                                    @if (_parsedItems.Count > 10)
+                                    {
+                                        <span class="preview-more">+@(_parsedItems.Count - 10) @Localizer["More"].Value.ToLower()</span>
+                                    }
+                                </div>
+                            </div>
+                        }
+
+                        <!-- Hints -->
+                        @if (!_isListening && !HasInput && !_isQuickAddMode)
+                        {
+                            <div class="form-hint-mini">
+                                <i class="fa fa-info-circle"></i>
+                                <span>@AppResources.BulkAddHint</span>
+                            </div>
+                        }
                     </div>
-                    
+
+                    <!-- Actions -->
                     <div class="form-actions compact">
                         <button class="btn btn-cancel compact" @onclick="CancelAdd">
                             <i class="fa fa-times"></i>
                             <span>@AppResources.Cancel</span>
                         </button>
                         <button class="btn btn-primary compact" 
-                                @onclick="ConfirmBulkAddAsync" 
-                                disabled="@(string.IsNullOrWhiteSpace(_bulkItemsText))">
-                            <i class="fa fa-check"></i>
-                            <span>@AppResources.AddItem</span>
+                                @onclick="ConfirmAddAsync" 
+                                disabled="@(!CanAdd)">
+                            <i class="fa fa-plus"></i>
+                            <span>@GetAddButtonText()</span>
                         </button>
                     </div>
                 </div>
@@ -362,6 +458,20 @@
     private Storage.PackingActivity _currentActivity = new Storage.PackingActivity();
     private string _activityName = string.Empty;
     private bool _isSettingsExpanded = false; // Collapsed by default
+
+    // Add item form state
+    private bool _isQuickAddMode = true;
+    private string _quickAddText = string.Empty;
+    private List<string> _parsedItems = [];
+    private List<string> _duplicateItems = [];
+    private HashSet<string> _existingItemNames = new(StringComparer.OrdinalIgnoreCase);
+    private ElementReference quickAddInputRef;
+
+    private bool HasInput => _isQuickAddMode 
+        ? !string.IsNullOrWhiteSpace(_quickAddText) 
+        : !string.IsNullOrWhiteSpace(_bulkItemsText);
+
+    private bool CanAdd => _parsedItems.Count > 0;
 
     private sealed class PackingItemView
     {
@@ -497,6 +607,17 @@
     private void ShowAddItemForm()
     {
         _isAddingItem = true;
+        _isQuickAddMode = true;
+        _quickAddText = string.Empty;
+        _bulkItemsText = string.Empty;
+        _parsedItems = [];
+        _duplicateItems = [];
+
+        // Cache existing item names for duplicate detection
+        _existingItemNames = Items
+            .Select(i => i.Item.Name.ToLower())
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
         if (_categoryOrder.Any())
         {
             _newCategory = _categoryOrder.First();
@@ -510,33 +631,115 @@
     private void CancelAdd()
     {
         _isAddingItem = false;
+        _quickAddText = string.Empty;
         _bulkItemsText = string.Empty;
+        _parsedItems = [];
+        _duplicateItems = [];
     }
 
-    private async Task ConfirmBulkAddAsync()
+    private void SetAddMode(bool isQuickMode)
     {
-        if (string.IsNullOrWhiteSpace(_bulkItemsText) || string.IsNullOrWhiteSpace(Id))
-            return;
+        if (_isQuickAddMode == isQuickMode) return;
 
-        var category = string.IsNullOrWhiteSpace(_newCategory) ? PackingCategory.Miscellaneous.ToString() : _newCategory.Trim();
+        _isQuickAddMode = isQuickMode;
 
-        // Split by both newlines and commas
-        var items = _bulkItemsText
-            .Split(new[] { "\r\n", "\r", "\n", "," }, StringSplitOptions.RemoveEmptyEntries)
+        // Transfer content between modes
+        if (isQuickMode && !string.IsNullOrWhiteSpace(_bulkItemsText))
+        {
+            // Take first item from bulk text
+            var firstItem = ParseInputItems(_bulkItemsText).FirstOrDefault();
+            _quickAddText = firstItem ?? string.Empty;
+        }
+        else if (!isQuickMode && !string.IsNullOrWhiteSpace(_quickAddText))
+        {
+            _bulkItemsText = _quickAddText;
+        }
+
+        UpdateParsedItems();
+    }
+
+    private void OnInputChanged()
+    {
+        UpdateParsedItems();
+    }
+
+    private async Task OnBulkTextChanged()
+    {
+        UpdateParsedItems();
+        await HandleTextareaAutoGrow();
+    }
+
+    private void UpdateParsedItems()
+    {
+        var inputText = _isQuickAddMode ? _quickAddText : _bulkItemsText;
+        var allItems = ParseInputItems(inputText);
+
+        // Remove duplicates within the input (case-insensitive)
+        var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var uniqueItems = new List<string>();
+        _duplicateItems = [];
+
+        foreach (var item in allItems)
+        {
+            if (seen.Add(item))
+            {
+                uniqueItems.Add(item);
+            }
+            else
+            {
+                _duplicateItems.Add(item);
+            }
+        }
+
+        _parsedItems = uniqueItems;
+    }
+
+    private List<string> ParseInputItems(string text)
+    {
+        if (string.IsNullOrWhiteSpace(text))
+            return [];
+
+        return text
+            .Split(["\r\n", "\r", "\n", ","], StringSplitOptions.RemoveEmptyEntries)
             .Select(line => line.Trim())
             .Where(line => !string.IsNullOrWhiteSpace(line))
             .ToList();
+    }
 
-        if (!items.Any())
+    private string GetAddButtonText()
+    {
+        if (_parsedItems.Count == 0)
+            return Localizer["Add"];
+
+        if (_parsedItems.Count == 1)
+            return Localizer["AddItem"];
+
+        return string.Format(Localizer["AddItemsCount"], _parsedItems.Count);
+    }
+
+    private async Task ConfirmAddAsync()
+    {
+        if (!CanAdd || string.IsNullOrWhiteSpace(Id))
             return;
 
+        var category = string.IsNullOrWhiteSpace(_newCategory) 
+            ? PackingCategory.Miscellaneous.ToString() 
+            : _newCategory.Trim();
+
         int addedCount = 0;
-        int failedCount = 0;
+        int skippedCount = 0;
 
         try
         {
-            foreach (var itemName in items)
+            foreach (var itemName in _parsedItems)
             {
+                // Skip items that already exist
+                if (_existingItemNames.Contains(itemName.ToLower()))
+                {
+                    skippedCount++;
+                    continue;
+                }
+
                 try
                 {
                     var newItem = new Storage.PackingItem 
@@ -552,24 +755,25 @@
                 }
                 catch
                 {
-                    failedCount++;
+                    // Item failed to add, continue with others
                 }
             }
 
             await LoadItemsForPackingAsync(Id);
             _manualOverride[category] = false;
 
+            // Show feedback
             if (addedCount > 0)
             {
                 var message = addedCount == 1 
-                    ? string.Format(AppResources.ItemAdded, items[0])
+                    ? string.Format(AppResources.ItemAdded, _parsedItems[0])
                     : string.Format(AppResources.ItemsAdded, addedCount);
                 ToastService.ShowSuccess(message);
             }
 
-            if (failedCount > 0)
+            if (skippedCount > 0)
             {
-                ToastService.ShowError(string.Format(AppResources.FailedToAddItems, failedCount));
+                ToastService.ShowInfo(string.Format(Localizer["DuplicatesSkipped"], skippedCount));
             }
         }
         catch (Exception ex)
@@ -577,9 +781,27 @@
             ToastService.ShowError(string.Format(AppResources.ErrorAddingItem, ex.Message));
         }
 
-        _isAddingItem = false;
-        _bulkItemsText = string.Empty;
+        // Close form and reset state
+        CancelAdd();
         StateHasChanged();
+    }
+
+    private void HandleQuickAddKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter" && !e.ShiftKey)
+        {
+            _ = ConfirmAddAsync();
+        }
+        else if (e.Key == "Escape")
+        {
+            CancelAdd();
+        }
+    }
+
+    private async Task ToggleSpeechRecognitionQuickAdd()
+    {
+        // For quick add, we use the same speech recognition but target the quick add input
+        await ToggleSpeechRecognition();
     }
 
     private void ToggleSettings()
@@ -1097,7 +1319,7 @@
     {
         if (e.Key == "Enter" && (e.CtrlKey || e.MetaKey))
         {
-            _ = ConfirmBulkAddAsync();
+            _ = ConfirmAddAsync();
         }
     }
 

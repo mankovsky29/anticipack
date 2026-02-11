@@ -2135,3 +2135,258 @@ ul.category-content {
     background: rgba(149, 165, 166, 0.2);
 }
 
+/* ============================================
+   ADD ITEM FORM - MODE TOGGLE & PREVIEW
+   ============================================ */
+
+/* Mode Toggle Buttons */
+.add-mode-toggle {
+    display: flex;
+    background: var(--background);
+    border-radius: 10px;
+    padding: 4px;
+    gap: 4px;
+    margin-bottom: 4px;
+}
+
+.mode-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--text-secondary);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.mode-btn i {
+    font-size: 14px;
+}
+
+.mode-btn:hover:not(.active) {
+    background: var(--hover-bg);
+    color: var(--text);
+}
+
+.mode-btn.active {
+    background: var(--primary);
+    color: white;
+    box-shadow: var(--shadow-sm);
+}
+
+.mode-btn:active {
+    transform: scale(0.98);
+}
+
+/* Quick Add Input */
+.quick-add-input-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    position: relative;
+}
+
+.quick-add-input {
+    flex: 1;
+    padding: 12px 14px;
+    border: 2px solid var(--border-color);
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 500;
+    background: var(--input-bg);
+    color: var(--text-primary);
+    transition: all 0.2s ease;
+}
+
+.quick-add-input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--input-focus-shadow);
+    background: var(--surface);
+}
+
+.quick-add-input::placeholder {
+    color: var(--text-light);
+    font-weight: 400;
+}
+
+/* Inline Speech Button for Quick Add */
+.speech-btn-inline {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    border: 2px solid var(--border-color);
+    background: var(--surface);
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.speech-btn-inline:hover {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
+.speech-btn-inline.listening {
+    background: var(--danger, #ef4444);
+    color: white;
+    border-color: var(--danger, #ef4444);
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+.speech-btn-inline i {
+    font-size: 18px;
+}
+
+/* Preview Section */
+.preview-section {
+    background: var(--background);
+    border-radius: 10px;
+    padding: 12px;
+    border: 1px solid var(--border-color);
+}
+
+.preview-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.preview-title {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.preview-title i {
+    color: var(--primary);
+}
+
+.duplicate-warning {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    color: var(--warning, #f59e0b);
+    background: rgba(245, 158, 11, 0.1);
+    padding: 4px 10px;
+    border-radius: 6px;
+}
+
+.duplicate-warning i {
+    font-size: 11px;
+}
+
+.preview-items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.preview-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: var(--surface);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-primary);
+    transition: all 0.2s ease;
+}
+
+.preview-chip.existing {
+    background: rgba(245, 158, 11, 0.1);
+    border-color: var(--warning, #f59e0b);
+    color: var(--warning, #f59e0b);
+}
+
+.preview-chip.existing i {
+    font-size: 11px;
+}
+
+.preview-more {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 12px;
+    background: var(--primary-light-bg);
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--primary);
+}
+
+/* Mobile Responsive for Add Form */
+@media (max-width: 640px) {
+    .mode-btn {
+        padding: 8px 12px;
+        font-size: 13px;
+    }
+
+    .mode-btn span {
+        display: none;
+    }
+
+    .mode-btn i {
+        font-size: 16px;
+    }
+
+    .quick-add-input {
+        padding: 10px 12px;
+        font-size: 14px;
+    }
+
+    .speech-btn-inline {
+        width: 40px;
+        height: 40px;
+    }
+
+    .preview-section {
+        padding: 10px;
+    }
+
+    .preview-chip {
+        padding: 5px 10px;
+        font-size: 12px;
+    }
+
+    .preview-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
+/* Dark theme for new components */
+[data-theme="dark"] .add-mode-toggle {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+[data-theme="dark"] .preview-section {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+[data-theme="dark"] .preview-chip {
+    background: rgba(255, 255, 255, 0.05);
+}
+

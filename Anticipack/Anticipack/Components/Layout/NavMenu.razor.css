@@ -58,6 +58,8 @@
 
 .top-row .container-fluid {
     display: flex;
+    padding-right: var(--space-sm);
+    padding-left: var(--space-sm);
     align-items: center;
     gap: 0.5rem;
     width: 100%;

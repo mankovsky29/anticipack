@@ -318,7 +318,7 @@
     background: var(--surface);
     border-radius: 12px;
     padding: 16px;
-    margin-bottom: 16px;
+    margin-bottom: var(--space-sm);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     border: 1px solid var(--border-color);
 }
@@ -359,7 +359,6 @@
     background-color: var(--surface);
     border-radius: var(--border-radius);
     box-shadow: var(--shadow);
-    padding-bottom: var(--space-lg);
 }
 
 /* Loading State */
@@ -395,7 +394,7 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     border: 1px solid var(--border-color);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    margin-bottom: 16px;
+    margin-bottom: var(--space-sm);
 }
 
 .category:hover {

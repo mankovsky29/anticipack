@@ -754,8 +754,8 @@
 .packing-list {
     display: flex;
     flex-direction: column;
-    gap: 16px;
-    padding-bottom: 20px;
+    gap: var(--space-xs);
+    padding-bottom: var(--space-xs);
     position: relative;
 }
 
@@ -2028,7 +2028,6 @@ ul.category-content {
 .settings-panel {
     background: var(--surface);
     border-radius: 12px;
-    margin: 12px 0px;
     box-shadow: var(--shadow-sm);
     overflow: hidden;
     transition: all 0.3s ease;
@@ -2284,7 +2283,7 @@ ul.category-content {
 /* Mobile Responsive */
 @media (max-width: 640px) {
     .settings-panel {
-        margin: 4px 0px;
+        margin-bottom: var(--space-sm);
     }
     
     .settings-header {

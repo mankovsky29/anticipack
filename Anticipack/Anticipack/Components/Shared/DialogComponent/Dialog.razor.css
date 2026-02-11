@@ -224,16 +224,17 @@
 /* Responsive adjustments */
 @media (max-width: 576px) {
     .dialog-overlay {
-        align-items: flex-start;
-        padding-top: 20px;
+        align-items: center;
+        justify-content: center;
+        padding: var(--space-lg);
         overflow-y: auto;
     }
 
     .dialog {
-        width: calc(100% - 32px);
+        width: calc(100% - var(--space-lg));
         max-width: none;
-        max-height: calc(100vh - 40px);
-        margin: 0 16px 20px;
+        max-height: calc(100vh - var(--space-lg));
+        margin: 0;
         border-radius: 10px;
     }
 

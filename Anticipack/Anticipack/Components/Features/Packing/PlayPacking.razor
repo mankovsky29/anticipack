@@ -522,27 +522,6 @@
 
     private async Task SwitchToEditMode()
     {
-        if(Items.Count(i => i.IsChecked) > 0)
-        {
-            bool confirm = await DialogService.ShowConfirmAsync(
-                AppResources.SwitchToEditMode, 
-                AppResources.EditingMightAffectProgress, 
-                AppResources.ContinueToEdit, 
-                AppResources.Cancel);
-
-            if (confirm)
-            {
-                NavigateToEditMode();
-            }
-        }
-        else
-        {
-            NavigateToEditMode();
-        }
-    }
-
-    private void NavigateToEditMode()
-    {
         if (!string.IsNullOrEmpty(Id))
         {
             Navigation.NavigateTo($"/edit-packing/{Id}");
@@ -609,10 +588,7 @@
                 {
                     await PackingRepository.AddOrUpdateItemAsync(item.Item);
                 }
-                
-                // Show a toast with the result
-                ToastService.ShowInfo(string.Format(AppResources.ResetItemsSuccess, checkedItemsCount));
-                
+                                
                 // Refresh categories state
                 foreach (var category in _categoryOrder)
                 {
@@ -657,7 +633,6 @@
                 item.IsChecked = isChecked;
                 UpdateCategoryStateAfterItemChange(item.Item.Category);
                 SaveCheckState(item);
-                ToastService.ShowSuccess(string.Format(AppResources.ItemPacked, item.Item.Name));
             }
             finally
             {
@@ -673,17 +648,7 @@
         }
         else
         {
-            // For unchecking, just update without animation
             item.IsChecked = isChecked;
-            
-            if (isChecked)
-            {
-                ToastService.ShowSuccess(string.Format(AppResources.ItemPacked, item.Item.Name));
-            }
-            else
-            {
-                ToastService.ShowInfo(string.Format(AppResources.ItemUnpacked, item.Item.Name));
-            }
             
             UpdateCategoryStateAfterItemChange(item.Item.Category);
             SaveCheckState(item);

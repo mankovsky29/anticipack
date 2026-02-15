@@ -773,4 +773,12 @@ Soap, Towel</value>
   <data name="OneTimeActivityDescription" xml:space="preserve">
     <value>Archives automatically after completion</value>
   </data>
+
+  <!-- Empty State -->
+  <data name="NoItemsYet" xml:space="preserve">
+    <value>No items yet</value>
+  </data>
+  <data name="AddFirstItem" xml:space="preserve">
+    <value>Add your first item</value>
+  </data>
 </root>

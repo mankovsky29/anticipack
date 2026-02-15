@@ -153,213 +153,24 @@
         }
 
         <div class="packing-list">
-            @if (_isAddingItem)
+            @* Show add form at top when adding generally (not to a specific category) *@
+            @if (_isAddingItem && _addingToCategory == null)
             {
-                <div class="add-item-form">
-                    <!-- Header with close button -->
-                    <div class="form-header-inline">
-                        <h4>@Localizer["AddItems"]</h4>
-                        <button class="close-form-btn" @onclick="CancelAdd" title="@AppResources.Cancel">
-                            <i class="fa fa-times"></i>
-                        </button>
+                @RenderAddItemForm()
+            }
+
+            @if (!Items.Any() && !_isAddingItem)
+            {
+                <!-- Empty state: Show add button when no items exist -->
+                <div class="empty-state">
+                    <div class="empty-state-icon">
+                        <i class="fa fa-box-open"></i>
                     </div>
-
-                    <div class="form-body">
-                        <!-- Mode Toggle: Quick Add / Bulk Add -->
-                        <div class="add-mode-toggle">
-                            <button type="button" 
-                                    class="mode-btn @(_isQuickAddMode ? "active" : "")"
-                                    @onclick="() => SetAddMode(true)">
-                                <i class="fa fa-plus"></i>
-                                <span>@Localizer["QuickAdd"]</span>
-                            </button>
-                            <button type="button" 
-                                    class="mode-btn @(!_isQuickAddMode ? "active" : "")"
-                                    @onclick="() => SetAddMode(false)">
-                                <i class="fa fa-list"></i>
-                                <span>@Localizer["BulkAdd"]</span>
-                            </button>
-                        </div>
-
-                        <!-- Category Selection -->
-                        <div class="form-section compact">
-                            <label class="form-label-inline">
-                                <i class="fa fa-folder"></i>
-                                @AppResources.SelectCategory
-                            </label>
-                            <div class="custom-dropdown @(_isCategoryDropdownOpen ? "open" : "")" @onclick:stopPropagation>
-                                <button type="button" 
-                                        class="dropdown-trigger"
-                                        @onclick="ToggleCategoryDropdown">
-                                    <span class="dropdown-selected-text">@GetLocalizedCategoryName(Enum.TryParse<PackingCategory>(_newCategory, out var selectedCat) ? selectedCat : PackingCategory.Miscellaneous)</span>
-                                    <i class="fa fa-chevron-down dropdown-chevron" aria-hidden="true"></i>
-                                </button>
-                                @if (_isCategoryDropdownOpen)
-                                {
-                                    <div class="dropdown-menu">
-                                        @foreach (var category in Enum.GetValues<PackingCategory>())
-                                        {
-                                            var isSelected = _newCategory == category.ToString();
-                                            <button type="button" 
-                                                    class="dropdown-item @(isSelected ? "selected" : "")"
-                                                    @onclick="() => SelectCategoryFromDropdown(category)">
-                                                <span>@GetLocalizedCategoryName(category)</span>
-                                                @if (isSelected)
-                                                {
-                                                    <i class="fa fa-check dropdown-item-check" aria-hidden="true"></i>
-                                                }
-                                            </button>
-                                        }
-                                    </div>
-                                }
-                            </div>
-                        </div>
-
-                        <!-- Input Section -->
-                        <div class="form-section compact">
-                            @if (_isQuickAddMode)
-                            {
-                                <!-- Quick Add: Single item input -->
-                                <label for="quick-add-input" class="form-label-inline">
-                                    <i class="fa fa-tag"></i>
-                                    @Localizer["ItemName"]
-                                </label>
-                                <div class="quick-add-input-container">
-                                    <input id="quick-add-input"
-                                           type="text"
-                                           class="quick-add-input"
-                                           placeholder="@Localizer["EnterItemNamePlaceholder"]"
-                                           @bind="_quickAddText"
-                                           @bind:event="oninput"
-                                           @bind:after="OnInputChanged"
-                                           @ref="quickAddInputRef"
-                                           @onkeydown="HandleQuickAddKeyDown" />
-                                    @if (_isSpeechRecognitionSupported)
-                                    {
-                                        <button type="button" 
-                                                class="speech-btn-inline @(_isListening ? "listening" : "")" 
-                                                @onclick="ToggleSpeechRecognitionQuickAdd"
-                                                @onclick:stopPropagation
-                                                title="@(_isListening ? AppResources.StopDictation : AppResources.StartDictation)">
-                                            <i class="fa @(_isListening ? "fa-stop" : "fa-microphone")" aria-hidden="true"></i>
-                                        </button>
-                                    }
-                                </div>
-                            }
-                            else
-                            {
-                                <!-- Bulk Add: Multi-line textarea -->
-                                <label for="bulk-textarea" class="form-label-inline">
-                                    <i class="fa fa-list-ul"></i>
-                                    @Localizer["EnterItems"]
-                                </label>
-                                <div class="textarea-container">
-                                    <textarea id="bulk-textarea"
-                                           class="bulk-textarea compact auto-grow" 
-                                           placeholder="@GetBulkAddPlaceholder()" 
-                                           @bind="_bulkItemsText" 
-                                           @bind:event="oninput"
-                                           @bind:after="OnBulkTextChanged"
-                                           @ref="bulkItemsTextarea"
-                                           rows="3"
-                                           @onkeydown="HandleBulkTextareaKeyDown"></textarea>
-
-                                    @if (_isSpeechRecognitionSupported)
-                                    {
-                                        <button type="button" 
-                                                class="speech-btn @(_isListening ? "listening" : "")" 
-                                                @onclick="ToggleSpeechRecognition"
-                                                @onclick:stopPropagation
-                                                title="@(_isListening ? AppResources.StopDictation : AppResources.StartDictation)">
-                                            <i class="fa @(_isListening ? "fa-stop" : "fa-microphone")" aria-hidden="true"></i>
-                                            @if (_isListening)
-                                            {
-                                                <span class="pulse-ring"></span>
-                                            }
-                                        </button>
-                                    }
-                                </div>
-                            }
-
-                            <!-- Interim transcript for speech -->
-                            @if (!string.IsNullOrWhiteSpace(_interimTranscript))
-                            {
-                                <div class="interim-transcript">
-                                    <i class="fa fa-microphone"></i>
-                                    <span>@_interimTranscript</span>
-                                </div>
-                            }
-
-                            <!-- Listening indicator -->
-                            @if (_isListening)
-                            {
-                                <div class="form-hint-mini listening-hint">
-                                    <i class="fa fa-microphone"></i>
-                                    <span>@AppResources.Listening</span>
-                                </div>
-                            }
-                        </div>
-
-                        <!-- Preview Section -->
-                        @if (_parsedItems.Count > 0)
-                        {
-                            <div class="preview-section">
-                                <div class="preview-header">
-                                    <span class="preview-title">
-                                        <i class="fa fa-eye"></i>
-                                        @Localizer["Preview"] (@_parsedItems.Count @(_parsedItems.Count == 1 ? Localizer["Item"].Value.ToLower() : Localizer["Items"].Value.ToLower()))
-                                    </span>
-                                    @if (_duplicateItems.Count > 0)
-                                    {
-                                        <span class="duplicate-warning">
-                                            <i class="fa fa-exclamation-triangle"></i>
-                                            @string.Format(Localizer["DuplicatesRemoved"].Value, _duplicateItems.Count)
-                                        </span>
-                                    }
-                                </div>
-                                <div class="preview-items">
-                                    @foreach (var item in _parsedItems.Take(10))
-                                    {
-                                        var isDuplicate = _existingItemNames.Contains(item.ToLower());
-                                        <span class="preview-chip @(isDuplicate ? "existing" : "")">
-                                            @item
-                                            @if (isDuplicate)
-                                            {
-                                                <i class="fa fa-info-circle" title="@Localizer["ItemAlreadyExists"]"></i>
-                                            }
-                                        </span>
-                                    }
-                                    @if (_parsedItems.Count > 10)
-                                    {
-                                        <span class="preview-more">+@(_parsedItems.Count - 10) @Localizer["More"].Value.ToLower()</span>
-                                    }
-                                </div>
-                            </div>
-                        }
-
-                        <!-- Hints -->
-                        @if (!_isListening && !HasInput && !_isQuickAddMode)
-                        {
-                            <div class="form-hint-mini">
-                                <i class="fa fa-info-circle"></i>
-                                <span>@AppResources.BulkAddHint</span>
-                            </div>
-                        }
-                    </div>
-
-                    <!-- Actions -->
-                    <div class="form-actions compact">
-                        <button class="btn btn-cancel compact" @onclick="CancelAdd">
-                            <i class="fa fa-times"></i>
-                            <span>@AppResources.Cancel</span>
-                        </button>
-                        <button class="btn btn-primary compact" 
-                                @onclick="ConfirmAddAsync" 
-                                disabled="@(!CanAdd)">
-                            <i class="fa fa-plus"></i>
-                            <span>@GetAddButtonText()</span>
-                        </button>
-                    </div>
+                    <p class="empty-state-text">@Localizer["NoItemsYet"]</p>
+                    <button class="btn btn-primary" @onclick="ShowAddItemForm">
+                        <i class="fa fa-plus"></i>
+                        <span>@Localizer["AddFirstItem"]</span>
+                    </button>
                 </div>
             }
 
@@ -374,13 +185,26 @@
                 var categoryId = $"cat-{category}";
                 var localizedCategory = GetLocalizedCategoryName(category);
 
+                @* Show add form above this category when adding to it *@
+                @if (_isAddingItem && string.Equals(_addingToCategory, category, StringComparison.OrdinalIgnoreCase))
+                {
+                    @RenderAddItemForm()
+                }
+
                 <section class="category @(allChecked ? "category-completed" : "")" aria-labelledby="@categoryId">
                     <div class="category-header" role="button" @onclick="() => ToggleCategory(category)" aria-expanded="@(!collapsed)">
                         <span class="chev @(collapsed ? "collapsed" : "")" aria-hidden="true">
                             <i class="fa fa-chevron-down"></i>
                         </span>
-                        <h4 id="@categoryId" class="category-title @(allChecked ? "checked" : "")">@localizedCategory</h4>
-                        <span class="count">(@groupItems.Count)</span>
+                        <h4 id="@categoryId" class="category-title @(allChecked ? "checked" : "")">
+                            @localizedCategory <span class="count">(@groupItems.Count)</span>
+                        </h4>
+                        <button class="category-add-btn" 
+                                @onclick="() => ShowAddItemFormForCategory(category)" 
+                                @onclick:stopPropagation
+                                title="@AppResources.AddItem">
+                            <i class="fa fa-plus"></i>
+                        </button>
                     </div>
 
                     <ul class="category-content @(collapsed ? "hidden" : "")">
@@ -484,6 +308,8 @@
     private List<string> _duplicateItems = [];
     private HashSet<string> _existingItemNames = new(StringComparer.OrdinalIgnoreCase);
     private ElementReference quickAddInputRef;
+    private bool _isCategoryLocked = false; // When adding from category header, hide category selector
+    private string? _addingToCategory = null; // Which category to show the form above (null = top of list)
 
     private bool HasInput => _isQuickAddMode 
         ? !string.IsNullOrWhiteSpace(_quickAddText) 
@@ -576,7 +402,9 @@
         _bulkItemsText = string.Empty;
         _parsedItems = [];
         _duplicateItems = [];
-        _isCategoryDropdownOpen = false;  // Add this line
+        _isCategoryDropdownOpen = false;
+        _isCategoryLocked = false;
+        _addingToCategory = null;
     }
 
     private void InitializeDefaultItems()
@@ -651,6 +479,8 @@
         _bulkItemsText = string.Empty;
         _parsedItems = [];
         _duplicateItems = [];
+        _isCategoryLocked = false;
+        _addingToCategory = null; // Show form at top
 
         // Cache existing item names for duplicate detection
         _existingItemNames = Items
@@ -665,6 +495,24 @@
         {
             _newCategory = PackingCategory.Miscellaneous.ToString();
         }
+    }
+
+    private void ShowAddItemFormForCategory(string category)
+    {
+        _isAddingItem = true;
+        _isQuickAddMode = true;
+        _quickAddText = string.Empty;
+        _bulkItemsText = string.Empty;
+        _parsedItems = [];
+        _duplicateItems = [];
+        _isCategoryLocked = true; // Hide category selector
+        _addingToCategory = category; // Show form above this category
+        _newCategory = category;
+
+        // Cache existing item names for duplicate detection
+        _existingItemNames = Items
+            .Select(i => i.Item.Name.ToLower())
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
     }
 
     private void SelectNewCategory(PackingCategory category)
@@ -1500,10 +1348,223 @@
             "language-not-supported" => AppResources.LanguageNotSupported,
             _ => string.Format(AppResources.SpeechError, error)
         };
-        
+
         ToastService.ShowError(errorMessage);
         StateHasChanged();
     }
+
+    private RenderFragment RenderAddItemForm() => __builder =>
+    {
+        <div class="add-item-form">
+            <!-- Header with close button -->
+            <div class="form-header-inline">
+                <h4>@Localizer["AddItems"]</h4>
+                <button class="close-form-btn" @onclick="CancelAdd" title="@AppResources.Cancel">
+                    <i class="fa fa-times"></i>
+                </button>
+            </div>
+
+            <div class="form-body">
+                <!-- Mode Toggle: Quick Add / Bulk Add -->
+                <div class="add-mode-toggle">
+                    <button type="button" 
+                            class="mode-btn @(_isQuickAddMode ? "active" : "")"
+                            @onclick="() => SetAddMode(true)">
+                        <i class="fa fa-plus"></i>
+                        <span>@Localizer["QuickAdd"]</span>
+                    </button>
+                    <button type="button" 
+                            class="mode-btn @(!_isQuickAddMode ? "active" : "")"
+                            @onclick="() => SetAddMode(false)">
+                        <i class="fa fa-list"></i>
+                        <span>@Localizer["BulkAdd"]</span>
+                    </button>
+                </div>
+
+                <!-- Category Selection (hidden when adding from category header) -->
+                @if (!_isCategoryLocked)
+                {
+                    <div class="form-section compact">
+                        <label class="form-label-inline">
+                            <i class="fa fa-folder"></i>
+                            @AppResources.SelectCategory
+                        </label>
+                        <div class="custom-dropdown @(_isCategoryDropdownOpen ? "open" : "")" @onclick:stopPropagation>
+                            <button type="button" 
+                                    class="dropdown-trigger"
+                                    @onclick="ToggleCategoryDropdown">
+                                <span class="dropdown-selected-text">@GetLocalizedCategoryName(Enum.TryParse<PackingCategory>(_newCategory, out var selectedCat) ? selectedCat : PackingCategory.Miscellaneous)</span>
+                                <i class="fa fa-chevron-down dropdown-chevron" aria-hidden="true"></i>
+                            </button>
+                            @if (_isCategoryDropdownOpen)
+                            {
+                                <div class="dropdown-menu">
+                                    @foreach (var cat in Enum.GetValues<PackingCategory>())
+                                    {
+                                        var isSelected = _newCategory == cat.ToString();
+                                        <button type="button" 
+                                                class="dropdown-item @(isSelected ? "selected" : "")"
+                                                @onclick="() => SelectCategoryFromDropdown(cat)">
+                                            <span>@GetLocalizedCategoryName(cat)</span>
+                                            @if (isSelected)
+                                            {
+                                                <i class="fa fa-check dropdown-item-check" aria-hidden="true"></i>
+                                            }
+                                        </button>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+
+                <!-- Input Section -->
+                <div class="form-section compact">
+                    @if (_isQuickAddMode)
+                    {
+                        <!-- Quick Add: Single item input -->
+                        <label for="quick-add-input" class="form-label-inline">
+                            <i class="fa fa-tag"></i>
+                            @Localizer["ItemName"]
+                        </label>
+                        <div class="quick-add-input-container">
+                            <input id="quick-add-input"
+                                   type="text"
+                                   class="quick-add-input"
+                                   placeholder="@Localizer["EnterItemNamePlaceholder"]"
+                                   @bind="_quickAddText"
+                                   @bind:event="oninput"
+                                   @bind:after="OnInputChanged"
+                                   @ref="quickAddInputRef"
+                                   @onkeydown="HandleQuickAddKeyDown" />
+                            @if (_isSpeechRecognitionSupported)
+                            {
+                                <button type="button" 
+                                        class="speech-btn-inline @(_isListening ? "listening" : "")" 
+                                        @onclick="ToggleSpeechRecognitionQuickAdd"
+                                        @onclick:stopPropagation
+                                        title="@(_isListening ? AppResources.StopDictation : AppResources.StartDictation)">
+                                    <i class="fa @(_isListening ? "fa-stop" : "fa-microphone")" aria-hidden="true"></i>
+                                </button>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <!-- Bulk Add: Multi-line textarea -->
+                        <label for="bulk-textarea" class="form-label-inline">
+                            <i class="fa fa-list-ul"></i>
+                            @Localizer["EnterItems"]
+                        </label>
+                        <div class="textarea-container">
+                            <textarea id="bulk-textarea"
+                                   class="bulk-textarea compact auto-grow" 
+                                   placeholder="@GetBulkAddPlaceholder()" 
+                                   @bind="_bulkItemsText" 
+                                   @bind:event="oninput"
+                                   @bind:after="OnBulkTextChanged"
+                                   @ref="bulkItemsTextarea"
+                                   rows="3"
+                                   @onkeydown="HandleBulkTextareaKeyDown"></textarea>
+
+                            @if (_isSpeechRecognitionSupported)
+                            {
+                                <button type="button" 
+                                        class="speech-btn @(_isListening ? "listening" : "")" 
+                                        @onclick="ToggleSpeechRecognition"
+                                        @onclick:stopPropagation
+                                        title="@(_isListening ? AppResources.StopDictation : AppResources.StartDictation)">
+                                    <i class="fa @(_isListening ? "fa-stop" : "fa-microphone")" aria-hidden="true"></i>
+                                    @if (_isListening)
+                                    {
+                                        <span class="pulse-ring"></span>
+                                    }
+                                </button>
+                            }
+                        </div>
+                    }
+
+                    <!-- Interim transcript for speech -->
+                    @if (!string.IsNullOrWhiteSpace(_interimTranscript))
+                    {
+                        <div class="interim-transcript">
+                            <i class="fa fa-microphone"></i>
+                            <span>@_interimTranscript</span>
+                        </div>
+                    }
+
+                    <!-- Listening indicator -->
+                    @if (_isListening)
+                    {
+                        <div class="form-hint-mini listening-hint">
+                            <i class="fa fa-microphone"></i>
+                            <span>@AppResources.Listening</span>
+                        </div>
+                    }
+                </div>
+
+                <!-- Preview Section -->
+                @if (_parsedItems.Count > 0)
+                {
+                    <div class="preview-section">
+                        <div class="preview-header">
+                            <span class="preview-title">
+                                <i class="fa fa-eye"></i>
+                                @Localizer["Preview"] (@_parsedItems.Count @(_parsedItems.Count == 1 ? Localizer["Item"].Value.ToLower() : Localizer["Items"].Value.ToLower()))
+                            </span>
+                            @if (_duplicateItems.Count > 0)
+                            {
+                                <span class="duplicate-warning">
+                                    <i class="fa fa-exclamation-triangle"></i>
+                                    @string.Format(Localizer["DuplicatesRemoved"].Value, _duplicateItems.Count)
+                                </span>
+                            }
+                        </div>
+                        <div class="preview-items">
+                            @foreach (var previewItem in _parsedItems.Take(10))
+                            {
+                                var isDuplicate = _existingItemNames.Contains(previewItem.ToLower());
+                                <span class="preview-chip @(isDuplicate ? "existing" : "")">
+                                    @previewItem
+                                    @if (isDuplicate)
+                                    {
+                                        <i class="fa fa-info-circle" title="@Localizer["ItemAlreadyExists"]"></i>
+                                    }
+                                </span>
+                            }
+                            @if (_parsedItems.Count > 10)
+                            {
+                                <span class="preview-more">+@(_parsedItems.Count - 10) @Localizer["More"].Value.ToLower()</span>
+                            }
+                        </div>
+                    </div>
+                }
+
+                <!-- Hints -->
+                @if (!_isListening && !HasInput && !_isQuickAddMode)
+                {
+                    <div class="form-hint-mini">
+                        <i class="fa fa-info-circle"></i>
+                        <span>@AppResources.BulkAddHint</span>
+                    </div>
+                }
+            </div>
+
+            <!-- Actions -->
+            <div class="form-actions compact">
+                <button class="btn btn-cancel compact" @onclick="CancelAdd">
+                    <i class="fa fa-times"></i>
+                    <span>@AppResources.Cancel</span>
+                </button>
+                <button class="btn btn-primary compact" 
+                        @onclick="ConfirmAddAsync" 
+                        disabled="@(!CanAdd)">
+                    <i class="fa fa-plus"></i>
+                    <span>@GetAddButtonText()</span>
+                </button>
+            </div>
+        </div>
+    };
 
     public void Dispose()
     {

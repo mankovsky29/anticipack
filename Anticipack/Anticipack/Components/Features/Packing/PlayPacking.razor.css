@@ -356,6 +356,7 @@
 /* Content Area */
 .content-area {
     padding: var(--space-sm);
+    padding-bottom: var(--space-xxl);
     background-color: var(--surface);
     border-radius: var(--border-radius);
     box-shadow: var(--shadow);
@@ -634,6 +635,7 @@ ul.category-content {
 /* History Panel */
 .history-panel {
     position: fixed;
+    padding: 2px;
     bottom: 0;
     left: 0;
     right: 0;

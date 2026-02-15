@@ -185,26 +185,11 @@
             <div class="form-row">
                 <label>@Localizer["ActivityType"]</label>
                 <div class="radio-group">
-                    <label class="radio-option">
-                        <input type="radio" 
-                               name="activity-type" 
-                               value="recurring" 
-                               checked="@_isRecurringActivity"
-                               @onchange="() => _isRecurringActivity = true" />
-                        <span class="radio-label">
-                            <i class="fa fa-sync-alt"></i>
-                            <div>
-                                <strong>@Localizer["RecurringActivity"]</strong>
-                                <small>@Localizer["RecurringActivityDescription"]</small>
-                            </div>
-                        </span>
-                    </label>
-                    <label class="radio-option">
+                    <label class="radio-option" @onclick="() => _isRecurringActivity = false">
                         <input type="radio" 
                                name="activity-type" 
                                value="one-time" 
-                               checked="@(!_isRecurringActivity)"
-                               @onchange="() => _isRecurringActivity = false" />
+                               checked="@(!_isRecurringActivity)" />
                         <span class="radio-label">
                             <i class="fa fa-calendar-check"></i>
                             <div>
@@ -213,6 +198,20 @@
                             </div>
                         </span>
                     </label>
+                    <label class="radio-option" @onclick="() => _isRecurringActivity = true">
+                        <input type="radio" 
+                               name="activity-type" 
+                               value="recurring" 
+                               checked="@_isRecurringActivity" />
+                        <span class="radio-label">
+                            <i class="fa fa-sync-alt"></i>
+                            <div>
+                                <strong>@Localizer["RecurringActivity"]</strong>
+                                <small>@Localizer["RecurringActivityDescription"]</small>
+                            </div>
+                        </span>
+                    </label>
+
                 </div>
             </div>
 
@@ -259,9 +258,9 @@ private ArchiveFilterType _archiveFilter = ArchiveFilterType.Active;
 private string? _openMenuId;
 
     // Add dialog
-    private bool _showAddDialog;
+    private bool _showAddDialog;    
     private string _newActivityName = string.Empty;
-    private bool _isRecurringActivity = true; // Default to recurring
+    private bool _isRecurringActivity = false; // Default to one-time activity
     private bool _hasAttemptedSubmit = false;
     private bool _isCreating = false;
     private ElementReference _activityNameInput;
@@ -450,7 +449,7 @@ private string? _openMenuId;
     private void AddNewActivity()
     {
         _newActivityName = string.Empty;
-        _isRecurringActivity = true;
+        _isRecurringActivity = false;
         _hasAttemptedSubmit = false;
         _isCreating = false;
         _hasDialogFocused = false; // Reset focus flag for new dialog session
@@ -463,7 +462,7 @@ private string? _openMenuId;
         _showAddDialog = false;
         _hasAttemptedSubmit = false;
         _newActivityName = string.Empty;
-        _isRecurringActivity = true;
+        _isRecurringActivity = false;
     }
 
     private async Task ConfirmAddActivityAsync()
@@ -661,3 +660,4 @@ private string? _openMenuId;
         _toastCts?.Dispose();
     }
 }
+

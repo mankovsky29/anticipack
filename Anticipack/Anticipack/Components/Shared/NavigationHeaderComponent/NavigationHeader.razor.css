@@ -12,8 +12,9 @@
     min-width: 0;
     height: 3rem;
     min-height: 3rem;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: var(--surface);
+    border: 1px solid;
+    border-color: var(--border-color);
     border-radius: 8px;
     padding: 0.5rem 0.75rem;
     color: #fff;

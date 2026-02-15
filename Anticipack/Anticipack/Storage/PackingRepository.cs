@@ -46,9 +46,12 @@ namespace Anticipack.Storage
                 return;
 
             var items = await GetItemsForActivityAsync(id);
-            foreach (var item in items)
+            if(items != null && items.Count > 0)
             {
-                await _db.DeleteAsync(item);
+                foreach (var item in items)
+                {
+                    await _db.DeleteAsync(item);
+                }
             }
 
             await DeleteHistoryForActivityAsync(id);

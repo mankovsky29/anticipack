@@ -64,6 +64,13 @@
     
     private void HandleDialogClose()
     {
+        // When dialog is closed via X button or overlay click,
+        // treat it as a cancel (false) for confirmation dialogs
+        if (_dialogVisible && _dialogOptions.OnConfirmCallback != null)
+        {
+            _dialogOptions.OnConfirmCallback.Invoke(false);
+        }
+        
         _dialogVisible = false;
         StateHasChanged();
     }
@@ -71,6 +78,8 @@
     private void HandleDialogConfirm(bool result)
     {
         _dialogOptions.OnConfirmCallback?.Invoke(result);
+        _dialogVisible = false;
+        StateHasChanged();
     }
     
     void IDisposable.Dispose()

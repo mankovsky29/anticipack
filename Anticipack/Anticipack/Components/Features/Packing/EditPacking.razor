@@ -3,6 +3,7 @@
 @using Microsoft.AspNetCore.Components
 @inject NavigationManager Navigation
 @inject IPackingRepository PackingRepository
+@inject IPackingActivityRepository PackingActivityRepository
 @inject IJSRuntime JSRuntime
 @inject IDialogService DialogService
 @inject IToastService ToastService
@@ -801,11 +802,31 @@
     private async Task ConfirmDeleteActivityAsync()
     {
         if (string.IsNullOrWhiteSpace(Id))
+        {
+            ToastService.ShowError("Activity ID is empty");
             return;
+        }
 
         try
         {
+            // Verify activity exists before deleting
+            var activity = await PackingRepository.GetByIdAsync(Id);
+            if (activity == null)
+            {
+                ToastService.ShowError($"Activity with ID '{Id}' not found");
+                return;
+            }
+
+            // Perform the delete
             await PackingRepository.DeleteAsync(Id);
+
+            // Set flag to prevent NavigationLock from re-saving the deleted activity
+            _isDeleting = true;
+
+            // Show success message
+            ToastService.ShowSuccess(AppResources.ActivityDeleted ?? "Activity deleted successfully");
+
+            // Navigate back
             Navigation.NavigateTo("/packing-activities");
         }
         catch (Exception ex)
@@ -1033,10 +1054,15 @@
     }
 
     private bool _isSavingBeforeNav;
+    private bool _isDeleting;
 
     private async Task OnBeforeInternalNavigation(LocationChangingContext context)
     {
         if (_isSavingBeforeNav)
+            return;
+
+        // Don't auto-save if we're deleting the activity
+        if (_isDeleting)
             return;
 
         if (string.IsNullOrWhiteSpace(Id))
@@ -1046,13 +1072,13 @@
         try
         {
             context.PreventNavigation();
-            
+
             // Save activity details
             await PackingRepository.AddOrUpdateAsync(_currentActivity);
-            
+
             // Save items order before navigating
             await UpdateAndSaveItemsOrder();
-            
+
             Navigation.NavigateTo(context.TargetLocation);
         }
         finally
@@ -1587,3 +1613,4 @@
         catch { }
     }
 }
+

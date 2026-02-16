@@ -1,4 +1,0 @@
-# Agent Mode & Clarification
-- **Ask Before Acting:** When operating in agent mode or performing multi-step autonomous tasks, you must NOT make assumptions if a request is ambiguous, lacks context, or has multiple potential interpretations.
-- **Mandatory Follow-up:** If any part of the requirement is unclear, you are required to ask the user clarifying questions *before* generating code, editing files, or running commands.
-- **Confirm Scope:** Briefly restate your understanding of the task and ask for confirmation if the impact of the change is significant (e.g., deleting files, refactoring large modules).

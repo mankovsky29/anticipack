@@ -8,7 +8,7 @@
 @inject IDialogService DialogService
 @inject IToastService ToastService
 @inject INavigationHeaderService NavigationHeaderService
-@implements IDisposable
+@implements IAsyncDisposable
 @inject IKeyboardService KeyboardService
 @inject ILocalizationService LocalizationService
 @inject MicrophonePermissionBridge PermissionBridge
@@ -245,7 +245,8 @@
                                                       @bind="item.Item.Notes"
                                                       @bind:event="oninput"
                                                       rows="2"
-                                                      class="edit-notes-textarea"></textarea>
+                                                      class="edit-notes-textarea"
+                                                      @onclick:stopPropagation></textarea>
                                         </div>
     
                                         <div class="item-edit-actions">
@@ -329,6 +330,9 @@
     private ElementReference itemEditInputElement;
     private ElementReference bulkItemsTextarea;
 
+    private string? _editingOriginalName;
+    private string? _editingOriginalNotes;
+
     private List<PackingItemView> Items { get; set; } = new();
     private List<string> _categoryOrder = new();
     private readonly Dictionary<string, bool?> _manualOverride = new(StringComparer.OrdinalIgnoreCase);
@@ -347,6 +351,7 @@
     private bool _isSpeechRecognitionSupported = false;
     private bool _isListening = false;
     private DotNetObjectReference<EditPacking>? _dotNetHelper;
+    private IJSObjectReference? _editPackingModule;
     private string _interimTranscript = string.Empty;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -354,7 +359,10 @@
         if (firstRender)
         {
             KeyboardService.Initialize(this);
-            
+
+            _editPackingModule = await JSRuntime.InvokeAsync<IJSObjectReference>(
+                "import", "./Components/Features/Packing/EditPacking.razor.js");
+
             // Check if speech recognition is supported
             try
             {
@@ -396,7 +404,7 @@
         _isCategoryDropdownOpen = false;
     }
 
-    private void CancelAdd()
+    private async Task CancelAdd()
     {
         _isAddingItem = false;
         _quickAddText = string.Empty;
@@ -406,6 +414,7 @@
         _isCategoryDropdownOpen = false;
         _isCategoryLocked = false;
         _addingToCategory = null;
+        await SyncClickOutsideHandlerAsync();
     }
 
     private void InitializeDefaultItems()
@@ -472,7 +481,7 @@
         return IsAllChecked(category);
     }
 
-    private void ShowAddItemForm()
+    private async Task ShowAddItemForm()
     {
         _isAddingItem = true;
         _isQuickAddMode = true;
@@ -496,9 +505,11 @@
         {
             _newCategory = PackingCategory.Miscellaneous.ToString();
         }
+
+        await SyncClickOutsideHandlerAsync();
     }
 
-    private void ShowAddItemFormForCategory(string category)
+    private async Task ShowAddItemFormForCategory(string category)
     {
         _isAddingItem = true;
         _isQuickAddMode = true;
@@ -514,6 +525,8 @@
         _existingItemNames = Items
             .Select(i => i.Item.Name.ToLower())
             .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        await SyncClickOutsideHandlerAsync();
     }
 
     private void SelectNewCategory(PackingCategory category)
@@ -658,19 +671,19 @@
         }
 
         // Close form and reset state
-        CancelAdd();
+        await CancelAdd();
         StateHasChanged();
     }
 
-    private void HandleQuickAddKeyDown(KeyboardEventArgs e)
+    private async Task HandleQuickAddKeyDown(KeyboardEventArgs e)
     {
         if (e.Key == "Enter" && !e.ShiftKey)
         {
-            _ = ConfirmAddAsync();
+            await ConfirmAddAsync();
         }
         else if (e.Key == "Escape")
         {
-            CancelAdd();
+            await CancelAdd();
         }
     }
 
@@ -1123,12 +1136,28 @@
         if (_isDragging)
             return;
 
+        if (_isAddingItem)
+            await CancelAdd();
+
+        if (_editingItem is not null && !ReferenceEquals(_editingItem, item))
+        {
+            var currentEdit = _editingItem;
+            if (HasEditingChanges(currentEdit))
+                await SaveItemChanges(currentEdit);
+            else
+                await CancelItemEdit(currentEdit);
+        }
+
         _editingItem = item;
+        _editingOriginalName = item.Item.Name;
+        _editingOriginalNotes = item.Item.Notes;
         StateHasChanged();
-        
+
+        await SyncClickOutsideHandlerAsync();
+
         // Delay to ensure DOM is ready and rendered
         await Task.Delay(100);
-        
+
         // Focus on the edit input
         try
         {
@@ -1186,7 +1215,10 @@
         finally
         {
             _editingItem = null;
+            _editingOriginalName = null;
+            _editingOriginalNotes = null;
             StateHasChanged();
+            await SyncClickOutsideHandlerAsync();
         }
     }
 
@@ -1213,7 +1245,69 @@
     private async Task CancelItemEdit(PackingItemView item)
     {
         _editingItem = null;
+        _editingOriginalName = null;
+        _editingOriginalNotes = null;
         StateHasChanged();
+        await SyncClickOutsideHandlerAsync();
+    }
+
+    private bool HasEditingChanges(PackingItemView item)
+    {
+        var originalName = _editingOriginalName ?? string.Empty;
+        var originalNotes = _editingOriginalNotes ?? string.Empty;
+
+        var currentName = item.Item.Name ?? string.Empty;
+        var currentNotes = item.Item.Notes ?? string.Empty;
+
+        return !string.Equals(originalName, currentName, StringComparison.Ordinal)
+            || !string.Equals(originalNotes, currentNotes, StringComparison.Ordinal);
+    }
+
+    private async Task CloseFlyoutsByClickOffAsync()
+    {
+        if (_isAddingItem)
+        {
+            await CancelAdd();
+        }
+
+        if (_editingItem is not null)
+        {
+            var item = _editingItem;
+            if (HasEditingChanges(item))
+            {
+                await SaveItemChanges(item);
+            }
+            else
+            {
+                await CancelItemEdit(item);
+            }
+        }
+    }
+
+    [JSInvokable]
+    public async Task CloseFlyoutsByClickOffJsAsync()
+    {
+        await CloseFlyoutsByClickOffAsync();
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task SyncClickOutsideHandlerAsync()
+    {
+        if (_editPackingModule is null)
+            return;
+        try
+        {
+            if (_isAddingItem || _editingItem is not null)
+            {
+                _dotNetHelper ??= DotNetObjectReference.Create(this);
+                await _editPackingModule.InvokeVoidAsync("registerClickOutsideHandler", _dotNetHelper);
+            }
+            else
+            {
+                await _editPackingModule.InvokeVoidAsync("unregisterClickOutsideHandler");
+            }
+        }
+        catch { }
     }
 
     private void HandleBulkTextareaKeyDown(KeyboardEventArgs e)
@@ -1381,7 +1475,7 @@
 
     private RenderFragment RenderAddItemForm() => __builder =>
     {
-        <div class="add-item-form">
+        <div class="add-item-form" @onclick:stopPropagation>
             <!-- Header with close button -->
             <div class="form-header-inline">
                 <h4>@Localizer["AddItems"]</h4>
@@ -1592,7 +1686,7 @@
         </div>
     };
 
-    public void Dispose()
+    public async ValueTask DisposeAsync()
     {
         try
         {
@@ -1600,13 +1694,19 @@
             {
                 KeyboardService.KeyboardVisibilityChanged -= OnKeyboardVisibilityChanged;
             }
-            
+
             // Stop speech recognition if active
             if (_isListening)
             {
-                _ = JSRuntime.InvokeVoidAsync("stopSpeechRecognition");
+                await JSRuntime.InvokeVoidAsync("stopSpeechRecognition");
             }
-            
+
+            if (_editPackingModule is not null)
+            {
+                await _editPackingModule.InvokeVoidAsync("unregisterClickOutsideHandler");
+                await _editPackingModule.DisposeAsync();
+            }
+
             // Dispose DotNetObjectReference
             _dotNetHelper?.Dispose();
         }

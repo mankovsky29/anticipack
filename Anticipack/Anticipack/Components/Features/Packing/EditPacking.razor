@@ -18,131 +18,128 @@
 <NavigationLock OnBeforeInternalNavigation="OnBeforeInternalNavigation" />
 
 <div class="page-container with-fixed-navbar">
-<div class="activity-header" role="banner" aria-label="@AppResources.PackingActivity">
-    <!-- Actions on second line -->
-    <div class="header-actions">
-        <div class="activity-actions activity-actions-left" role="group" aria-label="@AppResources.PackingDialogMenu">
-            <!-- Primary action: Play button -->
-            <button class="icon-btn play" @onclick="SwitchToPackingMode" @onclick:stopPropagation aria-label="@AppResources.StartPacking">
-                <i class="fa fa-play" aria-hidden="true"></i>
-            </button>
-        </div>
-
-        <div class="activity-actions activity-actions-right" role="group">
-            <!-- Copy button -->
-            <button class="icon-btn" @onclick="CopyPacking" @onclick:stopPropagation title="@AppResources.CopyTitle">
-                <i class="fa fa-copy" aria-hidden="true"></i>
-            </button>
-
-            <!-- Add item button -->
-            <button class="icon-btn" @onclick="ShowAddItemForm" @onclick:stopPropagation title="@AppResources.AddItem">
-                <i class="fa fa-plus" aria-hidden="true"></i>
-            </button>
-
-            <!-- Delete activity button -->
-            <button class="icon-btn delete-item" @onclick="PromptDeleteActivity" @onclick:stopPropagation title="@AppResources.DeleteActivity">
-                <i class="fa fa-trash" aria-hidden="true"></i>
-            </button>
-        </div>
-    </div>
-</div>
-
-<!-- Collapsible Activity Settings Panel -->
-<div class="settings-panel @(_isSettingsExpanded ? "expanded" : "collapsed")">
-    <div class="settings-header" @onclick="ToggleSettings" @onclick:stopPropagation>
-        <div class="settings-summary">
-            <i class="fa @(_isSettingsExpanded ? "fa-chevron-down" : "fa-chevron-right") settings-chevron" aria-hidden="true"></i>
-            <span class="activity-name-summary">@(_activityName ?? AppResources.NewPackingActivity)</span>
-            @if (!_isSettingsExpanded)
-            {
-                <div class="settings-badges">
-                    @if (_currentActivity.IsRecurring)
+    <!-- Unified Activity Panel -->
+    <div class="settings-panel @(_isSettingsExpanded ? "expanded" : "collapsed")" role="banner" aria-label="@AppResources.PackingActivity">
+        <div class="settings-header" @onclick="ToggleSettings" @onclick:stopPropagation>
+            <div class="settings-summary">
+                <button class="icon-btn play header-play-btn" @onclick="SwitchToPackingMode" @onclick:stopPropagation aria-label="@AppResources.StartPacking">
+                    <i class="fa fa-play" aria-hidden="true"></i>
+                </button>
+                <span class="activity-name-summary">@(_activityName ?? AppResources.NewPackingActivity)</span>
+                <div class="header-right-actions">
+                    @if (!_isSettingsExpanded)
                     {
-                        <span class="badge badge-recurring">
+                        <div class="settings-badges">
+                            @if (_currentActivity.IsRecurring)
+                            {
+                                <span class="badge badge-recurring">
+                                    <i class="fa fa-sync-alt"></i>
+                                    <span>@Localizer["RecurringActivity"]</span>
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge badge-one-time">
+                                    <i class="fa fa-calendar-check"></i>
+                                    <span>@Localizer["OneTimeActivity"]</span>
+                                </span>
+                            }
+                            @if (_currentActivity.IsArchived)
+                            {
+                                <span class="badge badge-archived">
+                                    <i class="fa fa-archive"></i>
+                                    <span>@Localizer["Archived"]</span>
+                                </span>
+                            }
+                        </div>
+                    }
+                    <div class="actions-overflow" @onclick:stopPropagation>
+                        <button class="overflow-btn" @onclick="ToggleOverflowMenu" title="@AppResources.PackingDialogMenu">
+                            <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
+                        </button>
+                        @if (_isOverflowMenuOpen)
+                        {
+                            <div class="action-dropdown" role="menu">
+                                <button class="dropdown-item" @onclick="CopyPacking" @onclick:stopPropagation role="menuitem">
+                                    <i class="fa fa-copy" aria-hidden="true"></i>
+                                    <span>@AppResources.CopyTitle</span>
+                                </button>
+                                <button class="dropdown-item" @onclick="ShowAddItemForm" @onclick:stopPropagation role="menuitem">
+                                    <i class="fa fa-plus" aria-hidden="true"></i>
+                                    <span>@AppResources.AddItem</span>
+                                </button>
+                                <button class="dropdown-item delete-item" @onclick="PromptDeleteActivity" @onclick:stopPropagation role="menuitem">
+                                    <i class="fa fa-trash" aria-hidden="true"></i>
+                                    <span>@AppResources.DeleteActivity</span>
+                                </button>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @if (_isSettingsExpanded)
+        {
+            <div class="settings-content">
+                <!-- Activity Name -->
+                <div class="setting-row">
+                    <label for="activity-name-input" class="setting-label">
+                        <i class="fa fa-tag"></i>
+                        @Localizer["Name"]
+                    </label>
+                    <input id="activity-name-input"
+                           type="text"
+                           class="setting-input"
+                           @bind="_activityName"
+                           @bind:event="oninput"
+                           @onblur="SaveActivityNameAsync"
+                           @onclick:stopPropagation
+                           placeholder="@AppResources.EnterActivityName" />
+                </div>
+
+                <!-- Activity Type -->
+                <div class="setting-row">
+                    <label class="setting-label">
+                        <i class="fa fa-repeat"></i>
+                        @Localizer["ActivityType"]
+                    </label>
+                    <div class="segmented-control">
+                        <button class="segment @(_currentActivity.IsRecurring ? "active" : "")"
+                                @onclick="() => SetActivityType(true)"
+                                @onclick:stopPropagation
+                                type="button">
                             <i class="fa fa-sync-alt"></i>
-                            @Localizer["RecurringActivity"]
-                        </span>
-                    }
-                    else
-                    {
-                        <span class="badge badge-one-time">
+                            <span>@Localizer["RecurringActivity"]</span>
+                        </button>
+                        <button class="segment @(!_currentActivity.IsRecurring ? "active" : "")"
+                                @onclick="() => SetActivityType(false)"
+                                @onclick:stopPropagation
+                                type="button">
                             <i class="fa fa-calendar-check"></i>
-                            @Localizer["OneTimeActivity"]
-                        </span>
-                    }
-                    @if (_currentActivity.IsArchived)
-                    {
-                        <span class="badge badge-archived">
-                            <i class="fa fa-archive"></i>
-                            @Localizer["Archived"]
-                        </span>
-                    }
+                            <span>@Localizer["OneTimeActivity"]</span>
+                        </button>
+                    </div>
                 </div>
-            }
-        </div>
+
+                <!-- Archive Toggle -->
+                <div class="setting-row">
+                    <label class="setting-label">
+                        <i class="fa fa-archive"></i>
+                        @Localizer["Archive"]
+                    </label>
+                    <label class="toggle-switch">
+                        <input type="checkbox"
+                               @bind="_currentActivity.IsArchived"
+                               @bind:after="SaveArchiveStatusAsync"
+                               @onclick:stopPropagation />
+                        <span class="toggle-slider"></span>
+                        <span class="toggle-label">@(_currentActivity.IsArchived ? Localizer["Archived"] : Localizer["Active"])</span>
+                    </label>
+                </div>
+            </div>
+        }
     </div>
-    
-    @if (_isSettingsExpanded)
-    {
-        <div class="settings-content">
-            <!-- Activity Name -->
-            <div class="setting-row">
-                <label for="activity-name-input" class="setting-label">
-                    <i class="fa fa-tag"></i>
-                    @Localizer["Name"]
-                </label>
-                <input id="activity-name-input"
-                       type="text"
-                       class="setting-input"
-                       @bind="_activityName"
-                       @bind:event="oninput"
-                       @onblur="SaveActivityNameAsync"
-                       @onclick:stopPropagation
-                       placeholder="@AppResources.EnterActivityName" />
-            </div>
-            
-            <!-- Activity Type -->
-            <div class="setting-row">
-                <label class="setting-label">
-                    <i class="fa fa-repeat"></i>
-                    @Localizer["ActivityType"]
-                </label>
-                <div class="segmented-control">
-                    <button class="segment @(_currentActivity.IsRecurring ? "active" : "")"
-                            @onclick="() => SetActivityType(true)"
-                            @onclick:stopPropagation
-                            type="button">
-                        <i class="fa fa-sync-alt"></i>
-                        <span>@Localizer["RecurringActivity"]</span>
-                    </button>
-                    <button class="segment @(!_currentActivity.IsRecurring ? "active" : "")"
-                            @onclick="() => SetActivityType(false)"
-                            @onclick:stopPropagation
-                            type="button">
-                        <i class="fa fa-calendar-check"></i>
-                        <span>@Localizer["OneTimeActivity"]</span>
-                    </button>
-                </div>
-            </div>
-            
-            <!-- Archive Toggle -->
-            <div class="setting-row">
-                <label class="setting-label">
-                    <i class="fa fa-archive"></i>
-                    @Localizer["Archive"]
-                </label>
-                <label class="toggle-switch">
-                    <input type="checkbox"
-                           @bind="_currentActivity.IsArchived"
-                           @bind:after="SaveArchiveStatusAsync"
-                           @onclick:stopPropagation />
-                    <span class="toggle-slider"></span>
-                    <span class="toggle-label">@(_currentActivity.IsArchived ? Localizer["Archived"] : Localizer["Active"])</span>
-                </label>
-            </div>
-        </div>
-    }
-</div>
 
     <main class="content-area">
         @if (_isLoading)
@@ -302,6 +299,7 @@
     private Storage.PackingActivity _currentActivity = new Storage.PackingActivity();
     private string _activityName = string.Empty;
     private bool _isSettingsExpanded = false; // Collapsed by default
+    private bool _isOverflowMenuOpen = false;
 
     // Add item form state
     private bool _isQuickAddMode = true;
@@ -483,6 +481,7 @@
 
     private async Task ShowAddItemForm()
     {
+        _isOverflowMenuOpen = false;
         _isAddingItem = true;
         _isQuickAddMode = true;
         _quickAddText = string.Empty;
@@ -698,6 +697,11 @@
         _isSettingsExpanded = !_isSettingsExpanded;
     }
 
+    private void ToggleOverflowMenu()
+    {
+        _isOverflowMenuOpen = !_isOverflowMenuOpen;
+    }
+
     private async Task SetActivityType(bool isRecurring)
     {
         if (_currentActivity.IsRecurring == isRecurring)
@@ -783,6 +787,7 @@
 
     private async Task CopyPacking()
     {
+        _isOverflowMenuOpen = false;
         if (string.IsNullOrWhiteSpace(Id))
             return;
 
@@ -800,6 +805,7 @@
 
     private async Task PromptDeleteActivity()
     {
+        _isOverflowMenuOpen = false;
         bool confirm = await DialogService.ShowConfirmAsync(
             AppResources.DeleteActivity, 
             AppResources.DeleteActivityConfirm,

@@ -3,7 +3,14 @@ let _clickOutsideHandler = null;
 export function scrollToAddForm() {
     requestAnimationFrame(function () {
         const form = document.querySelector('.add-item-form');
-        if (form) {
+        if (!form) return;
+
+        const rect = form.getBoundingClientRect();
+        const viewportHeight = window.innerHeight;
+        const margin = 32;
+
+        // Only scroll if the form is not fully visible in the viewport
+        if (rect.top < margin || rect.bottom > viewportHeight - margin) {
             form.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
     });

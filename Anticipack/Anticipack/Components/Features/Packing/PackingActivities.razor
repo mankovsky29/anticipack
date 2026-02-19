@@ -642,8 +642,8 @@ private string? _openMenuId;
                 _ = JSRuntime.InvokeVoidAsync("adjustPageForKeyboard", height);
             }
             
-            // Scroll the active input into view to ensure it's not covered by the keyboard
-            _ = JSRuntime.InvokeVoidAsync("scrollActiveElementIntoView");
+            // Scroll the active input into view only if covered by the keyboard
+            _ = JSRuntime.InvokeVoidAsync("scrollActiveElementIntoView", height);
         }
         else
         {

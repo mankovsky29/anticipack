@@ -17,62 +17,60 @@ function focusElement(element) {
     }
 }
 
-function scrollActiveElementIntoView() {
-const activeElement = document.activeElement;
-if (activeElement && (activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA')) {
+function scrollActiveElementIntoView(keyboardHeight) {
+    const activeElement = document.activeElement;
+    if (!activeElement || (activeElement.tagName !== 'INPUT' && activeElement.tagName !== 'TEXTAREA')) {
+        return;
+    }
+
     setTimeout(() => {
+        const rect = activeElement.getBoundingClientRect();
+        const viewportHeight = window.innerHeight;
+        const kbHeight = keyboardHeight || 0;
+        const visibleBottom = viewportHeight - kbHeight;
+        const margin = 16;
+
         // Check if element is inside a modal/popup
         const modalOverlay = activeElement.closest('.modal-overlay');
         const modalContent = activeElement.closest('.modal-content');
-            
+
         if (modalOverlay && modalContent) {
-            // For modals on mobile, ensure proper scrolling
-            const inputRect = activeElement.getBoundingClientRect();
-            const viewportHeight = window.innerHeight;
-                
-            // Estimate keyboard height (typically 40-50% of viewport on mobile)
-            const keyboardHeight = viewportHeight * 0.5;
-            const visibleAreaBottom = viewportHeight - keyboardHeight;
-                
-            // Check if input is hidden by keyboard
-            if (inputRect.bottom > visibleAreaBottom || inputRect.top < 100) {
-                // Calculate how much we need to scroll
-                // Position input at about 30% from top of visible area
-                const targetTop = 100; // 100px from top
-                const currentTop = inputRect.top;
-                const scrollAmount = currentTop - targetTop;
-                    
-                // Scroll the modal overlay
-                modalOverlay.scrollBy({
-                    top: scrollAmount,
-                    behavior: 'smooth'
-                });
+            if (rect.bottom > visibleBottom - margin || rect.top < 0) {
+                const targetTop = 100;
+                const scrollAmount = rect.top - targetTop;
+                modalOverlay.scrollBy({ top: scrollAmount, behavior: 'smooth' });
             }
             return;
         }
-            
-        // Check for other form containers
-        const isInFormModal = activeElement.closest('.add-item-form');
-        if (isInFormModal) {
-            activeElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            return;
-        }
 
-        // Get element position
-        const rect = activeElement.getBoundingClientRect();
-        const absoluteTop = rect.top + window.pageYOffset;
-            
-        // Calculate scroll position to place input at 1/3 from top of viewport
-        // This gives enough space above for context and keeps it well above keyboard
-        const viewportHeight = window.innerHeight;
-        const targetPosition = absoluteTop - (viewportHeight / 3);
-            
-        // Scroll to calculated position
-        window.scrollTo({
-            top: Math.max(0, targetPosition),
-            behavior: 'smooth'
-        });
-    }, 300); // Reduced delay for faster response
+        // Only scroll if the element is outside the visible area
+        if (rect.bottom > visibleBottom - margin) {
+            // Element is covered by keyboard — scroll up just enough
+            const scrollBy = rect.bottom - visibleBottom + margin + 40;
+            window.scrollBy({ top: scrollBy, behavior: 'smooth' });
+        } else if (rect.top < margin) {
+            // Element is above the viewport — scroll down to reveal it
+            const scrollBy = rect.top - margin - 40;
+            window.scrollBy({ top: scrollBy, behavior: 'smooth' });
+        }
+        // Otherwise element is fully visible — do nothing
+    }, 300);
+}
+
+function ensureElementVisible(element, keyboardHeight) {
+    if (!element) return;
+    const rect = element.getBoundingClientRect();
+    const viewportHeight = window.innerHeight;
+    const kbHeight = keyboardHeight || 0;
+    const visibleBottom = viewportHeight - kbHeight;
+    const margin = 16;
+
+    if (rect.bottom > visibleBottom - margin) {
+        const scrollBy = rect.bottom - visibleBottom + margin + 40;
+        window.scrollBy({ top: scrollBy, behavior: 'smooth' });
+    } else if (rect.top < margin) {
+        const scrollBy = rect.top - margin - 40;
+        window.scrollBy({ top: scrollBy, behavior: 'smooth' });
     }
 }
 

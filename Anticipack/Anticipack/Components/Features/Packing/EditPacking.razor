@@ -770,8 +770,8 @@
             // Adjust page padding to account for keyboard height
             _ = JSRuntime.InvokeVoidAsync("adjustPageForKeyboard", height);
             
-            // Scroll the active input into view to ensure it's not covered by the keyboard
-            _ = JSRuntime.InvokeVoidAsync("scrollActiveElementIntoView");
+            // Scroll the active input into view only if covered by the keyboard
+            _ = JSRuntime.InvokeVoidAsync("scrollActiveElementIntoView", height);
         }
         else
         {
@@ -1184,12 +1184,10 @@
         // Delay to ensure DOM is ready and rendered
         await Task.Delay(100);
 
-        // Focus on the edit input
+        // Focus on the edit input (keyboard handler will scroll if needed)
         try
         {
             await JSRuntime.InvokeVoidAsync("focusElement", itemEditInputElement);
-            await Task.Delay(50);
-            await JSRuntime.InvokeVoidAsync("ensureElementVisible", itemEditInputElement, _keyboardHeight);
         }
         catch
         {
@@ -1202,9 +1200,6 @@
         try
         {
             await JSRuntime.InvokeVoidAsync("selectAllText", itemEditInputElement);
-            // Ensure element is visible with a small delay
-            await Task.Delay(100);
-            await JSRuntime.InvokeVoidAsync("ensureElementVisible", itemEditInputElement, _keyboardHeight);
         }
         catch
         {

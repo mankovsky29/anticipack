@@ -1,5 +1,14 @@
 let _clickOutsideHandler = null;
 
+export function scrollToAddForm() {
+    requestAnimationFrame(function () {
+        const form = document.querySelector('.add-item-form');
+        if (form) {
+            form.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    });
+}
+
 export function registerClickOutsideHandler(dotNetRef) {
     unregisterClickOutsideHandler();
     _clickOutsideHandler = function (event) {

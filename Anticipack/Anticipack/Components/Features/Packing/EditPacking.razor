@@ -147,12 +147,6 @@
         }
 
         <div class="packing-list">
-            @* Show add form at top when adding generally (not to a specific category) *@
-            @if (_isAddingItem && _addingToCategory == null)
-            {
-                @RenderAddItemForm()
-            }
-
             @if (!Items.Any() && !_isAddingItem)
             {
                 <!-- Empty state: Show add button when no items exist -->
@@ -178,12 +172,6 @@
                 var collapsed = IsCollapsed(category);
                 var categoryId = $"cat-{category}";
                 var localizedCategory = GetLocalizedCategoryName(category);
-
-                @* Show add form above this category when adding to it *@
-                @if (_isAddingItem && string.Equals(_addingToCategory, category, StringComparison.OrdinalIgnoreCase))
-                {
-                    @RenderAddItemForm()
-                }
 
                 <section class="category @(allChecked ? "category-completed" : "")" aria-labelledby="@categoryId">
                     <div class="category-header" role="button" @onclick="() => ToggleCategory(category)" aria-expanded="@(!collapsed)">
@@ -279,9 +267,20 @@
                         }
                     </ul>
                 </section>
+
+                @* When adding to a specific category, show form right after that category *@
+                @if (_isAddingItem && _addingToCategory != null && string.Equals(_addingToCategory, category, StringComparison.OrdinalIgnoreCase))
+                {
+                    @RenderAddItemForm()
+                }
             }
 
-            @if (!_isAddingItem)
+            @* General add (bottom button) or form when no specific category targeted *@
+            @if (_isAddingItem && _addingToCategory == null)
+            {
+                @RenderAddItemForm()
+            }
+            else if (!_isAddingItem)
             {
                 <button class="btn-add-packing-item" @onclick="ShowAddItemForm">
                     <i class="fa fa-plus" aria-hidden="true"></i>
@@ -349,6 +348,8 @@
 
     private bool _showCategorySelector = false;
 
+    private bool _pendingScrollToAddForm = false;
+
     // Speech recognition state
     private bool _isSpeechRecognitionSupported = false;
     private bool _isListening = false;
@@ -374,6 +375,16 @@
             {
                 _isSpeechRecognitionSupported = false;
             }
+        }
+
+        if (_pendingScrollToAddForm && _editPackingModule is not null)
+        {
+            _pendingScrollToAddForm = false;
+            try
+            {
+                await _editPackingModule.InvokeVoidAsync("scrollToAddForm");
+            }
+            catch { }
         }
 
         await base.OnAfterRenderAsync(firstRender);
@@ -493,7 +504,7 @@
         _parsedItems = [];
         _duplicateItems = [];
         _isCategoryLocked = false;
-        _addingToCategory = null; // Show form at top
+        _addingToCategory = null;
 
         // Cache existing item names for duplicate detection
         _existingItemNames = Items
@@ -509,6 +520,7 @@
             _newCategory = PackingCategory.Miscellaneous.ToString();
         }
 
+        _pendingScrollToAddForm = true;
         await SyncClickOutsideHandlerAsync();
     }
 
@@ -521,14 +533,18 @@
         _parsedItems = [];
         _duplicateItems = [];
         _isCategoryLocked = true; // Hide category selector
-        _addingToCategory = category; // Show form above this category
+        _addingToCategory = category;
         _newCategory = category;
+
+        // Ensure the target category is expanded so the user sees context
+        _manualOverride[category] = false;
 
         // Cache existing item names for duplicate detection
         _existingItemNames = Items
             .Select(i => i.Item.Name.ToLower())
             .ToHashSet(StringComparer.OrdinalIgnoreCase);
 
+        _pendingScrollToAddForm = true;
         await SyncClickOutsideHandlerAsync();
     }
 

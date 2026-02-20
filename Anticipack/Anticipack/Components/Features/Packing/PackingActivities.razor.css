@@ -334,10 +334,27 @@
     display: block;
 }
 
+.menu-dropdown.open-up {
+    top: auto;
+    bottom: 40px;
+    animation: menuSlideInUp 0.2s ease-out;
+}
+
 @keyframes menuSlideIn {
     from {
         opacity: 0;
         transform: translateY(-8px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes menuSlideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(8px) scale(0.95);
     }
     to {
         opacity: 1;

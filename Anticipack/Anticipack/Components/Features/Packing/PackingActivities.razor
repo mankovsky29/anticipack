@@ -8,7 +8,7 @@
 @inject IJSRuntime JSRuntime
 @inject IKeyboardService KeyboardService
 @inject ICategoryIconProvider CategoryIconProvider
-@implements IDisposable
+@implements IAsyncDisposable
 
 <div class="page-container with-fixed-navbar">
     @if (_isLoading)
@@ -93,7 +93,8 @@
                             </div>
                             <div class="card-menu">
                                 <button class="btn-menu" 
-                                        @onclick="() => ToggleMenu(activity.Id)"
+                                        @onclick="() => ToggleMenuAsync(activity.Id)"
+                                        @onclick:stopPropagation
                                         title="@Localizer["More"]">
                                     <i class="fa fa-ellipsis-v"></i>
                                 </button>
@@ -256,6 +257,9 @@ private bool _isLoading = true;
 private string _searchTerm = string.Empty;
 private ArchiveFilterType _archiveFilter = ArchiveFilterType.Active;
 private string? _openMenuId;
+    private bool _menuJustOpened;
+    private IJSObjectReference? _jsModule;
+    private DotNetObjectReference<PackingActivities>? _dotNetRef;
 
     // Add dialog
     private bool _showAddDialog;    
@@ -288,8 +292,21 @@ private string? _openMenuId;
     {
         if (firstRender)
         {
+            _dotNetRef = DotNetObjectReference.Create(this);
             KeyboardService.Initialize(this);
-            await JSRuntime.InvokeVoidAsync("initScrollToTopButton", DotNetObjectReference.Create(this));
+            await JSRuntime.InvokeVoidAsync("initScrollToTopButton", _dotNetRef);
+            _jsModule = await JSRuntime.InvokeAsync<IJSObjectReference>(
+                "import", "./Components/Features/Packing/PackingActivities.razor.js");
+        }
+
+        if (_menuJustOpened && _jsModule is not null)
+        {
+            _menuJustOpened = false;
+            try
+            {
+                await _jsModule.InvokeVoidAsync("positionMenu");
+            }
+            catch { }
         }
         
         // Auto-focus the input when dialog opens (only once per dialog session)
@@ -342,14 +359,37 @@ private string? _openMenuId;
         _archiveFilter = filterType;
     }
 
-    private void ToggleMenu(string activityId)
+    private async Task ToggleMenuAsync(string activityId)
     {
-        _openMenuId = _openMenuId == activityId ? null : activityId;
+        if (_openMenuId == activityId)
+        {
+            _openMenuId = null;
+            if (_jsModule is not null)
+                try { await _jsModule.InvokeVoidAsync("unregisterMenuClickOutside"); } catch { }
+        }
+        else
+        {
+            _openMenuId = activityId;
+            _menuJustOpened = true;
+            if (_jsModule is not null && _dotNetRef is not null)
+                try { await _jsModule.InvokeVoidAsync("registerMenuClickOutside", _dotNetRef); } catch { }
+        }
     }
 
-    private void CloseMenu()
+    [JSInvokable]
+    public async Task CloseMenuFromJsAsync()
     {
         _openMenuId = null;
+        if (_jsModule is not null)
+            try { await _jsModule.InvokeVoidAsync("unregisterMenuClickOutside"); } catch { }
+        StateHasChanged();
+    }
+
+    private async Task CloseMenuAsync()
+    {
+        _openMenuId = null;
+        if (_jsModule is not null)
+            try { await _jsModule.InvokeVoidAsync("unregisterMenuClickOutside"); } catch { }
     }
 
     private async Task LoadActivitiesAsync()
@@ -509,7 +549,7 @@ private string? _openMenuId;
 
     private async Task ToggleArchiveActivity(Storage.PackingActivity activity)
     {
-        CloseMenu();
+        await CloseMenuAsync();
         var newArchiveState = !activity.IsArchived;
         var confirmMessage = newArchiveState 
             ? string.Format(Localizer["ConfirmArchive"], activity.Name)
@@ -543,7 +583,7 @@ private string? _openMenuId;
 
     private async Task PromptDeleteActivity(Storage.PackingActivity activity)
     {
-        CloseMenu();
+        await CloseMenuAsync();
         var message = string.Format(Localizer["DeleteActivityMessage"], activity.Name);
         var result = await DialogService.ShowConfirmAsync(Localizer["DeleteActivityTitle"], message);
         
@@ -572,9 +612,9 @@ private string? _openMenuId;
         Navigation.NavigateTo($"/packing-activity?id={id}&mode=packing");
     }
 
-    private void OpenActivityInEditMode(string id)
+    private async Task OpenActivityInEditMode(string id)
     {
-        CloseMenu();
+        await CloseMenuAsync();
         Navigation.NavigateTo($"/packing-activity?id={id}&mode=edit");
     }
 
@@ -652,12 +692,24 @@ private string? _openMenuId;
         }
     }
 
-    public void Dispose()
+    public async ValueTask DisposeAsync()
     {
         LocalizationService.CultureChanged -= OnCultureChanged;
         KeyboardService.KeyboardVisibilityChanged -= OnKeyboardVisibilityChanged;
         _toastCts?.Cancel();
         _toastCts?.Dispose();
+
+        if (_jsModule is not null)
+        {
+            try
+            {
+                await _jsModule.InvokeVoidAsync("unregisterMenuClickOutside");
+                await _jsModule.DisposeAsync();
+            }
+            catch { }
+        }
+
+        _dotNetRef?.Dispose();
     }
 }
 

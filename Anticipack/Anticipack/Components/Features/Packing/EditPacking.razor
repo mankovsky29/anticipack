@@ -54,7 +54,7 @@
                         </div>
                     }
                     <div class="actions-overflow" @onclick:stopPropagation>
-                        <button class="overflow-btn" @onclick="ToggleOverflowMenu" title="@AppResources.PackingDialogMenu">
+                        <button class="overflow-btn" @onclick="ToggleOverflowMenuAsync" @onclick:stopPropagation title="@AppResources.PackingDialogMenu">
                             <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
                         </button>
                         @if (_isOverflowMenuOpen)
@@ -303,6 +303,7 @@
     private string _activityName = string.Empty;
     private bool _isSettingsExpanded = false; // Collapsed by default
     private bool _isOverflowMenuOpen = false;
+    private bool _overflowMenuJustOpened = false;
 
     // Add item form state
     private bool _isQuickAddMode = true;
@@ -383,6 +384,16 @@
             try
             {
                 await _editPackingModule.InvokeVoidAsync("scrollToAddForm");
+            }
+            catch { }
+        }
+
+        if (_overflowMenuJustOpened && _editPackingModule is not null)
+        {
+            _overflowMenuJustOpened = false;
+            try
+            {
+                await _editPackingModule.InvokeVoidAsync("positionOverflowMenu");
             }
             catch { }
         }
@@ -496,7 +507,7 @@
 
     private async Task ShowAddItemForm()
     {
-        _isOverflowMenuOpen = false;
+        await CloseOverflowMenuAsync();
         _isAddingItem = true;
         _isQuickAddMode = true;
         _quickAddText = string.Empty;
@@ -717,9 +728,37 @@
         _isSettingsExpanded = !_isSettingsExpanded;
     }
 
-    private void ToggleOverflowMenu()
+    private async Task ToggleOverflowMenuAsync()
     {
         _isOverflowMenuOpen = !_isOverflowMenuOpen;
+        if (_isOverflowMenuOpen)
+        {
+            _overflowMenuJustOpened = true;
+            _dotNetHelper ??= DotNetObjectReference.Create(this);
+            if (_editPackingModule is not null)
+                try { await _editPackingModule.InvokeVoidAsync("registerOverflowClickOutside", _dotNetHelper); } catch { }
+        }
+        else
+        {
+            if (_editPackingModule is not null)
+                try { await _editPackingModule.InvokeVoidAsync("unregisterOverflowClickOutside"); } catch { }
+        }
+    }
+
+    [JSInvokable]
+    public async Task CloseOverflowMenuFromJsAsync()
+    {
+        _isOverflowMenuOpen = false;
+        if (_editPackingModule is not null)
+            try { await _editPackingModule.InvokeVoidAsync("unregisterOverflowClickOutside"); } catch { }
+        StateHasChanged();
+    }
+
+    private async Task CloseOverflowMenuAsync()
+    {
+        _isOverflowMenuOpen = false;
+        if (_editPackingModule is not null)
+            try { await _editPackingModule.InvokeVoidAsync("unregisterOverflowClickOutside"); } catch { }
     }
 
     private async Task SetActivityType(bool isRecurring)
@@ -807,7 +846,7 @@
 
     private async Task CopyPacking()
     {
-        _isOverflowMenuOpen = false;
+        await CloseOverflowMenuAsync();
         if (string.IsNullOrWhiteSpace(Id))
             return;
 
@@ -825,7 +864,7 @@
 
     private async Task PromptDeleteActivity()
     {
-        _isOverflowMenuOpen = false;
+        await CloseOverflowMenuAsync();
         bool confirm = await DialogService.ShowConfirmAsync(
             AppResources.DeleteActivity, 
             AppResources.DeleteActivityConfirm,
@@ -1725,6 +1764,7 @@
             if (_editPackingModule is not null)
             {
                 await _editPackingModule.InvokeVoidAsync("unregisterClickOutsideHandler");
+                await _editPackingModule.InvokeVoidAsync("unregisterOverflowClickOutside");
                 await _editPackingModule.DisposeAsync();
             }
 

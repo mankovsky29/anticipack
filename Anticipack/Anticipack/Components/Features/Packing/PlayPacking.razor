@@ -129,9 +129,8 @@
             }
         }
     </main>
-</div>
 
-<div class="history-panel @(_showHistory ? "expanded" : "")">
+    <div class="history-panel @(_showHistory ? "expanded" : "")">
     <div class="history-header" @onclick="ToggleHistory">
         <h4>@AppResources.PackingHistory</h4>
         <span class="chev @(_showHistory ? "" : "collapsed")">▾</span>
@@ -169,6 +168,7 @@
             </div>
         </div>
     }
+    </div>
 </div>
 
 @if (GetCompletionPercentage() == 100 && !_completionAcknowledged)

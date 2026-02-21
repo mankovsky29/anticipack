@@ -812,6 +812,66 @@
     <value>Каждый вклад, большой или маленький, имеет значение. Спасибо за вашу поддержку!</value>
   </data>
 
+  <data name="SupportUsDescription" xml:space="preserve">
+    <value>Помогите нам улучшить Anticipack</value>
+  </data>
+
+  <!-- Payment Methods -->
+  <data name="PaymentMethod" xml:space="preserve">
+    <value>Способ оплаты</value>
+  </data>
+  <data name="ApplePay" xml:space="preserve">
+    <value>Apple Pay</value>
+  </data>
+  <data name="GooglePay" xml:space="preserve">
+    <value>Google Pay</value>
+  </data>
+  <data name="OtherPayment" xml:space="preserve">
+    <value>Другой</value>
+  </data>
+  <data name="StorePaymentHint" xml:space="preserve">
+    <value>Безопасный платёж через магазин</value>
+  </data>
+  <data name="PayPalHint" xml:space="preserve">
+    <value>Оплата через PayPal</value>
+  </data>
+  <data name="PayWithPayPal" xml:space="preserve">
+    <value>Оплатить через PayPal</value>
+  </data>
+  <data name="LoadingProducts" xml:space="preserve">
+    <value>Загрузка вариантов оплаты...</value>
+  </data>
+  <data name="Processing" xml:space="preserve">
+    <value>Обработка...</value>
+  </data>
+  <data name="SecurePayment" xml:space="preserve">
+    <value>Безопасный платёж через ваше устройство</value>
+  </data>
+  <data name="RestorePurchases" xml:space="preserve">
+    <value>Восстановить предыдущие покупки</value>
+  </data>
+  <data name="DonateSuccess" xml:space="preserve">
+    <value>Спасибо за ваше щедрое пожертвование!</value>
+  </data>
+  <data name="DonateFailed" xml:space="preserve">
+    <value>Не удалось завершить платёж. Попробуйте ещё раз.</value>
+  </data>
+  <data name="DonatePurpose" xml:space="preserve">
+    <value>Пожертвование Anticipack</value>
+  </data>
+  <data name="PayPalRedirect" xml:space="preserve">
+    <value>Перенаправление на PayPal. Завершите оплату в браузере.</value>
+  </data>
+  <data name="PurchasesRestored" xml:space="preserve">
+    <value>Ваши покупки восстановлены.</value>
+  </data>
+  <data name="NoPurchasesToRestore" xml:space="preserve">
+    <value>Предыдущих покупок не найдено.</value>
+  </data>
+  <data name="RestoreFailed" xml:space="preserve">
+    <value>Не удалось восстановить покупки. Попробуйте ещё раз.</value>
+  </data>
+
   <!-- Add Items Form -->
   <data name="AddItems" xml:space="preserve">
     <value>Добавить предметы</value>

@@ -6,6 +6,7 @@ using Anticipack.Storage.Repositories;
 using Anticipack.Services;
 using Anticipack.Services.Categories;
 using Anticipack.Services.Packing;
+using Anticipack.Services.Payment;
 using Anticipack.Services.Sync;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -84,6 +85,18 @@ namespace Anticipack
             builder.Services.AddSingleton<IMicrophonePermissionService, MicrophonePermissionService>();
             builder.Services.AddScoped<MicrophonePermissionBridge>();
             builder.Services.AddScoped<IPackingHistoryService, PackingHistoryService>();
+
+            // Payment services (ISP: Segregated interfaces, DIP: Depend on abstractions)
+            builder.Services.AddSingleton<PayPalConfiguration>(_ => new PayPalConfiguration
+            {
+                // TODO: Replace with your PayPal credentials
+                ClientId = "",
+                BusinessEmail = "donate@anticipack.com",
+                PayPalMeUsername = ""
+            });
+            builder.Services.AddSingleton<IStoreService, StoreService>();
+            builder.Services.AddSingleton<IPayPalService, PayPalService>();
+            builder.Services.AddSingleton<IPaymentService, PaymentService>();
 
             var app = builder.Build();
 

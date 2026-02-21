@@ -1,51 +1,223 @@
 .donate-page {
-    padding: 2rem;
+    padding: var(--space-xl);
     max-width: 600px;
     margin: 0 auto;
 }
 
 .donate-header {
     text-align: center;
-    margin-bottom: 2rem;
+    margin-bottom: var(--space-xl);
+}
+
+.donate-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--danger), var(--primary));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto var(--space-md);
+    font-size: var(--font-size-xl);
+    color: white;
 }
 
 .donate-header h1 {
     color: var(--text-primary);
-    font-size: 2rem;
-    margin-bottom: 1rem;
+    font-size: var(--font-size-xl);
+    margin-bottom: var(--space-sm);
 }
 
 .donate-description {
     color: var(--text-secondary);
-    font-size: 1rem;
+    font-size: var(--font-size-md);
     line-height: 1.5;
 }
 
+/* Loading */
+.loading-section {
+    text-align: center;
+    padding: var(--space-xxl);
+    color: var(--text-secondary);
+}
+
+.loading-section i {
+    font-size: var(--font-size-xl);
+    margin-bottom: var(--space-md);
+    display: block;
+    color: var(--primary);
+}
+
+/* Payment Method Selection */
+.payment-method-section {
+    margin-bottom: var(--space-lg);
+}
+
+.payment-method-section h2 {
+    color: var(--text-primary);
+    font-size: var(--font-size-lg);
+    margin-bottom: var(--space-md);
+}
+
+.method-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: var(--space-sm);
+}
+
+.method-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: var(--space-md);
+    background: var(--surface);
+    border: 2px solid var(--border-color);
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    color: var(--text-primary);
+}
+
+.method-option:hover {
+    border-color: var(--primary);
+    background: var(--hover-bg);
+}
+
+.method-option.active {
+    border-color: var(--primary);
+    background: var(--primary-light-bg);
+}
+
+.method-option i {
+    font-size: var(--font-size-xl);
+    color: var(--primary);
+}
+
+.method-option span {
+    font-weight: 600;
+    font-size: var(--font-size-sm);
+}
+
+.method-hint {
+    font-weight: 400 !important;
+    color: var(--text-secondary);
+    font-size: var(--font-size-xs) !important;
+    text-align: center;
+}
+
+/* Product Cards */
 .donate-options {
     background: var(--surface);
     border-radius: var(--border-radius);
-    padding: 2rem;
+    padding: var(--space-xl);
     box-shadow: var(--shadow);
 }
 
 .donate-options h2 {
     color: var(--text-primary);
-    font-size: 1.25rem;
-    margin-bottom: 1.5rem;
+    font-size: var(--font-size-lg);
+    margin-bottom: var(--space-lg);
 }
 
+.product-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-md);
+    margin-bottom: var(--space-xl);
+}
+
+.product-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-lg) var(--space-md);
+    background: var(--background);
+    border: 2px solid var(--border-color);
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    color: var(--text-primary);
+}
+
+.product-card:hover:not(:disabled) {
+    border-color: var(--primary);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+}
+
+.product-card.active {
+    border-color: var(--primary);
+    background: var(--primary-light-bg);
+    box-shadow: var(--shadow-md);
+}
+
+.product-card:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.product-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--primary-light-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--font-size-lg);
+    color: var(--primary);
+}
+
+.product-card.active .product-icon {
+    background: var(--primary);
+    color: white;
+}
+
+.product-name {
+    font-weight: 600;
+    font-size: var(--font-size-sm);
+}
+
+.product-price {
+    font-size: var(--font-size-lg);
+    font-weight: 700;
+    color: var(--primary);
+}
+
+/* Section Divider */
+.section-divider {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    margin-bottom: var(--space-lg);
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+}
+
+.section-divider::before,
+.section-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border-color);
+}
+
+/* Amount Buttons */
 .amount-buttons {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 1rem;
-    margin-bottom: 2rem;
+    gap: var(--space-md);
+    margin-bottom: var(--space-xl);
 }
 
 .amount-option {
     background: var(--background);
     border: 2px solid var(--border-color);
     border-radius: var(--border-radius-sm);
-    padding: 1.5rem 1rem;
+    padding: var(--space-lg) var(--space-md);
     cursor: pointer;
     transition: all var(--transition-fast);
     color: var(--text-primary);
@@ -68,18 +240,19 @@
 
 .amount-value {
     display: block;
-    font-size: 1.5rem;
+    font-size: var(--font-size-xl);
 }
 
+/* Custom Amount */
 .custom-amount {
-    margin-bottom: 2rem;
+    margin-bottom: var(--space-xl);
 }
 
 .custom-amount label {
     display: block;
     color: var(--text-primary);
     font-weight: 500;
-    margin-bottom: 0.5rem;
+    margin-bottom: var(--space-sm);
 }
 
 .input-group {
@@ -90,48 +263,53 @@
 
 .currency-symbol {
     position: absolute;
-    left: 1rem;
+    left: var(--space-md);
     color: var(--text-secondary);
-    font-size: 1.25rem;
+    font-size: var(--font-size-lg);
     font-weight: 600;
 }
 
 .custom-amount-input {
     width: 100%;
-    padding: 0.75rem 1rem 0.75rem 2.5rem;
-    background: var(--background);
-    border: 2px solid var(--border-color);
+    padding: var(--space-sm) var(--space-md) var(--space-sm) var(--space-xl);
+    background: var(--input-bg);
+    border: 2px solid var(--input-border);
     border-radius: var(--border-radius-sm);
     color: var(--text-primary);
-    font-size: 1.25rem;
+    font-size: var(--font-size-lg);
     font-weight: 500;
     transition: all var(--transition-fast);
 }
 
 .custom-amount-input:focus {
     outline: none;
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(75, 137, 220, 0.1);
+    border-color: var(--input-focus-border);
+    box-shadow: 0 0 0 3px var(--input-focus-shadow);
 }
 
+/* Submit Buttons */
 .donate-submit-button {
     width: 100%;
-    padding: 1rem;
+    padding: var(--space-md);
     background: var(--primary);
     color: white;
     border: none;
-    border-radius: var(--border-radius-sm);
-    font-size: 1.125rem;
+    border-radius: var(--border-radius);
+    font-size: var(--font-size-lg);
     font-weight: 600;
     cursor: pointer;
     transition: all var(--transition-fast);
     box-shadow: var(--shadow);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-sm);
 }
 
 .donate-submit-button:hover:not(:disabled) {
     background: var(--primary-dark);
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-lg);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
 }
 
 .donate-submit-button:active:not(:disabled) {
@@ -139,32 +317,93 @@
 }
 
 .donate-submit-button:disabled {
-    background: var(--border-color);
+    background: var(--disabled-bg);
+    color: var(--disabled-text);
     cursor: not-allowed;
-    opacity: 0.6;
+    box-shadow: none;
 }
 
+.donate-submit-button.paypal {
+    background: #0070ba;
+}
+
+.donate-submit-button.paypal:hover:not(:disabled) {
+    background: #005ea6;
+}
+
+/* Restore Button */
+.restore-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-sm);
+    width: 100%;
+    padding: var(--space-sm);
+    margin-top: var(--space-md);
+    background: transparent;
+    color: var(--text-secondary);
+    border: none;
+    font-size: var(--font-size-sm);
+    cursor: pointer;
+    transition: color var(--transition-fast);
+}
+
+.restore-button:hover:not(:disabled) {
+    color: var(--primary);
+}
+
+.restore-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Security Badge */
+.security-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-sm);
+    margin-top: var(--space-lg);
+    padding: var(--space-sm) var(--space-md);
+    color: var(--success);
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+}
+
+.security-badge i {
+    font-size: var(--font-size-md);
+}
+
+/* Footer */
 .donate-footer {
     text-align: center;
-    margin-top: 2rem;
+    margin-top: var(--space-xl);
     color: var(--text-secondary);
 }
 
 /* Mobile responsive */
 @media (max-width: 640px) {
     .donate-page {
-        padding: 1rem;
+        padding: var(--space-md);
     }
-    
+
     .donate-options {
-        padding: 1.5rem;
+        padding: var(--space-lg);
     }
-    
+
+    .product-cards {
+        grid-template-columns: 1fr;
+    }
+
     .amount-buttons {
         grid-template-columns: 1fr;
     }
-    
+
+    .method-options {
+        grid-template-columns: 1fr;
+    }
+
     .donate-header h1 {
-        font-size: 1.5rem;
+        font-size: var(--font-size-lg);
     }
 }

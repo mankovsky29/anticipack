@@ -795,6 +795,66 @@ Jabón, Toalla</value>
   <data name="DonateThankYou" xml:space="preserve">
     <value>Cada contribución, grande o pequeña, hace la diferencia. ¡Gracias por tu apoyo!</value>
   </data>
+
+  <data name="SupportUsDescription" xml:space="preserve">
+    <value>Ayúdanos a mejorar Anticipack</value>
+  </data>
+
+  <!-- Payment Methods -->
+  <data name="PaymentMethod" xml:space="preserve">
+    <value>Método de pago</value>
+  </data>
+  <data name="ApplePay" xml:space="preserve">
+    <value>Apple Pay</value>
+  </data>
+  <data name="GooglePay" xml:space="preserve">
+    <value>Google Pay</value>
+  </data>
+  <data name="OtherPayment" xml:space="preserve">
+    <value>Otro</value>
+  </data>
+  <data name="StorePaymentHint" xml:space="preserve">
+    <value>Pago seguro de la tienda</value>
+  </data>
+  <data name="PayPalHint" xml:space="preserve">
+    <value>Pagar con PayPal</value>
+  </data>
+  <data name="PayWithPayPal" xml:space="preserve">
+    <value>Pagar con PayPal</value>
+  </data>
+  <data name="LoadingProducts" xml:space="preserve">
+    <value>Cargando opciones de pago...</value>
+  </data>
+  <data name="Processing" xml:space="preserve">
+    <value>Procesando...</value>
+  </data>
+  <data name="SecurePayment" xml:space="preserve">
+    <value>Pago seguro a través de tu dispositivo</value>
+  </data>
+  <data name="RestorePurchases" xml:space="preserve">
+    <value>Restaurar compras anteriores</value>
+  </data>
+  <data name="DonateSuccess" xml:space="preserve">
+    <value>¡Gracias por tu generosa donación!</value>
+  </data>
+  <data name="DonateFailed" xml:space="preserve">
+    <value>No se pudo completar el pago. Inténtalo de nuevo.</value>
+  </data>
+  <data name="DonatePurpose" xml:space="preserve">
+    <value>Donación a Anticipack</value>
+  </data>
+  <data name="PayPalRedirect" xml:space="preserve">
+    <value>Redirigiendo a PayPal. Completa el pago en tu navegador.</value>
+  </data>
+  <data name="PurchasesRestored" xml:space="preserve">
+    <value>Tus compras han sido restauradas.</value>
+  </data>
+  <data name="NoPurchasesToRestore" xml:space="preserve">
+    <value>No se encontraron compras anteriores.</value>
+  </data>
+  <data name="RestoreFailed" xml:space="preserve">
+    <value>No se pudieron restaurar las compras. Inténtalo de nuevo.</value>
+  </data>
   <data name="ActivityType" xml:space="preserve">
     <value>Tipo de Actividad</value>
   </data>

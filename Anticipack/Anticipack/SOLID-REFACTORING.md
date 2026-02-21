@@ -111,6 +111,35 @@ Components/
 
 ---
 
+## Payment Service Layer (SOLID)
+
+### Architecture
+```
+Services/Payment/
+├── PaymentMethod.cs           # Enum: StoreBilling, PayPal
+├── ProductInfo.cs             # Model: purchasable product info
+├── PurchaseResult.cs          # Model: purchase outcome
+├── IPaymentService.cs         # Facade interface (DIP)
+├── IStoreService.cs           # Native store billing interface (ISP)
+├── IPayPalService.cs          # PayPal payment interface (ISP)
+├── PaymentService.cs          # Orchestrator implementation (SRP)
+├── StoreService.cs            # Plugin.InAppBilling wrapper (SRP)
+└── PayPalService.cs           # PayPal web checkout (SRP)
+```
+
+### SOLID Principles Applied
+
+1. **ISP** - Separate interfaces for store billing (`IStoreService`) and PayPal (`IPayPalService`)
+2. **SRP** - Each service has a single responsibility; `PaymentService` orchestrates
+3. **DIP** - UI depends on `IPaymentService` abstraction, not concrete implementations
+4. **OCP** - New payment providers can be added without modifying existing services
+
+### Payment Methods
+- **Store Billing** (Primary): Uses `Plugin.InAppBilling` for Google Play / App Store in-app purchases. Google Pay and Apple Pay are payment methods available within the native store checkout.
+- **PayPal** (Secondary): Web-based PayPal checkout for alternative donations.
+
+---
+
 ## New Architecture
 
 ```

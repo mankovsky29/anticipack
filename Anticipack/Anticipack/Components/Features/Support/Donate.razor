@@ -2,53 +2,132 @@
 @using Anticipack.Components.Shared.NavigationHeaderComponent
 @inject INavigationHeaderService NavigationHeaderService
 @inject IStringLocalizer<AppResources> L
+@inject IPaymentService PaymentService
+@inject IToastService ToastService
 
 <div class="donate-page">
     <div class="donate-header">
+        <div class="donate-icon">
+            <i class="fa fa-heart"></i>
+        </div>
         <h1>@L["DonateTitle"]</h1>
         <p class="donate-description">@L["DonateDescription"]</p>
     </div>
 
-    <div class="donate-options">
-        <h2>@L["SelectAmount"]</h2>
-        
-        <div class="amount-buttons">
-            <button class="amount-option @GetActiveClass(1)" @onclick="() => SelectAmount(1)">
-                <span class="amount-value">$1</span>
-            </button>
-            
-            <button class="amount-option @GetActiveClass(3)" @onclick="() => SelectAmount(3)">
-                <span class="amount-value">$3</span>
-            </button>
-            
-            <button class="amount-option @GetActiveClass(5)" @onclick="() => SelectAmount(5)">
-                <span class="amount-value">$5</span>
-            </button>
+    @if (isLoading)
+    {
+        <div class="loading-section">
+            <i class="fa fa-circle-notch fa-spin"></i>
+            <p>@L["LoadingProducts"]</p>
         </div>
-
-        <div class="custom-amount">
-            <label for="customAmount">@L["CustomAmount"]</label>
-            <div class="input-group">
-                <span class="currency-symbol">$</span>
-                <input 
-                    id="customAmount"
-                    type="number" 
-                    min="1" 
-                    step="0.01" 
-                    @bind="customAmount"
-                    @bind:event="oninput"
-                    @onfocus="OnCustomAmountFocus"
-                    placeholder="0.00"
-                    class="custom-amount-input" />
+    }
+    else
+    {
+        <!-- Payment Method Selection -->
+        @if (availableMethods.Count > 1)
+        {
+            <div class="payment-method-section">
+                <h2>@L["PaymentMethod"]</h2>
+                <div class="method-options">
+                    @foreach (var method in availableMethods)
+                    {
+                        <button class="method-option @(selectedMethod == method ? "active" : "")"
+                                @onclick="() => SelectMethod(method)">
+                            <i class="@GetMethodIcon(method)"></i>
+                            <span>@GetMethodLabel(method)</span>
+                            <span class="method-hint">@GetMethodHint(method)</span>
+                        </button>
+                    }
+                </div>
             </div>
+        }
+
+        <div class="donate-options">
+            <h2>@L["SelectAmount"]</h2>
+
+            @if (products.Count > 0 && selectedMethod == PaymentMethod.StoreBilling)
+            {
+                <!-- Store Product Cards -->
+                <div class="product-cards">
+                    @foreach (var product in products)
+                    {
+                        <button class="product-card @(selectedProductId == product.ProductId ? "active" : "")"
+                                @onclick="() => SelectProduct(product)"
+                                disabled="@isProcessing">
+                            <div class="product-icon">
+                                <i class="@product.IconClass"></i>
+                            </div>
+                            <span class="product-name">@product.Name</span>
+                            <span class="product-price">@product.LocalizedPrice</span>
+                        </button>
+                    }
+                </div>
+
+                <div class="section-divider">
+                    <span>@L["CustomAmount"]</span>
+                </div>
+            }
+
+            <!-- Amount Selection (always visible) -->
+            <div class="amount-buttons">
+                <button class="amount-option @GetAmountActiveClass(1)" @onclick="() => SelectAmount(1)">
+                    <span class="amount-value">$1</span>
+                </button>
+                <button class="amount-option @GetAmountActiveClass(3)" @onclick="() => SelectAmount(3)">
+                    <span class="amount-value">$3</span>
+                </button>
+                <button class="amount-option @GetAmountActiveClass(5)" @onclick="() => SelectAmount(5)">
+                    <span class="amount-value">$5</span>
+                </button>
+            </div>
+
+            <div class="custom-amount">
+                <label for="customAmount">@L["CustomAmount"]</label>
+                <div class="input-group">
+                    <span class="currency-symbol">$</span>
+                    <input id="customAmount"
+                           type="number"
+                           min="1"
+                           step="0.01"
+                           @bind="customAmount"
+                           @bind:event="oninput"
+                           @onfocus="OnCustomAmountFocus"
+                           placeholder="0.00"
+                           class="custom-amount-input" />
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <button class="donate-submit-button @(selectedMethod == PaymentMethod.PayPal ? "paypal" : "")"
+                    @onclick="ProcessDonation"
+                    disabled="@(!IsAmountValid || isProcessing)">
+                @if (isProcessing)
+                {
+                    <i class="fa fa-circle-notch fa-spin"></i>
+                    <span>@L["Processing"]</span>
+                }
+                else
+                {
+                    <i class="@GetSubmitIcon()"></i>
+                    <span>@L["DonateNow"] @GetDisplayAmount()</span>
+                }
+            </button>
+
+            @if (selectedMethod == PaymentMethod.StoreBilling)
+            {
+                <button class="restore-button" @onclick="RestorePurchases" disabled="@isProcessing">
+                    <i class="fa fa-undo"></i>
+                    @L["RestorePurchases"]
+                </button>
+            }
         </div>
 
-        <button class="donate-submit-button" 
-                @onclick="ProcessDonation"
-                disabled="@(!IsAmountValid())">
-            @L["DonateNow"] @GetDisplayAmount()
-        </button>
-    </div>
+        <!-- Secure Payment Badge -->
+        <div class="security-badge">
+            <i class="fa fa-shield"></i>
+            <span>@L["SecurePayment"]</span>
+        </div>
+    }
 
     <div class="donate-footer">
         <p>@L["DonateThankYou"]</p>
@@ -56,61 +135,263 @@
 </div>
 
 @code {
-    private decimal? selectedAmount = null;
-    private decimal? customAmount = null;
+    private List<PaymentMethod> availableMethods = new();
+    private List<ProductInfo> products = new();
+    private PaymentMethod selectedMethod;
+    private string? selectedProductId;
+    private decimal? selectedAmount;
+    private decimal? customAmount;
+    private bool isLoading = true;
+    private bool isProcessing;
 
-    protected override void OnInitialized()
+    private bool IsAmountValid =>
+        !isProcessing && (
+            (!string.IsNullOrEmpty(selectedProductId) && selectedMethod == PaymentMethod.StoreBilling) ||
+            (selectedAmount.HasValue && selectedAmount.Value > 0) ||
+            (customAmount.HasValue && customAmount.Value > 0));
+
+    protected override async Task OnInitializedAsync()
     {
         NavigationHeaderService.SetText(L["Donate"]);
+        await LoadPaymentData();
+    }
+
+    private async Task LoadPaymentData()
+    {
+        isLoading = true;
+
+        try
+        {
+            availableMethods = (await PaymentService.GetAvailableMethodsAsync()).ToList();
+
+            if (availableMethods.Count == 0)
+            {
+                availableMethods.Add(PaymentMethod.PayPal);
+            }
+
+            selectedMethod = availableMethods.First();
+
+            if (availableMethods.Contains(PaymentMethod.StoreBilling))
+            {
+                products = (await PaymentService.GetProductsAsync()).ToList();
+            }
+        }
+        catch (Exception)
+        {
+            availableMethods = [PaymentMethod.PayPal];
+            selectedMethod = PaymentMethod.PayPal;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void SelectMethod(PaymentMethod method)
+    {
+        selectedMethod = method;
+        selectedProductId = null;
+        selectedAmount = null;
+        customAmount = null;
+    }
+
+    private void SelectProduct(ProductInfo product)
+    {
+        selectedProductId = product.ProductId;
+        selectedAmount = null;
+        customAmount = null;
     }
 
     private void SelectAmount(decimal amount)
     {
         selectedAmount = amount;
+        selectedProductId = null;
         customAmount = null;
     }
 
     private void OnCustomAmountFocus()
     {
         selectedAmount = null;
+        selectedProductId = null;
     }
 
-    private string GetActiveClass(decimal amount)
+    private decimal GetEffectiveAmount()
     {
-        return selectedAmount == amount ? "active" : "";
-    }
-
-    private bool IsAmountValid()
-    {
-        if (selectedAmount.HasValue && selectedAmount.Value > 0)
-            return true;
-            
-        if (customAmount.HasValue && customAmount.Value > 0)
-            return true;
-            
-        return false;
+        if (!string.IsNullOrEmpty(selectedProductId))
+        {
+            var product = products.FirstOrDefault(p => p.ProductId == selectedProductId);
+            if (product is not null && product.PriceMicros > 0)
+                return product.PriceMicros / 1_000_000m;
+        }
+        return selectedAmount ?? customAmount ?? 0;
     }
 
     private string GetDisplayAmount()
     {
+        if (!string.IsNullOrEmpty(selectedProductId))
+        {
+            var product = products.FirstOrDefault(p => p.ProductId == selectedProductId);
+            return product?.LocalizedPrice ?? "";
+        }
         var amount = selectedAmount ?? customAmount ?? 0;
         return amount > 0 ? $"${amount:F2}" : "";
     }
 
+    private string GetAmountActiveClass(decimal amount) =>
+        selectedAmount == amount ? "active" : "";
+
+    private string GetSubmitIcon() => selectedMethod switch
+    {
+        PaymentMethod.PayPal => "fa fa-paypal",
+        _ => "fa fa-lock"
+    };
+
+    private string GetMethodIcon(PaymentMethod method) => method switch
+    {
+        PaymentMethod.StoreBilling => DeviceInfo.Platform == DevicePlatform.iOS
+            ? "fa fa-apple" : "fa fa-google",
+        PaymentMethod.PayPal => "fa fa-paypal",
+        _ => "fa fa-credit-card"
+    };
+
+    private string GetMethodLabel(PaymentMethod method) => method switch
+    {
+        PaymentMethod.StoreBilling => DeviceInfo.Platform == DevicePlatform.iOS
+            ? L["ApplePay"].Value : L["GooglePay"].Value,
+        PaymentMethod.PayPal => "PayPal",
+        _ => L["OtherPayment"].Value
+    };
+
+    private string GetMethodHint(PaymentMethod method) => method switch
+    {
+        PaymentMethod.StoreBilling => L["StorePaymentHint"].Value,
+        PaymentMethod.PayPal => L["PayPalHint"].Value,
+        _ => ""
+    };
+
     private async Task ProcessDonation()
     {
-        var amount = selectedAmount ?? customAmount ?? 0;
-        
-        if (amount > 0)
+        if (!IsAmountValid || isProcessing) return;
+
+        // If a store product is selected, use store billing
+        if (!string.IsNullOrEmpty(selectedProductId) && selectedMethod == PaymentMethod.StoreBilling)
         {
-            // TODO: Implement actual donation processing logic
-            // This could integrate with payment providers like Stripe, PayPal, etc.
-            
-            // For now, just show a placeholder message
-            Console.WriteLine($"Processing donation of ${amount:F2}");
-            
-            // You might want to show a toast or dialog here
-            // await ToastService.ShowSuccess($"Thank you for your ${amount:F2} donation!");
+            await PurchaseStoreProduct();
+            return;
+        }
+
+        // Otherwise use the amount for the selected payment method
+        var amount = selectedAmount ?? customAmount ?? 0;
+        if (amount <= 0) return;
+
+        if (selectedMethod == PaymentMethod.StoreBilling)
+        {
+            // Find the closest matching product for the chosen amount
+            var closestProduct = products
+                .OrderBy(p => Math.Abs(p.PriceMicros / 1_000_000m - amount))
+                .FirstOrDefault();
+
+            if (closestProduct is not null)
+            {
+                selectedProductId = closestProduct.ProductId;
+                await PurchaseStoreProduct();
+                return;
+            }
+        }
+
+        await ProcessPayPalPayment(amount);
+    }
+
+    private async Task PurchaseStoreProduct()
+    {
+        if (string.IsNullOrEmpty(selectedProductId)) return;
+
+        isProcessing = true;
+        StateHasChanged();
+
+        try
+        {
+            var result = await PaymentService.PurchaseProductAsync(
+                selectedProductId, ProductType.Consumable);
+
+            if (result.Success)
+            {
+                ToastService.ShowSuccess(L["DonateSuccess"]);
+                selectedProductId = null;
+            }
+            else if (!result.WasCancelled)
+            {
+                ToastService.ShowError(L["DonateFailed"]);
+            }
+        }
+        catch
+        {
+            ToastService.ShowError(L["DonateFailed"]);
+        }
+        finally
+        {
+            isProcessing = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task ProcessPayPalPayment(decimal amount)
+    {
+        isProcessing = true;
+        StateHasChanged();
+
+        try
+        {
+            var result = await PaymentService.ProcessPayPalPaymentAsync(
+                amount, L["DonatePurpose"]);
+
+            if (result.Success)
+            {
+                ToastService.ShowSuccess(L["PayPalRedirect"]);
+                selectedAmount = null;
+                customAmount = null;
+            }
+            else
+            {
+                ToastService.ShowError(L["DonateFailed"]);
+            }
+        }
+        catch
+        {
+            ToastService.ShowError(L["DonateFailed"]);
+        }
+        finally
+        {
+            isProcessing = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task RestorePurchases()
+    {
+        isProcessing = true;
+        StateHasChanged();
+
+        try
+        {
+            var restored = await PaymentService.RestorePurchasesAsync();
+            if (restored.Any())
+            {
+                ToastService.ShowSuccess(L["PurchasesRestored"]);
+            }
+            else
+            {
+                ToastService.ShowInfo(L["NoPurchasesToRestore"]);
+            }
+        }
+        catch
+        {
+            ToastService.ShowError(L["RestoreFailed"]);
+        }
+        finally
+        {
+            isProcessing = false;
+            StateHasChanged();
         }
     }
 }

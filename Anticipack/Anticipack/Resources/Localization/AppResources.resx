@@ -526,14 +526,8 @@ This action cannot be undone.</value>
   <data name="ItemAdded" xml:space="preserve">
     <value>Added {0}</value>
   </data>
-  <data name="ItemsAdded" xml:space="preserve">
-    <value>Added {0} items</value>
-  </data>
   <data name="ErrorAddingItem" xml:space="preserve">
     <value>Error adding item: {0}</value>
-  </data>
-  <data name="FailedToAddItems" xml:space="preserve">
-    <value>Failed to add {0} items</value>
   </data>
 
   <!-- Add Items Form -->
@@ -583,25 +577,20 @@ This action cannot be undone.</value>
     <value>Unnamed Item</value>
   </data>
   <data name="NavigationMenu" xml:space="preserve">
-  <value>Navigation menu</value>
-</data>
-
+    <value>Navigation menu</value>
+  </data>
   <data name="PackingActivitiesMenu" xml:space="preserve">
-  <value>Packing Activities</value>
-</data>
-
+    <value>Packing Activities</value>
+  </data>
   <data name="PackingDialogMenu" xml:space="preserve">
-  <value>Packing Dialog</value>
-</data>
-
+    <value>Packing Dialog</value>
+  </data>
   <data name="SettingsMenu" xml:space="preserve">
-  <value>Settings</value>
-</data>
-
+    <value>Settings</value>
+  </data>
   <data name="More" xml:space="preserve">
     <value>More</value>
   </data>
-
   <data name="NameRequired" xml:space="preserve">
     <value>Name is required</value>
   </data>
@@ -780,5 +769,30 @@ Soap, Towel</value>
   </data>
   <data name="AddFirstItem" xml:space="preserve">
     <value>Add your first item</value>
+  </data>
+
+  <!-- Error Messages -->
+  <data name="ActivityIdEmpty" xml:space="preserve">
+    <value>Activity ID is empty</value>
+  </data>
+  <data name="ActivityNotFound" xml:space="preserve">
+    <value>Activity with ID '{0}' not found</value>
+  </data>
+  <data name="FailedToSaveItemOrder" xml:space="preserve">
+    <value>Failed to save item order: {0}</value>
+  </data>
+  <data name="ErrorSavingCompletion" xml:space="preserve">
+    <value>Error saving completion: {0}</value>
+  </data>
+  <data name="ErrorFinishingPacking" xml:space="preserve">
+    <value>Error finishing packing: {0}</value>
+  </data>
+
+  <!-- History & Duration -->
+  <data name="PackedItemsInMinutes" xml:space="preserve">
+    <value>Packed {0} items in {1} minutes</value>
+  </data>
+  <data name="DurationMinutes" xml:space="preserve">
+    <value>{0} minutes</value>
   </data>
 </root>

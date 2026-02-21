@@ -11,7 +11,7 @@ using Microsoft.JSInterop;
 
 namespace Anticipack.Components.Features.Packing;
 
-public partial class PlayPacking : IDisposable
+public partial class PlayPacking
 {
     [Inject] private NavigationManager Navigation { get; set; } = default!;
     [Inject] private IPackingRepository PackingRepository { get; set; } = default!;
@@ -278,13 +278,13 @@ public partial class PlayPacking : IDisposable
     private string GetHistoryEntryDescription(Storage.PackingHistoryEntry entry)
     {
         var durationMinutes = (int)(entry.DurationSeconds / 60.0);
-        return $"Packed {entry.PackedItems} items in {durationMinutes} minutes";
+        return string.Format(AppResources.PackedItemsInMinutes, entry.PackedItems, durationMinutes);
     }
 
     private string GetPackingDuration()
     {
         var duration = DateTime.Now - _packingStartTime;
-        return $"{(int)duration.TotalMinutes} minutes";
+        return string.Format(AppResources.DurationMinutes, (int)duration.TotalMinutes);
     }
 
     private async Task AcknowledgeCompletion()
@@ -331,7 +331,7 @@ public partial class PlayPacking : IDisposable
         }
         catch (Exception ex)
         {
-            ToastService.ShowError($"Error saving completion: {ex.Message}");
+            ToastService.ShowError(string.Format(AppResources.ErrorSavingCompletion, ex.Message));
             _completionAcknowledged = true;
         }
     }
@@ -342,11 +342,6 @@ public partial class PlayPacking : IDisposable
         {
             Navigation.NavigateTo($"/edit-packing/{Id}");
         }
-    }
-
-    public void Dispose()
-    {
-        // No toast cleanup needed anymore
     }
 
     private void ToggleItemVisibility()
@@ -563,7 +558,7 @@ public partial class PlayPacking : IDisposable
         }
         catch (Exception ex)
         {
-            ToastService.ShowError($"Error finishing packing: {ex.Message}");
+            ToastService.ShowError(string.Format(AppResources.ErrorFinishingPacking, ex.Message));
         }
     }
 }

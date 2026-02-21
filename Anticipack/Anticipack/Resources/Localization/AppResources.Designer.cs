@@ -1817,5 +1817,68 @@ namespace Anticipack.Resources.Localization {
                 return ResourceManager.GetString("YouPackedItems", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Activity ID is empty.
+        /// </summary>
+        public static string ActivityIdEmpty {
+            get {
+                return ResourceManager.GetString("ActivityIdEmpty", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Activity with ID &apos;{0}&apos; not found.
+        /// </summary>
+        public static string ActivityNotFound {
+            get {
+                return ResourceManager.GetString("ActivityNotFound", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to save item order: {0}.
+        /// </summary>
+        public static string FailedToSaveItemOrder {
+            get {
+                return ResourceManager.GetString("FailedToSaveItemOrder", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Error saving completion: {0}.
+        /// </summary>
+        public static string ErrorSavingCompletion {
+            get {
+                return ResourceManager.GetString("ErrorSavingCompletion", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Error finishing packing: {0}.
+        /// </summary>
+        public static string ErrorFinishingPacking {
+            get {
+                return ResourceManager.GetString("ErrorFinishingPacking", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Packed {0} items in {1} minutes.
+        /// </summary>
+        public static string PackedItemsInMinutes {
+            get {
+                return ResourceManager.GetString("PackedItemsInMinutes", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to {0} minutes.
+        /// </summary>
+        public static string DurationMinutes {
+            get {
+                return ResourceManager.GetString("DurationMinutes", resourceCulture);
+            }
+        }
     }
 }

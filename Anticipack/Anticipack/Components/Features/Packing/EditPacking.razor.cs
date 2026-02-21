@@ -22,7 +22,6 @@ public partial class EditPacking : IAsyncDisposable
 {
     [Inject] private NavigationManager Navigation { get; set; } = default!;
     [Inject] private IPackingRepository PackingRepository { get; set; } = default!;
-    [Inject] private IPackingActivityRepository PackingActivityRepository { get; set; } = default!;
     [Inject] private IJSRuntime JSRuntime { get; set; } = default!;
     [Inject] private IDialogService DialogService { get; set; } = default!;
     [Inject] private IToastService ToastService { get; set; } = default!;
@@ -80,8 +79,6 @@ public partial class EditPacking : IAsyncDisposable
     private PackingItemView? _dragOverItem;
     private bool _isDragging = false;
     private string _dropLinePosition = ""; // "before" or "after"
-
-    private bool _showCategorySelector = false;
 
     private bool _pendingScrollToAddForm = false;
 
@@ -615,7 +612,7 @@ public partial class EditPacking : IAsyncDisposable
     {
         if (string.IsNullOrWhiteSpace(Id))
         {
-            ToastService.ShowError("Activity ID is empty");
+            ToastService.ShowError(AppResources.ActivityIdEmpty);
             return;
         }
 
@@ -625,7 +622,7 @@ public partial class EditPacking : IAsyncDisposable
             var activity = await PackingRepository.GetByIdAsync(Id);
             if (activity == null)
             {
-                ToastService.ShowError($"Activity with ID '{Id}' not found");
+                ToastService.ShowError(string.Format(AppResources.ActivityNotFound, Id));
                 return;
             }
 
@@ -636,7 +633,7 @@ public partial class EditPacking : IAsyncDisposable
             _isDeleting = true;
 
             // Show success message
-            ToastService.ShowSuccess(AppResources.ActivityDeleted ?? "Activity deleted successfully");
+            ToastService.ShowSuccess(AppResources.ActivityDeleted);
 
             // Navigate back
             Navigation.NavigateTo("/packing-activities");
@@ -899,16 +896,6 @@ public partial class EditPacking : IAsyncDisposable
         }
     }
 
-    private void ToggleCategorySelector()
-    {
-        _showCategorySelector = !_showCategorySelector;
-    }
-
-    private void SelectCategory(PackingCategory category)
-    {
-        _showCategorySelector = false;
-    }
-
     private string GetCategoryIcon(PackingCategory category)
     {
         return CategoryIconProvider.GetIcon(category);
@@ -1141,7 +1128,7 @@ public partial class EditPacking : IAsyncDisposable
             }
             catch (Exception ex)
             {
-                ToastService.ShowError($"Failed to save item order: {ex.Message}");
+                ToastService.ShowError(string.Format(AppResources.FailedToSaveItemOrder, ex.Message));
             }
         }
     }

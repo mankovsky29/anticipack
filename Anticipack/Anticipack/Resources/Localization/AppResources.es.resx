@@ -810,4 +810,37 @@ Jabón, Toalla</value>
   <data name="OneTimeActivityDescription" xml:space="preserve">
     <value>Se archiva automáticamente después de completarse</value>
   </data>
+
+  <!-- Empty State -->
+  <data name="NoItemsYet" xml:space="preserve">
+    <value>Aún no hay artículos</value>
+  </data>
+  <data name="AddFirstItem" xml:space="preserve">
+    <value>Agrega tu primer artículo</value>
+  </data>
+
+  <!-- Error Messages -->
+  <data name="ActivityIdEmpty" xml:space="preserve">
+    <value>El ID de actividad está vacío</value>
+  </data>
+  <data name="ActivityNotFound" xml:space="preserve">
+    <value>Actividad con ID '{0}' no encontrada</value>
+  </data>
+  <data name="FailedToSaveItemOrder" xml:space="preserve">
+    <value>Error al guardar el orden de artículos: {0}</value>
+  </data>
+  <data name="ErrorSavingCompletion" xml:space="preserve">
+    <value>Error al guardar la finalización: {0}</value>
+  </data>
+  <data name="ErrorFinishingPacking" xml:space="preserve">
+    <value>Error al finalizar el empaque: {0}</value>
+  </data>
+
+  <!-- History & Duration -->
+  <data name="PackedItemsInMinutes" xml:space="preserve">
+    <value>Empacados {0} artículos en {1} minutos</value>
+  </data>
+  <data name="DurationMinutes" xml:space="preserve">
+    <value>{0} minutos</value>
+  </data>
 </root>

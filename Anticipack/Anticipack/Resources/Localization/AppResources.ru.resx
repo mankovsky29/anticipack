@@ -532,7 +532,7 @@
     <value>Активные</value>
   </data>
   <data name="Archived" xml:space="preserve">
-    <value>Архивные</value>
+    <value>Архивный</value>
   </data>
   <data name="Archive" xml:space="preserve">
     <value>Архивировать</value>
@@ -810,5 +810,93 @@
 
   <data name="DonateThankYou" xml:space="preserve">
     <value>Каждый вклад, большой или маленький, имеет значение. Спасибо за вашу поддержку!</value>
+  </data>
+
+  <!-- Add Items Form -->
+  <data name="AddItems" xml:space="preserve">
+    <value>Добавить предметы</value>
+  </data>
+  <data name="QuickAdd" xml:space="preserve">
+    <value>Быстрое добавление</value>
+  </data>
+  <data name="BulkAdd" xml:space="preserve">
+    <value>Массовое добавление</value>
+  </data>
+  <data name="EnterItemNamePlaceholder" xml:space="preserve">
+    <value>Введите название предмета...</value>
+  </data>
+  <data name="EnterItems" xml:space="preserve">
+    <value>Введите предметы</value>
+  </data>
+  <data name="Preview" xml:space="preserve">
+    <value>Предпросмотр</value>
+  </data>
+  <data name="Item" xml:space="preserve">
+    <value>Предмет</value>
+  </data>
+  <data name="DuplicatesRemoved" xml:space="preserve">
+    <value>{0} дубликат(ов) удалено</value>
+  </data>
+  <data name="DuplicatesSkipped" xml:space="preserve">
+    <value>{0} существующих предмет(ов) пропущено</value>
+  </data>
+  <data name="ItemAlreadyExists" xml:space="preserve">
+    <value>Этот предмет уже есть в вашем списке</value>
+  </data>
+  <data name="Add" xml:space="preserve">
+    <value>Добавить</value>
+  </data>
+  <data name="AddItemsCount" xml:space="preserve">
+    <value>Добавить {0} предметов</value>
+  </data>
+
+  <!-- Activity Type -->
+  <data name="ActivityType" xml:space="preserve">
+    <value>Тип активности</value>
+  </data>
+  <data name="RecurringActivity" xml:space="preserve">
+    <value>Повторяющаяся</value>
+  </data>
+  <data name="RecurringActivityDescription" xml:space="preserve">
+    <value>Сбрасывается после каждого использования (напр., деловые поездки)</value>
+  </data>
+  <data name="OneTimeActivity" xml:space="preserve">
+    <value>Одноразовая</value>
+  </data>
+  <data name="OneTimeActivityDescription" xml:space="preserve">
+    <value>Автоматически архивируется после завершения</value>
+  </data>
+
+  <!-- Empty State -->
+  <data name="NoItemsYet" xml:space="preserve">
+    <value>Пока нет предметов</value>
+  </data>
+  <data name="AddFirstItem" xml:space="preserve">
+    <value>Добавьте первый предмет</value>
+  </data>
+
+  <!-- Error Messages -->
+  <data name="ActivityIdEmpty" xml:space="preserve">
+    <value>ID активности пуст</value>
+  </data>
+  <data name="ActivityNotFound" xml:space="preserve">
+    <value>Активность с ID '{0}' не найдена</value>
+  </data>
+  <data name="FailedToSaveItemOrder" xml:space="preserve">
+    <value>Ошибка сохранения порядка предметов: {0}</value>
+  </data>
+  <data name="ErrorSavingCompletion" xml:space="preserve">
+    <value>Ошибка сохранения завершения: {0}</value>
+  </data>
+  <data name="ErrorFinishingPacking" xml:space="preserve">
+    <value>Ошибка завершения упаковки: {0}</value>
+  </data>
+
+  <!-- History & Duration -->
+  <data name="PackedItemsInMinutes" xml:space="preserve">
+    <value>Упаковано {0} предметов за {1} минут</value>
+  </data>
+  <data name="DurationMinutes" xml:space="preserve">
+    <value>{0} минут</value>
   </data>
 </root>

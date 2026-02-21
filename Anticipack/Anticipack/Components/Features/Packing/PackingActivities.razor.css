@@ -845,36 +845,6 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
-/* Toast notifications */
-.toast-container {
-    position: fixed;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 1001;
-    width: auto;
-    max-width: 90%;
-}
-
-.toast {
-    background: linear-gradient(135deg, var(--success) 0%, #28a745 100%);
-    color: white;
-    padding: 12px 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 0.3s ease, transform 0.3s ease;
-    text-align: center;
-    font-weight: 600;
-    font-size: 14px;
-}
-
-.toast.show {
-    opacity: 1;
-    transform: translateY(0);
-}
-
 /* Loading spinner */
 .loading {
     display: flex;

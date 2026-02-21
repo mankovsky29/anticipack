@@ -41,14 +41,6 @@ public partial class PlayPacking : IDisposable
     private string _lastPackedDate = "-";
     private PackingTimeComparison? _timeComparison;
 
-    private sealed class PackingItemView
-    {
-        public PackingItemView(Storage.PackingItem item) => Item = item;
-        public Storage.PackingItem Item { get; }
-        public bool IsChecked { get; set; }
-        public bool IsAnimating { get; set; } // Track animation state
-    }
-
     private ElementReference contentArea;
     private int _currentFocusIndex = -1;
 

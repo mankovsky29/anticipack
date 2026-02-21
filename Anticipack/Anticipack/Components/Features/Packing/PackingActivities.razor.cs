@@ -1,5 +1,6 @@
 using Anticipack.Components.Shared.DialogComponent;
 using Anticipack.Components.Shared.NavigationHeaderComponent;
+using Anticipack.Components.Shared.ToastComponent;
 using Anticipack.Resources.Localization;
 using Anticipack.Services;
 using Anticipack.Services.Categories;
@@ -22,6 +23,7 @@ public partial class PackingActivities : IAsyncDisposable
     [Inject] private IJSRuntime JSRuntime { get; set; } = default!;
     [Inject] private IKeyboardService KeyboardService { get; set; } = default!;
     [Inject] private ICategoryIconProvider CategoryIconProvider { get; set; } = default!;
+    [Inject] private IToastService ToastService { get; set; } = default!;
 
     private enum ArchiveFilterType
     {
@@ -49,11 +51,7 @@ public partial class PackingActivities : IAsyncDisposable
     private ElementReference _activityNameInput;
     private bool _hasDialogFocused = false;
 
-    // Toast
-    private bool _showToast;
-    private string _toastMessage = string.Empty;
-    private System.Threading.CancellationTokenSource? _toastCts;
-    
+
     // Scroll to top
     private bool _showScrollToTop;
     
@@ -203,7 +201,7 @@ public partial class PackingActivities : IAsyncDisposable
         }
         catch
         {
-            ShowToast(Localizer["FailedToLoad"]);
+            ToastService.ShowError(Localizer["FailedToLoad"]);
         }
         finally
         {
@@ -308,7 +306,7 @@ public partial class PackingActivities : IAsyncDisposable
         try
         {
             await PackingRepository.AddOrUpdateAsync(newActivity);
-            ShowToast(Localizer["ActivityCreated"]);
+            ToastService.ShowSuccess(Localizer["ActivityCreated"]);
             _showAddDialog = false;
             _hasAttemptedSubmit = false;
             _newActivityName = string.Empty;
@@ -317,7 +315,7 @@ public partial class PackingActivities : IAsyncDisposable
         }
         catch
         {
-            ShowToast(Localizer["FailedToCreate"]);
+            ToastService.ShowError(Localizer["FailedToCreate"]);
         }
         finally
         {
@@ -351,12 +349,12 @@ public partial class PackingActivities : IAsyncDisposable
             var message = activity.IsArchived 
                 ? string.Format(Localizer["ActivityArchived"], activity.Name)
                 : string.Format(Localizer["ActivityUnarchived"], activity.Name);
-            ShowToast(message);
+            ToastService.ShowSuccess(message);
             await LoadActivitiesAsync();
         }
         catch
         {
-            ShowToast(Localizer["FailedToUpdateArchiveStatus"]);
+            ToastService.ShowError(Localizer["FailedToUpdateArchiveStatus"]);
         }
     }
 
@@ -377,12 +375,12 @@ public partial class PackingActivities : IAsyncDisposable
         try
         {
             await PackingRepository.DeleteAsync(activity.Id);
-            ShowToast(Localizer["ActivityDeleted"]);
+            ToastService.ShowSuccess(Localizer["ActivityDeleted"]);
             await LoadActivitiesAsync();
         }
         catch
         {
-            ShowToast(Localizer["FailedToDelete"]);
+            ToastService.ShowError(Localizer["FailedToDelete"]);
         }
     }
 
@@ -395,37 +393,6 @@ public partial class PackingActivities : IAsyncDisposable
     {
         await CloseMenuAsync();
         Navigation.NavigateTo($"/packing-activity?id={id}&mode=edit");
-    }
-
-    private void ShowToast(string message)
-    {
-        try
-        {
-            _toastCts?.Cancel();
-            _toastCts?.Dispose();
-        }
-        catch { }
-
-        _toastCts = new System.Threading.CancellationTokenSource();
-
-        _toastMessage = message;
-        _showToast = true;
-        StateHasChanged();
-
-        _ = HideToastAfterDelayAsync(_toastCts.Token);
-    }
-
-    private async Task HideToastAfterDelayAsync(System.Threading.CancellationToken token)
-    {
-        try
-        {
-            await Task.Delay(2000, token);
-            _showToast = false;
-            await InvokeAsync(StateHasChanged);
-        }
-        catch (System.Threading.Tasks.TaskCanceledException)
-        {
-        }
     }
 
     private void HandleInputKeyDown(KeyboardEventArgs e)
@@ -475,8 +442,6 @@ public partial class PackingActivities : IAsyncDisposable
     {
         LocalizationService.CultureChanged -= OnCultureChanged;
         KeyboardService.KeyboardVisibilityChanged -= OnKeyboardVisibilityChanged;
-        _toastCts?.Cancel();
-        _toastCts?.Dispose();
 
         if (_jsModule is not null)
         {

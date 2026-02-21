@@ -62,13 +62,6 @@ public partial class EditPacking : IAsyncDisposable
 
     private bool CanAdd => _parsedItems.Count > 0;
 
-    private sealed class PackingItemView
-    {
-        public PackingItemView(Storage.PackingItem item) => Item = item;
-        public Storage.PackingItem Item { get; }
-        public bool IsChecked { get; set; }
-    }
-
     private PackingItemView? _editingItem = null;
     private ElementReference itemEditInputElement;
     private ElementReference bulkItemsTextarea;

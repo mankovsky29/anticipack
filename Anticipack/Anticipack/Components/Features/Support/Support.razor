@@ -113,11 +113,12 @@
 private ElementReference messageInput;
 private ElementReference messagesContainer;
 private DotNetObjectReference<Support>? _dotNetRef;
+private IJSObjectReference? _jsModule;
 
 private string currentMessage = string.Empty;
 private List<SupportMessage> messages = new();
 private bool CanSend => !string.IsNullOrWhiteSpace(currentMessage);
-    
+
 // Keyboard
 private bool _keyboardVisible;
 private double _keyboardHeight;
@@ -127,13 +128,16 @@ protected override async Task OnAfterRenderAsync(bool firstRender)
     if (firstRender)
     {
         NavigationHeaderService.SetText(L["Support"]);
-            
+
         KeyboardService.Initialize(this);
         KeyboardService.KeyboardVisibilityChanged += OnKeyboardVisibilityChanged;
-            
+
+        _jsModule = await JS.InvokeAsync<IJSObjectReference>(
+            "import", "./Components/Features/Support/Support.razor.js");
+
         _dotNetRef = DotNetObjectReference.Create(this);
-        await JS.InvokeVoidAsync("supportPage.attach", messageInput, _dotNetRef, messagesContainer);
-            
+        await _jsModule.InvokeVoidAsync("attach", messageInput, _dotNetRef, messagesContainer);
+
         // Show welcome message
         await Task.Delay(500);
         messages.Add(new SupportMessage
@@ -212,7 +216,8 @@ protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         try
         {
-            await JS.InvokeVoidAsync("supportPage.scrollToBottom", messagesContainer);
+            if (_jsModule is not null)
+                await _jsModule.InvokeVoidAsync("scrollToBottom", messagesContainer);
         }
         catch
         {
@@ -223,7 +228,7 @@ protected override async Task OnAfterRenderAsync(bool firstRender)
     public async ValueTask DisposeAsync()
     {
         KeyboardService.KeyboardVisibilityChanged -= OnKeyboardVisibilityChanged;
-        
+
         if (_dotNetRef is not null)
         {
             _dotNetRef.Dispose();
@@ -232,7 +237,11 @@ protected override async Task OnAfterRenderAsync(bool firstRender)
 
         try
         {
-            await JS.InvokeVoidAsync("supportPage.detach", messageInput);
+            if (_jsModule is not null)
+            {
+                await _jsModule.InvokeVoidAsync("detach", messageInput);
+                await _jsModule.DisposeAsync();
+            }
         }
         catch
         {
@@ -256,52 +265,3 @@ protected override async Task OnAfterRenderAsync(bool firstRender)
         public MessageStatus Status { get; set; } = MessageStatus.None;
     }
 }
-
-<script>
-    window.supportPage = {
-        attach: function (inputEl, dotNetRef, messagesEl) {
-            if (!inputEl) return;
-            
-            // Auto-resize textarea
-            const autoResize = function() {
-                inputEl.style.height = 'auto';
-                inputEl.style.height = Math.min(inputEl.scrollHeight, 120) + 'px';
-            };
-            
-            const keydownHandler = function (e) {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    dotNetRef.invokeMethodAsync('SubmitFromJs');
-                }
-            };
-            
-            inputEl.__supportAutoResize = autoResize;
-            inputEl.__supportKeydownHandler = keydownHandler;
-            inputEl.addEventListener('input', autoResize);
-            inputEl.addEventListener('keydown', keydownHandler);
-            inputEl.__messagesEl = messagesEl;
-        },
-        
-        detach: function (inputEl) {
-            if (!inputEl) return;
-            if (inputEl.__supportAutoResize) {
-                inputEl.removeEventListener('input', inputEl.__supportAutoResize);
-                delete inputEl.__supportAutoResize;
-            }
-            if (inputEl.__supportKeydownHandler) {
-                inputEl.removeEventListener('keydown', inputEl.__supportKeydownHandler);
-                delete inputEl.__supportKeydownHandler;
-            }
-            delete inputEl.__messagesEl;
-        },
-        
-        scrollToBottom: function (messagesEl) {
-            try {
-                if (!messagesEl) return;
-                messagesEl.scrollTop = messagesEl.scrollHeight;
-            } catch (e) {
-                // ignore
-            }
-        }
-    };
-</script>

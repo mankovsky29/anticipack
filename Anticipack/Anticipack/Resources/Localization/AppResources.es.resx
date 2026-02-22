@@ -986,4 +986,40 @@ Jabón, Toalla</value>
   <data name="StatsEmptyHint" xml:space="preserve">
     <value>Completa algunas sesiones de empaque para ver estadísticas detalladas de tiempo, actividades y categorías aquí.</value>
   </data>
+  <data name="Multiple" xml:space="preserve">
+    <value>Múltiple</value>
+  </data>
+  <data name="AI" xml:space="preserve">
+    <value>IA</value>
+  </data>
+  <data name="AiDescribeTrip" xml:space="preserve">
+    <value>Describe tu viaje</value>
+  </data>
+  <data name="AiPromptPlaceholder" xml:space="preserve">
+    <value>ej. vacaciones en la playa 2 semanas, viaje de negocios...</value>
+  </data>
+  <data name="Generate" xml:space="preserve">
+    <value>Generar</value>
+  </data>
+  <data name="Generating" xml:space="preserve">
+    <value>Generando...</value>
+  </data>
+  <data name="AiSuggestions" xml:space="preserve">
+    <value>Sugerencias</value>
+  </data>
+  <data name="SelectAll" xml:space="preserve">
+    <value>Seleccionar todo</value>
+  </data>
+  <data name="DeselectAll" xml:space="preserve">
+    <value>Deseleccionar todo</value>
+  </data>
+  <data name="AiHint" xml:space="preserve">
+    <value>Presiona Generar para obtener sugerencias de IA para empacar</value>
+  </data>
+  <data name="AiNotConfigured" xml:space="preserve">
+    <value>El servicio de IA no está configurado. Establece la clave API.</value>
+  </data>
+  <data name="AiError" xml:space="preserve">
+    <value>Error de IA: {0}</value>
+  </data>
 </root>

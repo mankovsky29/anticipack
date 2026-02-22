@@ -5,6 +5,7 @@ using Anticipack.Components.Shared.ToastComponent;
 using Anticipack.Packing;
 using Anticipack.Resources.Localization;
 using Anticipack.Services;
+using Anticipack.Services.AI;
 using Anticipack.Services.Categories;
 using Anticipack.Storage;
 using Anticipack.Storage.Repositories;
@@ -31,6 +32,7 @@ public partial class EditPacking : IAsyncDisposable
     [Inject] private MicrophonePermissionBridge PermissionBridge { get; set; } = default!;
     [Inject] private IStringLocalizer<AppResources> Localizer { get; set; } = default!;
     [Inject] private ICategoryIconProvider CategoryIconProvider { get; set; } = default!;
+    [Inject] private IAiSuggestionService AiSuggestionService { get; set; } = default!;
 
     [Parameter]
     public string Id { get; set; } = string.Empty;
@@ -46,13 +48,17 @@ public partial class EditPacking : IAsyncDisposable
     private bool _overflowMenuJustOpened = false;
 
     // Add item form state
-    private bool _isQuickAddMode = true;
-    private string _quickAddText = string.Empty;
+    private bool _isAiMode = false;
     private List<string> _parsedItems = [];
     private List<string> _duplicateItems = [];
     private HashSet<string> _existingItemNames = new(StringComparer.OrdinalIgnoreCase);
-    private ElementReference quickAddInputRef;
     private bool _isCategoryLocked = false; // When adding from category header, hide category selector
+
+    // AI suggestion state
+    private string _aiPrompt = string.Empty;
+    private List<AiSuggestedItem> _aiSuggestions = [];
+    private HashSet<int> _selectedAiIndices = [];
+    private bool _isGeneratingAi = false;
 
     // Autocomplete suggestions
     private List<string> _allDistinctItemNames = [];
@@ -60,15 +66,18 @@ public partial class EditPacking : IAsyncDisposable
     private List<string> _suggestions = [];
     private string? _addingToCategory = null; // Which category to show the form above (null = top of list)
 
-    private bool HasInput => _isQuickAddMode 
-        ? !string.IsNullOrWhiteSpace(_quickAddText) 
+    private bool HasInput => _isAiMode
+        ? _selectedAiIndices.Count > 0
         : !string.IsNullOrWhiteSpace(_bulkItemsText);
 
-    private bool CanAdd => _parsedItems.Count > 0;
+    private bool CanAdd => _isAiMode
+        ? _selectedAiIndices.Count > 0
+        : _parsedItems.Count > 0;
 
     private PackingItemView? _editingItem = null;
     private ElementReference itemEditInputElement;
     private ElementReference bulkItemsTextarea;
+    private ElementReference aiPromptTextarea;
 
     private string? _editingOriginalName;
     private string? _editingOriginalNotes;
@@ -167,7 +176,6 @@ public partial class EditPacking : IAsyncDisposable
     private async Task CancelAdd()
     {
         _isAddingItem = false;
-        _quickAddText = string.Empty;
         _bulkItemsText = string.Empty;
         _parsedItems = [];
         _duplicateItems = [];
@@ -175,6 +183,11 @@ public partial class EditPacking : IAsyncDisposable
         _isCategoryLocked = false;
         _addingToCategory = null;
         _suggestions = [];
+        _isAiMode = false;
+        _aiPrompt = string.Empty;
+        _aiSuggestions = [];
+        _selectedAiIndices = [];
+        _isGeneratingAi = false;
         await SyncClickOutsideHandlerAsync();
     }
 
@@ -246,13 +259,16 @@ public partial class EditPacking : IAsyncDisposable
     {
         await CloseOverflowMenuAsync();
         _isAddingItem = true;
-        _isQuickAddMode = true;
-        _quickAddText = string.Empty;
+        _isAiMode = false;
         _bulkItemsText = string.Empty;
         _parsedItems = [];
         _duplicateItems = [];
         _isCategoryLocked = false;
         _addingToCategory = null;
+        _aiPrompt = string.Empty;
+        _aiSuggestions = [];
+        _selectedAiIndices = [];
+        _isGeneratingAi = false;
 
         // Cache existing item names for duplicate detection
         _existingItemNames = Items
@@ -277,14 +293,17 @@ public partial class EditPacking : IAsyncDisposable
     private async Task ShowAddItemFormForCategory(string category)
     {
         _isAddingItem = true;
-        _isQuickAddMode = true;
-        _quickAddText = string.Empty;
+        _isAiMode = false;
         _bulkItemsText = string.Empty;
         _parsedItems = [];
         _duplicateItems = [];
         _isCategoryLocked = true; // Hide category selector
         _addingToCategory = category;
         _newCategory = category;
+        _aiPrompt = string.Empty;
+        _aiSuggestions = [];
+        _selectedAiIndices = [];
+        _isGeneratingAi = false;
 
         // Ensure the target category is expanded so the user sees context
         _manualOverride[category] = false;
@@ -305,44 +324,22 @@ public partial class EditPacking : IAsyncDisposable
         _newCategory = category.ToString();
     }
 
-    private void SetAddMode(bool isQuickMode)
+    private void SetAddTab(bool isAiMode)
     {
-        if (_isQuickAddMode == isQuickMode) return;
-
-        _isQuickAddMode = isQuickMode;
-
-        // Transfer content between modes
-        if (isQuickMode && !string.IsNullOrWhiteSpace(_bulkItemsText))
-        {
-            // Take first item from bulk text
-            var firstItem = ParseInputItems(_bulkItemsText).FirstOrDefault();
-            _quickAddText = firstItem ?? string.Empty;
-        }
-        else if (!isQuickMode && !string.IsNullOrWhiteSpace(_quickAddText))
-        {
-            _bulkItemsText = _quickAddText;
-        }
-
-        UpdateParsedItems();
-    }
-
-    private void OnInputChanged()
-    {
-        UpdateParsedItems();
-        UpdateSuggestions();
+        if (_isAiMode == isAiMode) return;
+        _isAiMode = isAiMode;
     }
 
     private async Task OnBulkTextChanged()
     {
         UpdateParsedItems();
         UpdateSuggestions();
-        await HandleTextareaAutoGrow();
+        await HandleTextareaAutoGrow(bulkItemsTextarea);
     }
 
     private void UpdateParsedItems()
     {
-        var inputText = _isQuickAddMode ? _quickAddText : _bulkItemsText;
-        var allItems = ParseInputItems(inputText);
+        var allItems = ParseInputItems(_bulkItemsText);
 
         // Remove duplicates within the input (case-insensitive)
         var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -378,19 +375,27 @@ public partial class EditPacking : IAsyncDisposable
 
     private string GetAddButtonText()
     {
-        if (_parsedItems.Count == 0)
+        var count = _isAiMode ? _selectedAiIndices.Count : _parsedItems.Count;
+
+        if (count == 0)
             return Localizer["Add"];
 
-        if (_parsedItems.Count == 1)
+        if (count == 1)
             return Localizer["AddItem"];
 
-        return string.Format(Localizer["AddItemsCount"], _parsedItems.Count);
+        return string.Format(Localizer["AddItemsCount"], count);
     }
 
     private async Task ConfirmAddAsync()
     {
         if (!CanAdd || string.IsNullOrWhiteSpace(Id))
             return;
+
+        if (_isAiMode)
+        {
+            await ConfirmAddAiItemsAsync();
+            return;
+        }
 
         var category = string.IsNullOrWhiteSpace(_newCategory) 
             ? PackingCategory.Miscellaneous.ToString() 
@@ -446,24 +451,6 @@ public partial class EditPacking : IAsyncDisposable
         // Close form and reset state
         await CancelAdd();
         StateHasChanged();
-    }
-
-    private async Task HandleQuickAddKeyDown(KeyboardEventArgs e)
-    {
-        if (e.Key == "Enter" && !e.ShiftKey)
-        {
-            await ConfirmAddAsync();
-        }
-        else if (e.Key == "Escape")
-        {
-            await CancelAdd();
-        }
-    }
-
-    private async Task ToggleSpeechRecognitionQuickAdd()
-    {
-        // For quick add, we use the same speech recognition but target the quick add input
-        await ToggleSpeechRecognition();
     }
 
     private void ToggleSettings()
@@ -1140,11 +1127,6 @@ public partial class EditPacking : IAsyncDisposable
 
     private string GetCurrentSearchToken()
     {
-        if (_isQuickAddMode)
-        {
-            return _quickAddText?.Trim() ?? string.Empty;
-        }
-
         var text = _bulkItemsText ?? string.Empty;
         if (string.IsNullOrEmpty(text))
             return string.Empty;
@@ -1202,30 +1184,23 @@ public partial class EditPacking : IAsyncDisposable
 
     private async Task SelectSuggestion(string suggestion)
     {
-        if (_isQuickAddMode)
+        var text = _bulkItemsText ?? string.Empty;
+        var lastNewline = text.LastIndexOf('\n');
+        var lastComma = text.LastIndexOf(',');
+        var lastDelimiter = Math.Max(lastNewline, lastComma);
+
+        if (lastDelimiter < 0)
         {
-            _quickAddText = suggestion;
+            _bulkItemsText = suggestion + "\n";
         }
         else
         {
-            var text = _bulkItemsText ?? string.Empty;
-            var lastNewline = text.LastIndexOf('\n');
-            var lastComma = text.LastIndexOf(',');
-            var lastDelimiter = Math.Max(lastNewline, lastComma);
+            var prefix = text[..(lastDelimiter + 1)];
+            var delimiter = text[lastDelimiter];
 
-            if (lastDelimiter < 0)
-            {
-                _bulkItemsText = suggestion + "\n";
-            }
-            else
-            {
-                var prefix = text[..(lastDelimiter + 1)];
-                var delimiter = text[lastDelimiter];
-
-                _bulkItemsText = delimiter == ','
-                    ? prefix + " " + suggestion + ", "
-                    : prefix + suggestion + "\n";
-            }
+            _bulkItemsText = delimiter == ','
+                ? prefix + " " + suggestion + ", "
+                : prefix + suggestion + "\n";
         }
 
         _suggestions = [];
@@ -1238,18 +1213,144 @@ public partial class EditPacking : IAsyncDisposable
         {
             if (_editPackingModule is not null)
             {
-                var targetRef = _isQuickAddMode ? quickAddInputRef : bulkItemsTextarea;
-                await _editPackingModule.InvokeVoidAsync("focusAndSetCursorToEnd", targetRef);
+                await _editPackingModule.InvokeVoidAsync("focusAndSetCursorToEnd", bulkItemsTextarea);
             }
         }
         catch { }
     }
 
-    private async Task HandleTextareaAutoGrow()
+    // AI suggestion methods
+    private async Task GenerateAiSuggestionsAsync()
+    {
+        if (string.IsNullOrWhiteSpace(_aiPrompt) || _isGeneratingAi)
+            return;
+
+        _isGeneratingAi = true;
+        _aiSuggestions = [];
+        _selectedAiIndices = [];
+        StateHasChanged();
+
+        try
+        {
+            var existingNames = Items.Select(i => i.Item.Name).ToList();
+            var category = _isCategoryLocked ? _newCategory : null;
+
+            _aiSuggestions = await AiSuggestionService.SuggestItemsAsync(
+                _aiPrompt,
+                _activityName,
+                category,
+                existingNames);
+
+            // Select all by default
+            _selectedAiIndices = Enumerable.Range(0, _aiSuggestions.Count).ToHashSet();
+        }
+        catch (InvalidOperationException ex) when (ex.Message.Contains("API key"))
+        {
+            ToastService.ShowError(Localizer["AiNotConfigured"]);
+        }
+        catch (Exception ex)
+        {
+            ToastService.ShowError(string.Format(Localizer["AiError"], ex.Message));
+        }
+        finally
+        {
+            _isGeneratingAi = false;
+            StateHasChanged();
+        }
+    }
+
+    private void ToggleAiItem(int index)
+    {
+        if (!_selectedAiIndices.Remove(index))
+            _selectedAiIndices.Add(index);
+    }
+
+    private void SelectAllAiItems()
+    {
+        _selectedAiIndices = Enumerable.Range(0, _aiSuggestions.Count).ToHashSet();
+    }
+
+    private void DeselectAllAiItems()
+    {
+        _selectedAiIndices = [];
+    }
+
+    private async Task ConfirmAddAiItemsAsync()
+    {
+        if (_selectedAiIndices.Count == 0 || string.IsNullOrWhiteSpace(Id))
+            return;
+
+        try
+        {
+            foreach (var index in _selectedAiIndices.OrderBy(i => i))
+            {
+                var aiItem = _aiSuggestions[index];
+
+                if (_existingItemNames.Contains(aiItem.Name))
+                    continue;
+
+                var category = _isCategoryLocked ? _newCategory : aiItem.Category;
+
+                try
+                {
+                    var newItem = new Storage.PackingItem
+                    {
+                        Name = aiItem.Name,
+                        Category = category,
+                        Notes = string.Empty,
+                        ActivityId = Id
+                    };
+
+                    await PackingRepository.AddItemToActivityAsync(Id, newItem);
+
+                    if (!_categoryOrder.Any(c => string.Equals(c, category, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        _categoryOrder.Add(category);
+                        _manualOverride[category] = false;
+                    }
+                }
+                catch
+                {
+                    // Item failed to add, continue with others
+                }
+            }
+
+            await LoadItemsForPackingAsync(Id);
+
+            // Expand categories that received new items
+            foreach (var index in _selectedAiIndices)
+            {
+                var cat = _isCategoryLocked ? _newCategory : _aiSuggestions[index].Category;
+                _manualOverride[cat] = false;
+            }
+        }
+        catch (Exception ex)
+        {
+            ToastService.ShowError(string.Format(AppResources.ErrorAddingItem, ex.Message));
+        }
+
+        await CancelAdd();
+        StateHasChanged();
+    }
+
+    private async Task HandleAiPromptKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter" && e.CtrlKey)
+        {
+            await GenerateAiSuggestionsAsync();
+        }
+    }
+
+    private async Task OnAiPromptChanged()
+    {
+        await HandleTextareaAutoGrow(aiPromptTextarea);
+    }
+
+    private async Task HandleTextareaAutoGrow(ElementReference textarea)
     {
         try
         {
-            await JSRuntime.InvokeVoidAsync("autoGrowTextarea", bulkItemsTextarea);
+            await JSRuntime.InvokeVoidAsync("autoGrowTextarea", textarea);
         }
         catch
         {

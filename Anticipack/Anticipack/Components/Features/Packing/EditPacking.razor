@@ -290,24 +290,24 @@
             </div>
 
             <div class="form-body">
-                <!-- Mode Toggle: Quick Add / Bulk Add -->
+                <!-- Mode Toggle: Multiple / AI -->
                 <div class="add-mode-toggle">
                     <button type="button" 
-                            class="mode-btn @(_isQuickAddMode ? "active" : "")"
-                            @onclick="() => SetAddMode(true)">
-                        <i class="fa fa-plus"></i>
-                        <span>@Localizer["QuickAdd"]</span>
+                            class="mode-btn @(!_isAiMode ? "active" : "")"
+                            @onclick="() => SetAddTab(false)">
+                        <i class="fa fa-list"></i>
+                        <span>@Localizer["Multiple"]</span>
                     </button>
                     <button type="button" 
-                            class="mode-btn @(!_isQuickAddMode ? "active" : "")"
-                            @onclick="() => SetAddMode(false)">
-                        <i class="fa fa-list"></i>
-                        <span>@Localizer["BulkAdd"]</span>
+                            class="mode-btn ai-mode-btn @(_isAiMode ? "active" : "")"
+                            @onclick="() => SetAddTab(true)">
+                        <i class="fa fa-magic"></i>
+                        <span>@Localizer["AI"]</span>
                     </button>
                 </div>
 
                 <!-- Category Selection (hidden when adding from category header) -->
-                @if (!_isCategoryLocked)
+                @if (!_isCategoryLocked && !_isAiMode)
                 {
                     <div class="form-section compact">
                         <label class="form-label-inline">
@@ -345,38 +345,9 @@
 
                 <!-- Input Section -->
                 <div class="form-section compact">
-                    @if (_isQuickAddMode)
+                    @if (!_isAiMode)
                     {
-                        <!-- Quick Add: Single item input -->
-                        <label for="quick-add-input" class="form-label-inline">
-                            <i class="fa fa-tag"></i>
-                            @Localizer["ItemName"]
-                        </label>
-                        <div class="quick-add-input-container">
-                            <input id="quick-add-input"
-                                   type="text"
-                                   class="quick-add-input"
-                                   placeholder="@Localizer["EnterItemNamePlaceholder"]"
-                                   @bind="_quickAddText"
-                                   @bind:event="oninput"
-                                   @bind:after="OnInputChanged"
-                                   @ref="quickAddInputRef"
-                                   @onkeydown="HandleQuickAddKeyDown" />
-                            @if (_isSpeechRecognitionSupported)
-                            {
-                                <button type="button" 
-                                        class="speech-btn-inline @(_isListening ? "listening" : "")" 
-                                        @onclick="ToggleSpeechRecognitionQuickAdd"
-                                        @onclick:stopPropagation
-                                        title="@(_isListening ? AppResources.StopDictation : AppResources.StartDictation)">
-                                    <i class="fa @(_isListening ? "fa-stop" : "fa-microphone")" aria-hidden="true"></i>
-                                </button>
-                            }
-                        </div>
-                    }
-                    else
-                    {
-                        <!-- Bulk Add: Multi-line textarea -->
+                        <!-- Multiple: Multi-line textarea -->
                         <label for="bulk-textarea" class="form-label-inline">
                             <i class="fa fa-list-ul"></i>
                             @Localizer["EnterItems"]
@@ -407,46 +378,141 @@
                                 </button>
                             }
                         </div>
-                    }
 
-                    <!-- Autocomplete suggestions -->
-                    @if (_suggestions.Count > 0)
-                    {
-                        <div class="suggestion-chips">
-                            @foreach (var suggestion in _suggestions)
-                            {
-                                <button type="button"
-                                        class="suggestion-chip"
-                                        @onclick="() => SelectSuggestion(suggestion)"
-                                        @onclick:stopPropagation>
-                                    <i class="fa fa-plus"></i>
-                                    <span>@suggestion</span>
-                                </button>
-                            }
-                        </div>
-                    }
+                        <!-- Autocomplete suggestions -->
+                        @if (_suggestions.Count > 0)
+                        {
+                            <div class="suggestion-chips">
+                                @foreach (var suggestion in _suggestions)
+                                {
+                                    <button type="button"
+                                            class="suggestion-chip"
+                                            @onclick="() => SelectSuggestion(suggestion)"
+                                            @onclick:stopPropagation>
+                                        <i class="fa fa-plus"></i>
+                                        <span>@suggestion</span>
+                                    </button>
+                                }
+                            </div>
+                        }
 
-                    <!-- Interim transcript for speech -->
-                    @if (!string.IsNullOrWhiteSpace(_interimTranscript))
-                    {
-                        <div class="interim-transcript">
-                            <i class="fa fa-microphone"></i>
-                            <span>@_interimTranscript</span>
-                        </div>
-                    }
+                        <!-- Interim transcript for speech -->
+                        @if (!string.IsNullOrWhiteSpace(_interimTranscript))
+                        {
+                            <div class="interim-transcript">
+                                <i class="fa fa-microphone"></i>
+                                <span>@_interimTranscript</span>
+                            </div>
+                        }
 
-                    <!-- Listening indicator -->
-                    @if (_isListening)
+                        <!-- Listening indicator -->
+                        @if (_isListening)
+                        {
+                            <div class="form-hint-mini listening-hint">
+                                <i class="fa fa-microphone"></i>
+                                <span>@AppResources.Listening</span>
+                            </div>
+                        }
+                    }
+                    else
                     {
-                        <div class="form-hint-mini listening-hint">
-                            <i class="fa fa-microphone"></i>
-                            <span>@AppResources.Listening</span>
+                        <!-- AI: Prompt input + generate -->
+                        <label for="ai-prompt-input" class="form-label-inline">
+                            <i class="fa fa-magic"></i>
+                            @Localizer["AiDescribeTrip"]
+                        </label>
+                        <div class="ai-prompt-container">
+                            <textarea id="ai-prompt-input"
+                                   class="ai-prompt-input auto-grow"
+                                   placeholder="@Localizer["AiPromptPlaceholder"]"
+                                   @bind="_aiPrompt"
+                                   @bind:event="oninput"
+                                   @bind:after="OnAiPromptChanged"
+                                   @ref="aiPromptTextarea"
+                                   rows="3"
+                                   @onkeydown="HandleAiPromptKeyDown"
+                                   disabled="@_isGeneratingAi"></textarea>
+                            <button type="button"
+                                    class="ai-generate-btn @(_isGeneratingAi ? "generating" : "")"
+                                    @onclick="GenerateAiSuggestionsAsync"
+                                    @onclick:stopPropagation
+                                    disabled="@(string.IsNullOrWhiteSpace(_aiPrompt) || _isGeneratingAi)">
+                                @if (_isGeneratingAi)
+                                {
+                                    <span class="ai-spinner"></span>
+                                }
+                                else
+                                {
+                                    <i class="fa fa-magic"></i>
+                                }
+                                <span>@(_isGeneratingAi ? Localizer["Generating"] : Localizer["Generate"])</span>
+                            </button>
                         </div>
+
+                        <!-- AI Results -->
+                        @if (_aiSuggestions.Count > 0)
+                        {
+                            <div class="ai-results">
+                                <div class="ai-results-header">
+                                    <span class="ai-results-title">
+                                        <i class="fa fa-star"></i>
+                                        @Localizer["AiSuggestions"]
+                                    </span>
+                                    <div class="ai-results-actions">
+                                        @if (_selectedAiIndices.Count < _aiSuggestions.Count)
+                                        {
+                                            <button type="button" class="ai-select-btn" @onclick="SelectAllAiItems" @onclick:stopPropagation>
+                                                @Localizer["SelectAll"]
+                                            </button>
+                                        }
+                                        else
+                                        {
+                                            <button type="button" class="ai-select-btn" @onclick="DeselectAllAiItems" @onclick:stopPropagation>
+                                                @Localizer["DeselectAll"]
+                                            </button>
+                                        }
+                                    </div>
+                                </div>
+                                <div class="ai-suggestion-chips">
+                                    @for (var i = 0; i < _aiSuggestions.Count; i++)
+                                    {
+                                        var index = i;
+                                        var item = _aiSuggestions[index];
+                                        var isSelected = _selectedAiIndices.Contains(index);
+                                        var isDuplicate = _existingItemNames.Contains(item.Name);
+                                        <button type="button"
+                                                class="ai-chip @(isSelected ? "selected" : "") @(isDuplicate ? "existing" : "")"
+                                                @onclick="() => ToggleAiItem(index)"
+                                                @onclick:stopPropagation
+                                                disabled="@isDuplicate"
+                                                title="@(isDuplicate ? Localizer["ItemAlreadyExists"] : GetLocalizedCategoryName(item.Category))">
+                                            @if (isSelected && !isDuplicate)
+                                            {
+                                                <i class="fa fa-check"></i>
+                                            }
+                                            else if (isDuplicate)
+                                            {
+                                                <i class="fa fa-info-circle"></i>
+                                            }
+                                            <span>@item.Name</span>
+                                            <span class="ai-chip-category">@GetLocalizedCategoryName(item.Category)</span>
+                                        </button>
+                                    }
+                                </div>
+                            </div>
+                        }
+                        else if (!_isGeneratingAi && !string.IsNullOrWhiteSpace(_aiPrompt))
+                        {
+                            <div class="form-hint-mini">
+                                <i class="fa fa-info-circle"></i>
+                                <span>@Localizer["AiHint"]</span>
+                            </div>
+                        }
                     }
                 </div>
 
-                <!-- Preview Section -->
-                @if (_parsedItems.Count > 0)
+                <!-- Preview Section (Multiple mode only) -->
+                @if (!_isAiMode && _parsedItems.Count > 0)
                 {
                     <div class="preview-section">
                         <div class="preview-header">
@@ -482,8 +548,8 @@
                     </div>
                 }
 
-                <!-- Hints -->
-                @if (!_isListening && !HasInput && !_isQuickAddMode)
+                <!-- Hints (Multiple mode only) -->
+                @if (!_isAiMode && !_isListening && !HasInput)
                 {
                     <div class="form-hint-mini">
                         <i class="fa fa-info-circle"></i>

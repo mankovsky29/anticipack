@@ -4,6 +4,7 @@ using Anticipack.Components.Shared.NavigationHeaderComponent;
 using Anticipack.Storage;
 using Anticipack.Storage.Repositories;
 using Anticipack.Services;
+using Anticipack.Services.AI;
 using Anticipack.Services.Categories;
 using Anticipack.Services.Packing;
 using Anticipack.Services.Payment;
@@ -99,6 +100,15 @@ namespace Anticipack
             builder.Services.AddSingleton<IStoreService, StoreService>();
             builder.Services.AddSingleton<IPayPalService, PayPalService>();
             builder.Services.AddSingleton<IPaymentService, PaymentService>();
+
+            // AI suggestion service (DIP: Depend on abstraction)
+            builder.Services.AddSingleton<AiServiceConfiguration>(_ => new AiServiceConfiguration
+            {
+                ApiKey = "", // TODO: Set your Gemini API key
+                Model = "gemini-2.0-flash"
+            });
+            builder.Services.AddSingleton<HttpClient>();
+            builder.Services.AddSingleton<IAiSuggestionService, GeminiSuggestionService>();
 
             var app = builder.Build();
 

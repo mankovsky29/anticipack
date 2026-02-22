@@ -1042,4 +1042,40 @@
   <data name="StatsEmptyHint" xml:space="preserve">
     <value>Завершите несколько сессий упаковки, чтобы увидеть подробную статистику по времени, активностям и категориям.</value>
   </data>
+  <data name="Multiple" xml:space="preserve">
+    <value>Несколько</value>
+  </data>
+  <data name="AI" xml:space="preserve">
+    <value>ИИ</value>
+  </data>
+  <data name="AiDescribeTrip" xml:space="preserve">
+    <value>Опишите вашу поездку</value>
+  </data>
+  <data name="AiPromptPlaceholder" xml:space="preserve">
+    <value>напр. 2 недели на пляже, командировка в Москву...</value>
+  </data>
+  <data name="Generate" xml:space="preserve">
+    <value>Сгенерировать</value>
+  </data>
+  <data name="Generating" xml:space="preserve">
+    <value>Генерация...</value>
+  </data>
+  <data name="AiSuggestions" xml:space="preserve">
+    <value>Предложения</value>
+  </data>
+  <data name="SelectAll" xml:space="preserve">
+    <value>Выбрать все</value>
+  </data>
+  <data name="DeselectAll" xml:space="preserve">
+    <value>Снять все</value>
+  </data>
+  <data name="AiHint" xml:space="preserve">
+    <value>Нажмите Сгенерировать для получения предложений от ИИ</value>
+  </data>
+  <data name="AiNotConfigured" xml:space="preserve">
+    <value>Сервис ИИ не настроен. Укажите API ключ.</value>
+  </data>
+  <data name="AiError" xml:space="preserve">
+    <value>Ошибка ИИ: {0}</value>
+  </data>
 </root>

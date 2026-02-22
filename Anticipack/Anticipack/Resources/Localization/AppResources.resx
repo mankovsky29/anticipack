@@ -938,4 +938,40 @@ Soap, Towel</value>
   <data name="StatsEmptyHint" xml:space="preserve">
     <value>Complete some packing sessions to see detailed time stats, activity breakdowns, and usage patterns here.</value>
   </data>
+  <data name="Multiple" xml:space="preserve">
+    <value>Multiple</value>
+  </data>
+  <data name="AI" xml:space="preserve">
+    <value>AI</value>
+  </data>
+  <data name="AiDescribeTrip" xml:space="preserve">
+    <value>Describe your trip</value>
+  </data>
+  <data name="AiPromptPlaceholder" xml:space="preserve">
+    <value>e.g. 2-week beach vacation, business trip to NYC...</value>
+  </data>
+  <data name="Generate" xml:space="preserve">
+    <value>Generate</value>
+  </data>
+  <data name="Generating" xml:space="preserve">
+    <value>Generating...</value>
+  </data>
+  <data name="AiSuggestions" xml:space="preserve">
+    <value>Suggestions</value>
+  </data>
+  <data name="SelectAll" xml:space="preserve">
+    <value>Select All</value>
+  </data>
+  <data name="DeselectAll" xml:space="preserve">
+    <value>Deselect All</value>
+  </data>
+  <data name="AiHint" xml:space="preserve">
+    <value>Press Generate to get AI-powered packing suggestions</value>
+  </data>
+  <data name="AiNotConfigured" xml:space="preserve">
+    <value>AI service is not configured. Please set the API key.</value>
+  </data>
+  <data name="AiError" xml:space="preserve">
+    <value>AI error: {0}</value>
+  </data>
 </root>

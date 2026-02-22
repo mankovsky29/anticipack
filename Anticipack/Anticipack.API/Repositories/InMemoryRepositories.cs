@@ -176,3 +176,27 @@ public class InMemoryPackingItemRepository : IPackingItemRepository
         return Task.FromResult(false);
     }
 }
+
+public class InMemoryPackingHistoryRepository : IPackingHistoryRepository
+{
+    private readonly List<PackingHistoryEntry> _entries = new();
+
+    public Task<List<PackingHistoryEntry>> GetByActivityIdAsync(string activityId, int count = 10)
+        => Task.FromResult(_entries
+            .Where(e => e.ActivityId == activityId)
+            .OrderByDescending(e => e.CompletedDate)
+            .Take(count)
+            .ToList());
+
+    public Task<PackingHistoryEntry> CreateAsync(PackingHistoryEntry entry)
+    {
+        _entries.Add(entry);
+        return Task.FromResult(entry);
+    }
+
+    public Task<PackingHistoryEntry?> GetLatestByActivityIdAsync(string activityId)
+        => Task.FromResult(_entries
+            .Where(e => e.ActivityId == activityId)
+            .OrderByDescending(e => e.CompletedDate)
+            .FirstOrDefault());
+}

@@ -21,5 +21,6 @@ public enum AuthProvider
 {
     Google,
     Apple,
-    Email
+    Email,
+    Telegram
 }

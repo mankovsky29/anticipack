@@ -53,6 +53,7 @@ builder.Services.AddSingleton<IUserRepository, InMemoryUserRepository>();
 builder.Services.AddSingleton<IActivityRepository, InMemoryActivityRepository>();
 builder.Services.AddSingleton<ISettingsRepository, InMemorySettingsRepository>();
 builder.Services.AddSingleton<IPackingItemRepository, InMemoryPackingItemRepository>();
+builder.Services.AddSingleton<IPackingHistoryRepository, InMemoryPackingHistoryRepository>();
 
 // Register services
 builder.Services.AddSingleton<IAuthService, AuthService>();

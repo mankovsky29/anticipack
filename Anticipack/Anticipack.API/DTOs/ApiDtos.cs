@@ -31,12 +31,14 @@ public record UpdateUserRequest(
 // Activity DTOs
 public record CreateActivityRequest(
     string Name,
-    bool IsShared = false
+    bool IsShared = false,
+    bool IsRecurring = true
 );
 
 public record UpdateActivityRequest(
     string Name,
-    bool IsShared
+    bool IsShared,
+    bool IsRecurring = true
 );
 
 public record ActivityDto(
@@ -46,6 +48,9 @@ public record ActivityDto(
     DateTime LastPacked,
     int RunCount,
     bool IsShared,
+    bool IsArchived,
+    bool IsFinished,
+    bool IsRecurring,
     DateTime CreatedAt,
     DateTime UpdatedAt,
     List<PackingItemDto> Items
@@ -114,4 +119,32 @@ public record ApiResponse<T>(
     T? Data,
     string? Message = null,
     List<string>? Errors = null
+);
+
+// History DTOs
+public record PackingHistoryEntryDto(
+    string Id,
+    string ActivityId,
+    DateTime CompletedDate,
+    int TotalItems,
+    int PackedItems,
+    int DurationSeconds,
+    DateTime StartTime,
+    DateTime EndTime
+);
+
+public record CreateHistoryEntryRequest(
+    int TotalItems,
+    int PackedItems,
+    int DurationSeconds,
+    DateTime StartTime,
+    DateTime EndTime
+);
+
+// Telegram Auth
+public record TelegramLoginRequest(
+    long TelegramUserId,
+    string? FirstName,
+    string? LastName,
+    string? Username
 );

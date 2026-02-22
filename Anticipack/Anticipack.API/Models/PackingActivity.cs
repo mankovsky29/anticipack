@@ -9,6 +9,8 @@ public class PackingActivity
     public int RunCount { get; set; }
     public bool IsShared { get; set; }
     public bool IsArchived { get; set; }
+    public bool IsFinished { get; set; }
+    public bool IsRecurring { get; set; } = true;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
     

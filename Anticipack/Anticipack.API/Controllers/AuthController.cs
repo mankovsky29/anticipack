@@ -13,15 +13,18 @@ public class AuthController : ControllerBase
     private readonly IAuthService _authService;
     private readonly IUserRepository _userRepository;
     private readonly ISettingsRepository _settingsRepository;
+    private readonly IConfiguration _configuration;
 
     public AuthController(
         IAuthService authService,
         IUserRepository userRepository,
-        ISettingsRepository settingsRepository)
+        ISettingsRepository settingsRepository,
+        IConfiguration configuration)
     {
         _authService = authService;
         _userRepository = userRepository;
         _settingsRepository = settingsRepository;
+        _configuration = configuration;
     }
 
     [HttpPost("login")]
@@ -142,7 +145,7 @@ public class AuthController : ControllerBase
     public async Task<ActionResult<ApiResponse<LoginResponse>>> RefreshToken([FromBody] RefreshTokenRequest request)
     {
         var userId = await _authService.ValidateRefreshTokenAsync(request.RefreshToken);
-        
+
         if (userId == null)
         {
             return Unauthorized(new ApiResponse<LoginResponse>(
@@ -182,5 +185,81 @@ public class AuthController : ControllerBase
         );
 
         return Ok(new ApiResponse<LoginResponse>(true, response, "Token refreshed"));
+    }
+
+    [HttpPost("telegram")]
+    public async Task<ActionResult<ApiResponse<LoginResponse>>> TelegramLogin([FromBody] TelegramLoginRequest request)
+    {
+        try
+        {
+            var botApiKey = _configuration["Telegram:BotApiKey"];
+            var requestApiKey = Request.Headers["X-Bot-Api-Key"].FirstOrDefault();
+
+            if (string.IsNullOrEmpty(botApiKey) || botApiKey != requestApiKey)
+            {
+                return Unauthorized(new ApiResponse<LoginResponse>(
+                    false, null, "Invalid bot API key", new List<string> { "Authentication failed" }));
+            }
+
+            var externalId = request.TelegramUserId.ToString();
+            var user = await _userRepository.GetByExternalAuthIdAsync(externalId, AuthProvider.Telegram);
+
+            if (user == null)
+            {
+                var displayName = string.IsNullOrEmpty(request.LastName)
+                    ? request.FirstName ?? "Telegram User"
+                    : $"{request.FirstName} {request.LastName}";
+
+                user = new User
+                {
+                    Email = $"tg_{request.TelegramUserId}@telegram.user",
+                    DisplayName = displayName,
+                    AuthProvider = AuthProvider.Telegram,
+                    ExternalAuthId = externalId,
+                    LastLoginAt = DateTime.UtcNow
+                };
+                user = await _userRepository.CreateAsync(user);
+
+                var settings = new UserSettings { UserId = user.Id };
+                await _settingsRepository.CreateAsync(settings);
+            }
+            else
+            {
+                user.LastLoginAt = DateTime.UtcNow;
+                await _userRepository.UpdateAsync(user);
+            }
+
+            var accessToken = _authService.GenerateJwtToken(user.Id, user.Email);
+            var refreshToken = _authService.GenerateRefreshToken();
+
+            if (_authService is AuthService authServiceImpl)
+            {
+                authServiceImpl.StoreRefreshToken(refreshToken, user.Id, DateTime.UtcNow.AddDays(30));
+            }
+
+            var userDto = new UserDto(
+                user.Id,
+                user.Email,
+                user.DisplayName,
+                user.ProfilePictureUrl,
+                user.AuthProvider.ToString(),
+                user.CreatedAt,
+                user.LastLoginAt
+            );
+
+            var response = new LoginResponse(
+                accessToken,
+                refreshToken,
+                userDto,
+                DateTime.UtcNow.AddHours(24)
+            );
+
+            return Ok(new ApiResponse<LoginResponse>(true, response, "Telegram login successful"));
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new ApiResponse<LoginResponse>(
+                false, null, "Internal server error", new List<string> { ex.Message }));
+        }
     }
 }

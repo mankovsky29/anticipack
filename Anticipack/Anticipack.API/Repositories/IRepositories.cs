@@ -37,3 +37,10 @@ public interface IPackingItemRepository
     Task<PackingItem> UpdateAsync(PackingItem item);
     Task<bool> DeleteAsync(string id);
 }
+
+public interface IPackingHistoryRepository
+{
+    Task<List<PackingHistoryEntry>> GetByActivityIdAsync(string activityId, int count = 10);
+    Task<PackingHistoryEntry> CreateAsync(PackingHistoryEntry entry);
+    Task<PackingHistoryEntry?> GetLatestByActivityIdAsync(string activityId);
+}

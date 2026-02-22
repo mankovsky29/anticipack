@@ -959,4 +959,87 @@
   <data name="DurationMinutes" xml:space="preserve">
     <value>{0} минут</value>
   </data>
+
+  <!-- Statistics Page -->
+  <data name="StatsMenu" xml:space="preserve">
+    <value>Статистика</value>
+  </data>
+  <data name="StatsTitle" xml:space="preserve">
+    <value>Статистика</value>
+  </data>
+  <data name="StatsOverview" xml:space="preserve">
+    <value>Обзор</value>
+  </data>
+  <data name="StatsTotalActivities" xml:space="preserve">
+    <value>Активности</value>
+  </data>
+  <data name="StatsTotalSessions" xml:space="preserve">
+    <value>Сессии</value>
+  </data>
+  <data name="StatsItemsPacked" xml:space="preserve">
+    <value>Упаковано</value>
+  </data>
+  <data name="StatsEfficiency" xml:space="preserve">
+    <value>Эффективность</value>
+  </data>
+  <data name="StatsTimeTitle" xml:space="preserve">
+    <value>Время</value>
+  </data>
+  <data name="StatsAvgTime" xml:space="preserve">
+    <value>Среднее время упаковки</value>
+  </data>
+  <data name="StatsFastestSession" xml:space="preserve">
+    <value>Быстрейшая сессия</value>
+  </data>
+  <data name="StatsTotalTime" xml:space="preserve">
+    <value>Общее время упаковки</value>
+  </data>
+  <data name="StatsRecentTrend" xml:space="preserve">
+    <value>Последние сессии</value>
+  </data>
+  <data name="StatsActivityBreakdown" xml:space="preserve">
+    <value>Лучшие активности</value>
+  </data>
+  <data name="StatsMostPacked" xml:space="preserve">
+    <value>Чаще всего</value>
+  </data>
+  <data name="StatsMostEfficient" xml:space="preserve">
+    <value>Самая эффективная</value>
+  </data>
+  <data name="StatsNeedsWork" xml:space="preserve">
+    <value>Нужна доработка</value>
+  </data>
+  <data name="StatsMostItems" xml:space="preserve">
+    <value>Самый большой список</value>
+  </data>
+  <data name="StatsSessionCount" xml:space="preserve">
+    <value>{0} сессий</value>
+  </data>
+  <data name="StatsItemCountValue" xml:space="preserve">
+    <value>{0} предметов</value>
+  </data>
+  <data name="StatsUsagePatterns" xml:space="preserve">
+    <value>Паттерны использования</value>
+  </data>
+  <data name="StatsStreak" xml:space="preserve">
+    <value>Дней подряд</value>
+  </data>
+  <data name="StatsThisMonth" xml:space="preserve">
+    <value>Этот месяц</value>
+  </data>
+  <data name="StatsLastMonth" xml:space="preserve">
+    <value>Прошлый месяц</value>
+  </data>
+  <data name="StatsMostActiveDay" xml:space="preserve">
+    <value>Самый активный день</value>
+  </data>
+  <data name="StatsCategoryInsights" xml:space="preserve">
+    <value>Категории</value>
+  </data>
+  <data name="StatsTopCategory" xml:space="preserve">
+    <value>Топ категория: {0}</value>
+  </data>
+  <data name="StatsEmptyHint" xml:space="preserve">
+    <value>Завершите несколько сессий упаковки, чтобы увидеть подробную статистику по времени, активностям и категориям.</value>
+  </data>
 </root>

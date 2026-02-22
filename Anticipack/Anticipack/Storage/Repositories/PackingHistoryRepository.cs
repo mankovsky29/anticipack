@@ -33,6 +33,13 @@ public sealed class PackingHistoryRepository : IPackingHistoryRepository
         return await query.ToListAsync();
     }
 
+    public async Task<List<PackingHistoryEntry>> GetAllHistoryAsync()
+    {
+        return await _db.Table<PackingHistoryEntry>()
+            .OrderByDescending(x => x.CompletedDate)
+            .ToListAsync();
+    }
+
     public async Task DeleteHistoryForActivityAsync(string activityId)
     {
         var entries = await _db.Table<PackingHistoryEntry>()

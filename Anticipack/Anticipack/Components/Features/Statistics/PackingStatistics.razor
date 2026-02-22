@@ -1,0 +1,271 @@
+@page "/statistics"
+
+<div class="page-container with-fixed-navbar">
+    @if (_isLoading)
+    {
+        <div class="loading">
+            <div class="loading-spinner"></div>
+            <span>@Localizer["Loading"]</span>
+        </div>
+    }
+    else if (_stats is not null)
+    {
+        <div class="stats-page">
+            <!-- Overview Cards -->
+            <section class="stats-section">
+                <h2 class="section-title">
+                    <i class="fa fa-chart-bar"></i>
+                    @Localizer["StatsOverview"]
+                </h2>
+                <div class="overview-grid">
+                    <div class="overview-card">
+                        <div class="overview-icon activities">
+                            <i class="fa fa-layer-group"></i>
+                        </div>
+                        <div class="overview-value">@_stats.TotalActivities</div>
+                        <div class="overview-label">@Localizer["StatsTotalActivities"]</div>
+                    </div>
+                    <div class="overview-card">
+                        <div class="overview-icon sessions">
+                            <i class="fa fa-play-circle"></i>
+                        </div>
+                        <div class="overview-value">@_stats.TotalSessions</div>
+                        <div class="overview-label">@Localizer["StatsTotalSessions"]</div>
+                    </div>
+                    <div class="overview-card">
+                        <div class="overview-icon items">
+                            <i class="fa fa-box"></i>
+                        </div>
+                        <div class="overview-value">@_stats.TotalItemsPacked</div>
+                        <div class="overview-label">@Localizer["StatsItemsPacked"]</div>
+                    </div>
+                    <div class="overview-card">
+                        <div class="overview-icon efficiency">
+                            <i class="fa fa-bullseye"></i>
+                        </div>
+                        <div class="overview-value">@_stats.OverallEfficiency%</div>
+                        <div class="overview-label">@Localizer["StatsEfficiency"]</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Time Stats -->
+            @if (_stats.TotalSessions > 0)
+            {
+                <section class="stats-section">
+                    <h2 class="section-title">
+                        <i class="fa fa-clock"></i>
+                        @Localizer["StatsTimeTitle"]
+                    </h2>
+                    <div class="time-stats-grid">
+                        <div class="time-stat-card">
+                            <div class="time-stat-icon">
+                                <i class="fa fa-hourglass-half"></i>
+                            </div>
+                            <div class="time-stat-content">
+                                <div class="time-stat-value">@FormatDuration(_stats.AveragePackingTime)</div>
+                                <div class="time-stat-label">@Localizer["StatsAvgTime"]</div>
+                            </div>
+                        </div>
+                        <div class="time-stat-card">
+                            <div class="time-stat-icon fastest">
+                                <i class="fa fa-bolt"></i>
+                            </div>
+                            <div class="time-stat-content">
+                                <div class="time-stat-value">@FormatDuration(_stats.FastestSession)</div>
+                                <div class="time-stat-label">
+                                    @Localizer["StatsFastestSession"]
+                                    @if (!string.IsNullOrEmpty(_stats.FastestSessionActivityName))
+                                    {
+                                        <span class="time-stat-detail">@_stats.FastestSessionActivityName</span>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                        <div class="time-stat-card">
+                            <div class="time-stat-icon total">
+                                <i class="fa fa-stopwatch"></i>
+                            </div>
+                            <div class="time-stat-content">
+                                <div class="time-stat-value">@FormatTotalDuration(_stats.TotalTimePacking)</div>
+                                <div class="time-stat-label">@Localizer["StatsTotalTime"]</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mini trend chart -->
+                    @if (_stats.RecentSessionDurations.Count >= 2)
+                    {
+                        <div class="trend-section">
+                            <h3 class="subsection-title">@Localizer["StatsRecentTrend"]</h3>
+                            <div class="trend-chart">
+                                @foreach (var point in _stats.RecentSessionDurations)
+                                {
+                                    var heightPct = GetBarHeight(point.DurationSeconds);
+                                    <div class="trend-bar-wrapper" title="@point.Date.ToString("MMM d") — @FormatDuration(TimeSpan.FromSeconds(point.DurationSeconds))">
+                                        <div class="trend-bar" style="height: @(heightPct)%"></div>
+                                        <div class="trend-label">@point.Date.ToString("dd")</div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+                </section>
+            }
+
+            <!-- Per-Activity Breakdown -->
+            @if (_stats.MostPackedActivity is not null || _stats.MostItemsActivity is not null)
+            {
+                <section class="stats-section">
+                    <h2 class="section-title">
+                        <i class="fa fa-trophy"></i>
+                        @Localizer["StatsActivityBreakdown"]
+                    </h2>
+                    <div class="activity-stats-list">
+                        @if (_stats.MostPackedActivity is not null)
+                        {
+                            <div class="activity-stat-row">
+                                <div class="activity-stat-badge star">
+                                    <i class="fa fa-star"></i>
+                                </div>
+                                <div class="activity-stat-info">
+                                    <div class="activity-stat-title">@Localizer["StatsMostPacked"]</div>
+                                    <div class="activity-stat-name">@_stats.MostPackedActivity.Name</div>
+                                </div>
+                                <div class="activity-stat-value">
+                                    @string.Format(Localizer["StatsSessionCount"], _stats.MostPackedActivity.Value)
+                                </div>
+                            </div>
+                        }
+                        @if (_stats.MostEfficientActivity is not null)
+                        {
+                            <div class="activity-stat-row">
+                                <div class="activity-stat-badge efficient">
+                                    <i class="fa fa-check-double"></i>
+                                </div>
+                                <div class="activity-stat-info">
+                                    <div class="activity-stat-title">@Localizer["StatsMostEfficient"]</div>
+                                    <div class="activity-stat-name">@_stats.MostEfficientActivity.Name</div>
+                                </div>
+                                <div class="activity-stat-value">@_stats.MostEfficientActivity.Percentage%</div>
+                            </div>
+                        }
+                        @if (_stats.LeastEfficientActivity is not null)
+                        {
+                            <div class="activity-stat-row">
+                                <div class="activity-stat-badge needs-work">
+                                    <i class="fa fa-exclamation-triangle"></i>
+                                </div>
+                                <div class="activity-stat-info">
+                                    <div class="activity-stat-title">@Localizer["StatsNeedsWork"]</div>
+                                    <div class="activity-stat-name">@_stats.LeastEfficientActivity.Name</div>
+                                </div>
+                                <div class="activity-stat-value">@_stats.LeastEfficientActivity.Percentage%</div>
+                            </div>
+                        }
+                        @if (_stats.MostItemsActivity is not null)
+                        {
+                            <div class="activity-stat-row">
+                                <div class="activity-stat-badge items">
+                                    <i class="fa fa-boxes"></i>
+                                </div>
+                                <div class="activity-stat-info">
+                                    <div class="activity-stat-title">@Localizer["StatsMostItems"]</div>
+                                    <div class="activity-stat-name">@_stats.MostItemsActivity.Name</div>
+                                </div>
+                                <div class="activity-stat-value">
+                                    @string.Format(Localizer["StatsItemCountValue"], _stats.MostItemsActivity.Value)
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </section>
+            }
+
+            <!-- Usage Patterns -->
+            @if (_stats.TotalSessions > 0)
+            {
+                <section class="stats-section">
+                    <h2 class="section-title">
+                        <i class="fa fa-calendar-alt"></i>
+                        @Localizer["StatsUsagePatterns"]
+                    </h2>
+                    <div class="usage-grid">
+                        @if (_stats.CurrentStreak > 0)
+                        {
+                            <div class="usage-card streak">
+                                <div class="usage-icon">🔥</div>
+                                <div class="usage-value">@_stats.CurrentStreak</div>
+                                <div class="usage-label">@Localizer["StatsStreak"]</div>
+                            </div>
+                        }
+                        <div class="usage-card">
+                            <div class="usage-icon"><i class="fa fa-calendar"></i></div>
+                            <div class="usage-value">@_stats.SessionsThisMonth</div>
+                            <div class="usage-label">@Localizer["StatsThisMonth"]</div>
+                        </div>
+                        <div class="usage-card">
+                            <div class="usage-icon"><i class="fa fa-history"></i></div>
+                            <div class="usage-value">@_stats.SessionsLastMonth</div>
+                            <div class="usage-label">@Localizer["StatsLastMonth"]</div>
+                        </div>
+                        @if (_stats.MostActiveDay.HasValue)
+                        {
+                            <div class="usage-card">
+                                <div class="usage-icon"><i class="fa fa-fire"></i></div>
+                                <div class="usage-value">@GetDayName(_stats.MostActiveDay.Value)</div>
+                                <div class="usage-label">@Localizer["StatsMostActiveDay"]</div>
+                            </div>
+                        }
+                    </div>
+                </section>
+            }
+
+            <!-- Category Insights -->
+            @if (_stats.CategoryDistribution.Count > 0)
+            {
+                <section class="stats-section">
+                    <h2 class="section-title">
+                        <i class="fa fa-tags"></i>
+                        @Localizer["StatsCategoryInsights"]
+                    </h2>
+                    @if (!string.IsNullOrEmpty(_stats.MostCommonCategory))
+                    {
+                        <div class="top-category-banner">
+                            <i class="@GetCategoryIcon(_stats.MostCommonCategory)"></i>
+                            <span>@string.Format(Localizer["StatsTopCategory"], GetLocalizedCategory(_stats.MostCommonCategory))</span>
+                        </div>
+                    }
+                    <div class="category-chart">
+                        @{
+                            var maxCount = _stats.CategoryDistribution.Max(c => c.ItemCount);
+                        }
+                        @foreach (var cat in _stats.CategoryDistribution.Take(8))
+                        {
+                            var widthPct = maxCount > 0 ? (int)((double)cat.ItemCount / maxCount * 100) : 0;
+                            <div class="category-bar-row">
+                                <div class="category-bar-label">
+                                    <i class="@GetCategoryIcon(cat.Category)"></i>
+                                    <span>@GetLocalizedCategory(cat.Category)</span>
+                                </div>
+                                <div class="category-bar-track">
+                                    <div class="category-bar-fill" style="width: @(widthPct)%"></div>
+                                </div>
+                                <div class="category-bar-count">@cat.ItemCount</div>
+                            </div>
+                        }
+                    </div>
+                </section>
+            }
+
+            <!-- Empty state when no sessions at all -->
+            @if (_stats.TotalSessions == 0)
+            {
+                <div class="stats-empty-hint">
+                    <i class="fa fa-info-circle"></i>
+                    <p>@Localizer["StatsEmptyHint"]</p>
+                </div>
+            }
+        </div>
+    }
+</div>

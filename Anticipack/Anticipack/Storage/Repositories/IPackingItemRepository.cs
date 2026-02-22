@@ -6,6 +6,7 @@ namespace Anticipack.Storage.Repositories;
 public interface IPackingItemRepository
 {
     Task<List<PackingItem>> GetItemsForActivityAsync(string activityId);
+    Task<List<PackingItem>> GetAllItemsAsync();
     Task AddItemToActivityAsync(string activityId, PackingItem item);
     Task AddOrUpdateItemAsync(PackingItem item);
     Task UpdateItemsSortOrderAsync(IEnumerable<PackingItem> items);

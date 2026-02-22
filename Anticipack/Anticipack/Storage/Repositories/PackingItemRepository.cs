@@ -22,6 +22,11 @@ public sealed class PackingItemRepository : IPackingItemRepository
             .ToListAsync();
     }
 
+    public async Task<List<PackingItem>> GetAllItemsAsync()
+    {
+        return await _db.Table<PackingItem>().ToListAsync();
+    }
+
     public async Task AddItemToActivityAsync(string activityId, PackingItem item)
     {
         item.ActivityId = activityId;

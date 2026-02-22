@@ -7,5 +7,6 @@ public interface IPackingHistoryRepository
 {
     Task AddHistoryEntryAsync(PackingHistoryEntry entry);
     Task<List<PackingHistoryEntry>> GetHistoryForActivityAsync(string activityId, int? limit = null);
+    Task<List<PackingHistoryEntry>> GetAllHistoryAsync();
     Task DeleteHistoryForActivityAsync(string activityId);
 }

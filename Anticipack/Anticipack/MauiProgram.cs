@@ -7,6 +7,7 @@ using Anticipack.Services;
 using Anticipack.Services.Categories;
 using Anticipack.Services.Packing;
 using Anticipack.Services.Payment;
+using Anticipack.Services.Statistics;
 using Anticipack.Services.Sync;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -51,6 +52,7 @@ namespace Anticipack
             // Business services (SRP: Separated business logic)
             builder.Services.AddScoped<IPackingActivityService, PackingActivityService>();
             builder.Services.AddSingleton<ICategoryIconProvider, CategoryIconProvider>();
+            builder.Services.AddScoped<IPackingStatisticsService, PackingStatisticsService>();
 
             // Add Localization Services
             builder.Services.AddLocalization();

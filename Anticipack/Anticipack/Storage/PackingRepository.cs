@@ -109,6 +109,11 @@ namespace Anticipack.Storage
                 .ToListAsync();
         }
 
+        public async Task<List<PackingItem>> GetAllItemsAsync()
+        {
+            return await _db.Table<PackingItem>().ToListAsync();
+        }
+
         public async Task AddItemToActivityAsync(string activityId, PackingItem item)
         {
             item.ActivityId = activityId;
@@ -161,6 +166,13 @@ namespace Anticipack.Storage
             }
 
             return await query.ToListAsync();
+        }
+
+        public async Task<List<PackingHistoryEntry>> GetAllHistoryAsync()
+        {
+            return await _db.Table<PackingHistoryEntry>()
+                .OrderByDescending(x => x.CompletedDate)
+                .ToListAsync();
         }
 
         public async Task DeleteHistoryForActivityAsync(string activityId)

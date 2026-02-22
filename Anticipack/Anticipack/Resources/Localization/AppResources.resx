@@ -855,4 +855,87 @@ Soap, Towel</value>
   <data name="DurationMinutes" xml:space="preserve">
     <value>{0} minutes</value>
   </data>
+
+  <!-- Statistics Page -->
+  <data name="StatsMenu" xml:space="preserve">
+    <value>Statistics</value>
+  </data>
+  <data name="StatsTitle" xml:space="preserve">
+    <value>Statistics</value>
+  </data>
+  <data name="StatsOverview" xml:space="preserve">
+    <value>Overview</value>
+  </data>
+  <data name="StatsTotalActivities" xml:space="preserve">
+    <value>Activities</value>
+  </data>
+  <data name="StatsTotalSessions" xml:space="preserve">
+    <value>Sessions</value>
+  </data>
+  <data name="StatsItemsPacked" xml:space="preserve">
+    <value>Items Packed</value>
+  </data>
+  <data name="StatsEfficiency" xml:space="preserve">
+    <value>Efficiency</value>
+  </data>
+  <data name="StatsTimeTitle" xml:space="preserve">
+    <value>Time Stats</value>
+  </data>
+  <data name="StatsAvgTime" xml:space="preserve">
+    <value>Average packing time</value>
+  </data>
+  <data name="StatsFastestSession" xml:space="preserve">
+    <value>Fastest session</value>
+  </data>
+  <data name="StatsTotalTime" xml:space="preserve">
+    <value>Total time packing</value>
+  </data>
+  <data name="StatsRecentTrend" xml:space="preserve">
+    <value>Recent Sessions</value>
+  </data>
+  <data name="StatsActivityBreakdown" xml:space="preserve">
+    <value>Activity Highlights</value>
+  </data>
+  <data name="StatsMostPacked" xml:space="preserve">
+    <value>Most Packed</value>
+  </data>
+  <data name="StatsMostEfficient" xml:space="preserve">
+    <value>Most Efficient</value>
+  </data>
+  <data name="StatsNeedsWork" xml:space="preserve">
+    <value>Needs Improvement</value>
+  </data>
+  <data name="StatsMostItems" xml:space="preserve">
+    <value>Largest List</value>
+  </data>
+  <data name="StatsSessionCount" xml:space="preserve">
+    <value>{0} sessions</value>
+  </data>
+  <data name="StatsItemCountValue" xml:space="preserve">
+    <value>{0} items</value>
+  </data>
+  <data name="StatsUsagePatterns" xml:space="preserve">
+    <value>Usage Patterns</value>
+  </data>
+  <data name="StatsStreak" xml:space="preserve">
+    <value>Day Streak</value>
+  </data>
+  <data name="StatsThisMonth" xml:space="preserve">
+    <value>This Month</value>
+  </data>
+  <data name="StatsLastMonth" xml:space="preserve">
+    <value>Last Month</value>
+  </data>
+  <data name="StatsMostActiveDay" xml:space="preserve">
+    <value>Most Active Day</value>
+  </data>
+  <data name="StatsCategoryInsights" xml:space="preserve">
+    <value>Category Insights</value>
+  </data>
+  <data name="StatsTopCategory" xml:space="preserve">
+    <value>Top category: {0}</value>
+  </data>
+  <data name="StatsEmptyHint" xml:space="preserve">
+    <value>Complete some packing sessions to see detailed time stats, activity breakdowns, and usage patterns here.</value>
+  </data>
 </root>

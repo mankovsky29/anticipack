@@ -1,6 +1,19 @@
 export function attach(inputEl, dotNetRef, messagesEl) {
     if (!inputEl) return;
 
+    // Fit page container to available viewport height so input stays visible
+    const container = inputEl.closest('.page-container');
+    if (container) {
+        const fitToViewport = () => {
+            container.style.height = '';
+            const top = container.getBoundingClientRect().top;
+            container.style.height = (window.innerHeight - top) + 'px';
+        };
+        fitToViewport();
+        inputEl.__fitToViewport = fitToViewport;
+        window.addEventListener('resize', fitToViewport);
+    }
+
     // Auto-resize textarea
     const autoResize = function () {
         inputEl.style.height = 'auto';
@@ -23,6 +36,10 @@ export function attach(inputEl, dotNetRef, messagesEl) {
 
 export function detach(inputEl) {
     if (!inputEl) return;
+    if (inputEl.__fitToViewport) {
+        window.removeEventListener('resize', inputEl.__fitToViewport);
+        delete inputEl.__fitToViewport;
+    }
     if (inputEl.__supportAutoResize) {
         inputEl.removeEventListener('input', inputEl.__supportAutoResize);
         delete inputEl.__supportAutoResize;

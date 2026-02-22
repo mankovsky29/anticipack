@@ -64,7 +64,7 @@ public partial class Support : IAsyncDisposable
         if (isVisible)
         {
             _ = JS.InvokeVoidAsync("adjustPageForKeyboard", height);
-            _ = JS.InvokeVoidAsync("scrollActiveElementIntoView");
+            _ = JS.InvokeVoidAsync("scrollActiveElementIntoView", height);
         }
         else
         {

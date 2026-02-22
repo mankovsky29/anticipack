@@ -77,3 +77,12 @@ export function unregisterOverflowClickOutside() {
         _overflowClickOutsideHandler = null;
     }
 }
+
+export function focusAndSetCursorToEnd(element) {
+    if (!element) return;
+    requestAnimationFrame(function () {
+        element.focus();
+        var len = element.value ? element.value.length : 0;
+        element.setSelectionRange(len, len);
+    });
+}

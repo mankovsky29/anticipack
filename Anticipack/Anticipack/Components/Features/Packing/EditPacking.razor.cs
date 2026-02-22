@@ -53,6 +53,11 @@ public partial class EditPacking : IAsyncDisposable
     private HashSet<string> _existingItemNames = new(StringComparer.OrdinalIgnoreCase);
     private ElementReference quickAddInputRef;
     private bool _isCategoryLocked = false; // When adding from category header, hide category selector
+
+    // Autocomplete suggestions
+    private List<string> _allDistinctItemNames = [];
+    private Dictionary<string, HashSet<string>> _itemNameCategories = new(StringComparer.OrdinalIgnoreCase);
+    private List<string> _suggestions = [];
     private string? _addingToCategory = null; // Which category to show the form above (null = top of list)
 
     private bool HasInput => _isQuickAddMode 
@@ -169,6 +174,7 @@ public partial class EditPacking : IAsyncDisposable
         _isCategoryDropdownOpen = false;
         _isCategoryLocked = false;
         _addingToCategory = null;
+        _suggestions = [];
         await SyncClickOutsideHandlerAsync();
     }
 
@@ -262,6 +268,8 @@ public partial class EditPacking : IAsyncDisposable
             _newCategory = PackingCategory.Miscellaneous.ToString();
         }
 
+        await LoadAllItemNamesAsync();
+        _suggestions = [];
         _pendingScrollToAddForm = true;
         await SyncClickOutsideHandlerAsync();
     }
@@ -286,6 +294,8 @@ public partial class EditPacking : IAsyncDisposable
             .Select(i => i.Item.Name.ToLower())
             .ToHashSet(StringComparer.OrdinalIgnoreCase);
 
+        await LoadAllItemNamesAsync();
+        _suggestions = [];
         _pendingScrollToAddForm = true;
         await SyncClickOutsideHandlerAsync();
     }
@@ -319,11 +329,13 @@ public partial class EditPacking : IAsyncDisposable
     private void OnInputChanged()
     {
         UpdateParsedItems();
+        UpdateSuggestions();
     }
 
     private async Task OnBulkTextChanged()
     {
         UpdateParsedItems();
+        UpdateSuggestions();
         await HandleTextareaAutoGrow();
     }
 
@@ -1097,6 +1109,140 @@ public partial class EditPacking : IAsyncDisposable
         {
             _ = ConfirmAddAsync();
         }
+    }
+
+    private async Task LoadAllItemNamesAsync()
+    {
+        try
+        {
+            var allItems = await PackingRepository.GetAllItemsAsync();
+            _allDistinctItemNames = allItems
+                .Select(i => i.Name)
+                .Where(n => !string.IsNullOrWhiteSpace(n))
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .OrderBy(n => n)
+                .ToList();
+
+            _itemNameCategories = allItems
+                .Where(i => !string.IsNullOrWhiteSpace(i.Name) && !string.IsNullOrWhiteSpace(i.Category))
+                .GroupBy(i => i.Name, StringComparer.OrdinalIgnoreCase)
+                .ToDictionary(
+                    g => g.Key,
+                    g => new HashSet<string>(g.Select(i => i.Category), StringComparer.OrdinalIgnoreCase),
+                    StringComparer.OrdinalIgnoreCase);
+        }
+        catch
+        {
+            _allDistinctItemNames = [];
+            _itemNameCategories = new(StringComparer.OrdinalIgnoreCase);
+        }
+    }
+
+    private string GetCurrentSearchToken()
+    {
+        if (_isQuickAddMode)
+        {
+            return _quickAddText?.Trim() ?? string.Empty;
+        }
+
+        var text = _bulkItemsText ?? string.Empty;
+        if (string.IsNullOrEmpty(text))
+            return string.Empty;
+
+        var lastNewline = text.LastIndexOf('\n');
+        var lastComma = text.LastIndexOf(',');
+        var lastDelimiter = Math.Max(lastNewline, lastComma);
+
+        return lastDelimiter < 0
+            ? text.Trim()
+            : text[(lastDelimiter + 1)..].Trim();
+    }
+
+    private void UpdateSuggestions()
+    {
+        var token = GetCurrentSearchToken();
+
+        if (string.IsNullOrWhiteSpace(token))
+        {
+            _suggestions = [];
+            return;
+        }
+
+        var alreadyAdding = new HashSet<string>(_parsedItems, StringComparer.OrdinalIgnoreCase);
+
+        bool IsSameCategory(string name) =>
+            _itemNameCategories.TryGetValue(name, out var cats)
+            && cats.Contains(_newCategory, StringComparer.OrdinalIgnoreCase);
+
+        var candidates = _allDistinctItemNames
+            .Where(name => !_existingItemNames.Contains(name)
+                        && !alreadyAdding.Contains(name)
+                        && !string.Equals(name, token, StringComparison.OrdinalIgnoreCase));
+
+        var startsWithMatches = candidates
+            .Where(name => name.StartsWith(token, StringComparison.OrdinalIgnoreCase))
+            .OrderByDescending(IsSameCategory)
+            .Take(3)
+            .ToList();
+
+        if (startsWithMatches.Count >= 3)
+        {
+            _suggestions = startsWithMatches;
+            return;
+        }
+
+        var containsMatches = candidates
+            .Where(name => name.Contains(token, StringComparison.OrdinalIgnoreCase)
+                        && !name.StartsWith(token, StringComparison.OrdinalIgnoreCase))
+            .OrderByDescending(IsSameCategory)
+            .Take(3 - startsWithMatches.Count);
+
+        _suggestions = [..startsWithMatches, ..containsMatches];
+    }
+
+    private async Task SelectSuggestion(string suggestion)
+    {
+        if (_isQuickAddMode)
+        {
+            _quickAddText = suggestion;
+        }
+        else
+        {
+            var text = _bulkItemsText ?? string.Empty;
+            var lastNewline = text.LastIndexOf('\n');
+            var lastComma = text.LastIndexOf(',');
+            var lastDelimiter = Math.Max(lastNewline, lastComma);
+
+            if (lastDelimiter < 0)
+            {
+                _bulkItemsText = suggestion + "\n";
+            }
+            else
+            {
+                var prefix = text[..(lastDelimiter + 1)];
+                var delimiter = text[lastDelimiter];
+
+                _bulkItemsText = delimiter == ','
+                    ? prefix + " " + suggestion + ", "
+                    : prefix + suggestion + "\n";
+            }
+        }
+
+        _suggestions = [];
+        UpdateParsedItems();
+
+        // Let Blazor re-render the DOM with the new value before refocusing
+        await Task.Yield();
+
+        try
+        {
+            if (_editPackingModule is not null)
+            {
+                var targetRef = _isQuickAddMode ? quickAddInputRef : bulkItemsTextarea;
+                await _editPackingModule.InvokeVoidAsync("focusAndSetCursorToEnd", targetRef);
+            }
+        }
+        catch { }
     }
 
     private async Task HandleTextareaAutoGrow()

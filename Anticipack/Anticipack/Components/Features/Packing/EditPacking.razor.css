@@ -2335,6 +2335,43 @@ ul.category-content {
     border: 1px solid var(--border-color);
 }
 
+/* Suggestion Chips (autocomplete) */
+.suggestion-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.suggestion-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: var(--primary-light-bg);
+    border: 1px dashed var(--primary);
+    border-radius: 20px;
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    color: var(--primary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.suggestion-chip:hover {
+    background: var(--primary);
+    color: white;
+    border-style: solid;
+}
+
+.suggestion-chip:active {
+    transform: scale(0.96);
+}
+
+.suggestion-chip i {
+    font-size: 10px;
+}
+
 .preview-header {
     display: flex;
     justify-content: space-between;

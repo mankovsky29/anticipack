@@ -409,6 +409,23 @@
                         </div>
                     }
 
+                    <!-- Autocomplete suggestions -->
+                    @if (_suggestions.Count > 0)
+                    {
+                        <div class="suggestion-chips">
+                            @foreach (var suggestion in _suggestions)
+                            {
+                                <button type="button"
+                                        class="suggestion-chip"
+                                        @onclick="() => SelectSuggestion(suggestion)"
+                                        @onclick:stopPropagation>
+                                    <i class="fa fa-plus"></i>
+                                    <span>@suggestion</span>
+                                </button>
+                            }
+                        </div>
+                    }
+
                     <!-- Interim transcript for speech -->
                     @if (!string.IsNullOrWhiteSpace(_interimTranscript))
                     {

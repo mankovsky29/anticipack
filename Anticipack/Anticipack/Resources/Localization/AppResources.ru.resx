@@ -132,9 +132,6 @@
   <data name="CreateActivity" xml:space="preserve">
     <value>Создать активность упаковки</value>
   </data>
-  <data name="LastPacked" xml:space="preserve">
-    <value>Последняя упаковка:</value>
-  </data>
   <data name="PackNow" xml:space="preserve">
     <value>Упаковать сейчас</value>
   </data>
@@ -144,9 +141,6 @@
   <data name="Delete" xml:space="preserve">
     <value>Удалить</value>
   </data>
-  <data name="Search" xml:space="preserve">
-    <value>Поиск</value>
-  </data>
   <data name="AddActivity" xml:space="preserve">
     <value>Добавить активность</value>
   </data>
@@ -155,9 +149,6 @@
   </data>
   <data name="Name" xml:space="preserve">
     <value>Название</value>
-  </data>
-  <data name="Category" xml:space="preserve">
-    <value>Категория</value>
   </data>
   <data name="Cancel" xml:space="preserve">
     <value>Отмена</value>
@@ -195,12 +186,6 @@
   <data name="Appearance" xml:space="preserve">
     <value>Внешний вид</value>
   </data>
-  <data name="PersonalizeAppLooks" xml:space="preserve">
-    <value>Персонализируйте внешний вид приложения</value>
-  </data>
-  <data name="Theme" xml:space="preserve">
-    <value>Тема</value>
-  </data>
   <data name="LightTheme" xml:space="preserve">
     <value>Светлая</value>
   </data>
@@ -219,20 +204,8 @@
   <data name="AutoThemeTitle" xml:space="preserve">
     <value>Автоматическая тема на основе системных настроек</value>
   </data>
-  <data name="AutoThemeHint" xml:space="preserve">
-    <value>Приложение автоматически подстроится под системную тему вашего устройства</value>
-  </data>
-  <data name="DarkThemeHint" xml:space="preserve">
-    <value>Тёмная тема снижает напряжение глаз в условиях низкой освещённости</value>
-  </data>
-  <data name="LightThemeHint" xml:space="preserve">
-    <value>Светлая тема идеальна для ярких условий</value>
-  </data>
   <data name="Notifications" xml:space="preserve">
     <value>Уведомления</value>
-  </data>
-  <data name="ManageNotificationPreferences" xml:space="preserve">
-    <value>Управляйте настройками уведомлений</value>
   </data>
   <data name="PushNotifications" xml:space="preserve">
     <value>Push-уведомления</value>
@@ -246,9 +219,6 @@
   <data name="DataStorage" xml:space="preserve">
     <value>Данные и Хранилище</value>
   </data>
-  <data name="ManageAppData" xml:space="preserve">
-    <value>Управление данными приложения</value>
-  </data>
   <data name="ClearCache" xml:space="preserve">
     <value>Очистить кэш</value>
   </data>
@@ -257,9 +227,6 @@
   </data>
   <data name="Language" xml:space="preserve">
     <value>Язык</value>
-  </data>
-  <data name="ChoosePreferredLanguage" xml:space="preserve">
-    <value>Выберите предпочитаемый язык</value>
   </data>
   <data name="Version" xml:space="preserve">
     <value>Версия</value>
@@ -306,12 +273,6 @@
   <data name="HideCheckedItems" xml:space="preserve">
     <value>Скрыть отмеченные предметы</value>
   </data>
-  <data name="ShowHistory" xml:space="preserve">
-    <value>Показать историю</value>
-  </data>
-  <data name="HideHistory" xml:space="preserve">
-    <value>Скрыть историю</value>
-  </data>
   <data name="ResetAllItems" xml:space="preserve">
     <value>Сбросить все предметы</value>
   </data>
@@ -348,9 +309,6 @@
   <data name="YouPackedItems" xml:space="preserve">
     <value>Вы упаковали {0} предметов за {1}</value>
   </data>
-  <data name="Efficiency" xml:space="preserve">
-    <value>Эффективность</value>
-  </data>
   <data name="ComparedToLastTime" xml:space="preserve">
     <value>По сравнению с прошлым разом</value>
   </data>
@@ -360,29 +318,8 @@
   <data name="FinishPacking" xml:space="preserve">
     <value>Завершить упаковку</value>
   </data>
-  <data name="ConfirmFinishPacking" xml:space="preserve">
-    <value>Вы упаковали {0} из {1} предметов. Вы уверены, что хотите завершить упаковку?</value>
-  </data>
   <data name="FinishNow" xml:space="preserve">
     <value>Завершить сейчас</value>
-  </data>
-  <data name="PackingFinished" xml:space="preserve">
-    <value>Упаковка завершена!</value>
-  </data>
-  <data name="ShowCheckedItems" xml:space="preserve">
-    <value>Показать</value>
-  </data>
-  <data name="HideLabel" xml:space="preserve">
-    <value>Скрыть</value>
-  </data>
-  <data name="SwitchToEditMode" xml:space="preserve">
-    <value>Переключиться в режим редактирования?</value>
-  </data>
-  <data name="EditingMightAffectProgress" xml:space="preserve">
-    <value>Редактирование этого списка упаковки может повлиять на ваш текущий прогресс упаковки.</value>
-  </data>
-  <data name="ContinueToEdit" xml:space="preserve">
-    <value>Продолжить редактирование</value>
   </data>
   <data name="ResetPackingList" xml:space="preserve">
     <value>Сбросить список упаковки</value>
@@ -393,15 +330,6 @@
   <data name="ResetAll" xml:space="preserve">
     <value>Сбросить всё</value>
   </data>
-  <data name="ResetItemsSuccess" xml:space="preserve">
-    <value>Сброшено {0} предметов</value>
-  </data>
-  <data name="ItemPacked" xml:space="preserve">
-    <value>✓ {0} упаковано</value>
-  </data>
-  <data name="ItemUnpacked" xml:space="preserve">
-    <value>◯ {0} распаковано</value>
-  </data>
   <data name="FailedToLoadItems" xml:space="preserve">
     <value>Ошибка загрузки предметов</value>
   </data>
@@ -411,19 +339,13 @@
   <data name="ErrorResettingItems" xml:space="preserve">
     <value>Ошибка сброса предметов: {0}</value>
   </data>
-  <data name="PackingCompletedRecorded" xml:space="preserve">
-    <value>Упаковка завершена и записана!</value>
-  </data>
   <data name="PackingActivity" xml:space="preserve">
     <value>Активность упаковки</value>
   </data>
   <data name="Send" xml:space="preserve">
     <value>Отправить</value>
   </data>
-    <!-- EditPacking Page -->
-  <data name="DeleteTitle" xml:space="preserve">
-    <value>Удалить</value>
-  </data>
+  <!-- EditPacking Page -->
   <data name="CopyTitle" xml:space="preserve">
     <value>Копировать</value>
   </data>
@@ -433,20 +355,11 @@
   <data name="AddItem" xml:space="preserve">
     <value>Добавить</value>
   </data>
-  <data name="AddNewItems" xml:space="preserve">
-    <value>Добавить новые предметы</value>
-  </data>
   <data name="EnterActivityName" xml:space="preserve">
     <value>Введите название активности...</value>
   </data>
-  <data name="EnterItemName" xml:space="preserve">
-    <value>Введите название предмета...</value>
-  </data>
   <data name="SelectCategory" xml:space="preserve">
     <value>Выберите категорию:</value>
-  </data>
-  <data name="NotesOptional" xml:space="preserve">
-    <value>Заметки (необязательно):</value>
   </data>
   <data name="AddNotesAboutItem" xml:space="preserve">
     <value>Добавьте заметки об этом предмете...</value>
@@ -454,26 +367,14 @@
   <data name="ItemName" xml:space="preserve">
     <value>Название предмета...</value>
   </data>
-  <data name="DeleteItem" xml:space="preserve">
-    <value>Удалить предмет</value>
-  </data>
   <data name="Save" xml:space="preserve">
     <value>Сохранить</value>
-  </data>
-  <data name="TypeItemNameForQuickAdd" xml:space="preserve">
-    <value>Введите название для быстрого добавления...</value>
-  </data>
-  <data name="EnterItemNameFirst" xml:space="preserve">
-    <value>Сначала введите название предмета</value>
   </data>
   <data name="DeleteItemTitle" xml:space="preserve">
     <value>Удалить предмет</value>
   </data>
   <data name="DeleteItemMessage" xml:space="preserve">
     <value>Вы уверены, что хотите удалить "{0}"?</value>
-  </data>
-  <data name="ItemDeleted" xml:space="preserve">
-    <value>Удалено "{0}"</value>
   </data>
   <data name="FailedToDeleteItem" xml:space="preserve">
     <value>Ошибка удаления предмета: {0}</value>
@@ -491,20 +392,11 @@
     <value>Вы уверены, что хотите удалить эту активность упаковки?
 Это действие нельзя отменить.</value>
   </data>
-  <data name="PackingActivityDeleted" xml:space="preserve">
-    <value>Активность упаковки успешно удалена.</value>
-  </data>
   <data name="FailedToDeleteActivity" xml:space="preserve">
     <value>Ошибка удаления активности упаковки: {0}</value>
   </data>
-  <data name="ItemAdded" xml:space="preserve">
-    <value>Добавлено {0}</value>
-  </data>
   <data name="ErrorAddingItem" xml:space="preserve">
     <value>Ошибка добавления предмета: {0}</value>
-  </data>
-  <data name="ItemUpdated" xml:space="preserve">
-    <value>Предмет обновлён</value>
   </data>
   <data name="FailedToUpdateItem" xml:space="preserve">
     <value>Ошибка обновления предмета: {0}</value>
@@ -512,7 +404,7 @@
   <data name="UnnamedItem" xml:space="preserve">
     <value>Безымянный предмет</value>
   </data>
-    <!-- Navigation Menu -->
+  <!-- Navigation Menu -->
   <data name="NavigationMenu" xml:space="preserve">
     <value>Меню навигации</value>
   </data>
@@ -532,7 +424,7 @@
     <value>Активные</value>
   </data>
   <data name="Archived" xml:space="preserve">
-    <value>Архивный</value>
+    <value>Архивные</value>
   </data>
   <data name="Archive" xml:space="preserve">
     <value>Архивировать</value>
@@ -540,32 +432,8 @@
   <data name="Unarchive" xml:space="preserve">
     <value>Разархивировать</value>
   </data>
-  <data name="All" xml:space="preserve">
-    <value>Все</value>
-  </data>
-  <data name="Private" xml:space="preserve">
-    <value>Личные</value>
-  </data>
-  <data name="Shared" xml:space="preserve">
-    <value>Общие</value>
-  </data>
   <data name="SharedActivity" xml:space="preserve">
     <value>Общая активность</value>
-  </data>
-  <data name="MakeShared" xml:space="preserve">
-    <value>Сделать общей</value>
-  </data>
-  <data name="MakePrivate" xml:space="preserve">
-    <value>Сделать личной</value>
-  </data>
-  <data name="SharedActivityDescription" xml:space="preserve">
-    <value>Общие активности доступны другим пользователям</value>
-  </data>
-  <data name="ConfirmMakeShared" xml:space="preserve">
-    <value>Вы уверены, что хотите сделать "{0}" общей для других пользователей?</value>
-  </data>
-  <data name="ConfirmMakePrivate" xml:space="preserve">
-    <value>Вы уверены, что хотите сделать "{0}" личной?</value>
   </data>
   <data name="ConfirmArchive" xml:space="preserve">
     <value>Вы уверены, что хотите архивировать "{0}"?</value>
@@ -573,17 +441,8 @@
   <data name="ConfirmUnarchive" xml:space="preserve">
     <value>Вы уверены, что хотите разархивировать "{0}"?</value>
   </data>
-  <data name="ChangeShareStatus" xml:space="preserve">
-    <value>Изменить статус общего доступа</value>
-  </data>
   <data name="ChangeArchiveStatus" xml:space="preserve">
     <value>Изменить статус архива</value>
-  </data>
-  <data name="ActivityNowShared" xml:space="preserve">
-    <value>"{0}" теперь общая</value>
-  </data>
-  <data name="ActivityNowPrivate" xml:space="preserve">
-    <value>"{0}" теперь личная</value>
   </data>
   <data name="ActivityArchived" xml:space="preserve">
     <value>"{0}" архивирована</value>
@@ -591,17 +450,8 @@
   <data name="ActivityUnarchived" xml:space="preserve">
     <value>"{0}" разархивирована</value>
   </data>
-  <data name="FailedToUpdateShareStatus" xml:space="preserve">
-    <value>Ошибка изменения статуса общего доступа</value>
-  </data>
   <data name="FailedToUpdateArchiveStatus" xml:space="preserve">
     <value>Ошибка изменения статуса архива</value>
-  </data>
-  <data name="Runs" xml:space="preserve">
-    <value>запусков</value>
-  </data>
-  <data name="Categories" xml:space="preserve">
-    <value>категорий</value>
   </data>
   <data name="JustNow" xml:space="preserve">
     <value>Только что</value>
@@ -624,198 +474,136 @@
   <data name="Confirm" xml:space="preserve">
     <value>Подтвердить</value>
   </data>
-
   <!-- Missing keys added -->
   <data name="More" xml:space="preserve">
     <value>Ещё</value>
   </data>
-
   <data name="NameRequired" xml:space="preserve">
     <value>Требуется название</value>
   </data>
-
   <data name="Creating" xml:space="preserve">
     <value>Создание...</value>
   </data>
-
   <!-- Support Page -->
   <data name="Support" xml:space="preserve">
     <value>Поддержка</value>
   </data>
-
   <data name="SupportMenu" xml:space="preserve">
     <value>Поддержка</value>
   </data>
-
   <data name="OtherWaysToReach" xml:space="preserve">
     <value>Другие способы связи</value>
   </data>
-
   <data name="Email" xml:space="preserve">
     <value>Электронная почта</value>
   </data>
-
   <data name="YourMessages" xml:space="preserve">
     <value>Ваши сообщения</value>
   </data>
-
   <data name="NoMessagesYet" xml:space="preserve">
     <value>Пока нет сообщений</value>
   </data>
-
   <data name="SendFirstMessage" xml:space="preserve">
     <value>Отправьте первое сообщение, чтобы получить помощь от нашей команды поддержки</value>
   </data>
-
   <data name="You" xml:space="preserve">
     <value>Вы</value>
   </data>
-
   <data name="SupportTeam" xml:space="preserve">
     <value>Команда поддержки</value>
   </data>
-
   <data name="Sending" xml:space="preserve">
     <value>Отправка...</value>
   </data>
-
   <data name="Sent" xml:space="preserve">
     <value>Отправлено</value>
   </data>
-
   <data name="SendFailed" xml:space="preserve">
     <value>Не удалось отправить</value>
   </data>
-
   <data name="TypeYourMessage" xml:space="preserve">
     <value>Введите ваше сообщение...</value>
   </data>
-
   <data name="PrivacyNotice" xml:space="preserve">
     <value>Ваши сообщения зашифрованы и конфиденциальны</value>
   </data>
-
   <data name="WelcomeToSupport" xml:space="preserve">
     <value>Добро пожаловать в службу поддержки Anticipack! Как мы можем помочь вам сегодня?</value>
   </data>
-
   <data name="AutoReplyMessage" xml:space="preserve">
     <value>Спасибо за ваше сообщение! Наша команда поддержки свяжется с вами как можно скорее.</value>
   </data>
-
   <!-- Bulk Add Items -->
   <data name="BulkAddPlaceholder" xml:space="preserve">
     <value>Зубная щётка, Зубная паста
 Шампунь
 Мыло, Полотенце</value>
   </data>
-
   <data name="BulkAddHint" xml:space="preserve">
     <value>Разделяйте предметы новой строкой или запятой. Все предметы будут добавлены в выбранную категорию.</value>
   </data>
-
-  <data name="ItemsAdded" xml:space="preserve">
-    <value>Добавлено {0} предметов</value>
-  </data>
-
-  <data name="FailedToAddItems" xml:space="preserve">
-    <value>Не удалось добавить {0} предметов</value>
-  </data>
-
   <data name="ConfirmFinishPackingWithAutoCheck" xml:space="preserve">
     <value>Вы упаковали {0} из {1} предметов. Оставшиеся {2} предмет(ов) будут автоматически отмечены. Хотите завершить упаковку?</value>
   </data>
-
   <!-- Speech to Text -->
   <data name="StartDictation" xml:space="preserve">
     <value>Начать диктовку</value>
   </data>
-
   <data name="StopDictation" xml:space="preserve">
     <value>Остановить диктовку</value>
   </data>
-
   <data name="Listening" xml:space="preserve">
     <value>Слушаю...</value>
   </data>
-
   <data name="SpeechNotSupported" xml:space="preserve">
     <value>Распознавание речи не поддерживается в вашем браузере</value>
   </data>
-
   <data name="SpeechError" xml:space="preserve">
     <value>Ошибка распознавания речи: {0}</value>
   </data>
-
   <data name="MicrophonePermissionDenied" xml:space="preserve">
     <value>Отказано в доступе к микрофону</value>
   </data>
-
   <data name="MicrophonePermissionHelp" xml:space="preserve">
     <value>Пожалуйста, разрешите доступ к микрофону в настройках браузера, чтобы использовать голосовую диктовку</value>
   </data>
-
   <data name="NoSpeechDetected" xml:space="preserve">
     <value>Речь не обнаружена. Пожалуйста, попробуйте снова.</value>
   </data>
-
   <data name="AudioCaptureError" xml:space="preserve">
     <value>Не удалось захватить аудио. Пожалуйста, проверьте микрофон.</value>
   </data>
-
   <data name="NetworkErrorSpeech" xml:space="preserve">
     <value>Ошибка сети. Пожалуйста, проверьте подключение к интернету.</value>
   </data>
-
-  <data name="GrantMicrophonePermission" xml:space="preserve">
-    <value>Предоставить доступ к микрофону</value>
-  </data>
-
   <data name="LanguageNotSupported" xml:space="preserve">
     <value>Распознавание речи не поддерживается для выбранного языка. Переключение на английский.</value>
   </data>
-
-  <data name="SpeechRecognitionLanguage" xml:space="preserve">
-    <value>Язык распознавания речи</value>
-  </data>
-
-  <data name="UseAppLanguage" xml:space="preserve">
-    <value>Использовать язык приложения для распознавания речи</value>
-  </data>
-
   <!-- Donate Page -->
   <data name="Donate" xml:space="preserve">
     <value>Пожертвовать</value>
   </data>
-
   <data name="DonateTitle" xml:space="preserve">
     <value>Поддержать Anticipack</value>
   </data>
-
   <data name="DonateDescription" xml:space="preserve">
     <value>Ваша поддержка помогает нам продолжать разработку и улучшение Anticipack. Спасибо, что рассматриваете возможность пожертвования!</value>
   </data>
-
   <data name="SelectAmount" xml:space="preserve">
     <value>Выберите сумму</value>
   </data>
-
   <data name="CustomAmount" xml:space="preserve">
     <value>Или введите свою сумму</value>
   </data>
-
   <data name="DonateNow" xml:space="preserve">
     <value>Пожертвовать</value>
   </data>
-
   <data name="DonateThankYou" xml:space="preserve">
     <value>Каждый вклад, большой или маленький, имеет значение. Спасибо за вашу поддержку!</value>
   </data>
-
   <data name="SupportUsDescription" xml:space="preserve">
     <value>Помогите нам улучшить Anticipack</value>
   </data>
-
   <!-- Payment Methods -->
   <data name="PaymentMethod" xml:space="preserve">
     <value>Способ оплаты</value>
@@ -834,9 +622,6 @@
   </data>
   <data name="PayPalHint" xml:space="preserve">
     <value>Оплата через PayPal</value>
-  </data>
-  <data name="PayWithPayPal" xml:space="preserve">
-    <value>Оплатить через PayPal</value>
   </data>
   <data name="LoadingProducts" xml:space="preserve">
     <value>Загрузка вариантов оплаты...</value>
@@ -871,19 +656,9 @@
   <data name="RestoreFailed" xml:space="preserve">
     <value>Не удалось восстановить покупки. Попробуйте ещё раз.</value>
   </data>
-
   <!-- Add Items Form -->
   <data name="AddItems" xml:space="preserve">
     <value>Добавить предметы</value>
-  </data>
-  <data name="QuickAdd" xml:space="preserve">
-    <value>Быстрое добавление</value>
-  </data>
-  <data name="BulkAdd" xml:space="preserve">
-    <value>Массовое добавление</value>
-  </data>
-  <data name="EnterItemNamePlaceholder" xml:space="preserve">
-    <value>Введите название предмета...</value>
   </data>
   <data name="EnterItems" xml:space="preserve">
     <value>Введите предметы</value>
@@ -909,7 +684,6 @@
   <data name="AddItemsCount" xml:space="preserve">
     <value>Добавить {0} предметов</value>
   </data>
-
   <!-- Activity Type -->
   <data name="ActivityType" xml:space="preserve">
     <value>Тип активности</value>
@@ -926,7 +700,6 @@
   <data name="OneTimeActivityDescription" xml:space="preserve">
     <value>Автоматически архивируется после завершения</value>
   </data>
-
   <!-- Empty State -->
   <data name="NoItemsYet" xml:space="preserve">
     <value>Пока нет предметов</value>
@@ -934,7 +707,6 @@
   <data name="AddFirstItem" xml:space="preserve">
     <value>Добавьте первый предмет</value>
   </data>
-
   <!-- Error Messages -->
   <data name="ActivityIdEmpty" xml:space="preserve">
     <value>ID активности пуст</value>
@@ -951,7 +723,6 @@
   <data name="ErrorFinishingPacking" xml:space="preserve">
     <value>Ошибка завершения упаковки: {0}</value>
   </data>
-
   <!-- History & Duration -->
   <data name="PackedItemsInMinutes" xml:space="preserve">
     <value>Упаковано {0} предметов за {1} минут</value>
@@ -959,7 +730,6 @@
   <data name="DurationMinutes" xml:space="preserve">
     <value>{0} минут</value>
   </data>
-
   <!-- Statistics Page -->
   <data name="StatsMenu" xml:space="preserve">
     <value>Статистика</value>

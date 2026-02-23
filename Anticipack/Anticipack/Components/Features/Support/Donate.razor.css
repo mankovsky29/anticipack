@@ -1,37 +1,37 @@
 .donate-page {
-    padding: var(--space-xl);
+    padding: var(--space-md);
     max-width: 600px;
     margin: 0 auto;
 }
 
 .donate-header {
     text-align: center;
-    margin-bottom: var(--space-xl);
+    margin-bottom: var(--space-md);
 }
 
 .donate-icon {
-    width: 64px;
-    height: 64px;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
     background: linear-gradient(135deg, var(--danger), var(--primary));
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 0 auto var(--space-md);
-    font-size: var(--font-size-xl);
+    margin: 0 auto var(--space-sm);
+    font-size: var(--font-size-lg);
     color: white;
 }
 
 .donate-header h1 {
     color: var(--text-primary);
-    font-size: var(--font-size-xl);
-    margin-bottom: var(--space-sm);
+    font-size: var(--font-size-lg);
+    margin-bottom: var(--space-xs);
 }
 
 .donate-description {
     color: var(--text-secondary);
-    font-size: var(--font-size-md);
-    line-height: 1.5;
+    font-size: var(--font-size-sm);
+    line-height: 1.4;
 }
 
 /* Loading */
@@ -50,13 +50,13 @@
 
 /* Payment Method Selection */
 .payment-method-section {
-    margin-bottom: var(--space-lg);
+    margin-bottom: var(--space-md);
 }
 
 .payment-method-section h2 {
     color: var(--text-primary);
-    font-size: var(--font-size-lg);
-    margin-bottom: var(--space-md);
+    font-size: var(--font-size-md);
+    margin-bottom: var(--space-sm);
 }
 
 .method-options {
@@ -70,7 +70,7 @@
     flex-direction: column;
     align-items: center;
     gap: var(--space-xs);
-    padding: var(--space-md);
+    padding: var(--space-sm);
     background: var(--surface);
     border: 2px solid var(--border-color);
     border-radius: var(--border-radius);
@@ -110,29 +110,29 @@
 .donate-options {
     background: var(--surface);
     border-radius: var(--border-radius);
-    padding: var(--space-xl);
+    padding: var(--space-md);
     box-shadow: var(--shadow);
 }
 
 .donate-options h2 {
     color: var(--text-primary);
-    font-size: var(--font-size-lg);
-    margin-bottom: var(--space-lg);
+    font-size: var(--font-size-md);
+    margin-bottom: var(--space-sm);
 }
 
 .product-cards {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: var(--space-md);
-    margin-bottom: var(--space-xl);
+    gap: var(--space-sm);
+    margin-bottom: var(--space-md);
 }
 
 .product-card {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: var(--space-sm);
-    padding: var(--space-lg) var(--space-md);
+    gap: var(--space-xs);
+    padding: var(--space-sm);
     background: var(--background);
     border: 2px solid var(--border-color);
     border-radius: var(--border-radius);
@@ -159,14 +159,14 @@
 }
 
 .product-icon {
-    width: 48px;
-    height: 48px;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
     background: var(--primary-light-bg);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: var(--font-size-lg);
+    font-size: var(--font-size-md);
     color: var(--primary);
 }
 
@@ -191,7 +191,7 @@
     display: flex;
     align-items: center;
     gap: var(--space-md);
-    margin-bottom: var(--space-lg);
+    margin-bottom: var(--space-sm);
     color: var(--text-secondary);
     font-size: var(--font-size-sm);
     font-weight: 500;
@@ -209,15 +209,15 @@
 .amount-buttons {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: var(--space-md);
-    margin-bottom: var(--space-xl);
+    gap: var(--space-sm);
+    margin-bottom: var(--space-md);
 }
 
 .amount-option {
     background: var(--background);
     border: 2px solid var(--border-color);
     border-radius: var(--border-radius-sm);
-    padding: var(--space-lg) var(--space-md);
+    padding: var(--space-sm) var(--space-md);
     cursor: pointer;
     transition: all var(--transition-fast);
     color: var(--text-primary);
@@ -240,12 +240,12 @@
 
 .amount-value {
     display: block;
-    font-size: var(--font-size-xl);
+    font-size: var(--font-size-lg);
 }
 
 /* Custom Amount */
 .custom-amount {
-    margin-bottom: var(--space-xl);
+    margin-bottom: var(--space-md);
 }
 
 .custom-amount label {
@@ -363,8 +363,8 @@
     align-items: center;
     justify-content: center;
     gap: var(--space-sm);
-    margin-top: var(--space-lg);
-    padding: var(--space-sm) var(--space-md);
+    margin-top: var(--space-sm);
+    padding: var(--space-xs) var(--space-md);
     color: var(--success);
     font-size: var(--font-size-sm);
     font-weight: 500;
@@ -377,7 +377,7 @@
 /* Footer */
 .donate-footer {
     text-align: center;
-    margin-top: var(--space-xl);
+    margin-top: var(--space-md);
     color: var(--text-secondary);
 }
 
@@ -388,15 +388,15 @@
     }
 
     .donate-options {
-        padding: var(--space-lg);
+        padding: var(--space-sm);
     }
 
     .product-cards {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(3, 1fr);
     }
 
     .amount-buttons {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(3, 1fr);
     }
 
     .method-options {

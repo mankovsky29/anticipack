@@ -264,6 +264,9 @@
   <data name="Done" xml:space="preserve">
     <value>Done!</value>
   </data>
+  <data name="FullyPacked" xml:space="preserve">
+    <value>All items packed</value>
+  </data>
   <data name="PackingHistory" xml:space="preserve">
     <value>Packing History</value>
   </data>

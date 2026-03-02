@@ -348,6 +348,9 @@
   <data name="Done" xml:space="preserve">
     <value>¡Listo!</value>
   </data>
+  <data name="FullyPacked" xml:space="preserve">
+    <value>Todos los artículos empacados</value>
+  </data>
   <data name="PackingHistory" xml:space="preserve">
     <value>Historial de Empaque</value>
   </data>

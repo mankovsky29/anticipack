@@ -288,6 +288,9 @@
   <data name="Done" xml:space="preserve">
     <value>Готово!</value>
   </data>
+  <data name="FullyPacked" xml:space="preserve">
+    <value>Все предметы упакованы</value>
+  </data>
   <data name="PackingHistory" xml:space="preserve">
     <value>История упаковки</value>
   </data>

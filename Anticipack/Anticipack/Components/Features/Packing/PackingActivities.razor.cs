@@ -33,6 +33,7 @@ public partial class PackingActivities : IAsyncDisposable
 
     private List<Storage.PackingActivity> _activities = new();
     private Dictionary<string, int> _activityItemCounts = new();
+    private Dictionary<string, int> _activityPackedCounts = new();
     private Dictionary<string, List<string>> _activityTopCategories = new();
     private bool _isLoading = true;
     private string _searchTerm = string.Empty;
@@ -180,12 +181,14 @@ public partial class PackingActivities : IAsyncDisposable
 
             // Load metadata for each activity
             _activityItemCounts.Clear();
+            _activityPackedCounts.Clear();
             _activityTopCategories.Clear();
-            
+
             foreach (var activity in _activities)
             {
                 var items = await PackingRepository.GetItemsForActivityAsync(activity.Id);
                 _activityItemCounts[activity.Id] = items.Count;
+                _activityPackedCounts[activity.Id] = items.Count(i => i.IsPacked);
                 
                 // Get top categories by count
                 var topCategories = items

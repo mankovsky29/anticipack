@@ -124,18 +124,27 @@
                 @foreach (var activity in FilteredActivities)
                 {
                     var itemCount = _activityItemCounts.GetValueOrDefault(activity.Id, 0);
-                    
-                    <div class="activity-card">
+                    var packedCount = _activityPackedCounts.GetValueOrDefault(activity.Id, 0);
+                    var isCompleted = itemCount > 0 && packedCount == itemCount;
+                    var progressPercent = itemCount > 0 ? (int)Math.Round((double)packedCount / itemCount * 100) : 0;
+
+                    <div class="activity-card @(isCompleted ? "completed" : "")">
                         <button class="btn-play" 
                                 @onclick="() => OpenActivityInPackingMode(activity.Id)"
                                 title="@Localizer["PackNow"]">
-                            <i class="fa fa-play"></i>
+                            <i class="fa @(isCompleted ? "fa-check" : "fa-play")"></i>
                         </button>
-                        
+
                         <div class="card-header">
                             <div class="header-content">
                                 <div class="title-row">
                                     <h3 class="activity-title">@activity.Name</h3>
+                                    @if (isCompleted)
+                                    {
+                                        <span class="completed-badge" title="@Localizer["FullyPacked"]">
+                                            <i class="fa fa-check-circle" aria-hidden="true"></i>
+                                        </span>
+                                    }
                                     @if (activity.IsShared)
                                     {
                                         <span class="shared-badge" title="@Localizer["SharedActivity"]">
@@ -151,9 +160,15 @@
                                     <span class="meta-separator">•</span>
                                     <span class="meta-item">
                                         <i class="fa fa-box"></i>
-                                        @itemCount @GetItemsText()
+                                        @(string.Format(Localizer["ItemsPacked"], packedCount, itemCount))
                                     </span>
                                 </div>
+                                @if (itemCount > 0)
+                                {
+                                    <div class="progress-bar-container" title="@progressPercent%">
+                                        <div class="progress-bar-fill @(isCompleted ? "completed" : "")" style="width: @(progressPercent)%"></div>
+                                    </div>
+                                }
                             </div>
                             <div class="card-menu">
                                 <button class="btn-menu" 

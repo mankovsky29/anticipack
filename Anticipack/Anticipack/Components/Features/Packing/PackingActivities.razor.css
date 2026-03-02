@@ -288,6 +288,54 @@
     opacity: 0.5;
 }
 
+/* Completed Badge */
+.completed-badge {
+    color: var(--success);
+    font-size: 14px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+}
+
+/* Completed Card State */
+.activity-card.completed {
+    border-color: var(--success);
+}
+
+.activity-card.completed::before {
+    background: linear-gradient(90deg, var(--success) 0%, var(--success-dark, var(--success)) 100%);
+    opacity: 1;
+}
+
+.activity-card.completed .btn-play {
+    background: linear-gradient(135deg, var(--success) 0%, var(--success-dark, var(--success)) 100%);
+}
+
+.activity-card.completed .btn-play:hover {
+    background: linear-gradient(135deg, var(--success-dark, var(--success)) 0%, var(--success) 100%);
+}
+
+/* Progress Bar */
+.progress-bar-container {
+    width: 100%;
+    height: 4px;
+    background: var(--hover-bg);
+    border-radius: 2px;
+    margin-top: 8px;
+    overflow: hidden;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    background: var(--primary);
+    border-radius: 2px;
+    transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.progress-bar-fill.completed {
+    background: var(--success);
+}
+
 /* Three-dot Menu */
 .card-menu {
     position: relative;
@@ -973,7 +1021,8 @@
     .add-fab,
     .filter-chip,
     .add-activity-form,
-    .segmented-control .segment {
+    .segmented-control .segment,
+    .progress-bar-fill {
         transition: none;
     }
 

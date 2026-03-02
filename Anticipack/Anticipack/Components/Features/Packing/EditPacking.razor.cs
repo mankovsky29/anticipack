@@ -7,6 +7,7 @@ using Anticipack.Resources.Localization;
 using Anticipack.Services;
 using Anticipack.Services.AI;
 using Anticipack.Services.Categories;
+using Anticipack.Services.Suggestions;
 using Anticipack.Storage;
 using Anticipack.Storage.Repositories;
 using Microsoft.AspNetCore.Components;
@@ -33,6 +34,7 @@ public partial class EditPacking : IAsyncDisposable
     [Inject] private IStringLocalizer<AppResources> Localizer { get; set; } = default!;
     [Inject] private ICategoryIconProvider CategoryIconProvider { get; set; } = default!;
     [Inject] private IAiSuggestionService AiSuggestionService { get; set; } = default!;
+    [Inject] private IItemSuggestionService ItemSuggestionService { get; set; } = default!;
 
     [Parameter]
     public string Id { get; set; } = string.Empty;
@@ -61,8 +63,6 @@ public partial class EditPacking : IAsyncDisposable
     private bool _isGeneratingAi = false;
 
     // Autocomplete suggestions
-    private List<string> _allDistinctItemNames = [];
-    private Dictionary<string, HashSet<string>> _itemNameCategories = new(StringComparer.OrdinalIgnoreCase);
     private List<string> _suggestions = [];
     private string? _addingToCategory = null; // Which category to show the form above (null = top of list)
 
@@ -182,7 +182,7 @@ public partial class EditPacking : IAsyncDisposable
         _isCategoryDropdownOpen = false;
         _isCategoryLocked = false;
         _addingToCategory = null;
-        _suggestions = [];
+        UpdateSuggestions();
         _isAiMode = false;
         _aiPrompt = string.Empty;
         _aiSuggestions = [];
@@ -285,7 +285,7 @@ public partial class EditPacking : IAsyncDisposable
         }
 
         await LoadAllItemNamesAsync();
-        _suggestions = [];
+        UpdateSuggestions();
         _pendingScrollToAddForm = true;
         await SyncClickOutsideHandlerAsync();
     }
@@ -314,7 +314,7 @@ public partial class EditPacking : IAsyncDisposable
             .ToHashSet(StringComparer.OrdinalIgnoreCase);
 
         await LoadAllItemNamesAsync();
-        _suggestions = [];
+        UpdateSuggestions();
         _pendingScrollToAddForm = true;
         await SyncClickOutsideHandlerAsync();
     }
@@ -1100,29 +1100,7 @@ public partial class EditPacking : IAsyncDisposable
 
     private async Task LoadAllItemNamesAsync()
     {
-        try
-        {
-            var allItems = await PackingRepository.GetAllItemsAsync();
-            _allDistinctItemNames = allItems
-                .Select(i => i.Name)
-                .Where(n => !string.IsNullOrWhiteSpace(n))
-                .Distinct(StringComparer.OrdinalIgnoreCase)
-                .OrderBy(n => n)
-                .ToList();
-
-            _itemNameCategories = allItems
-                .Where(i => !string.IsNullOrWhiteSpace(i.Name) && !string.IsNullOrWhiteSpace(i.Category))
-                .GroupBy(i => i.Name, StringComparer.OrdinalIgnoreCase)
-                .ToDictionary(
-                    g => g.Key,
-                    g => new HashSet<string>(g.Select(i => i.Category), StringComparer.OrdinalIgnoreCase),
-                    StringComparer.OrdinalIgnoreCase);
-        }
-        catch
-        {
-            _allDistinctItemNames = [];
-            _itemNameCategories = new(StringComparer.OrdinalIgnoreCase);
-        }
+        await ItemSuggestionService.LoadAsync();
     }
 
     private string GetCurrentSearchToken()
@@ -1143,43 +1121,8 @@ public partial class EditPacking : IAsyncDisposable
     private void UpdateSuggestions()
     {
         var token = GetCurrentSearchToken();
-
-        if (string.IsNullOrWhiteSpace(token))
-        {
-            _suggestions = [];
-            return;
-        }
-
-        var alreadyAdding = new HashSet<string>(_parsedItems, StringComparer.OrdinalIgnoreCase);
-
-        bool IsSameCategory(string name) =>
-            _itemNameCategories.TryGetValue(name, out var cats)
-            && cats.Contains(_newCategory, StringComparer.OrdinalIgnoreCase);
-
-        var candidates = _allDistinctItemNames
-            .Where(name => !_existingItemNames.Contains(name)
-                        && !alreadyAdding.Contains(name)
-                        && !string.Equals(name, token, StringComparison.OrdinalIgnoreCase));
-
-        var startsWithMatches = candidates
-            .Where(name => name.StartsWith(token, StringComparison.OrdinalIgnoreCase))
-            .OrderByDescending(IsSameCategory)
-            .Take(3)
-            .ToList();
-
-        if (startsWithMatches.Count >= 3)
-        {
-            _suggestions = startsWithMatches;
-            return;
-        }
-
-        var containsMatches = candidates
-            .Where(name => name.Contains(token, StringComparison.OrdinalIgnoreCase)
-                        && !name.StartsWith(token, StringComparison.OrdinalIgnoreCase))
-            .OrderByDescending(IsSameCategory)
-            .Take(3 - startsWithMatches.Count);
-
-        _suggestions = [..startsWithMatches, ..containsMatches];
+        _suggestions = ItemSuggestionService.GetSuggestions(
+            token, _newCategory, _existingItemNames, _parsedItems);
     }
 
     private async Task SelectSuggestion(string suggestion)
@@ -1202,9 +1145,9 @@ public partial class EditPacking : IAsyncDisposable
                 ? prefix + " " + suggestion + ", "
                 : prefix + suggestion + "\n";
         }
-
-        _suggestions = [];
         UpdateParsedItems();
+        UpdateSuggestions();
+        
 
         // Let Blazor re-render the DOM with the new value before refocusing
         await Task.Yield();

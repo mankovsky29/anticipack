@@ -9,6 +9,7 @@ using Anticipack.Services.Categories;
 using Anticipack.Services.Packing;
 using Anticipack.Services.Payment;
 using Anticipack.Services.Statistics;
+using Anticipack.Services.Suggestions;
 using Anticipack.Services.Sync;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -54,6 +55,7 @@ namespace Anticipack
             builder.Services.AddScoped<IPackingActivityService, PackingActivityService>();
             builder.Services.AddSingleton<ICategoryIconProvider, CategoryIconProvider>();
             builder.Services.AddScoped<IPackingStatisticsService, PackingStatisticsService>();
+            builder.Services.AddScoped<IItemSuggestionService, ItemSuggestionService>();
 
             // Add Localization Services
             builder.Services.AddLocalization();

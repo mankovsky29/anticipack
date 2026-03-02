@@ -229,6 +229,10 @@
                                 {
                                     <div class="item-display" @onclick="() => StartEditingItem(item)" @onclick:stopPropagation>
                                         <span class="item-text">
+                                            @if (item.IsChecked)
+                                            {
+                                                <i class="fa fa-check-circle packed-icon" aria-hidden="true"></i>
+                                            }
                                             @item.Item.Name
                                         </span>
 

@@ -998,6 +998,17 @@ ul.category-content {
     letter-spacing: 0.2px;
 }
 
+/* Packed item indicator */
+.packing-row.packed .item-text {
+    color: var(--text-secondary);
+}
+
+.packed-icon {
+    color: var(--success);
+    margin-right: 6px;
+    font-size: 14px;
+}
+
 /* Notes styling */
 .notes {
     font-size: 13px;

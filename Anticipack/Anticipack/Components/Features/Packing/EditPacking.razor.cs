@@ -212,7 +212,7 @@ public partial class EditPacking : IAsyncDisposable
             _activityName = _currentActivity.Name ?? AppResources.NewPackingActivity;
             NavigationHeaderService.SetText(_currentActivity.Name ?? "");
             var itemsFromRepo = await PackingRepository.GetItemsForActivityAsync(id);
-            Items = itemsFromRepo.Select(pi => new PackingItemView(pi)).ToList();
+            Items = itemsFromRepo.Select(pi => new PackingItemView(pi) { IsChecked = pi.IsPacked }).ToList();
             _categoryOrder = Items.Select(i => i.Item.Category).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
 
             if (!_categoryOrder.Any())
@@ -759,7 +759,7 @@ public partial class EditPacking : IAsyncDisposable
 
     private string GetPackingRowClass(PackingItemView item)
     {
-        var baseClass = "packing-row";
+        var baseClass = item.IsChecked ? "packing-row packed" : "packing-row";
         if (ReferenceEquals(item, _draggedItem))
             return $"{baseClass} dragging";
         if (ReferenceEquals(item, _dragOverItem))

@@ -42,14 +42,14 @@ public partial class PackingActivities : IAsyncDisposable
     private IJSObjectReference? _jsModule;
     private DotNetObjectReference<PackingActivities>? _dotNetRef;
 
-    // Add dialog
-    private bool _showAddDialog;    
+    // Add form (inline)
+    private bool _showAddForm;
     private string _newActivityName = string.Empty;
     private bool _isRecurringActivity = false; // Default to one-time activity
     private bool _hasAttemptedSubmit = false;
     private bool _isCreating = false;
     private ElementReference _activityNameInput;
-    private bool _hasDialogFocused = false;
+    private bool _hasFormFocused = false;
 
 
     // Scroll to top
@@ -86,15 +86,14 @@ public partial class PackingActivities : IAsyncDisposable
             catch { }
         }
         
-        // Auto-focus the input when dialog opens (only once per dialog session)
-        if (_showAddDialog && !_hasDialogFocused && _activityNameInput.Id != null)
+        // Auto-focus the input when inline form opens (only once per form session)
+        if (_showAddForm && !_hasFormFocused && _activityNameInput.Id != null)
         {
             try
             {
-                // Longer delay for Android to ensure modal is fully rendered
-                await Task.Delay(200);
+                await Task.Delay(100);
                 await JSRuntime.InvokeVoidAsync("focusElement", _activityNameInput);
-                _hasDialogFocused = true;
+                _hasFormFocused = true;
             }
             catch { }
         }
@@ -269,14 +268,14 @@ public partial class PackingActivities : IAsyncDisposable
         _isRecurringActivity = false;
         _hasAttemptedSubmit = false;
         _isCreating = false;
-        _hasDialogFocused = false; // Reset focus flag for new dialog session
-        _showAddDialog = true;
+        _hasFormFocused = false;
+        _showAddForm = true;
     }
 
     private void CancelAddActivity()
     {
         if (_isCreating) return; // Prevent closing while creating
-        _showAddDialog = false;
+        _showAddForm = false;
         _hasAttemptedSubmit = false;
         _newActivityName = string.Empty;
         _isRecurringActivity = false;
@@ -307,10 +306,10 @@ public partial class PackingActivities : IAsyncDisposable
         {
             await PackingRepository.AddOrUpdateAsync(newActivity);
             ToastService.ShowSuccess(Localizer["ActivityCreated"]);
-            _showAddDialog = false;
+            _showAddForm = false;
             _hasAttemptedSubmit = false;
             _newActivityName = string.Empty;
-            _isRecurringActivity = true;
+            _isRecurringActivity = false;
             await LoadActivitiesAsync();
         }
         catch
@@ -407,14 +406,6 @@ public partial class PackingActivities : IAsyncDisposable
         }
     }
     
-    private void HandleDialogKeyDown(KeyboardEventArgs e)
-    {
-        if (e.Key == "Escape")
-        {
-            CancelAddActivity();
-        }
-    }
-    
     private void OnKeyboardVisibilityChanged(bool isVisible, double height)
     {
         _keyboardVisible = isVisible;
@@ -422,18 +413,11 @@ public partial class PackingActivities : IAsyncDisposable
 
         if (isVisible)
         {
-            // Only adjust page padding if not in a modal
-            if (!_showAddDialog)
-            {
-                _ = JSRuntime.InvokeVoidAsync("adjustPageForKeyboard", height);
-            }
-            
-            // Scroll the active input into view only if covered by the keyboard
+            _ = JSRuntime.InvokeVoidAsync("adjustPageForKeyboard", height);
             _ = JSRuntime.InvokeVoidAsync("scrollActiveElementIntoView", height);
         }
         else
         {
-            // Remove padding when keyboard hides
             _ = JSRuntime.InvokeVoidAsync("adjustPageForKeyboard", 0);
         }
     }

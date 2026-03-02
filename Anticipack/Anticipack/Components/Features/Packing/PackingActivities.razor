@@ -44,6 +44,80 @@
             </div>
         </div>
         
+        @if (_showAddForm)
+        {
+            <div class="add-activity-form" @onclick:stopPropagation>
+                <div class="form-header-inline">
+                    <h4>@Localizer["NewPackingActivity"]</h4>
+                    <button class="close-form-btn" @onclick="CancelAddActivity" title="@Localizer["Cancel"]">
+                        <i class="fa fa-times"></i>
+                    </button>
+                </div>
+
+                <div class="form-body">
+                    <div class="form-section compact">
+                        <input id="activity-name"
+                               type="text"
+                               class="form-input @(string.IsNullOrWhiteSpace(_newActivityName) && _hasAttemptedSubmit ? "input-error" : "")"
+                               placeholder="@Localizer["EnterActivityName"]"
+                               @bind="_newActivityName"
+                               @bind:event="oninput"
+                               @onkeydown="HandleInputKeyDown"
+                               @ref="_activityNameInput" />
+                        @if (string.IsNullOrWhiteSpace(_newActivityName) && _hasAttemptedSubmit)
+                        {
+                            <span class="error-message">
+                                <i class="fa fa-exclamation-circle"></i>
+                                @Localizer["NameRequired"]
+                            </span>
+                        }
+                    </div>
+
+                    <div class="form-section compact">
+                        <label class="form-label-inline">
+                            <i class="fa fa-repeat"></i>
+                            @Localizer["ActivityType"]
+                        </label>
+                        <div class="segmented-control">
+                            <button type="button"
+                                    class="segment @(!_isRecurringActivity ? "active" : "")"
+                                    @onclick="() => _isRecurringActivity = false">
+                                <i class="fa fa-calendar-check"></i>
+                                <span>@Localizer["OneTimeActivity"]</span>
+                            </button>
+                            <button type="button"
+                                    class="segment @(_isRecurringActivity ? "active" : "")"
+                                    @onclick="() => _isRecurringActivity = true">
+                                <i class="fa fa-sync-alt"></i>
+                                <span>@Localizer["RecurringActivity"]</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-actions compact">
+                    <button class="btn btn-cancel compact" @onclick="CancelAddActivity" disabled="@_isCreating">
+                        <i class="fa fa-times"></i>
+                        <span>@Localizer["Cancel"]</span>
+                    </button>
+                    <button class="btn btn-primary compact"
+                            @onclick="ConfirmAddActivityAsync"
+                            disabled="@(_isCreating || string.IsNullOrWhiteSpace(_newActivityName))">
+                        @if (_isCreating)
+                        {
+                            <span class="btn-spinner"></span>
+                            <span>@Localizer["Creating"]</span>
+                        }
+                        else
+                        {
+                            <i class="fa fa-check"></i>
+                            <span>@Localizer["Create"]</span>
+                        }
+                    </button>
+                </div>
+            </div>
+        }
+
         @if (FilteredActivities.Any())
         {
             <div class="activities-list">
@@ -134,97 +208,11 @@
         }
         
         <!-- Simplified FAB - Single Add Button -->
-        <button class="add-fab" @onclick="AddNewActivity" aria-label="@Localizer["AddActivity"]" title="@Localizer["AddActivity"]">
-            <i class="fa fa-plus"></i>
-        </button>
+        @if (!_showAddForm)
+        {
+            <button class="add-fab" @onclick="AddNewActivity" aria-label="@Localizer["AddActivity"]" title="@Localizer["AddActivity"]">
+                <i class="fa fa-plus"></i>
+            </button>
+        }
     }
 </div>
-
-@if (_showAddDialog)
-{
-    <div class="modal-overlay" @onclick="CancelAddActivity" @onkeydown="HandleDialogKeyDown">
-        <div class="modal-content" @onclick:stopPropagation>
-            <button class="modal-close-btn" @onclick="CancelAddActivity" aria-label="Close" title="@Localizer["Cancel"]">
-                <i class="fa fa-times"></i>
-            </button>
-            
-            <div class="modal-icon">
-                <i class="fa fa-plus-circle"></i>
-            </div>
-            
-            <h4 class="modal-header">@Localizer["NewPackingActivity"]</h4>
-            
-            <div class="form-row">
-                <label for="activity-name">@Localizer["Name"]</label>
-                <input id="activity-name" 
-                       type="text"
-                       class="@(string.IsNullOrWhiteSpace(_newActivityName) && _hasAttemptedSubmit ? "input-error" : "")"
-                       placeholder="@Localizer["EnterActivityName"]"
-                       @bind="_newActivityName" 
-                       @bind:event="oninput"
-                       @onkeydown="HandleInputKeyDown"
-                       @ref="_activityNameInput" />
-                @if (string.IsNullOrWhiteSpace(_newActivityName) && _hasAttemptedSubmit)
-                {
-                    <span class="error-message">
-                        <i class="fa fa-exclamation-circle"></i>
-                        @Localizer["NameRequired"]
-                    </span>
-                }
-            </div>
-            
-            <div class="form-row">
-                <label>@Localizer["ActivityType"]</label>
-                <div class="radio-group">
-                    <label class="radio-option" @onclick="() => _isRecurringActivity = false">
-                        <input type="radio" 
-                               name="activity-type" 
-                               value="one-time" 
-                               checked="@(!_isRecurringActivity)" />
-                        <span class="radio-label">
-                            <i class="fa fa-calendar-check"></i>
-                            <div>
-                                <strong>@Localizer["OneTimeActivity"]</strong>
-                                <small>@Localizer["OneTimeActivityDescription"]</small>
-                            </div>
-                        </span>
-                    </label>
-                    <label class="radio-option" @onclick="() => _isRecurringActivity = true">
-                        <input type="radio" 
-                               name="activity-type" 
-                               value="recurring" 
-                               checked="@_isRecurringActivity" />
-                        <span class="radio-label">
-                            <i class="fa fa-sync-alt"></i>
-                            <div>
-                                <strong>@Localizer["RecurringActivity"]</strong>
-                                <small>@Localizer["RecurringActivityDescription"]</small>
-                            </div>
-                        </span>
-                    </label>
-
-                </div>
-            </div>
-
-            <div class="form-actions">
-                <button class="btn cancel" @onclick="CancelAddActivity" disabled="@_isCreating">
-                    @Localizer["Cancel"]
-                </button>
-                <button class="btn primary" 
-                        @onclick="ConfirmAddActivityAsync" 
-                        disabled="@(_isCreating || string.IsNullOrWhiteSpace(_newActivityName))">
-                    @if (_isCreating)
-                    {
-                        <span class="btn-spinner"></span>
-                        <span>@Localizer["Creating"]</span>
-                    }
-                    else
-                    {
-                        <i class="fa fa-check"></i>
-                        <span>@Localizer["Create"]</span>
-                    }
-                </button>
-            </div>
-        </div>
-    </div>
-}

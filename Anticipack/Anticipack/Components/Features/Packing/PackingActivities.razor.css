@@ -686,163 +686,208 @@
     line-height: 1.5;
 }
 
-/* Modals */
-.modal-overlay {
-    position: fixed;
-    inset: 0;
-    background: var(--overlay-bg);
+/* Inline Add Activity Form */
+.add-activity-form {
+    background: var(--surface);
+    border-radius: var(--border-radius-lg);
+    border: 1.5px solid var(--primary);
+    box-shadow: var(--shadow-md);
+    margin-bottom: var(--space-md);
+    overflow: hidden;
+    animation: formSlideIn 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes formSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.add-activity-form .form-header-inline {
     display: flex;
-    align-items: flex-start;
-    justify-content: center;
-    z-index: 1000;
-    backdrop-filter: blur(4px);
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior: contain;
-    padding: 20px 0;
-    padding-top: max(20px, env(safe-area-inset-top));
-    padding-bottom: max(20px, env(safe-area-inset-bottom));
-}
-
-.modal-content {
-    background: var(--modal-bg);
-    border-radius: 14px;
-    padding: 18px;
-    box-shadow: var(--shadow-lg);
-    width: 90%;
-    max-width: 400px;
-    margin: auto;
-    min-height: min-content;
-    max-height: none;
-    animation: modal-in 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    transition: none;
-    position: relative;
-    flex-shrink: 0;
-}
-
-@keyframes modal-in {
-    from { opacity: 0; transform: translateY(20px) scale(0.95); }
-    to { opacity: 1; transform: translateY(0) scale(1); }
-}
-
-.modal-header {
-    margin-top: 0;
-    margin-bottom: 16px;
-    font-size: 17px;
-    padding-bottom: 8px;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-sm) var(--space-md);
     border-bottom: 1px solid var(--border-color);
-    color: var(--text-primary);
-    font-weight: 700;
+    background: var(--hover-bg);
 }
 
-.form-row {
-    margin-bottom: 14px;
+.add-activity-form .form-header-inline h4 {
+    margin: 0;
+    font-size: var(--font-size-md);
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.add-activity-form .close-form-btn {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    font-size: 14px;
+}
+
+.add-activity-form .close-form-btn:hover {
+    background: var(--hover-bg);
+    color: var(--text-primary);
+}
+
+.add-activity-form .form-body {
+    padding: var(--space-md);
     display: flex;
     flex-direction: column;
-    gap: 5px;
+    gap: var(--space-md);
 }
 
-.form-row label {
+.add-activity-form .form-section.compact {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+}
+
+.add-activity-form .form-label-inline {
     font-weight: 600;
     color: var(--text-primary);
-    font-size: 13px;
+    font-size: var(--font-size-sm);
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
 }
 
-.form-row input,
-.form-row select {
+.add-activity-form .form-label-inline i {
+    color: var(--primary);
+    font-size: 12px;
+}
+
+.add-activity-form .form-input {
     border: 1px solid var(--input-border);
-    border-radius: 8px;
-    padding: 10px;
+    border-radius: var(--border-radius);
+    padding: 10px 12px;
     font-size: 15px;
     background-color: var(--input-bg);
     color: var(--text-primary);
     transition: border-color var(--transition);
+    width: 100%;
+    box-sizing: border-box;
 }
 
-.form-row input:focus,
-.form-row select:focus {
+.add-activity-form .form-input:focus {
     border-color: var(--input-focus-border);
     outline: none;
     box-shadow: 0 0 0 3px var(--input-focus-shadow);
 }
 
-/* Checkbox Row for Sharing Option */
-.checkbox-row {
-    background-color: var(--hover-bg);
-    border-radius: 8px;
-    padding: 10px;
-    margin-bottom: 16px;
+/* Segmented Control */
+.segmented-control {
+    display: flex;
+    gap: 0;
+    border: 1.5px solid var(--border-color);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    background: var(--input-bg);
 }
 
-.checkbox-label {
+.segmented-control .segment {
+    flex: 1;
     display: flex;
     align-items: center;
-    gap: 10px;
-    cursor: pointer;
+    justify-content: center;
+    gap: var(--space-xs);
+    padding: 10px 12px;
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm);
     font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    white-space: nowrap;
+}
+
+.segmented-control .segment:not(:last-child) {
+    border-right: 1px solid var(--border-color);
+}
+
+.segmented-control .segment:hover:not(.active) {
+    background: var(--hover-bg);
     color: var(--text-primary);
 }
 
-.checkbox-label input[type="checkbox"] {
-    width: 18px;
-    height: 18px;
-    cursor: pointer;
-    accent-color: var(--primary);
+.segmented-control .segment.active {
+    background: var(--primary);
+    color: white;
+    font-weight: 600;
 }
 
-.checkbox-text {
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    font-size: 14px;
-}
-
-.checkbox-text i {
-    color: var(--primary);
-}
-
-.help-text {
-    margin: 6px 0 0 28px;
+.segmented-control .segment i {
     font-size: 12px;
-    color: var(--text-secondary);
-    line-height: 1.4;
 }
 
-.form-actions {
+/* Form Actions (inline) */
+.add-activity-form .form-actions.compact {
     display: flex;
     justify-content: flex-end;
-    gap: 10px;
-    margin-top: 16px;
+    gap: var(--space-sm);
+    padding: var(--space-sm) var(--space-md);
+    border-top: 1px solid var(--border-color);
+    background: var(--hover-bg);
 }
 
-.btn {
-    padding: 10px 18px;
-    border-radius: 8px;
-    font-weight: 600;
-    border: none;
-    cursor: pointer;
-    transition: all var(--transition);
-    font-size: 14px;
-}
-
-.btn.cancel {
-    background-color: var(--surface);
-    color: var(--text-primary);
+.add-activity-form .btn.btn-cancel.compact {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border-radius: var(--border-radius);
     border: 1px solid var(--border-color);
+    background: var(--surface);
+    color: var(--text-primary);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-fast);
 }
 
-.btn.cancel:hover {
-    background-color: var(--hover-bg);
+.add-activity-form .btn.btn-cancel.compact:hover {
+    background: var(--hover-bg);
 }
 
-.btn.primary {
+.add-activity-form .btn.btn-primary.compact {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border-radius: var(--border-radius);
+    border: none;
     background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
     color: white;
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-fast);
 }
 
-.btn.primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+.add-activity-form .btn.btn-primary.compact:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow);
+}
+
+.add-activity-form .btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none !important;
 }
 
 /* Loading spinner */
@@ -926,79 +971,27 @@
 @media (prefers-reduced-motion: reduce) {
     .activity-card,
     .add-fab,
-    .btn-primary,
-    .btn-secondary,
-    .btn-icon,
-    .filter-chip {
+    .filter-chip,
+    .add-activity-form,
+    .segmented-control .segment {
         transition: none;
     }
-    
+
     @keyframes spin {
         to { transform: none; }
     }
-    
+
     @keyframes float {
         0%, 100% { transform: none; }
         50% { transform: none; }
     }
-    
-    @keyframes modal-in {
+
+    @keyframes formSlideIn {
         from { opacity: 1; transform: none; }
         to { opacity: 1; transform: none; }
     }
 }
 
-
-/* Enhanced Modal Styles */
-.modal-close-btn {
-    position: absolute;
-    top: 14px;
-    right: 14px;
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    border: none;
-    background: transparent;
-    color: var(--text-secondary);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all var(--transition-fast);
-    font-size: 15px;
-    z-index: 1;
-}
-
-.modal-close-btn:hover {
-    background: var(--hover-bg);
-    color: var(--text-primary);
-    transform: rotate(90deg);
-}
-
-.modal-close-btn:active {
-    transform: rotate(90deg) scale(0.9);
-}
-
-.modal-icon {
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, var(--primary-light-bg) 0%, var(--primary-light-bg) 100%);
-    color: var(--primary);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 20px;
-    margin: 0 auto 12px;
-    animation: icon-bounce 0.5s ease-out;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-@keyframes icon-bounce {
-    0% { transform: scale(0); }
-    50% { transform: scale(1.1); }
-    100% { transform: scale(1); }
-}
 
 /* Input Error State */
 .input-error {
@@ -1053,98 +1046,5 @@
     animation: spin 0.8s linear infinite;
 }
 
-.btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    transform: none !important;
-}
-
-.btn.primary {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-}
-
-/* Radio Group Styles */
-.radio-group {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    margin-top: 8px;
-}
-
-.radio-option {
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    padding: 16px;
-    border: 2px solid var(--border-color);
-    border-radius: 12px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    background: var(--card-bg);
-}
-
-.radio-option:hover {
-    border-color: var(--primary-light);
-    background: var(--hover-bg);
-}
-
-.radio-option input[type="radio"] {
-    margin-top: 2px;
-    width: 20px;
-    height: 20px;
-    cursor: pointer;
-    accent-color: var(--primary);
-}
-
-.radio-option:has(input[type="radio"]:checked) {
-    border-color: var(--primary);
-    background: var(--primary-light-bg);
-    box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.1);
-}
-
-.radio-label {
-    flex: 1;
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    cursor: pointer;
-}
-
-.radio-label i {
-    font-size: 20px;
-    margin-top: 2px;
-    color: var(--text-secondary);
-    transition: color 0.2s ease;
-}
-
-.radio-option:has(input[type="radio"]:checked) .radio-label i {
-    color: var(--primary);
-}
-
-.radio-label div {
-    flex: 1;
-}
-
-.radio-label strong {
-    display: block;
-    font-size: 15px;
-    font-weight: 600;
-    margin-bottom: 4px;
-    color: var(--text-primary);
-    transition: color 0.2s ease;
-}
-
-.radio-option:has(input[type="radio"]:checked) .radio-label strong {
-    color: var(--primary);
-}
-
-.radio-label small {
-    display: block;
-    font-size: 13px;
-    color: var(--text-secondary);
-    line-height: 1.4;
-}
+/* (Radio group and modal styles removed — inline form uses segmented control) */
 

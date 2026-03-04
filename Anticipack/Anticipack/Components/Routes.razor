@@ -1,4 +1,6 @@
 ﻿@inject NavigationManager Navigation
+@inject Anticipack.Storage.Repositories.IPackingActivityRepository ActivityRepository
+@inject Anticipack.Storage.Repositories.IPackingItemRepository ItemRepository
 
 <Router AppAssembly="@typeof(MauiProgram).Assembly">
     <Found Context="routeData">
@@ -8,12 +10,40 @@
 </Router>
 
 @code {
-    protected override void OnAfterRender(bool firstRender)
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            // Navigate to the desired route when the Blazor UI finishes its first render.
-            Navigation.NavigateTo("/packing-activities");
+            var targetRoute = await GetStartupRouteAsync();
+            Navigation.NavigateTo(targetRoute);
         }
+    }
+
+    private async Task<string> GetStartupRouteAsync()
+    {
+        try
+        {
+            var activities = await ActivityRepository.GetAllAsync();
+
+            // Find unfinished, non-archived activities (already ordered by LastPacked descending)
+            var candidates = activities
+                .Where(a => !a.IsFinished && !a.IsArchived)
+                .ToList();
+
+            foreach (var activity in candidates)
+            {
+                var items = await ItemRepository.GetItemsForActivityAsync(activity.Id);
+                if (items.Any(i => i.IsPacked))
+                {
+                    return $"/play-packing/{activity.Id}";
+                }
+            }
+        }
+        catch
+        {
+            // Fall back to default route if anything fails
+        }
+
+        return "/packing-activities";
     }
 }

@@ -851,4 +851,20 @@ Jabón, Toalla</value>
   <data name="AddItemsCount" xml:space="preserve">
     <value>Agregar {0} Artículos</value>
   </data>
+  <!-- UserSettings - Activity Management Section -->
+  <data name="ActivityManagement" xml:space="preserve">
+    <value>Gestión de actividades</value>
+  </data>
+  <data name="AutoArchiveDaysLabel" xml:space="preserve">
+    <value>Archivar actividades inactivas</value>
+  </data>
+  <data name="AutoArchiveDaysHint" xml:space="preserve">
+    <value>Archivar actividades sin empacar durante este número de días (0 = desactivado)</value>
+  </data>
+  <data name="AutoArchiveDisabled" xml:space="preserve">
+    <value>Desactivado</value>
+  </data>
+  <data name="Days" xml:space="preserve">
+    <value>días</value>
+  </data>
 </root>

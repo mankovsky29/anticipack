@@ -1,6 +1,7 @@
 ﻿@inject NavigationManager Navigation
 @inject Anticipack.Storage.Repositories.IPackingActivityRepository ActivityRepository
 @inject Anticipack.Storage.Repositories.IPackingItemRepository ItemRepository
+@inject Anticipack.Services.IAutoArchiveService AutoArchiveService
 
 <Router AppAssembly="@typeof(MauiProgram).Assembly">
     <Found Context="routeData">
@@ -23,6 +24,8 @@
     {
         try
         {
+            await AutoArchiveService.RunAutoArchiveAsync();
+
             var activities = await ActivityRepository.GetAllAsync();
 
             // Find unfinished, non-archived activities (already ordered by LastPacked descending)

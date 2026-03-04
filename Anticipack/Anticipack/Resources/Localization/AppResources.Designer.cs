@@ -1880,5 +1880,50 @@ namespace Anticipack.Resources.Localization {
                 return ResourceManager.GetString("DurationMinutes", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Activity Management.
+        /// </summary>
+        public static string ActivityManagement {
+            get {
+                return ResourceManager.GetString("ActivityManagement", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Auto-Archive Inactive Activities.
+        /// </summary>
+        public static string AutoArchiveDaysLabel {
+            get {
+                return ResourceManager.GetString("AutoArchiveDaysLabel", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Archive activities not packed for this many days (0 = disabled).
+        /// </summary>
+        public static string AutoArchiveDaysHint {
+            get {
+                return ResourceManager.GetString("AutoArchiveDaysHint", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Off.
+        /// </summary>
+        public static string AutoArchiveDisabled {
+            get {
+                return ResourceManager.GetString("AutoArchiveDisabled", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to days.
+        /// </summary>
+        public static string Days {
+            get {
+                return ResourceManager.GetString("Days", resourceCulture);
+            }
+        }
     }
 }

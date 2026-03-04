@@ -52,6 +52,7 @@ namespace Anticipack
 #pragma warning restore CS0618
 
             // Business services (SRP: Separated business logic)
+            builder.Services.AddSingleton<IAutoArchiveService, AutoArchiveService>();
             builder.Services.AddScoped<IPackingActivityService, PackingActivityService>();
             builder.Services.AddSingleton<ICategoryIconProvider, CategoryIconProvider>();
             builder.Services.AddScoped<IPackingStatisticsService, PackingStatisticsService>();

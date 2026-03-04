@@ -851,4 +851,20 @@
   <data name="AiError" xml:space="preserve">
     <value>Ошибка ИИ: {0}</value>
   </data>
+  <!-- UserSettings - Activity Management Section -->
+  <data name="ActivityManagement" xml:space="preserve">
+    <value>Управление активностями</value>
+  </data>
+  <data name="AutoArchiveDaysLabel" xml:space="preserve">
+    <value>Авто-архивирование неактивных</value>
+  </data>
+  <data name="AutoArchiveDaysHint" xml:space="preserve">
+    <value>Архивировать активности без упаковки через указанное кол-во дней (0 = выключено)</value>
+  </data>
+  <data name="AutoArchiveDisabled" xml:space="preserve">
+    <value>Выключено</value>
+  </data>
+  <data name="Days" xml:space="preserve">
+    <value>дн.</value>
+  </data>
 </root>

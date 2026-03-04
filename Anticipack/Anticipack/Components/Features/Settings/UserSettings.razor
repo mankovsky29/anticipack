@@ -4,6 +4,7 @@
 @inject IJSRuntime JSRuntime
 @inject ILocalizationService LocalizationService
 @inject INavigationHeaderService NavigationHeaderService
+@inject IAutoArchiveService AutoArchiveService
 @implements IDisposable
 
 <div class="settings-page">
@@ -77,6 +78,49 @@
             </div>
         </div>
 
+        <!-- Activity Management Section -->
+        <div class="setting-section">
+            <div class="section-header">
+                <i class="fas fa-archive"></i>
+                <span>@AppResources.ActivityManagement</span>
+            </div>
+
+            <div class="section-body">
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <label>@AppResources.AutoArchiveDaysLabel</label>
+                        <span class="setting-hint">@AppResources.AutoArchiveDaysHint</span>
+                    </div>
+                    <div class="stepper" role="group" aria-label="@AppResources.AutoArchiveDaysLabel">
+                        <button class="stepper-btn"
+                                @onclick="DecrementAutoArchiveDays"
+                                disabled="@(_autoArchiveDays <= 0)"
+                                title="Decrease"
+                                aria-label="Decrease">
+                            <i class="fa fa-minus" aria-hidden="true"></i>
+                        </button>
+                        <span class="stepper-value">
+                            @if (_autoArchiveDays == 0)
+                            {
+                                @AppResources.AutoArchiveDisabled
+                            }
+                            else
+                            {
+                                @($"{_autoArchiveDays} {AppResources.Days}")
+                            }
+                        </span>
+                        <button class="stepper-btn"
+                                @onclick="IncrementAutoArchiveDays"
+                                disabled="@(_autoArchiveDays >= 365)"
+                                title="Increase"
+                                aria-label="Increase">
+                            <i class="fa fa-plus" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Notifications Section (Coming Soon) -->
         <div class="setting-section">
             <div class="section-header">
@@ -131,11 +175,13 @@
 @code {
     private string CurrentTheme { get; set; } = "light";
     private bool NotificationsEnabled { get; set; } = false;
+    private int _autoArchiveDays;
 
     protected override async Task OnInitializedAsync()
     {
         NavigationHeaderService.SetText(AppResources.Settings);
-        
+        _autoArchiveDays = AutoArchiveService.AutoArchiveDays;
+
         try
         {
             CurrentTheme = await JSRuntime.InvokeAsync<string>("themeManager.getTheme");
@@ -163,6 +209,24 @@
     private void ChangeLanguage(string culture)
     {
         LocalizationService.SetCulture(culture);
+    }
+
+    private void IncrementAutoArchiveDays()
+    {
+        if (_autoArchiveDays < 365)
+        {
+            _autoArchiveDays++;
+            AutoArchiveService.SaveAutoArchiveDays(_autoArchiveDays);
+        }
+    }
+
+    private void DecrementAutoArchiveDays()
+    {
+        if (_autoArchiveDays > 0)
+        {
+            _autoArchiveDays--;
+            AutoArchiveService.SaveAutoArchiveDays(_autoArchiveDays);
+        }
     }
 
     private void OnCultureChanged(object? sender, CultureInfo culture)

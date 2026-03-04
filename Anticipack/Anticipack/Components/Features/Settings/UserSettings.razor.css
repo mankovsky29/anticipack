@@ -380,12 +380,61 @@
     .language-selector {
         grid-template-columns: 1fr;
     }
-    
+
     .settings-header {
         padding: var(--space-sm) var(--space-md);
     }
-    
+
     .settings-content {
         padding: var(--space-xs) var(--space-sm);
+    }
+}
+
+/* Stepper Control */
+.stepper {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    flex-shrink: 0;
+}
+
+.stepper-btn {
+    width: 32px;
+    height: 32px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-sm);
+    background-color: var(--background);
+    color: var(--text-primary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--font-size-xs);
+    transition: all var(--transition-fast);
+    font-family: var(--font-family);
+}
+
+.stepper-btn:hover:not(:disabled) {
+    background-color: var(--primary-light-bg);
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.stepper-btn:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+}
+
+.stepper-value {
+    min-width: 64px;
+    text-align: center;
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .stepper-btn {
+        transition: none;
     }
 }

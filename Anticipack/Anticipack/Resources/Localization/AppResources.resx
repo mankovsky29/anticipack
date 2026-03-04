@@ -767,4 +767,20 @@ Soap, Towel</value>
   <data name="AiError" xml:space="preserve">
     <value>AI error: {0}</value>
   </data>
+  <!-- UserSettings - Activity Management Section -->
+  <data name="ActivityManagement" xml:space="preserve">
+    <value>Activity Management</value>
+  </data>
+  <data name="AutoArchiveDaysLabel" xml:space="preserve">
+    <value>Auto-Archive Inactive Activities</value>
+  </data>
+  <data name="AutoArchiveDaysHint" xml:space="preserve">
+    <value>Archive activities not packed for this many days (0 = disabled)</value>
+  </data>
+  <data name="AutoArchiveDisabled" xml:space="preserve">
+    <value>Off</value>
+  </data>
+  <data name="Days" xml:space="preserve">
+    <value>days</value>
+  </data>
 </root>

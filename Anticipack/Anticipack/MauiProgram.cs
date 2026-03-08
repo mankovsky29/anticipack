@@ -6,6 +6,7 @@ using Anticipack.Storage.Repositories;
 using Anticipack.Services;
 using Anticipack.Services.AI;
 using Anticipack.Services.Categories;
+using Anticipack.Services.Notifications;
 using Anticipack.Services.Packing;
 using Anticipack.Services.Payment;
 using Anticipack.Services.Statistics;
@@ -53,6 +54,7 @@ namespace Anticipack
 
             // Business services (SRP: Separated business logic)
             builder.Services.AddSingleton<IAutoArchiveService, AutoArchiveService>();
+            builder.Services.AddSingleton<IPackingReminderService, PackingReminderService>();
             builder.Services.AddScoped<IPackingActivityService, PackingActivityService>();
             builder.Services.AddSingleton<ICategoryIconProvider, CategoryIconProvider>();
             builder.Services.AddScoped<IPackingStatisticsService, PackingStatisticsService>();
@@ -78,11 +80,15 @@ namespace Anticipack
 
 #if ANDROID
             builder.Services.AddSingleton<Anticipack.Services.IKeyboardService, Anticipack.Platforms.Android.KeyboardService>();
+            builder.Services.AddSingleton<INotificationManagerService, Anticipack.Platforms.Android.Notifications.NotificationManagerService>();
 #elif IOS
             builder.Services.AddSingleton<Anticipack.Services.IKeyboardService, Anticipack.Platforms.iOS.KeyboardService>();
-
+            builder.Services.AddSingleton<INotificationManagerService, Anticipack.Platforms.iOS.Notifications.NotificationManagerService>();
+#elif MACCATALYST
+            builder.Services.AddSingleton<INotificationManagerService, Anticipack.Platforms.MacCatalyst.Notifications.NotificationManagerService>();
 #elif WINDOWS
             builder.Services.AddSingleton<Anticipack.Services.IKeyboardService, Anticipack.Platforms.Windows.KeyboardService>();
+            builder.Services.AddSingleton<INotificationManagerService, Anticipack.Platforms.Windows.Notifications.NotificationManagerService>();
 #endif
 
             builder.Services.AddScoped<IDialogService, DialogService>();

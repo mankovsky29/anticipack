@@ -867,4 +867,14 @@ Jabón, Toalla</value>
   <data name="Days" xml:space="preserve">
     <value>días</value>
   </data>
+  <!-- Packing Reminder Notifications -->
+  <data name="ReminderNotificationTitle" xml:space="preserve">
+    <value>Recordatorio de empaque</value>
+  </data>
+  <data name="ReminderNotificationBodySingle" xml:space="preserve">
+    <value>¡No olvides terminar de empacar "{0}"!</value>
+  </data>
+  <data name="ReminderNotificationBodyMultiple" xml:space="preserve">
+    <value>Tienes {0} actividades de empaque sin terminar.</value>
+  </data>
 </root>

@@ -783,4 +783,14 @@ Soap, Towel</value>
   <data name="Days" xml:space="preserve">
     <value>days</value>
   </data>
+  <!-- Packing Reminder Notifications -->
+  <data name="ReminderNotificationTitle" xml:space="preserve">
+    <value>Packing Reminder</value>
+  </data>
+  <data name="ReminderNotificationBodySingle" xml:space="preserve">
+    <value>Don't forget to finish packing "{0}"!</value>
+  </data>
+  <data name="ReminderNotificationBodyMultiple" xml:space="preserve">
+    <value>You have {0} unfinished packing activities.</value>
+  </data>
 </root>

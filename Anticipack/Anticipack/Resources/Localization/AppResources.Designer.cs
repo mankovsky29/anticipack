@@ -1493,7 +1493,34 @@ namespace Anticipack.Resources.Localization {
                 return ResourceManager.GetString("RecentActivity", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to You have {0} unfinished packing activities..
+        /// </summary>
+        public static string ReminderNotificationBodyMultiple {
+            get {
+                return ResourceManager.GetString("ReminderNotificationBodyMultiple", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Don't forget to finish packing &quot;{0}&quot;!.
+        /// </summary>
+        public static string ReminderNotificationBodySingle {
+            get {
+                return ResourceManager.GetString("ReminderNotificationBodySingle", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Packing Reminder.
+        /// </summary>
+        public static string ReminderNotificationTitle {
+            get {
+                return ResourceManager.GetString("ReminderNotificationTitle", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Reset All.
         /// </summary>

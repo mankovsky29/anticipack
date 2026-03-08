@@ -1,7 +1,8 @@
-﻿@inject NavigationManager Navigation
+@inject NavigationManager Navigation
 @inject Anticipack.Storage.Repositories.IPackingActivityRepository ActivityRepository
 @inject Anticipack.Storage.Repositories.IPackingItemRepository ItemRepository
 @inject Anticipack.Services.IAutoArchiveService AutoArchiveService
+@inject Anticipack.Services.Notifications.IPackingReminderService PackingReminderService
 
 <Router AppAssembly="@typeof(MauiProgram).Assembly">
     <Found Context="routeData">
@@ -17,6 +18,7 @@
         {
             var targetRoute = await GetStartupRouteAsync();
             Navigation.NavigateTo(targetRoute);
+            try { await PackingReminderService.ScheduleReminderIfNeededAsync(); } catch { }
         }
     }
 

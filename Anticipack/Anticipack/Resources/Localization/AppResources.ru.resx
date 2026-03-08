@@ -867,4 +867,14 @@
   <data name="Days" xml:space="preserve">
     <value>дн.</value>
   </data>
+  <!-- Packing Reminder Notifications -->
+  <data name="ReminderNotificationTitle" xml:space="preserve">
+    <value>Напоминание об упаковке</value>
+  </data>
+  <data name="ReminderNotificationBodySingle" xml:space="preserve">
+    <value>Не забудьте завершить сборку "{0}"!</value>
+  </data>
+  <data name="ReminderNotificationBodyMultiple" xml:space="preserve">
+    <value>У вас {0} незавершённых активностей упаковки.</value>
+  </data>
 </root>

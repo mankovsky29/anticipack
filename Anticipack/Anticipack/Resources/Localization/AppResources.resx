@@ -783,4 +783,19 @@ Soap, Towel</value>
   <data name="Days" xml:space="preserve">
     <value>days</value>
   </data>
+  <data name="ScrollToTop" xml:space="preserve">
+    <value>Scroll to top</value>
+  </data>
+  <data name="Increase" xml:space="preserve">
+    <value>Increase</value>
+  </data>
+  <data name="Decrease" xml:space="preserve">
+    <value>Decrease</value>
+  </data>
+  <data name="StoragePermissionRequiredTitle" xml:space="preserve">
+    <value>Permission Required</value>
+  </data>
+  <data name="StoragePermissionRequiredMessage" xml:space="preserve">
+    <value>Storage permission is required to save and load your packing data. You can enable it later in system settings.</value>
+  </data>
 </root>

@@ -867,4 +867,19 @@
   <data name="Days" xml:space="preserve">
     <value>дн.</value>
   </data>
+  <data name="ScrollToTop" xml:space="preserve">
+    <value>Прокрутить наверх</value>
+  </data>
+  <data name="Increase" xml:space="preserve">
+    <value>Увеличить</value>
+  </data>
+  <data name="Decrease" xml:space="preserve">
+    <value>Уменьшить</value>
+  </data>
+  <data name="StoragePermissionRequiredTitle" xml:space="preserve">
+    <value>Требуется разрешение</value>
+  </data>
+  <data name="StoragePermissionRequiredMessage" xml:space="preserve">
+    <value>Для сохранения и загрузки данных упаковки требуется разрешение на доступ к хранилищу. Вы можете включить его позже в настройках системы.</value>
+  </data>
 </root>

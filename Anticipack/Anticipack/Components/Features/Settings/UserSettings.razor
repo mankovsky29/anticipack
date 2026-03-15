@@ -95,8 +95,8 @@
                         <button class="stepper-btn"
                                 @onclick="DecrementAutoArchiveDays"
                                 disabled="@(_autoArchiveDays <= 0)"
-                                title="Decrease"
-                                aria-label="Decrease">
+                                title="@_decreaseText"
+                                aria-label="@_decreaseText">
                             <i class="fa fa-minus" aria-hidden="true"></i>
                         </button>
                         <span class="stepper-value">
@@ -112,8 +112,8 @@
                         <button class="stepper-btn"
                                 @onclick="IncrementAutoArchiveDays"
                                 disabled="@(_autoArchiveDays >= 365)"
-                                title="Increase"
-                                aria-label="Increase">
+                                title="@_increaseText"
+                                aria-label="@_increaseText">
                             <i class="fa fa-plus" aria-hidden="true"></i>
                         </button>
                     </div>
@@ -176,6 +176,8 @@
     private string CurrentTheme { get; set; } = "light";
     private bool NotificationsEnabled { get; set; } = false;
     private int _autoArchiveDays;
+    private readonly string _decreaseText = AppResources.ResourceManager.GetString("Decrease") ?? "Decrease";
+    private readonly string _increaseText = AppResources.ResourceManager.GetString("Increase") ?? "Increase";
 
     protected override async Task OnInitializedAsync()
     {

@@ -5,6 +5,12 @@ function selectAllText(inputId) {
     }
 }
 
+window.anticipack = window.anticipack || {};
+
+window.anticipack.isMobileNavViewport = function () {
+    return window.innerWidth < 641;
+};
+
 function scrollIntoView(element) {
     if (element) {
         element.scrollIntoView({ behavior: 'smooth', block: 'center' });

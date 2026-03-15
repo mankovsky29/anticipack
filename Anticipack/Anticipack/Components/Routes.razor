@@ -1,6 +1,4 @@
 ﻿@inject NavigationManager Navigation
-@inject Anticipack.Storage.Repositories.IPackingActivityRepository ActivityRepository
-@inject Anticipack.Storage.Repositories.IPackingItemRepository ItemRepository
 @inject Anticipack.Services.IAutoArchiveService AutoArchiveService
 
 <Router AppAssembly="@typeof(MauiProgram).Assembly">
@@ -15,38 +13,20 @@
     {
         if (firstRender)
         {
-            var targetRoute = await GetStartupRouteAsync();
-            Navigation.NavigateTo(targetRoute);
-        }
-    }
-
-    private async Task<string> GetStartupRouteAsync()
-    {
-        try
-        {
-            await AutoArchiveService.RunAutoArchiveAsync();
-
-            var activities = await ActivityRepository.GetAllAsync();
-
-            // Find unfinished, non-archived activities (already ordered by LastPacked descending)
-            var candidates = activities
-                .Where(a => !a.IsFinished && !a.IsArchived)
-                .ToList();
-
-            foreach (var activity in candidates)
+            try
             {
-                var items = await ItemRepository.GetItemsForActivityAsync(activity.Id);
-                if (items.Any(i => i.IsPacked))
-                {
-                    return $"/play-packing/{activity.Id}";
-                }
+                await AutoArchiveService.RunAutoArchiveAsync();
+            }
+            catch
+            {
+                // Keep startup resilient if background initialization fails.
+            }
+
+            var currentPath = Navigation.ToBaseRelativePath(Navigation.Uri);
+            if (string.IsNullOrWhiteSpace(currentPath))
+            {
+                Navigation.NavigateTo("/packing-activities");
             }
         }
-        catch
-        {
-            // Fall back to default route if anything fails
-        }
-
-        return "/packing-activities";
     }
 }

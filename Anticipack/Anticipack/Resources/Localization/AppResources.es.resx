@@ -867,4 +867,19 @@ Jabón, Toalla</value>
   <data name="Days" xml:space="preserve">
     <value>días</value>
   </data>
+  <data name="ScrollToTop" xml:space="preserve">
+    <value>Desplazarse arriba</value>
+  </data>
+  <data name="Increase" xml:space="preserve">
+    <value>Aumentar</value>
+  </data>
+  <data name="Decrease" xml:space="preserve">
+    <value>Disminuir</value>
+  </data>
+  <data name="StoragePermissionRequiredTitle" xml:space="preserve">
+    <value>Permiso requerido</value>
+  </data>
+  <data name="StoragePermissionRequiredMessage" xml:space="preserve">
+    <value>Se requiere permiso de almacenamiento para guardar y cargar tus datos de empaque. Puedes habilitarlo después en la configuración del sistema.</value>
+  </data>
 </root>

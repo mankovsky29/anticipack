@@ -18,30 +18,33 @@
     </div>
 
     <div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
+        <div class="desktop-nav-header">
+            <NavigationHeader />
+        </div>
         <nav class="flex-column">
             <div class="nav-item px-3">
                 <NavLink class="nav-link" href="packing-activities">
-                    <span class="oi oi-list" aria-hidden="true"></span> @L["PackingActivitiesMenu"]
+                    <i class="fa fa-list" aria-hidden="true"></i> @L["PackingActivitiesMenu"]
                 </NavLink>
             </div>
             <div class="nav-item px-3">
                 <NavLink class="nav-link" href="statistics">
-                    <span class="oi oi-bar-chart" aria-hidden="true"></span> @L["StatsMenu"]
+                    <i class="fa fa-chart-bar" aria-hidden="true"></i> @L["StatsMenu"]
                 </NavLink>
             </div>
             <div class="nav-item px-3">
                 <NavLink class="nav-link" href="support">
-                    <span class="oi oi-chat" aria-hidden="true"></span> @L["SupportMenu"]
+                    <i class="fa fa-comments" aria-hidden="true"></i> @L["SupportMenu"]
                 </NavLink>
             </div>
             <div class="nav-item px-3">
                 <NavLink class="nav-link" href="donate">
-                    <span class="oi oi-heart" aria-hidden="true"></span> @L["Donate"]
+                    <i class="fa fa-heart" aria-hidden="true"></i> @L["Donate"]
                 </NavLink>
             </div>
             <div class="nav-item px-3">
                 <NavLink class="nav-link" href="user-settings">
-                    <span class="oi oi-cog" aria-hidden="true"></span> @L["SettingsMenu"]
+                    <i class="fa fa-cog" aria-hidden="true"></i> @L["SettingsMenu"]
                 </NavLink>
             </div>
         </nav>
@@ -55,9 +58,7 @@
 
     private async Task ToggleNavMenu()
     {
-        // Check if we're on mobile screen (< 641px)
-        // Only toggle on mobile - on tablet/desktop the menu is always visible
-        var isMobile = await JSRuntime.InvokeAsync<bool>("eval", "window.innerWidth < 641");
+        var isMobile = await JSRuntime.InvokeAsync<bool>("anticipack.isMobileNavViewport");
         
         if (isMobile)
         {

@@ -217,7 +217,7 @@
         <!-- Scroll to Top Button -->
         @if (_showScrollToTop)
         {
-            <button class="scroll-to-top-fab" @onclick="ScrollToTopAsync" aria-label="Scroll to top" title="Scroll to top">
+            <button class="scroll-to-top-fab" @onclick="ScrollToTopAsync" aria-label="@Localizer["ScrollToTop"]" title="@Localizer["ScrollToTop"]">
                 <i class="fa fa-arrow-up"></i>
             </button>
         }

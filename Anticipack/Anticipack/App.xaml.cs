@@ -34,10 +34,16 @@ namespace Anticipack
                 {
                     if (Current?.MainPage is not null)
                     {
-                        await Current.MainPage.DisplayAlert(
-                            Anticipack.Resources.Localization.AppResources.ResourceManager.GetString("StoragePermissionRequiredTitle") ?? "Permission Required",
-                            Anticipack.Resources.Localization.AppResources.ResourceManager.GetString("StoragePermissionRequiredMessage") ?? "Storage permission is required to save and load your packing data. You can enable it later in system settings.",
-                            Anticipack.Resources.Localization.AppResources.Confirm);
+                        var title = Anticipack.Resources.Localization.AppResources.ResourceManager.GetString("StoragePermissionRequiredTitle") ?? "Permission Required";
+                        var message = Anticipack.Resources.Localization.AppResources.ResourceManager.GetString("StoragePermissionRequiredMessage") ?? "Storage permission is required to save and load your packing data. You can enable it later in system settings.";
+                        var openSettingsText = Anticipack.Resources.Localization.AppResources.ResourceManager.GetString("OpenSettings") ?? "Open Settings";
+                        var laterText = Anticipack.Resources.Localization.AppResources.ResourceManager.GetString("Later") ?? "Later";
+
+                        var openSettings = await Current.MainPage.DisplayAlert(title, message, openSettingsText, laterText);
+                        if (openSettings)
+                        {
+                            AppInfo.ShowSettingsUI();
+                        }
                     }
                 });
 

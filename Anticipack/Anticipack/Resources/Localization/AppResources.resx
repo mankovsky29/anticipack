@@ -798,4 +798,10 @@ Soap, Towel</value>
   <data name="StoragePermissionRequiredMessage" xml:space="preserve">
     <value>Storage permission is required to save and load your packing data. You can enable it later in system settings.</value>
   </data>
+  <data name="OpenSettings" xml:space="preserve">
+    <value>Open Settings</value>
+  </data>
+  <data name="Later" xml:space="preserve">
+    <value>Later</value>
+  </data>
 </root>

@@ -882,4 +882,10 @@ Jabón, Toalla</value>
   <data name="StoragePermissionRequiredMessage" xml:space="preserve">
     <value>Se requiere permiso de almacenamiento para guardar y cargar tus datos de empaque. Puedes habilitarlo después en la configuración del sistema.</value>
   </data>
+  <data name="OpenSettings" xml:space="preserve">
+    <value>Abrir configuración</value>
+  </data>
+  <data name="Later" xml:space="preserve">
+    <value>Más tarde</value>
+  </data>
 </root>

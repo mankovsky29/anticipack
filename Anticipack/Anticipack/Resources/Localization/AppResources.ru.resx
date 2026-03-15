@@ -882,4 +882,10 @@
   <data name="StoragePermissionRequiredMessage" xml:space="preserve">
     <value>Для сохранения и загрузки данных упаковки требуется разрешение на доступ к хранилищу. Вы можете включить его позже в настройках системы.</value>
   </data>
+  <data name="OpenSettings" xml:space="preserve">
+    <value>Открыть настройки</value>
+  </data>
+  <data name="Later" xml:space="preserve">
+    <value>Позже</value>
+  </data>
 </root>

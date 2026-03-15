@@ -8,6 +8,28 @@
     </div>
 
     <main>
+        @if (_showStoragePermissionBanner)
+        {
+            <div class="status-banner warning" role="alert">
+                <div class="status-banner-content">
+                    <strong>@PermissionBannerTitle</strong>
+                    <span>@PermissionBannerMessage</span>
+                </div>
+                <div class="status-banner-actions">
+                    <button class="btn cancel" @onclick="RetryStoragePermissionAsync">@RetryText</button>
+                    <button class="btn primary" @onclick="OpenAppSettings">@OpenSettingsText</button>
+                </div>
+            </div>
+        }
+
+        @if (_isOffline)
+        {
+            <div class="status-banner info" role="status" aria-live="polite">
+                <i class="fa fa-cloud" aria-hidden="true"></i>
+                <span>@OfflineNotice</span>
+            </div>
+        }
+
         <div>
             @Body
         </div>

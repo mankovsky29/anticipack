@@ -3,9 +3,18 @@
 <div class="page-container with-fixed-navbar">
     @if (_isLoading)
     {
-        <div class="loading">
-            <div class="loading-spinner"></div>
-            <span>@Localizer["Loading"]</span>
+        <div class="activities-skeleton" aria-label="@Localizer["Loading"]" aria-live="polite">
+            @for (var i = 0; i < 4; i++)
+            {
+                <div class="skeleton-card">
+                    <div class="skeleton-play"></div>
+                    <div class="skeleton-content">
+                        <div class="skeleton-line skeleton-title"></div>
+                        <div class="skeleton-line skeleton-meta"></div>
+                        <div class="skeleton-line skeleton-progress"></div>
+                    </div>
+                </div>
+            }
         </div>
     }
     else
@@ -43,6 +52,26 @@
                 </div>
             </div>
         </div>
+
+        @if (_showOnboardingCard)
+        {
+            <section class="onboarding-card" role="region" aria-label="@Localizer["WelcomeTitle"]">
+                <div class="onboarding-icon">
+                    <i class="fa fa-route" aria-hidden="true"></i>
+                </div>
+                <div class="onboarding-content">
+                    <h3>@Localizer["WelcomeTitle"]</h3>
+                    <p>@Localizer["WelcomeDescription"]</p>
+                    <div class="onboarding-actions">
+                        <button class="btn primary" @onclick="AddNewActivity">
+                            <i class="fa fa-plus" aria-hidden="true"></i>
+                            @Localizer["CreateActivity"]
+                        </button>
+                        <button class="btn cancel" @onclick="DismissOnboarding">@Localizer["Later"]</button>
+                    </div>
+                </div>
+            </section>
+        }
         
         @if (_showAddForm)
         {
@@ -210,6 +239,9 @@
                 <p>@Localizer["NoActivitiesDescription"]</p>
                 <button class="btn primary" @onclick="AddNewActivity">
                     <i class="fa fa-plus"></i> @Localizer["CreateActivity"]
+                </button>
+                <button class="btn cancel quick-template-btn" @onclick="AddNewActivity">
+                    <i class="fa fa-suitcase" aria-hidden="true"></i> @Localizer["StartFirstTrip"]
                 </button>
             </div>
         }

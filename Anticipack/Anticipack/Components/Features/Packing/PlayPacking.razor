@@ -6,6 +6,7 @@
             <!-- Edit mode button -->
             <button class="icon-btn" 
                     @onclick="SwitchToEditMode" 
+                    aria-label="@AppResources.EditActivity"
                     title="@AppResources.EditActivity">
                 <i class="fa fa-edit" aria-hidden="true"></i>
             </button>
@@ -15,6 +16,7 @@
             <!-- Show/Hide toggle -->
             <button class="toggle-visibility-btn @(_hideCheckedItems ? "filtering" : "")" 
                     @onclick="ToggleItemVisibility" 
+                    aria-label="@(_hideCheckedItems ? AppResources.ShowAllItems : AppResources.HideCheckedItems)"
                     title="@(_hideCheckedItems ? AppResources.ShowAllItems : AppResources.HideCheckedItems)">
                 <i class="fa @(_hideCheckedItems ? "fa-eye-slash" : "fa-eye")" aria-hidden="true"></i>
             </button>
@@ -22,6 +24,7 @@
             <!-- Reset all items button -->
             <button class="icon-btn" 
                     @onclick="ConfirmResetAllItems" 
+                    aria-label="@AppResources.ResetAllItems"
                     title="@AppResources.ResetAllItems">
                 <i class="fa fa-undo-alt" aria-hidden="true"></i>
             </button>
@@ -30,6 +33,7 @@
             <button class="icon-btn" 
                     @onclick="ConfirmFinishPacking" 
                     disabled="@(!CanFinishPacking())"
+                    aria-label="@AppResources.FinishPacking"
                     title="@AppResources.FinishPacking">
                 <i class="fa fa-check-circle" aria-hidden="true"></i>
             </button>
@@ -161,6 +165,7 @@
             
             <h3>@AppResources.PackingComplete</h3>
             <p>@string.Format(AppResources.YouPackedItems, Items.Count, GetPackingDuration())</p>
+            <p class="completion-save-hint">@SessionSavedMessage</p>
             
             <div class="completion-stats">
                 <div class="stat">

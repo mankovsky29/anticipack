@@ -898,4 +898,22 @@
   <data name="Later" xml:space="preserve">
     <value>Позже</value>
   </data>
+  <data name="Retry" xml:space="preserve">
+    <value>Повторить</value>
+  </data>
+  <data name="OfflineChangesSaved" xml:space="preserve">
+    <value>Офлайн-режим: изменения сохранены локально.</value>
+  </data>
+  <data name="WelcomeTitle" xml:space="preserve">
+    <value>Добро пожаловать в Anticipack</value>
+  </data>
+  <data name="WelcomeDescription" xml:space="preserve">
+    <value>Создайте первую активность, чтобы собираться быстрее и оставаться организованным.</value>
+  </data>
+  <data name="StartFirstTrip" xml:space="preserve">
+    <value>Начать первую упаковку</value>
+  </data>
+  <data name="SessionSavedMessage" xml:space="preserve">
+    <value>Прогресс вашей сессии сохранён.</value>
+  </data>
 </root>

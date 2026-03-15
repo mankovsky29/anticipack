@@ -20,6 +20,8 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <EnableDefaultCssItems>false</EnableDefaultCssItems>
         <Nullable>enable</Nullable>
+        <DisableBuildCompression>true</DisableBuildCompression>
+        <DisablePublishCompression>true</DisablePublishCompression>
 
         <!-- Display name -->
         <ApplicationTitle>Anticipack</ApplicationTitle>

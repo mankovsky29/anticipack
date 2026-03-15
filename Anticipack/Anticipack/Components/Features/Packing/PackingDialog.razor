@@ -12,7 +12,7 @@
     </div>
 
     <div class="chat-input">
-        <textarea @bind="currentMessage" @bind:event="oninput" placeholder="@AppResources.TypeMessage"
+        <textarea @bind="currentMessage" @bind:event="oninput" placeholder="@AppResources.TypeYourMessage"
                   rows="2" @ref="messageInput"></textarea>
         <button class="send-btn" @onclick="Send">
             <!-- simple send SVG icon -->

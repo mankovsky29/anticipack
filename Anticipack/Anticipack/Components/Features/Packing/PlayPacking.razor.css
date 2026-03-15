@@ -818,6 +818,14 @@ ul.category-content {
     line-height: 1.6;
 }
 
+.completion-save-hint {
+    margin-top: calc(var(--space-sm) * -1);
+    margin-bottom: var(--space-md) !important;
+    font-size: var(--font-size-xs) !important;
+    color: var(--success) !important;
+    font-weight: 600;
+}
+
 .completion-stats {
     display: flex;
     gap: 16px;

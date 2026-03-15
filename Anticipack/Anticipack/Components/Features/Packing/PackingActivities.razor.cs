@@ -9,11 +9,14 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.Extensions.Localization;
 using Microsoft.JSInterop;
+using Microsoft.Maui.Storage;
 
 namespace Anticipack.Components.Features.Packing;
 
 public partial class PackingActivities : IAsyncDisposable
 {
+    private const string OnboardingSeenPreferenceKey = "ux.onboarding.seen.v1";
+
     [Inject] private IPackingRepository PackingRepository { get; set; } = default!;
     [Inject] private NavigationManager Navigation { get; set; } = default!;
     [Inject] private IDialogService DialogService { get; set; } = default!;
@@ -24,6 +27,10 @@ public partial class PackingActivities : IAsyncDisposable
     [Inject] private IKeyboardService KeyboardService { get; set; } = default!;
     [Inject] private ICategoryIconProvider CategoryIconProvider { get; set; } = default!;
     [Inject] private IToastService ToastService { get; set; } = default!;
+
+    [Parameter]
+    [SupplyParameterFromQuery(Name = "create")]
+    public bool? Create { get; set; }
 
     private enum ArchiveFilterType
     {
@@ -55,6 +62,8 @@ public partial class PackingActivities : IAsyncDisposable
 
     // Scroll to top
     private bool _showScrollToTop;
+    private bool _showOnboardingCard;
+    private bool _hasHandledCreateQuery;
     
     // Keyboard
     private bool _keyboardVisible;
@@ -119,6 +128,18 @@ public partial class PackingActivities : IAsyncDisposable
     {
         NavigationHeaderService.SetText(Localizer["PackingActivitiesMenu"]);
         await LoadActivitiesAsync();
+
+        _showOnboardingCard = !_activities.Any() && !Preferences.Default.Get(OnboardingSeenPreferenceKey, false);
+    }
+
+    protected override void OnParametersSet()
+    {
+        if (Create == true && !_hasHandledCreateQuery)
+        {
+            _hasHandledCreateQuery = true;
+            AddNewActivity();
+            Navigation.NavigateTo("/packing-activities", replace: true);
+        }
     }
 
     private void OnCultureChanged(object? sender, System.Globalization.CultureInfo culture)
@@ -267,12 +288,24 @@ public partial class PackingActivities : IAsyncDisposable
 
     private void AddNewActivity()
     {
+        if (_showOnboardingCard)
+        {
+            Preferences.Default.Set(OnboardingSeenPreferenceKey, true);
+            _showOnboardingCard = false;
+        }
+
         _newActivityName = string.Empty;
         _isRecurringActivity = false;
         _hasAttemptedSubmit = false;
         _isCreating = false;
         _hasFormFocused = false;
         _showAddForm = true;
+    }
+
+    private void DismissOnboarding()
+    {
+        Preferences.Default.Set(OnboardingSeenPreferenceKey, true);
+        _showOnboardingCard = false;
     }
 
     private void CancelAddActivity()

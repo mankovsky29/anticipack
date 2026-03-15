@@ -898,4 +898,22 @@ Jabón, Toalla</value>
   <data name="Later" xml:space="preserve">
     <value>Más tarde</value>
   </data>
+  <data name="Retry" xml:space="preserve">
+    <value>Reintentar</value>
+  </data>
+  <data name="OfflineChangesSaved" xml:space="preserve">
+    <value>Modo sin conexión: tus cambios se guardan localmente.</value>
+  </data>
+  <data name="WelcomeTitle" xml:space="preserve">
+    <value>Bienvenido a Anticipack</value>
+  </data>
+  <data name="WelcomeDescription" xml:space="preserve">
+    <value>Crea tu primera actividad para empacar más rápido y mantenerte organizado.</value>
+  </data>
+  <data name="StartFirstTrip" xml:space="preserve">
+    <value>Comencemos con el primer embalaje</value>
+  </data>
+  <data name="SessionSavedMessage" xml:space="preserve">
+    <value>El progreso de tu sesión se ha guardado.</value>
+  </data>
 </root>

@@ -47,6 +47,7 @@ public partial class PlayPacking
     private List<PackingItemView> Items { get; set; } = new();
     private List<string> _categoryOrder = new();
     private readonly Dictionary<string, bool?> _manualOverride = new(StringComparer.OrdinalIgnoreCase);
+    private string SessionSavedMessage => AppResources.ResourceManager.GetString("SessionSavedMessage") ?? "Progress saved successfully.";
 
     protected override async Task OnInitializedAsync()
     {
@@ -327,6 +328,7 @@ public partial class PlayPacking
             }
             
             _completionAcknowledged = true;
+            ToastService.ShowSuccess(SessionSavedMessage);
             await InvokeAsync(StateHasChanged);
         }
         catch (Exception ex)
@@ -554,6 +556,7 @@ public partial class PlayPacking
             
             // Show completion modal
             _completionAcknowledged = false;
+            ToastService.ShowSuccess(SessionSavedMessage);
             await InvokeAsync(StateHasChanged);
         }
         catch (Exception ex)

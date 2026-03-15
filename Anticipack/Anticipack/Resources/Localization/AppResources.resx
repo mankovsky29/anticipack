@@ -814,4 +814,22 @@ Soap, Towel</value>
   <data name="Later" xml:space="preserve">
     <value>Later</value>
   </data>
+  <data name="Retry" xml:space="preserve">
+    <value>Retry</value>
+  </data>
+  <data name="OfflineChangesSaved" xml:space="preserve">
+    <value>Offline mode: your changes are saved locally.</value>
+  </data>
+  <data name="WelcomeTitle" xml:space="preserve">
+    <value>Welcome to Anticipack</value>
+  </data>
+  <data name="WelcomeDescription" xml:space="preserve">
+    <value>Create your first activity to start packing faster and stay organized.</value>
+  </data>
+  <data name="StartFirstTrip" xml:space="preserve">
+    <value>Start first packing</value>
+  </data>
+  <data name="SessionSavedMessage" xml:space="preserve">
+    <value>Your session progress has been saved.</value>
+  </data>
 </root>

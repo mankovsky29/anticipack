@@ -8,6 +8,113 @@
     flex-direction: column;
 }
 
+.onboarding-card {
+    display: flex;
+    gap: var(--space-md);
+    align-items: flex-start;
+    background: linear-gradient(135deg, var(--surface), var(--background));
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-lg);
+    padding: var(--space-md);
+    margin-bottom: var(--space-md);
+    box-shadow: var(--shadow-sm);
+}
+
+.onboarding-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: var(--primary-light-bg);
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--font-size-lg);
+    flex-shrink: 0;
+}
+
+.onboarding-content h3 {
+    margin: 0 0 var(--space-xs) 0;
+    color: var(--text-primary);
+    font-size: var(--font-size-md);
+}
+
+.onboarding-content p {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm);
+}
+
+.onboarding-actions {
+    display: flex;
+    gap: var(--space-sm);
+    margin-top: var(--space-sm);
+    flex-wrap: wrap;
+}
+
+.activities-skeleton {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.skeleton-card {
+    background: var(--surface);
+    border-radius: var(--border-radius-lg);
+    border: 1px solid var(--border-color);
+    padding: var(--space-md);
+    display: flex;
+    gap: var(--space-sm);
+}
+
+.skeleton-play {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--hover-bg);
+    flex-shrink: 0;
+    animation: skeletonPulse 1.3s ease-in-out infinite;
+}
+
+.skeleton-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+}
+
+.skeleton-line {
+    height: 12px;
+    border-radius: var(--border-radius-sm);
+    background: linear-gradient(90deg, var(--hover-bg), var(--surface-dark), var(--hover-bg));
+    background-size: 200% 100%;
+    animation: skeletonShimmer 1.6s linear infinite;
+}
+
+.skeleton-title {
+    width: 65%;
+    height: 16px;
+}
+
+.skeleton-meta {
+    width: 45%;
+}
+
+.skeleton-progress {
+    width: 80%;
+    height: 8px;
+}
+
+@keyframes skeletonShimmer {
+    from { background-position: 200% 0; }
+    to { background-position: -200% 0; }
+}
+
+@keyframes skeletonPulse {
+    0%, 100% { opacity: 0.55; }
+    50% { opacity: 1; }
+}
+
 /* Sticky header container for search + filters */
 .sticky-header {
     position: sticky;
@@ -17,6 +124,10 @@
     margin: -12px -12px 12px -12px;
     padding-bottom: 2px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.quick-template-btn {
+    margin-top: var(--space-sm);
 }
 
 /* Enhanced Search Bar - Always Visible */

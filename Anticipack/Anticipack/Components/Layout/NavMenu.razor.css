@@ -120,6 +120,27 @@
     margin-top: 0.5rem;
 }
 
+.quick-action-item {
+    margin-top: var(--space-sm);
+    margin-bottom: var(--space-xs);
+}
+
+.nav-item ::deep .nav-link.quick-action-link {
+    background: var(--primary-light-bg);
+    border: 1px solid rgba(var(--primary-rgb), 0.25);
+    color: var(--primary);
+    font-weight: 600;
+}
+
+.nav-item ::deep .nav-link.quick-action-link:hover {
+    background: var(--primary);
+    color: white;
+}
+
+.nav-item ::deep .nav-link.quick-action-link i.fa {
+    color: inherit;
+}
+
     .nav-item ::deep .nav-link {
         color: var(--text-primary);
         border-radius: 4px;

@@ -9,17 +9,17 @@
 .messages {
     flex: 1;
     overflow-y: auto;
-    padding: 1rem;
+    padding: var(--space-md);
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    gap: var(--space-sm);
 }
 
 .message {
     display: flex;
     flex-direction: column;
-    max-width: 70%;
-    gap: 0.25rem;
+    max-width: min(70%, 42rem);
+    gap: var(--space-xs);
 }
 
 .message.sent {
@@ -33,8 +33,8 @@
 }
 
 .bubble {
-    padding: 0.75rem 1rem;
-    border-radius: 1rem;
+    padding: var(--space-sm) var(--space-md);
+    border-radius: var(--border-radius-lg);
     word-wrap: break-word;
     overflow-wrap: break-word;
 }
@@ -42,46 +42,46 @@
 .message.sent .bubble {
     background-color: var(--primary);
     color: white;
-    border-bottom-right-radius: 0.25rem;
+    border-bottom-right-radius: var(--border-radius-sm);
 }
 
 .message.received .bubble {
-    background-color: var(--secondary);
-    color: #333;
-    border-bottom-left-radius: 0.25rem;
+    background-color: var(--surface);
+    color: var(--text-primary);
+    border-bottom-left-radius: var(--border-radius-sm);
 }
 
 .meta {
-    font-size: 0.75rem;
-    color: #666;
-    padding: 0 0.5rem;
+    font-size: var(--font-size-xs);
+    color: var(--text-secondary);
+    padding: 0 var(--space-xs);
 }
 
 .chat-input {
     position: sticky;
     bottom: 0;
     display: flex;
-    gap: 0.5rem;
-    padding: 1rem;
-    border-top: 1px solid #e1e1e1;
+    gap: var(--space-sm);
+    padding: var(--space-md);
+    border-top: 1px solid var(--border-color);
     align-items: flex-end;
 }
 
 .chat-input textarea {
     flex: 1;
-    padding: 0.75rem;
-    border: 1px solid #ccc;
-    border-radius: 1.25rem;
+    padding: var(--space-sm);
+    border: 1px solid var(--input-border);
+    border-radius: var(--border-radius-xl);
     resize: none;
     font-family: inherit;
-    font-size: 1rem;
+    font-size: var(--font-size-sm);
     max-height: 120px;
     overflow-y: auto;
 }
 
 .chat-input textarea:focus {
     outline: none;
-    border-color: #0078d4;
+    border-color: var(--input-focus-border);
 }
 
 .send-btn {
@@ -89,22 +89,22 @@
     height: 40px;
     border-radius: 50%;
     border: none;
-    background-color: #0078d4;
+    background-color: var(--primary);
     color: white;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    transition: background-color 0.2s;
+    transition: all var(--transition-fast);
 }
 
 .send-btn:hover {
-    background-color: #106ebe;
+    background-color: var(--primary-dark);
 }
 
 .send-btn:active {
-    background-color: #005a9e;
+    background-color: var(--primary-dark);
 }
 
 .sr-only {
@@ -118,3 +118,19 @@
     white-space: nowrap;
     border-width: 0;
 }
+
+@media (prefers-reduced-motion: reduce) {
+    .send-btn,
+    .chat-input textarea {
+        transition: none;
+    }
+}
+
+@media (prefers-contrast: high) {
+    .bubble,
+    .chat-input textarea,
+    .send-btn {
+        border: 2px solid currentColor;
+    }
+}
+

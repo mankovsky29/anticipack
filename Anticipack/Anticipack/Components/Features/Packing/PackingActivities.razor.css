@@ -1081,34 +1081,31 @@
 }
 
 @media (max-width: 480px) {
-    .stats-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .btn-secondary span {
-        display: none;
-    }
-    
-    .card-actions {
-        grid-template-columns: auto 1fr;
+    .title-row {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: var(--space-xs);
     }
 
-    .card-actions-inline {
-        flex-direction: column;
+    .activity-meta {
+        gap: var(--space-xs);
     }
-    
-    .btn-secondary {
-        padding: 11px;
+
+    .btn-play {
+        width: 40px;
+        height: 40px;
+        margin-left: var(--space-xs);
     }
+}
 
 @media (prefers-contrast: high) {
     .activity-card,
-    .activity-badge,
-    .card-action-btn,
-    .category-pill {
+    .filter-chip,
+    .category-pill,
+    .btn-play,
+    .btn-menu {
         border-width: 2px;
     }
-}
 }
 
 /* Accessibility improvements */
@@ -1192,5 +1189,7 @@
 }
 
 /* (Radio group and modal styles removed — inline form uses segmented control) */
+
+
 
 

@@ -19,9 +19,9 @@
 .form-control {
     width: 100%;
     padding: 0.75rem;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    font-size: 1rem;
+    border: 1px solid var(--input-border);
+    border-radius: var(--border-radius);
+    font-size: var(--font-size-sm);
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
     font-family: inherit;
     box-sizing: border-box;
@@ -29,8 +29,8 @@
 
 .form-control:focus {
     outline: none;
-    border-color: #007bff;
-    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+    border-color: var(--input-focus-border);
+    box-shadow: 0 0 0 3px var(--input-focus-shadow);
 }
 
 textarea.form-control {
@@ -44,14 +44,14 @@ textarea.form-control {
     justify-content: flex-end;
     margin-top: 2rem;
     padding-top: 1rem;
-    border-top: 1px solid #eee;
+    border-top: 1px solid var(--border-color);
     flex-wrap: wrap;
 }
 
 .btn {
     padding: 0.625rem 1.25rem;
     border: none;
-    border-radius: 6px;
+    border-radius: var(--border-radius);
     font-size: 0.95rem;
     font-weight: 500;
     cursor: pointer;
@@ -72,21 +72,23 @@ textarea.form-control {
 }
 
 .btn-cancel {
-    background: #6c757d;
-    color: white;
+    background: var(--surface);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
 }
 
 .btn-cancel:hover {
-    background: #5a6268;
+    background: var(--hover-bg);
+    color: var(--text-primary);
 }
 
 .btn-primary {
-    background: #007bff;
+    background: var(--primary);
     color: white;
 }
 
 .btn-primary:hover {
-    background: #0056b3;
+    background: var(--primary-dark);
 }
 
 .btn i {
@@ -135,3 +137,21 @@ textarea.form-control {
         width: 100%;
     }
 }
+
+
+@media (prefers-reduced-motion: reduce) {
+    .btn,
+    .form-control {
+        transition: none;
+    }
+}
+
+@media (prefers-contrast: high) {
+    .form-control,
+    .btn {
+        border-width: 2px;
+    }
+}
+
+
+

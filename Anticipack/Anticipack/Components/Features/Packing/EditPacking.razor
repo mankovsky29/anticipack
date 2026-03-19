@@ -269,7 +269,7 @@
             {
                 @RenderAddItemForm()
             }
-            else if (!_isAddingItem)
+            else if (!_isAddingItem && Items.Any())
             {
                 <button class="btn-add-packing-item" @onclick="ShowAddItemForm">
                     <i class="fa fa-plus" aria-hidden="true"></i>

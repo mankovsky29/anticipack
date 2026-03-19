@@ -806,6 +806,9 @@
   <data name="StatsMostActiveDay" xml:space="preserve">
     <value>Самый активный день</value>
   </data>
+  <data name="StatsLastPacked" xml:space="preserve">
+    <value>Последняя упаковка</value>
+  </data>
   <data name="StatsCategoryInsights" xml:space="preserve">
     <value>Категории</value>
   </data>

@@ -722,6 +722,9 @@ Soap, Towel</value>
   <data name="StatsMostActiveDay" xml:space="preserve">
     <value>Most Active Day</value>
   </data>
+  <data name="StatsLastPacked" xml:space="preserve">
+    <value>Last packed</value>
+  </data>
   <data name="StatsCategoryInsights" xml:space="preserve">
     <value>Category Insights</value>
   </data>

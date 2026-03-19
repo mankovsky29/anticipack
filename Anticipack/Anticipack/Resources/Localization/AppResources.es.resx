@@ -779,6 +779,9 @@ Jabón, Toalla</value>
   <data name="StatsMostActiveDay" xml:space="preserve">
     <value>Día más activo</value>
   </data>
+  <data name="StatsLastPacked" xml:space="preserve">
+    <value>Último empaque</value>
+  </data>
   <data name="StatsCategoryInsights" xml:space="preserve">
     <value>Categorías</value>
   </data>

@@ -96,6 +96,11 @@ public partial class PackingStatistics : IDisposable
         return System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedDayName(day);
     }
 
+    private static string FormatDate(DateTime date)
+    {
+        return date.ToLocalTime().ToString("d", System.Globalization.CultureInfo.CurrentCulture);
+    }
+
     public void Dispose()
     {
         LocalizationService.CultureChanged -= OnCultureChanged;

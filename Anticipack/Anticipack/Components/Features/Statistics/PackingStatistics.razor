@@ -114,7 +114,10 @@
             }
 
             <!-- Per-Activity Breakdown -->
-            @if (_stats.MostPackedActivity is not null || _stats.MostItemsActivity is not null)
+            @if (_stats.MostPackedActivity is not null ||
+                _stats.MostEfficientActivity is not null ||
+                _stats.LeastEfficientActivity is not null ||
+                _stats.MostItemsActivity is not null)
             {
                 <section class="stats-section">
                     <h2 class="section-title">
@@ -203,12 +206,16 @@
                             <div class="usage-icon"><i class="fa fa-calendar"></i></div>
                             <div class="usage-value">@_stats.SessionsThisMonth</div>
                             <div class="usage-label">@Localizer["StatsThisMonth"]</div>
+                            <div class="usage-detail">@Localizer["StatsLastMonth"]: @_stats.SessionsLastMonth</div>
                         </div>
-                        <div class="usage-card">
-                            <div class="usage-icon"><i class="fa fa-history"></i></div>
-                            <div class="usage-value">@_stats.SessionsLastMonth</div>
-                            <div class="usage-label">@Localizer["StatsLastMonth"]</div>
-                        </div>
+                        @if (_stats.LastPackedDate.HasValue)
+                        {
+                            <div class="usage-card">
+                                <div class="usage-icon"><i class="fa fa-clock"></i></div>
+                                <div class="usage-value usage-value-small">@FormatDate(_stats.LastPackedDate.Value)</div>
+                                <div class="usage-label">@Localizer["StatsLastPacked"]</div>
+                            </div>
+                        }
                         @if (_stats.MostActiveDay.HasValue)
                         {
                             <div class="usage-card">

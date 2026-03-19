@@ -336,9 +336,20 @@
     line-height: 1;
 }
 
+.usage-value-small {
+    font-size: var(--font-size-sm);
+    line-height: 1.2;
+}
+
 .usage-label {
     font-size: var(--font-size-xs);
     color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.usage-detail {
+    font-size: var(--font-size-xs);
+    color: var(--text-light);
     font-weight: 500;
 }
 

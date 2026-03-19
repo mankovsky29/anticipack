@@ -160,6 +160,7 @@
                     <div class="activity-card @(isCompleted ? "completed" : "")">
                         <button class="btn-play" 
                                 @onclick="() => OpenActivityInPackingMode(activity.Id)"
+                                aria-label="@Localizer["PackNow"]"
                                 title="@Localizer["PackNow"]">
                             <i class="fa @(isCompleted ? "fa-check" : "fa-play")"></i>
                         </button>
@@ -168,41 +169,49 @@
                             <div class="header-content">
                                 <div class="title-row">
                                     <h3 class="activity-title">@activity.Name</h3>
-                                    @if (isCompleted)
-                                    {
-                                        <span class="completed-badge" title="@Localizer["FullyPacked"]">
-                                            <i class="fa fa-check-circle" aria-hidden="true"></i>
-                                        </span>
-                                    }
-                                    @if (activity.IsShared)
-                                    {
-                                        <span class="shared-badge" title="@Localizer["SharedActivity"]">
-                                            <i class="fa fa-share-alt"></i>
-                                        </span>
-                                    }
+                                    <div class="title-badges">
+                                        @if (isCompleted)
+                                        {
+                                            <span class="completed-badge" title="@Localizer["FullyPacked"]">
+                                                <i class="fa fa-check-circle" aria-hidden="true"></i>
+                                            </span>
+                                        }
+                                        @if (activity.IsShared)
+                                        {
+                                            <span class="shared-badge" title="@Localizer["SharedActivity"]">
+                                                <i class="fa fa-share-alt"></i>
+                                            </span>
+                                        }
+                                    </div>
                                 </div>
+
                                 <div class="activity-meta">
                                     <span class="meta-item">
                                         <i class="fa fa-clock"></i>
                                         @GetRelativeTime(activity.LastPacked)
                                     </span>
-                                    <span class="meta-separator">•</span>
                                     <span class="meta-item">
                                         <i class="fa fa-box"></i>
                                         @(string.Format(Localizer["ItemsPacked"], packedCount, itemCount))
                                     </span>
                                 </div>
+
                                 @if (itemCount > 0)
                                 {
                                     <div class="progress-bar-container" title="@progressPercent%">
                                         <div class="progress-bar-fill @(isCompleted ? "completed" : "")" style="width: @(progressPercent)%"></div>
                                     </div>
                                 }
+                                else
+                                {
+                                    <div class="progress-empty">@Localizer["NoItemsYet"]</div>
+                                }
                             </div>
                             <div class="card-menu">
                                 <button class="btn-menu" 
                                         @onclick="() => ToggleMenuAsync(activity.Id)"
                                         @onclick:stopPropagation
+                                        aria-label="@Localizer["More"]"
                                         title="@Localizer["More"]">
                                     <i class="fa fa-ellipsis-v"></i>
                                 </button>

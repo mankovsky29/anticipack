@@ -346,7 +346,7 @@ public partial class PackingActivities : IAsyncDisposable
             _hasAttemptedSubmit = false;
             _newActivityName = string.Empty;
             _isRecurringActivity = false;
-            await LoadActivitiesAsync();
+            Navigation.NavigateTo($"/packing-activity?id={newActivity.Id}&mode=edit");
         }
         catch
         {

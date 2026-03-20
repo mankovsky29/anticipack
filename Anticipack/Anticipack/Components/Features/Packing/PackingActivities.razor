@@ -157,7 +157,7 @@
                     var isCompleted = itemCount > 0 && packedCount == itemCount;
                     var progressPercent = itemCount > 0 ? (int)Math.Round((double)packedCount / itemCount * 100) : 0;
 
-                    <div class="activity-card @(isCompleted ? "completed" : "")">
+                    <div class="activity-card @(isCompleted ? "completed" : "") @(_openMenuId == activity.Id ? "menu-open" : "")">
                         <button class="btn-play" 
                                 @onclick="() => OpenActivityInPackingMode(activity.Id)"
                                 aria-label="@Localizer["PackNow"]"

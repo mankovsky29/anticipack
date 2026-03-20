@@ -258,6 +258,10 @@
     box-shadow: var(--shadow);
 }
 
+.activity-card.menu-open {
+    z-index: 2000;
+}
+
 /* Play Button - Left Side - Circular */
 .btn-play {
     width: 44px;

@@ -1,7 +1,9 @@
+using Anticipack.API.Models;
+
 namespace Anticipack.API.DTOs;
 
 // Auth DTOs
-public record LoginRequest(string IdToken, string Provider); // Google or Apple ID token
+public record LoginRequest(string IdToken, string Provider, string? DeviceId = null); // Provider token from mobile client
 
 public record LoginResponse(
     string AccessToken,
@@ -11,6 +13,14 @@ public record LoginResponse(
 );
 
 public record RefreshTokenRequest(string RefreshToken);
+
+public record ExchangeTokenRequest(
+    AuthProvider Provider,
+    string IdentityToken,
+    string? DeviceId = null
+);
+
+public record RevokeTokenRequest(string RefreshToken);
 
 // User DTOs
 public record UserDto(

@@ -1,13 +1,20 @@
+using Anticipack.API.Models;
 using System.Security.Claims;
 
 namespace Anticipack.API.Services;
 
 public interface IAuthService
 {
-    Task<(bool Success, string? UserId, string? Email, string? Name, string? Picture)> ValidateGoogleTokenAsync(string idToken);
-    Task<(bool Success, string? UserId, string? Email, string? Name)> ValidateAppleTokenAsync(string idToken);
-    string GenerateJwtToken(string userId, string email);
+    string GenerateJwtToken(string userId, string email, string? deviceId = null);
     string GenerateRefreshToken();
-    Task<string?> ValidateRefreshTokenAsync(string refreshToken);
+    string HashRefreshToken(string refreshToken);
+    Task<RefreshToken> CreateRefreshTokenAsync(string userId, string refreshToken, DateTime expiresAtUtc, string? createdByIp);
+    Task<RefreshToken?> ValidateRefreshTokenAsync(string refreshToken);
+    Task<bool> RevokeRefreshTokenAsync(string refreshToken, string? revokedByIp);
+    Task<(RefreshToken RevokedToken, RefreshToken NewToken)?> RotateRefreshTokenAsync(
+        string refreshToken,
+        string userId,
+        DateTime newExpiryDateUtc,
+        string? requestIp);
     ClaimsPrincipal? ValidateJwtToken(string token);
 }

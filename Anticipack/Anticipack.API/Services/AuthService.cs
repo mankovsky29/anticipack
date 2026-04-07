@@ -1,4 +1,5 @@
-using Google.Apis.Auth;
+using Anticipack.API.Models;
+using Anticipack.API.Repositories;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -10,74 +11,37 @@ namespace Anticipack.API.Services;
 public class AuthService : IAuthService
 {
     private readonly IConfiguration _configuration;
-    private readonly Dictionary<string, (string UserId, DateTime ExpiresAt)> _refreshTokens = new();
+    private readonly IRefreshTokenRepository _refreshTokenRepository;
 
-    public AuthService(IConfiguration configuration)
+    public AuthService(IConfiguration configuration, IRefreshTokenRepository refreshTokenRepository)
     {
         _configuration = configuration;
+        _refreshTokenRepository = refreshTokenRepository;
     }
 
-    public async Task<(bool Success, string? UserId, string? Email, string? Name, string? Picture)> ValidateGoogleTokenAsync(string idToken)
-    {
-        try
-        {
-            var settings = new GoogleJsonWebSignature.ValidationSettings
-            {
-                Audience = new[] { _configuration["Authentication:Google:ClientId"] ?? "" }
-            };
-
-            var payload = await GoogleJsonWebSignature.ValidateAsync(idToken, settings);
-            
-            return (true, payload.Subject, payload.Email, payload.Name, payload.Picture);
-        }
-        catch (Exception)
-        {
-            return (false, null, null, null, null);
-        }
-    }
-
-    public async Task<(bool Success, string? UserId, string? Email, string? Name)> ValidateAppleTokenAsync(string idToken)
-    {
-        try
-        {
-            // Apple Sign In validation requires fetching Apple's public keys and validating the JWT
-            // This is a simplified version - in production, implement full Apple ID token validation
-            var handler = new JwtSecurityTokenHandler();
-            var token = handler.ReadJwtToken(idToken);
-            
-            var userId = token.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
-            var email = token.Claims.FirstOrDefault(c => c.Type == "email")?.Value;
-            var name = token.Claims.FirstOrDefault(c => c.Type == "name")?.Value;
-
-            // TODO: Add proper Apple public key validation
-            // For now, we'll accept the token (NOT PRODUCTION READY)
-            
-            return await Task.FromResult((true, userId, email, name));
-        }
-        catch (Exception)
-        {
-            return (false, null, null, null);
-        }
-    }
-
-    public string GenerateJwtToken(string userId, string email)
+    public string GenerateJwtToken(string userId, string email, string? deviceId = null)
     {
         var securityKey = new SymmetricSecurityKey(
             Encoding.UTF8.GetBytes(_configuration["Jwt:Key"] ?? "your-secret-key-min-32-characters-long-for-security"));
         var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
-        var claims = new[]
+        var claims = new List<Claim>
         {
             new Claim(ClaimTypes.NameIdentifier, userId),
             new Claim(ClaimTypes.Email, email),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
 
+        if (!string.IsNullOrWhiteSpace(deviceId))
+        {
+            claims.Add(new Claim("device_id", deviceId));
+        }
+
         var token = new JwtSecurityToken(
             issuer: _configuration["Jwt:Issuer"] ?? "anticipack-api",
             audience: _configuration["Jwt:Audience"] ?? "anticipack-app",
             claims: claims,
-            expires: DateTime.UtcNow.AddHours(24),
+            expires: DateTime.UtcNow.AddMinutes(15),
             signingCredentials: credentials
         );
 
@@ -92,17 +56,74 @@ public class AuthService : IAuthService
         return Convert.ToBase64String(randomNumber);
     }
 
-    public Task<string?> ValidateRefreshTokenAsync(string refreshToken)
+    public string HashRefreshToken(string refreshToken)
     {
-        if (_refreshTokens.TryGetValue(refreshToken, out var tokenData))
+        var hash = SHA256.HashData(Encoding.UTF8.GetBytes(refreshToken));
+        return Convert.ToHexString(hash);
+    }
+
+    public Task<RefreshToken> CreateRefreshTokenAsync(string userId, string refreshToken, DateTime expiresAtUtc, string? createdByIp)
+    {
+        var token = new RefreshToken
         {
-            if (tokenData.ExpiresAt > DateTime.UtcNow)
-            {
-                return Task.FromResult<string?>(tokenData.UserId);
-            }
-            _refreshTokens.Remove(refreshToken);
+            UserId = userId,
+            TokenHash = HashRefreshToken(refreshToken),
+            ExpiryDate = expiresAtUtc,
+            CreatedByIp = createdByIp
+        };
+
+        return _refreshTokenRepository.CreateAsync(token);
+    }
+
+    public async Task<RefreshToken?> ValidateRefreshTokenAsync(string refreshToken)
+    {
+        var tokenHash = HashRefreshToken(refreshToken);
+        var token = await _refreshTokenRepository.GetByTokenHashAsync(tokenHash);
+        if (token == null || !token.IsActive)
+        {
+            return null;
         }
-        return Task.FromResult<string?>(null);
+
+        return token;
+    }
+
+    public async Task<bool> RevokeRefreshTokenAsync(string refreshToken, string? revokedByIp)
+    {
+        var token = await ValidateRefreshTokenAsync(refreshToken);
+        if (token == null)
+        {
+            return false;
+        }
+
+        token.IsRevoked = true;
+        token.RevokedAt = DateTime.UtcNow;
+        token.RevokedByIp = revokedByIp;
+        await _refreshTokenRepository.UpdateAsync(token);
+        return true;
+    }
+
+    public async Task<(RefreshToken RevokedToken, RefreshToken NewToken)?> RotateRefreshTokenAsync(
+        string refreshToken,
+        string userId,
+        DateTime newExpiryDateUtc,
+        string? requestIp)
+    {
+        var current = await ValidateRefreshTokenAsync(refreshToken);
+        if (current == null || current.UserId != userId)
+        {
+            return null;
+        }
+
+        var newRefreshToken = GenerateRefreshToken();
+        var newToken = await CreateRefreshTokenAsync(userId, newRefreshToken, newExpiryDateUtc, requestIp);
+
+        current.IsRevoked = true;
+        current.RevokedAt = DateTime.UtcNow;
+        current.RevokedByIp = requestIp;
+        current.ReplacedByTokenHash = newToken.TokenHash;
+        await _refreshTokenRepository.UpdateAsync(current);
+
+        return (current, newToken);
     }
 
     public ClaimsPrincipal? ValidateJwtToken(string token)
@@ -130,11 +151,5 @@ public class AuthService : IAuthService
         {
             return null;
         }
-    }
-
-    // Helper method to store refresh tokens (in production, use a database or Redis)
-    public void StoreRefreshToken(string refreshToken, string userId, DateTime expiresAt)
-    {
-        _refreshTokens[refreshToken] = (userId, expiresAt);
     }
 }

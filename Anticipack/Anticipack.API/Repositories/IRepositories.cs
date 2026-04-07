@@ -44,3 +44,10 @@ public interface IPackingHistoryRepository
     Task<PackingHistoryEntry> CreateAsync(PackingHistoryEntry entry);
     Task<PackingHistoryEntry?> GetLatestByActivityIdAsync(string activityId);
 }
+
+public interface IRefreshTokenRepository
+{
+    Task<RefreshToken?> GetByTokenHashAsync(string tokenHash);
+    Task<RefreshToken> CreateAsync(RefreshToken refreshToken);
+    Task<RefreshToken> UpdateAsync(RefreshToken refreshToken);
+}

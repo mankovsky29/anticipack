@@ -10,3 +10,5 @@
 /Anticipack/Anticipack.API/obj
 /Anticipack/Anticipack.Workers/obj
 /Anticipack/Anticipack.Workers/bin/Debug/net9.0
+/Anticipack/Anticipack.Workers/bin/Debug/net10.0
+/Anticipack/Anticipack.API/bin/Debug/net10.0

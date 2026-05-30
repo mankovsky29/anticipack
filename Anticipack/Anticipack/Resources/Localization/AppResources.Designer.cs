@@ -1963,15 +1963,6 @@ namespace Anticipack.Resources.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Start first packing.
-        /// </summary>
-        public static string StartFirstTrip {
-            get {
-                return ResourceManager.GetString("StartFirstTrip", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Start Packing.
         /// </summary>
         public static string StartPacking {
@@ -2058,6 +2049,15 @@ namespace Anticipack.Resources.Localization {
         public static string StatsLastMonth {
             get {
                 return ResourceManager.GetString("StatsLastMonth", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Last packed.
+        /// </summary>
+        public static string StatsLastPacked {
+            get {
+                return ResourceManager.GetString("StatsLastPacked", resourceCulture);
             }
         }
         

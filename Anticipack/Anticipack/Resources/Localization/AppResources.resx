@@ -829,9 +829,6 @@ Soap, Towel</value>
   <data name="WelcomeDescription" xml:space="preserve">
     <value>Create your first activity to start packing faster and stay organized.</value>
   </data>
-  <data name="StartFirstTrip" xml:space="preserve">
-    <value>Start first packing</value>
-  </data>
   <data name="SessionSavedMessage" xml:space="preserve">
     <value>Your session progress has been saved.</value>
   </data>

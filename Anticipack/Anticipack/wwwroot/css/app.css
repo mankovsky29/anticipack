@@ -69,6 +69,12 @@
     --space-xl: 2rem;
     --space-xxl: 3rem;
     --space-xxxl: 4rem;
+
+    /* Device safe area */
+    --safe-area-top: env(safe-area-inset-top, 0px);
+    --safe-area-right: env(safe-area-inset-right, 0px);
+    --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+    --safe-area-left: env(safe-area-inset-left, 0px);
     
     /* Borders */
     --border-radius-sm: 0.25rem;
@@ -158,6 +164,19 @@ html, body {
     margin: 0;
     padding: 0;
     transition: background-color var(--transition), color var(--transition);
+}
+
+.status-bar-safe-area {
+    height: var(--safe-area-top);
+    background-color: var(--background);
+}
+
+#app {
+    min-height: calc(100vh - var(--safe-area-top));
+    padding-right: var(--safe-area-right);
+    padding-bottom: var(--safe-area-bottom);
+    padding-left: var(--safe-area-left);
+    box-sizing: border-box;
 }
 
 /* Common Button Styles */
@@ -285,7 +304,7 @@ input:disabled, select:disabled, textarea:disabled {
 /* Toast notifications */
 .toast-container {
     position: fixed;
-    top: var(--space-xxxl);
+    top: calc(var(--space-xxxl) + var(--safe-area-top));
     left: 50%;
     transform: translateX(-50%);
     z-index: 1001;

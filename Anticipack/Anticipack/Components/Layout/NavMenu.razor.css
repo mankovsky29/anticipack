@@ -65,8 +65,8 @@
 
 .top-row .container-fluid {
     display: flex;
-    padding-right: var(--space-sm);
-    padding-left: var(--space-sm);
+    padding-right: max(var(--space-sm), var(--safe-area-right));
+    padding-left: max(var(--space-sm), var(--safe-area-left));
     align-items: center;
     gap: 0.5rem;
     width: 100%;
@@ -176,7 +176,10 @@
     bottom: 0;
     background-color: var(--surface);
     z-index: 1000;
-    padding-top: 3.5rem;
+    padding-top: calc(3.5rem + var(--safe-area-top));
+    padding-right: max(var(--space-sm), var(--safe-area-right));
+    padding-bottom: var(--safe-area-bottom);
+    padding-left: max(var(--space-sm), var(--safe-area-left));
     animation: slideIn 0.3s ease-out;
     overflow-y: auto;
 }

@@ -11,7 +11,7 @@ Anticipack is a **packing checklist app** built as a multi-project .NET 9 soluti
 
 ### Key Technologies & Libraries
 - **UI**: Blazor Hybrid (Razor components rendered in MAUI WebView), Font Awesome icons (`fa fa-*`)
-- **Data**: SQLite via `sqlite-net-pcl` (async), models in `Anticipack\Storage\`
+- **Data**: SQLite via `sqlite-net-pcl` (async), models in `Storage/`
 - **Localization**: `IStringLocalizer<AppResources>` with `.resx` files (`en`, `es`, `ru`) under `Resources/Localization/`
 - **AI**: Gemini API via `GeminiSuggestionService` (implements `IAiSuggestionService`)
 - **Payments**: In-app billing (`Plugin.InAppBilling`), PayPal integration
@@ -21,9 +21,9 @@ Anticipack is a **packing checklist app** built as a multi-project .NET 9 soluti
 ---
 
 ## Architecture & SOLID Principles
-The codebase follows SOLID principles (documented in `Anticipack/SOLID-REFACTORING.md`):
+The codebase follows SOLID principles (documented in `SOLID-REFACTORING.md`):
 
-### Repository Layer (`Anticipack\Storage\Repositories\`)
+### Repository Layer (`Storage\Repositories\`)
 - **ISP**: Three focused repository interfaces instead of one monolith:
   - `IPackingActivityRepository` — Activity CRUD
   - `IPackingItemRepository` — Item CRUD
@@ -31,7 +31,7 @@ The codebase follows SOLID principles (documented in `Anticipack/SOLID-REFACTORI
 - **Legacy**: `IPackingRepository` (marked `[Obsolete]`) extends all three for backward compatibility. Prefer the focused interfaces in new code.
 - **DIP**: `IDatabaseConnectionFactory` abstracts SQLite connection creation (`SqliteDatabaseConnectionFactory` implementation).
 
-### Service Layer (`Anticipack\Services\`)
+### Service Layer (`Services\`)
 - **SRP**: Business logic lives in dedicated services, not in Razor components:
   - `IPackingActivityService` / `PackingActivityService` — activity & item business operations
   - `IPackingHistoryService` / `PackingHistoryService` — history recording & statistics
@@ -88,12 +88,12 @@ Use `[Inject] private IServiceName ServiceName { get; set; } = default!;` patter
 
 ## Domain Model
 
-### Core Entities (SQLite, in `Anticipack\Storage\`)
+### Core Entities (SQLite, in `Storage\`)
 - `PackingActivity` — Id (GUID string PK), Name, LastPacked, RunCount, IsShared, IsArchived, IsFinished, IsRecurring
 - `PackingItem` — Id (GUID string PK), ActivityId (FK), Name, IsPacked, Category (string matching `PackingCategory` enum), Notes, SortOrder
 - `PackingHistoryEntry` — Id (GUID string PK), ActivityId (FK), CompletedDate, TotalItems, PackedItems, DurationSeconds, StartTime, EndTime
 
-### Category Enum (`Anticipack\Packing\PackingCategory.cs`)
+### Category Enum (`Packing\PackingCategory.cs`)
 Valid categories: `Clothing`, `Shoes`, `Toiletries`, `Electronics`, `Documents`, `Health`, `Accessories`, `Outdoor`, `Food`, `Entertainment`, `Miscellaneous`
 
 ---
@@ -173,8 +173,8 @@ When calling global JS helpers that accept a keyboard height parameter (e.g., `s
 ## API Project (`Anticipack.API`)
 - Controllers use `[ApiController]`, `[Route("api/[controller]")]`, `[Authorize]` attributes.
 - User identification via `User.FindFirst(ClaimTypes.NameIdentifier)`.
-- Repository interfaces are in `Anticipack.API.Repositories.IRepositories.cs` (separate from MAUI app repositories).
-- DTOs are records in `Anticipack.API.DTOs.ApiDtos.cs`.
+- Repository interfaces are in `API\Repositories\IRepositories.cs` (separate from MAUI app repositories).
+- DTOs are records in `API\DTOs\ApiDtos.cs`.
 - Currently uses in-memory repositories — production will use a real database.
 
 ## Workers Project (`Anticipack.Workers`)

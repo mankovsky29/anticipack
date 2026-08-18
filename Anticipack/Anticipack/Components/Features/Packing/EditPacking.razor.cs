@@ -5,7 +5,6 @@ using Anticipack.Components.Shared.ToastComponent;
 using Anticipack.Packing;
 using Anticipack.Resources.Localization;
 using Anticipack.Services;
-using Anticipack.Services.AI;
 using Anticipack.Services.Categories;
 using Anticipack.Services.Suggestions;
 using Anticipack.Storage;
@@ -22,6 +21,8 @@ namespace Anticipack.Components.Features.Packing;
 
 public partial class EditPacking : IAsyncDisposable
 {
+    private const string DefaultItemCategory = nameof(PackingCategory.Miscellaneous);
+
     [Inject] private NavigationManager Navigation { get; set; } = default!;
     [Inject] private IPackingRepository PackingRepository { get; set; } = default!;
     [Inject] private IJSRuntime JSRuntime { get; set; } = default!;
@@ -33,12 +34,10 @@ public partial class EditPacking : IAsyncDisposable
     [Inject] private MicrophonePermissionBridge PermissionBridge { get; set; } = default!;
     [Inject] private IStringLocalizer<AppResources> Localizer { get; set; } = default!;
     [Inject] private ICategoryIconProvider CategoryIconProvider { get; set; } = default!;
-    [Inject] private IAiSuggestionService AiSuggestionService { get; set; } = default!;
     [Inject] private IItemSuggestionService ItemSuggestionService { get; set; } = default!;
 
     [Parameter]
     public string Id { get; set; } = string.Empty;
-    private bool _isCategoryDropdownOpen = false;
     private bool _isAddingItem = false;
     private bool _isLoading;
     private bool _keyboardVisible;
@@ -49,35 +48,20 @@ public partial class EditPacking : IAsyncDisposable
     private bool _isOverflowMenuOpen = false;
     private bool _overflowMenuJustOpened = false;
 
-    // Add item form state
-    private bool _isAiMode = false;
     private List<string> _parsedItems = [];
     private List<string> _duplicateItems = [];
     private HashSet<string> _existingItemNames = new(StringComparer.OrdinalIgnoreCase);
-    private bool _isCategoryLocked = false; // When adding from category header, hide category selector
-
-    // AI suggestion state
-    private string _aiPrompt = string.Empty;
-    private List<AiSuggestedItem> _aiSuggestions = [];
-    private HashSet<int> _selectedAiIndices = [];
-    private bool _isGeneratingAi = false;
 
     // Autocomplete suggestions
     private List<string> _suggestions = [];
-    private string? _addingToCategory = null; // Which category to show the form above (null = top of list)
 
-    private bool HasInput => _isAiMode
-        ? _selectedAiIndices.Count > 0
-        : !string.IsNullOrWhiteSpace(_bulkItemsText);
+    private bool HasInput => !string.IsNullOrWhiteSpace(_bulkItemsText);
 
-    private bool CanAdd => _isAiMode
-        ? _selectedAiIndices.Count > 0
-        : _parsedItems.Count > 0;
+    private bool CanAdd => _parsedItems.Count > 0;
 
     private PackingItemView? _editingItem = null;
     private ElementReference itemEditInputElement;
     private ElementReference bulkItemsTextarea;
-    private ElementReference aiPromptTextarea;
 
     private string? _editingOriginalName;
     private string? _editingOriginalNotes;
@@ -86,7 +70,6 @@ public partial class EditPacking : IAsyncDisposable
     private List<string> _categoryOrder = new();
     private readonly Dictionary<string, bool?> _manualOverride = new(StringComparer.OrdinalIgnoreCase);
 
-    private string _newCategory = string.Empty;
     private string _bulkItemsText = string.Empty;
 
     private PackingItemView? _draggedItem;
@@ -162,32 +145,13 @@ public partial class EditPacking : IAsyncDisposable
         await base.OnInitializedAsync();
     }
 
-    private void ToggleCategoryDropdown()
-    {
-        _isCategoryDropdownOpen = !_isCategoryDropdownOpen;
-    }
-
-    private void SelectCategoryFromDropdown(PackingCategory category)
-    {
-        _newCategory = category.ToString();
-        _isCategoryDropdownOpen = false;
-    }
-
     private async Task CancelAdd()
     {
         _isAddingItem = false;
         _bulkItemsText = string.Empty;
         _parsedItems = [];
         _duplicateItems = [];
-        _isCategoryDropdownOpen = false;
-        _isCategoryLocked = false;
-        _addingToCategory = null;
         UpdateSuggestions();
-        _isAiMode = false;
-        _aiPrompt = string.Empty;
-        _aiSuggestions = [];
-        _selectedAiIndices = [];
-        _isGeneratingAi = false;
         await SyncClickOutsideHandlerAsync();
     }
 
@@ -259,30 +223,14 @@ public partial class EditPacking : IAsyncDisposable
     {
         await CloseOverflowMenuAsync();
         _isAddingItem = true;
-        _isAiMode = false;
         _bulkItemsText = string.Empty;
         _parsedItems = [];
         _duplicateItems = [];
-        _isCategoryLocked = false;
-        _addingToCategory = null;
-        _aiPrompt = string.Empty;
-        _aiSuggestions = [];
-        _selectedAiIndices = [];
-        _isGeneratingAi = false;
 
         // Cache existing item names for duplicate detection
         _existingItemNames = Items
             .Select(i => i.Item.Name.ToLower())
             .ToHashSet(StringComparer.OrdinalIgnoreCase);
-
-        if (_categoryOrder.Any())
-        {
-            _newCategory = _categoryOrder.First();
-        }
-        else
-        {
-            _newCategory = PackingCategory.Miscellaneous.ToString();
-        }
 
         await LoadAllItemNamesAsync();
         UpdateSuggestions();
@@ -292,42 +240,7 @@ public partial class EditPacking : IAsyncDisposable
 
     private async Task ShowAddItemFormForCategory(string category)
     {
-        _isAddingItem = true;
-        _isAiMode = false;
-        _bulkItemsText = string.Empty;
-        _parsedItems = [];
-        _duplicateItems = [];
-        _isCategoryLocked = true; // Hide category selector
-        _addingToCategory = category;
-        _newCategory = category;
-        _aiPrompt = string.Empty;
-        _aiSuggestions = [];
-        _selectedAiIndices = [];
-        _isGeneratingAi = false;
-
-        // Ensure the target category is expanded so the user sees context
-        _manualOverride[category] = false;
-
-        // Cache existing item names for duplicate detection
-        _existingItemNames = Items
-            .Select(i => i.Item.Name.ToLower())
-            .ToHashSet(StringComparer.OrdinalIgnoreCase);
-
-        await LoadAllItemNamesAsync();
-        UpdateSuggestions();
-        _pendingScrollToAddForm = true;
-        await SyncClickOutsideHandlerAsync();
-    }
-
-    private void SelectNewCategory(PackingCategory category)
-    {
-        _newCategory = category.ToString();
-    }
-
-    private void SetAddTab(bool isAiMode)
-    {
-        if (_isAiMode == isAiMode) return;
-        _isAiMode = isAiMode;
+        await ShowAddItemForm();
     }
 
     private async Task OnBulkTextChanged()
@@ -375,7 +288,7 @@ public partial class EditPacking : IAsyncDisposable
 
     private string GetAddButtonText()
     {
-        var count = _isAiMode ? _selectedAiIndices.Count : _parsedItems.Count;
+        var count = _parsedItems.Count;
 
         if (count == 0)
             return Localizer["Add"];
@@ -391,15 +304,7 @@ public partial class EditPacking : IAsyncDisposable
         if (!CanAdd || string.IsNullOrWhiteSpace(Id))
             return;
 
-        if (_isAiMode)
-        {
-            await ConfirmAddAiItemsAsync();
-            return;
-        }
-
-        var category = string.IsNullOrWhiteSpace(_newCategory) 
-            ? PackingCategory.Miscellaneous.ToString() 
-            : _newCategory.Trim();
+        const string category = DefaultItemCategory;
 
         int addedCount = 0;
         int skippedCount = 0;
@@ -1122,7 +1027,7 @@ public partial class EditPacking : IAsyncDisposable
     {
         var token = GetCurrentSearchToken();
         _suggestions = ItemSuggestionService.GetSuggestions(
-            token, _newCategory, _existingItemNames, _parsedItems);
+            token, DefaultItemCategory, _existingItemNames, _parsedItems);
     }
 
     private async Task SelectSuggestion(string suggestion)
@@ -1160,133 +1065,6 @@ public partial class EditPacking : IAsyncDisposable
             }
         }
         catch { }
-    }
-
-    // AI suggestion methods
-    private async Task GenerateAiSuggestionsAsync()
-    {
-        if (string.IsNullOrWhiteSpace(_aiPrompt) || _isGeneratingAi)
-            return;
-
-        _isGeneratingAi = true;
-        _aiSuggestions = [];
-        _selectedAiIndices = [];
-        StateHasChanged();
-
-        try
-        {
-            var existingNames = Items.Select(i => i.Item.Name).ToList();
-            var category = _isCategoryLocked ? _newCategory : null;
-
-            _aiSuggestions = await AiSuggestionService.SuggestItemsAsync(
-                _aiPrompt,
-                _activityName,
-                category,
-                existingNames);
-
-            // Select all by default
-            _selectedAiIndices = Enumerable.Range(0, _aiSuggestions.Count).ToHashSet();
-        }
-        catch (InvalidOperationException ex) when (ex.Message.Contains("API key"))
-        {
-            ToastService.ShowError(Localizer["AiNotConfigured"]);
-        }
-        catch (Exception ex)
-        {
-            ToastService.ShowError(string.Format(Localizer["AiError"], ex.Message));
-        }
-        finally
-        {
-            _isGeneratingAi = false;
-            StateHasChanged();
-        }
-    }
-
-    private void ToggleAiItem(int index)
-    {
-        if (!_selectedAiIndices.Remove(index))
-            _selectedAiIndices.Add(index);
-    }
-
-    private void SelectAllAiItems()
-    {
-        _selectedAiIndices = Enumerable.Range(0, _aiSuggestions.Count).ToHashSet();
-    }
-
-    private void DeselectAllAiItems()
-    {
-        _selectedAiIndices = [];
-    }
-
-    private async Task ConfirmAddAiItemsAsync()
-    {
-        if (_selectedAiIndices.Count == 0 || string.IsNullOrWhiteSpace(Id))
-            return;
-
-        try
-        {
-            foreach (var index in _selectedAiIndices.OrderBy(i => i))
-            {
-                var aiItem = _aiSuggestions[index];
-
-                if (_existingItemNames.Contains(aiItem.Name))
-                    continue;
-
-                var category = _isCategoryLocked ? _newCategory : aiItem.Category;
-
-                try
-                {
-                    var newItem = new Storage.PackingItem
-                    {
-                        Name = aiItem.Name,
-                        Category = category,
-                        Notes = string.Empty,
-                        ActivityId = Id
-                    };
-
-                    await PackingRepository.AddItemToActivityAsync(Id, newItem);
-
-                    if (!_categoryOrder.Any(c => string.Equals(c, category, StringComparison.OrdinalIgnoreCase)))
-                    {
-                        _categoryOrder.Add(category);
-                        _manualOverride[category] = false;
-                    }
-                }
-                catch
-                {
-                    // Item failed to add, continue with others
-                }
-            }
-
-            await LoadItemsForPackingAsync(Id);
-
-            // Expand categories that received new items
-            foreach (var index in _selectedAiIndices)
-            {
-                var cat = _isCategoryLocked ? _newCategory : _aiSuggestions[index].Category;
-                _manualOverride[cat] = false;
-            }
-        }
-        catch (Exception ex)
-        {
-            ToastService.ShowError(string.Format(AppResources.ErrorAddingItem, ex.Message));
-        }
-
-        await CancelAdd();
-        StateHasChanged();
-    }
-
-    private async Task HandleAiPromptKeyDown(KeyboardEventArgs e)
-    {
-        if (e.Key == "Enter" && e.CtrlKey)
-        {
-            await GenerateAiSuggestionsAsync();
-        }
-    }
-
-    private async Task OnAiPromptChanged()
-    {
-        await HandleTextareaAutoGrow(aiPromptTextarea);
     }
 
     private async Task HandleTextareaAutoGrow(ElementReference textarea)

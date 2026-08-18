@@ -63,7 +63,7 @@
                     <h3>@Localizer["WelcomeTitle"]</h3>
                     <p>@Localizer["WelcomeDescription"]</p>
                     <div class="onboarding-actions">
-                        <button class="btn primary" @onclick="AddNewActivity">
+                        <button class="btn primary" @onclick="AddNewActivityAsync">
                             <i class="fa fa-plus" aria-hidden="true"></i>
                             @Localizer["CreateActivity"]
                         </button>
@@ -73,80 +73,6 @@
             </section>
         }
         
-        @if (_showAddForm)
-        {
-            <div class="add-activity-form" @onclick:stopPropagation>
-                <div class="form-header-inline">
-                    <h4>@Localizer["NewPackingActivity"]</h4>
-                    <button class="close-form-btn" @onclick="CancelAddActivity" title="@Localizer["Cancel"]">
-                        <i class="fa fa-times"></i>
-                    </button>
-                </div>
-
-                <div class="form-body">
-                    <div class="form-section compact">
-                        <input id="activity-name"
-                               type="text"
-                               class="form-input @(string.IsNullOrWhiteSpace(_newActivityName) && _hasAttemptedSubmit ? "input-error" : "")"
-                               placeholder="@Localizer["EnterActivityName"]"
-                               @bind="_newActivityName"
-                               @bind:event="oninput"
-                               @onkeydown="HandleInputKeyDown"
-                               @ref="_activityNameInput" />
-                        @if (string.IsNullOrWhiteSpace(_newActivityName) && _hasAttemptedSubmit)
-                        {
-                            <span class="error-message">
-                                <i class="fa fa-exclamation-circle"></i>
-                                @Localizer["NameRequired"]
-                            </span>
-                        }
-                    </div>
-
-                    <div class="form-section compact">
-                        <label class="form-label-inline">
-                            <i class="fa fa-repeat"></i>
-                            @Localizer["ActivityType"]
-                        </label>
-                        <div class="segmented-control">
-                            <button type="button"
-                                    class="segment @(!_isRecurringActivity ? "active" : "")"
-                                    @onclick="() => _isRecurringActivity = false">
-                                <i class="fa fa-calendar-check"></i>
-                                <span>@Localizer["OneTimeActivity"]</span>
-                            </button>
-                            <button type="button"
-                                    class="segment @(_isRecurringActivity ? "active" : "")"
-                                    @onclick="() => _isRecurringActivity = true">
-                                <i class="fa fa-sync-alt"></i>
-                                <span>@Localizer["RecurringActivity"]</span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-actions compact">
-                    <button class="btn btn-cancel compact" @onclick="CancelAddActivity" disabled="@_isCreating">
-                        <i class="fa fa-times"></i>
-                        <span>@Localizer["Cancel"]</span>
-                    </button>
-                    <button class="btn btn-primary compact"
-                            @onclick="ConfirmAddActivityAsync"
-                            disabled="@(_isCreating || string.IsNullOrWhiteSpace(_newActivityName))">
-                        @if (_isCreating)
-                        {
-                            <span class="btn-spinner"></span>
-                            <span>@Localizer["Creating"]</span>
-                        }
-                        else
-                        {
-                            <i class="fa fa-check"></i>
-                            <span>@Localizer["Create"]</span>
-                        }
-                    </button>
-                </div>
-            </div>
-        }
-
         @if (FilteredActivities.Any())
         {
             <div class="activities-list">
@@ -246,7 +172,7 @@
                 </div>
                 <h3>@Localizer["NoActivities"]</h3>
                 <p>@Localizer["NoActivitiesDescription"]</p>
-                <button class="btn primary" @onclick="AddNewActivity">
+                <button class="btn primary" @onclick="AddNewActivityAsync">
                     <i class="fa fa-plus"></i> @Localizer["CreateActivity"]
                 </button>
             </div>
@@ -260,12 +186,8 @@
             </button>
         }
         
-        <!-- Simplified FAB - Single Add Button -->
-        @if (!_showAddForm)
-        {
-            <button class="add-fab" @onclick="AddNewActivity" aria-label="@Localizer["AddActivity"]" title="@Localizer["AddActivity"]">
-                <i class="fa fa-plus"></i>
-            </button>
-        }
+        <button class="add-fab" @onclick="AddNewActivityAsync" aria-label="@Localizer["AddActivity"]" title="@Localizer["AddActivity"]">
+            <i class="fa fa-plus"></i>
+        </button>
     }
 </div>

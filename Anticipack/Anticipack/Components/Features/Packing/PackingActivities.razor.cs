@@ -6,7 +6,6 @@ using Anticipack.Services;
 using Anticipack.Services.Categories;
 using Anticipack.Storage;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
 using Microsoft.Extensions.Localization;
 using Microsoft.JSInterop;
 using Microsoft.Maui.Storage;
@@ -50,15 +49,7 @@ public partial class PackingActivities : IAsyncDisposable
     private IJSObjectReference? _jsModule;
     private DotNetObjectReference<PackingActivities>? _dotNetRef;
 
-    // Add form (inline)
-    private bool _showAddForm;
-    private string _newActivityName = string.Empty;
-    private bool _isRecurringActivity = false; // Default to one-time activity
-    private bool _hasAttemptedSubmit = false;
     private bool _isCreating = false;
-    private ElementReference _activityNameInput;
-    private bool _hasFormFocused = false;
-
 
     // Scroll to top
     private bool _showScrollToTop;
@@ -96,17 +87,6 @@ public partial class PackingActivities : IAsyncDisposable
             catch { }
         }
         
-        // Auto-focus the input when inline form opens (only once per form session)
-        if (_showAddForm && !_hasFormFocused && _activityNameInput.Id != null)
-        {
-            try
-            {
-                await Task.Delay(100);
-                await JSRuntime.InvokeVoidAsync("focusElement", _activityNameInput);
-                _hasFormFocused = true;
-            }
-            catch { }
-        }
     }
     
     [JSInvokable]
@@ -132,12 +112,12 @@ public partial class PackingActivities : IAsyncDisposable
         _showOnboardingCard = !_activities.Any() && !Preferences.Default.Get(OnboardingSeenPreferenceKey, false);
     }
 
-    protected override void OnParametersSet()
+    protected override async Task OnParametersSetAsync()
     {
         if (Create == true && !_hasHandledCreateQuery)
         {
             _hasHandledCreateQuery = true;
-            AddNewActivity();
+            await AddNewActivityAsync();
             Navigation.NavigateTo("/packing-activities", replace: true);
         }
     }
@@ -286,66 +266,32 @@ public partial class PackingActivities : IAsyncDisposable
         return "fa " + CategoryIconProvider.GetIcon(category);
     }
 
-    private void AddNewActivity()
+    private async Task AddNewActivityAsync()
     {
+        if (_isCreating)
+            return;
+
         if (_showOnboardingCard)
         {
             Preferences.Default.Set(OnboardingSeenPreferenceKey, true);
             _showOnboardingCard = false;
         }
 
-        _newActivityName = string.Empty;
-        _isRecurringActivity = false;
-        _hasAttemptedSubmit = false;
-        _isCreating = false;
-        _hasFormFocused = false;
-        _showAddForm = true;
-    }
-
-    private void DismissOnboarding()
-    {
-        Preferences.Default.Set(OnboardingSeenPreferenceKey, true);
-        _showOnboardingCard = false;
-    }
-
-    private void CancelAddActivity()
-    {
-        if (_isCreating) return; // Prevent closing while creating
-        _showAddForm = false;
-        _hasAttemptedSubmit = false;
-        _newActivityName = string.Empty;
-        _isRecurringActivity = false;
-    }
-
-    private async Task ConfirmAddActivityAsync()
-    {
-        _hasAttemptedSubmit = true;
-        
-        if (string.IsNullOrWhiteSpace(_newActivityName))
-        {
-            StateHasChanged();
-            return;
-        }
-
         _isCreating = true;
-        StateHasChanged();
 
+        var createdAt = DateTime.Now;
         var newActivity = new Storage.PackingActivity
         {
-            Name = _newActivityName.Trim(),
-            LastPacked = DateTime.Now,
-            IsShared = false, // Will be implemented later with user-specific sharing
-            IsRecurring = _isRecurringActivity
+            Name = createdAt.ToString("yyyy-MM-dd:hh:mm"),
+            LastPacked = createdAt,
+            IsShared = false,
+            IsRecurring = false
         };
 
         try
         {
             await PackingRepository.AddOrUpdateAsync(newActivity);
             ToastService.ShowSuccess(Localizer["ActivityCreated"]);
-            _showAddForm = false;
-            _hasAttemptedSubmit = false;
-            _newActivityName = string.Empty;
-            _isRecurringActivity = false;
             Navigation.NavigateTo($"/packing-activity?id={newActivity.Id}&mode=edit");
         }
         catch
@@ -355,8 +301,13 @@ public partial class PackingActivities : IAsyncDisposable
         finally
         {
             _isCreating = false;
-            StateHasChanged();
         }
+    }
+
+    private void DismissOnboarding()
+    {
+        Preferences.Default.Set(OnboardingSeenPreferenceKey, true);
+        _showOnboardingCard = false;
     }
 
     private async Task ToggleArchiveActivity(Storage.PackingActivity activity)
@@ -430,18 +381,6 @@ public partial class PackingActivities : IAsyncDisposable
         Navigation.NavigateTo($"/packing-activity?id={id}&mode=edit");
     }
 
-    private void HandleInputKeyDown(KeyboardEventArgs e)
-    {
-        if (e.Key == "Enter" && !string.IsNullOrWhiteSpace(_newActivityName))
-        {
-            _ = ConfirmAddActivityAsync();
-        }
-        else if (e.Key == "Escape")
-        {
-            CancelAddActivity();
-        }
-    }
-    
     private void OnKeyboardVisibilityChanged(bool isVisible, double height)
     {
         _keyboardVisible = isVisible;

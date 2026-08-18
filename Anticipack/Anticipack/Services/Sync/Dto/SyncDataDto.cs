@@ -38,6 +38,7 @@ public class PackingItemDto
     public string Id { get; set; } = string.Empty;
     public string ActivityId { get; set; } = string.Empty;
     public string Name { get; set; } = string.Empty;
+    public int Quantity { get; set; } = 1;
     public bool IsPacked { get; set; }
     public string? Category { get; set; }
     public string? Notes { get; set; }

@@ -97,7 +97,7 @@
                                         <label for="@($"checkbox-{item.Item.Id}")" @onclick:stopPropagation="true"></label>
                                     </div>
                                     <span class="@($"item-text {(item.IsChecked ? "checked" : "")}")">
-                                        @item.Item.Name
+                                        @(item.Item.Quantity > 1 ? $"{item.Item.Quantity} × {item.Item.Name}" : item.Item.Name)
                                     </span>
                                 </div>
                                 

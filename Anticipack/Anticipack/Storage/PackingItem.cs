@@ -10,6 +10,7 @@ namespace Anticipack.Storage
         public string ActivityId { get; set; } = string.Empty; // Foreign key to PackingActivity
 
         public string Name { get; set; } = string.Empty;
+        public int Quantity { get; set; } = 1;
         public bool IsPacked { get; set; }
         public string Category { get; set; }
         public string Notes { get; set; }

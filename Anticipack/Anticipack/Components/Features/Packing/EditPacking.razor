@@ -204,6 +204,14 @@
                                                    @onkeydown="@(e => HandleItemEditKeyDown(e, item))"
                                                    placeholder="@AppResources.ItemName"
                                                    @onclick:stopPropagation />
+                                            <input type="number"
+                                                   class="edit-quantity-input"
+                                                   min="1"
+                                                   @bind="item.Item.Quantity"
+                                                   @onkeydown="@(e => HandleItemEditKeyDown(e, item))"
+                                                   title="Quantity"
+                                                   aria-label="Quantity"
+                                                   @onclick:stopPropagation />
                                         </div>
 
                                         <div class="edit-notes">
@@ -230,7 +238,7 @@
                                             {
                                                 <i class="fa fa-check-circle packed-icon" aria-hidden="true"></i>
                                             }
-                                            @item.Item.Name
+                                            @GetItemDisplayName(item.Item.Name, item.Item.Quantity)
                                         </span>
 
                                         @if (!string.IsNullOrWhiteSpace(item.Item.Notes))
@@ -364,9 +372,9 @@
                         <div class="preview-items">
                             @foreach (var previewItem in _parsedItems.Take(10))
                             {
-                                var isDuplicate = _existingItemNames.Contains(previewItem.ToLower());
+                                var isDuplicate = _existingItemNames.Contains(previewItem.Name);
                                 <span class="preview-chip @(isDuplicate ? "existing" : "")">
-                                    @previewItem
+                                    @GetItemDisplayName(previewItem.Name, previewItem.Quantity)
                                     @if (isDuplicate)
                                     {
                                         <i class="fa fa-info-circle" title="@Localizer["ItemAlreadyExists"]"></i>

@@ -22,6 +22,7 @@ namespace Anticipack.Components.Features.Packing;
 public partial class EditPacking : IAsyncDisposable
 {
     private const string DefaultItemCategory = nameof(PackingCategory.Miscellaneous);
+    private readonly record struct ParsedItem(string Name, int Quantity);
 
     [Inject] private NavigationManager Navigation { get; set; } = default!;
     [Inject] private IPackingRepository PackingRepository { get; set; } = default!;
@@ -48,7 +49,7 @@ public partial class EditPacking : IAsyncDisposable
     private bool _isOverflowMenuOpen = false;
     private bool _overflowMenuJustOpened = false;
 
-    private List<string> _parsedItems = [];
+    private List<ParsedItem> _parsedItems = [];
     private List<string> _duplicateItems = [];
     private HashSet<string> _existingItemNames = new(StringComparer.OrdinalIgnoreCase);
 
@@ -65,6 +66,7 @@ public partial class EditPacking : IAsyncDisposable
 
     private string? _editingOriginalName;
     private string? _editingOriginalNotes;
+    private int _editingOriginalQuantity;
 
     private List<PackingItemView> Items { get; set; } = new();
     private List<string> _categoryOrder = new();
@@ -256,25 +258,25 @@ public partial class EditPacking : IAsyncDisposable
 
         // Remove duplicates within the input (case-insensitive)
         var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        var uniqueItems = new List<string>();
+        var uniqueItems = new List<ParsedItem>();
         _duplicateItems = [];
 
         foreach (var item in allItems)
         {
-            if (seen.Add(item))
+            if (seen.Add(item.Name))
             {
                 uniqueItems.Add(item);
             }
             else
             {
-                _duplicateItems.Add(item);
+                _duplicateItems.Add(item.Name);
             }
         }
 
         _parsedItems = uniqueItems;
     }
 
-    private List<string> ParseInputItems(string text)
+    private static List<ParsedItem> ParseInputItems(string text)
     {
         if (string.IsNullOrWhiteSpace(text))
             return [];
@@ -283,7 +285,44 @@ public partial class EditPacking : IAsyncDisposable
             .Split(["\r\n", "\r", "\n", ","], StringSplitOptions.RemoveEmptyEntries)
             .Select(line => line.Trim())
             .Where(line => !string.IsNullOrWhiteSpace(line))
+            .Select(ParseItem)
             .ToList();
+    }
+
+    private static ParsedItem ParseItem(string input)
+    {
+        var separatorIndex = input.IndexOfAny([' ', '\t']);
+        if (separatorIndex > 0
+            && TryParseQuantity(input[..separatorIndex], out var quantity))
+        {
+            var name = input[(separatorIndex + 1)..].Trim();
+            if (!string.IsNullOrWhiteSpace(name))
+                return new ParsedItem(name, quantity);
+        }
+
+        var lastSeparatorIndex = input.LastIndexOfAny([' ', '\t']);
+        if (lastSeparatorIndex > 0)
+        {
+            var name = input[..lastSeparatorIndex].Trim();
+            if (!string.IsNullOrWhiteSpace(name)
+                && TryParseQuantity(input[(lastSeparatorIndex + 1)..], out quantity))
+            {
+                return new ParsedItem(name, quantity);
+            }
+        }
+
+        return new ParsedItem(input, 1);
+    }
+
+    private static bool TryParseQuantity(string value, out int quantity)
+    {
+        var numericValue = value.Length > 0 && (value[0] is 'x' or 'X') ? value[1..] : value;
+        return int.TryParse(numericValue, out quantity) && quantity > 0;
+    }
+
+    private static string GetItemDisplayName(string name, int quantity)
+    {
+        return quantity > 1 ? $"{quantity} × {name}" : name;
     }
 
     private string GetAddButtonText()
@@ -311,10 +350,10 @@ public partial class EditPacking : IAsyncDisposable
 
         try
         {
-            foreach (var itemName in _parsedItems)
+            foreach (var item in _parsedItems)
             {
                 // Skip items that already exist
-                if (_existingItemNames.Contains(itemName.ToLower()))
+                if (_existingItemNames.Contains(item.Name))
                 {
                     skippedCount++;
                     continue;
@@ -324,7 +363,8 @@ public partial class EditPacking : IAsyncDisposable
                 {
                     var newItem = new Storage.PackingItem 
                     { 
-                        Name = itemName, 
+                        Name = item.Name,
+                        Quantity = item.Quantity,
                         Category = category, 
                         Notes = string.Empty, 
                         ActivityId = Id 
@@ -841,6 +881,7 @@ public partial class EditPacking : IAsyncDisposable
         _editingItem = item;
         _editingOriginalName = item.Item.Name;
         _editingOriginalNotes = item.Item.Notes;
+        _editingOriginalQuantity = item.Item.Quantity;
         StateHasChanged();
 
         await SyncClickOutsideHandlerAsync();
@@ -891,6 +932,11 @@ public partial class EditPacking : IAsyncDisposable
                 item.Item.Name = AppResources.UnnamedItem;
             }
 
+            if (item.Item.Quantity < 1)
+            {
+                item.Item.Quantity = 1;
+            }
+
             await PackingRepository.AddOrUpdateItemAsync(item.Item);
         }
         catch (Exception ex)
@@ -902,6 +948,7 @@ public partial class EditPacking : IAsyncDisposable
             _editingItem = null;
             _editingOriginalName = null;
             _editingOriginalNotes = null;
+            _editingOriginalQuantity = 1;
             StateHasChanged();
             await SyncClickOutsideHandlerAsync();
         }
@@ -929,9 +976,13 @@ public partial class EditPacking : IAsyncDisposable
 
     private async Task CancelItemEdit(PackingItemView item)
     {
+        item.Item.Name = _editingOriginalName ?? string.Empty;
+        item.Item.Notes = _editingOriginalNotes ?? string.Empty;
+        item.Item.Quantity = _editingOriginalQuantity;
         _editingItem = null;
         _editingOriginalName = null;
         _editingOriginalNotes = null;
+        _editingOriginalQuantity = 1;
         StateHasChanged();
         await SyncClickOutsideHandlerAsync();
     }
@@ -945,7 +996,8 @@ public partial class EditPacking : IAsyncDisposable
         var currentNotes = item.Item.Notes ?? string.Empty;
 
         return !string.Equals(originalName, currentName, StringComparison.Ordinal)
-            || !string.Equals(originalNotes, currentNotes, StringComparison.Ordinal);
+            || !string.Equals(originalNotes, currentNotes, StringComparison.Ordinal)
+            || _editingOriginalQuantity != item.Item.Quantity;
     }
 
     private async Task CloseFlyoutsByClickOffAsync()
@@ -1027,7 +1079,7 @@ public partial class EditPacking : IAsyncDisposable
     {
         var token = GetCurrentSearchToken();
         _suggestions = ItemSuggestionService.GetSuggestions(
-            token, DefaultItemCategory, _existingItemNames, _parsedItems);
+            token, DefaultItemCategory, _existingItemNames, _parsedItems.Select(item => item.Name).ToList());
     }
 
     private async Task SelectSuggestion(string suggestion)

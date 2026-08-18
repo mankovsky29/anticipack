@@ -1187,6 +1187,23 @@ ul.category-content {
     background: var(--surface);
 }
 
+.edit-quantity-input {
+    width: 72px;
+    padding: 10px;
+    border: 2px solid var(--input-border);
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 500;
+    background: var(--surface);
+    color: var(--text-primary);
+}
+
+.edit-quantity-input:focus {
+    border-color: var(--primary);
+    outline: none;
+    box-shadow: 0 0 0 3px var(--input-focus-shadow);
+}
+
 .edit-notes {
     width: 100%;
 }

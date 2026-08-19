@@ -9,7 +9,7 @@
     display: none;
     padding: var(--space-md);
     border-bottom: 1px solid var(--border-color);
-    background: var(--surface);
+    background: var(--background);
 }
 
 /* hamburger button */
@@ -56,7 +56,7 @@
 
 /* top row visuals */
 .top-row {
-    background-color: var(--surface);
+    background-color: var(--background);
     display: flex;
     align-items: center;
     position: relative;

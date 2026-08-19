@@ -8,7 +8,7 @@
 @inject IJSRuntime JSRuntime
 
 <div class="nav-container">
-    <div class="top-row navbar navbar-dark">
+    <div class="top-row navbar">
         <div class="container-fluid">
             <button title="@L["NavigationMenu"]" class="navbar-toggler" @onclick="ToggleNavMenu">
                 <span class="navbar-toggler-icon"></span>
@@ -22,32 +22,27 @@
             <NavigationHeader />
         </div>
         <nav class="flex-column">
-            <div class="nav-item px-3 quick-action-item">
-                <NavLink class="nav-link quick-action-link" href="packing-activities?create=true">
-                    <i class="fa fa-plus-circle" aria-hidden="true"></i> @L["CreateActivity"]
-                </NavLink>
-            </div>
-            <div class="nav-item px-3">
+            <div class="nav-item">
                 <NavLink class="nav-link" href="packing-activities">
                     <i class="fa fa-list" aria-hidden="true"></i> @L["PackingActivitiesMenu"]
                 </NavLink>
             </div>
-            <div class="nav-item px-3">
+            <div class="nav-item">
                 <NavLink class="nav-link" href="statistics">
                     <i class="fa fa-chart-bar" aria-hidden="true"></i> @L["StatsMenu"]
                 </NavLink>
             </div>
-            <div class="nav-item px-3">
+            <div class="nav-item">
                 <NavLink class="nav-link" href="support">
                     <i class="fa fa-comments" aria-hidden="true"></i> @L["SupportMenu"]
                 </NavLink>
             </div>
-            <div class="nav-item px-3">
+            <div class="nav-item">
                 <NavLink class="nav-link" href="donate">
                     <i class="fa fa-heart" aria-hidden="true"></i> @L["Donate"]
                 </NavLink>
             </div>
-            <div class="nav-item px-3">
+            <div class="nav-item">
                 <NavLink class="nav-link" href="user-settings">
                     <i class="fa fa-cog" aria-hidden="true"></i> @L["SettingsMenu"]
                 </NavLink>

@@ -303,6 +303,13 @@
     word-wrap: break-word;
 }
 
+.activity-relative-time {
+    color: var(--text-secondary);
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
 .shared-badge {
     width: 20px;
     height: 20px;

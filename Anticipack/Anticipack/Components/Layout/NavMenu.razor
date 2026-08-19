@@ -2,6 +2,7 @@
 @using Anticipack.Components.Shared.NavigationHeaderComponent
 @using Microsoft.Extensions.Localization
 @using Microsoft.JSInterop
+@implements IDisposable
 
 @inject IStringLocalizer<AppResources> L
 @inject INavigationHeaderService NavigationHeaderService
@@ -56,6 +57,12 @@
 
     private string NavMenuCssClass => collapseNavMenu ? "nav-menu-collapsed" : "nav-menu-expanded";
 
+    protected override void OnInitialized()
+    {
+        NavigationHeaderService.OnNavMenuToggled += UpdateNavMenuState;
+        collapseNavMenu = !NavigationHeaderService.IsNavMenuExpanded();
+    }
+
     private async Task ToggleNavMenu()
     {
         var isMobile = await JSRuntime.InvokeAsync<bool>("anticipack.isMobileNavViewport");
@@ -67,5 +74,16 @@
             // Notify the service about the nav menu state
             NavigationHeaderService.SetNavMenuExpanded(!collapseNavMenu);
         }
+    }
+
+    private void UpdateNavMenuState(bool isExpanded)
+    {
+        collapseNavMenu = !isExpanded;
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        NavigationHeaderService.OnNavMenuToggled -= UpdateNavMenuState;
     }
 }

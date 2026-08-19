@@ -271,6 +271,11 @@ public partial class PackingActivities : IAsyncDisposable
         if (_isCreating)
             return;
 
+        if (NavigationHeaderService.IsNavMenuExpanded())
+        {
+            NavigationHeaderService.SetNavMenuExpanded(false);
+        }
+
         if (_showOnboardingCard)
         {
             Preferences.Default.Set(OnboardingSeenPreferenceKey, true);
@@ -291,7 +296,6 @@ public partial class PackingActivities : IAsyncDisposable
         try
         {
             await PackingRepository.AddOrUpdateAsync(newActivity);
-            ToastService.ShowSuccess(Localizer["ActivityCreated"]);
             Navigation.NavigateTo($"/packing-activity?id={newActivity.Id}&mode=edit");
         }
         catch

@@ -739,6 +739,19 @@
     transform: scale(0.95) rotate(90deg);
 }
 
+@media (max-width: 768px) {
+    .add-fab {
+        bottom: var(--space-xxxl);
+    }
+}
+
+@media (max-height: 768px) and (orientation: landscape) {
+    .add-fab {
+        bottom: var(--space-lg);
+        right: var(--space-xxxl);
+    }
+}
+
 /* Scroll to Top FAB */
 .scroll-to-top-fab {
     position: fixed;

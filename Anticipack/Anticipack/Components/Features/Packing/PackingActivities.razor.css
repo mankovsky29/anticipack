@@ -716,7 +716,7 @@
 /* Scroll to Top FAB */
 .scroll-to-top-fab {
     position: fixed;
-    bottom: 20px;
+    bottom: var(--space-xxxl);
     left: 20px;
     width: 48px;
     height: 48px;

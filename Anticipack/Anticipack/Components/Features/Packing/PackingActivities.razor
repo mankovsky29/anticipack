@@ -83,14 +83,8 @@
                     var isCompleted = itemCount > 0 && packedCount == itemCount;
                     var progressPercent = itemCount > 0 ? (int)Math.Round((double)packedCount / itemCount * 100) : 0;
 
-                    <div class="activity-card @(isCompleted ? "completed" : "") @(_openMenuId == activity.Id ? "menu-open" : "")">
-                        <button class="btn-play" 
-                                @onclick="() => OpenActivityInPackingMode(activity.Id)"
-                                aria-label="@Localizer["PackNow"]"
-                                title="@Localizer["PackNow"]">
-                            <i class="fa @(isCompleted ? "fa-check" : "fa-play")"></i>
-                        </button>
-
+                    <div class="activity-card @(isCompleted ? "completed" : "") @(_openMenuId == activity.Id ? "menu-open" : "")"
+                         @onclick="() => OpenActivityInPackingMode(activity.Id)">
                         <div class="card-header">
                             <div class="header-content">
                                 <div class="title-row">
@@ -144,15 +138,15 @@
                                 @if (_openMenuId == activity.Id)
                                 {
                                     <div class="menu-dropdown">
-                                        <button class="menu-item" @onclick="() => OpenActivityInEditMode(activity.Id)">
+                                        <button class="menu-item" @onclick="() => OpenActivityInEditMode(activity.Id)" @onclick:stopPropagation>
                                             <i class="fa fa-edit"></i>
                                             <span>@Localizer["Edit"]</span>
                                         </button>
-                                        <button class="menu-item" @onclick="() => ToggleArchiveActivity(activity)">
+                                        <button class="menu-item" @onclick="() => ToggleArchiveActivity(activity)" @onclick:stopPropagation>
                                             <i class="fa @(activity.IsArchived ? "fa-box-open" : "fa-archive")"></i>
                                             <span>@(activity.IsArchived ? Localizer["Unarchive"] : Localizer["Archive"])</span>
                                         </button>
-                                        <button class="menu-item danger" @onclick="() => PromptDeleteActivity(activity)">
+                                        <button class="menu-item danger" @onclick="() => PromptDeleteActivity(activity)" @onclick:stopPropagation>
                                             <i class="fa fa-trash"></i>
                                             <span>@Localizer["Delete"]</span>
                                         </button>

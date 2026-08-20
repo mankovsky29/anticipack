@@ -15,6 +15,10 @@
     [SupplyParameterFromQuery(Name = "mode")]
     public string? Mode { get; set; } = "edit";
 
+    [Parameter]
+    [SupplyParameterFromQuery(Name = "openAddItems")]
+    public bool OpenAddItems { get; set; }
+
     protected override void OnInitialized()
     {
         if (string.IsNullOrEmpty(PackingId))
@@ -29,7 +33,8 @@
         }
         else
         {
-            Navigation.NavigateTo($"/edit-packing/{PackingId}");
+            var openAddItemsQuery = OpenAddItems ? "?openAddItems=true" : string.Empty;
+            Navigation.NavigateTo($"/edit-packing/{PackingId}{openAddItemsQuery}");
         }
     }
 }

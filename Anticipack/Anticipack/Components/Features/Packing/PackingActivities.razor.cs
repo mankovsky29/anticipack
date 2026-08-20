@@ -296,7 +296,7 @@ public partial class PackingActivities : IAsyncDisposable
         try
         {
             await PackingRepository.AddOrUpdateAsync(newActivity);
-            Navigation.NavigateTo($"/packing-activity?id={newActivity.Id}&mode=edit");
+            Navigation.NavigateTo($"/packing-activity?id={newActivity.Id}&mode=edit&openAddItems=true");
         }
         catch
         {

@@ -39,6 +39,11 @@ public partial class EditPacking : IAsyncDisposable
 
     [Parameter]
     public string Id { get; set; } = string.Empty;
+
+    [Parameter]
+    [SupplyParameterFromQuery(Name = "openAddItems")]
+    public bool OpenAddItems { get; set; }
+
     private bool _isAddingItem = false;
     private bool _isLoading;
     private bool _keyboardVisible;
@@ -80,6 +85,7 @@ public partial class EditPacking : IAsyncDisposable
     private string _dropLinePosition = ""; // "before" or "after"
 
     private bool _pendingScrollToAddForm = false;
+    private bool _pendingFocusAddForm = false;
 
     // Speech recognition state
     private bool _isSpeechRecognitionSupported = false;
@@ -118,6 +124,16 @@ public partial class EditPacking : IAsyncDisposable
             catch { }
         }
 
+        if (_pendingFocusAddForm && _editPackingModule is not null)
+        {
+            _pendingFocusAddForm = false;
+            try
+            {
+                await _editPackingModule.InvokeVoidAsync("focusAndSetCursorToEnd", bulkItemsTextarea);
+            }
+            catch { }
+        }
+
         if (_overflowMenuJustOpened && _editPackingModule is not null)
         {
             _overflowMenuJustOpened = false;
@@ -140,6 +156,11 @@ public partial class EditPacking : IAsyncDisposable
         else
         {
             InitializeDefaultItems();
+        }
+
+        if (OpenAddItems && !Items.Any())
+        {
+            await ShowAddItemForm();
         }
 
         KeyboardService.KeyboardVisibilityChanged += OnKeyboardVisibilityChanged;
@@ -237,6 +258,7 @@ public partial class EditPacking : IAsyncDisposable
         await LoadAllItemNamesAsync();
         UpdateSuggestions();
         _pendingScrollToAddForm = true;
+        _pendingFocusAddForm = true;
         await SyncClickOutsideHandlerAsync();
     }
 

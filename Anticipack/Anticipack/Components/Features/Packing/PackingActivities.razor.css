@@ -268,6 +268,7 @@
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
+    flex-wrap: wrap;
     padding: 14px 14px 14px;
     gap: 12px;
     flex: 1;
@@ -308,6 +309,8 @@
     font-size: 12px;
     font-weight: 500;
     white-space: nowrap;
+    flex-shrink: 0;
+    margin-left: auto;
 }
 
 .shared-badge {
@@ -365,12 +368,20 @@
 }
 
 /* Progress Bar */
-.progress-bar-container {
+.progress-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    min-width: 0;
     width: 100%;
+}
+
+.progress-bar-container {
+    flex: 1;
+    min-width: 0;
     height: 6px;
     background: var(--hover-bg);
     border-radius: 999px;
-    margin-top: 8px;
     overflow: hidden;
 }
 
@@ -386,7 +397,8 @@
 }
 
 .progress-empty {
-    margin-top: var(--space-sm);
+    flex: 1;
+    min-width: 0;
     font-size: var(--font-size-xs);
     color: var(--text-light);
 }

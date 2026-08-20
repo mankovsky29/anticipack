@@ -89,7 +89,7 @@
                             <div class="header-content">
                                 <div class="title-row">
                                     <h3 class="activity-title">
-                                        @activity.Name <span class="activity-relative-time">(@GetRelativeTime(activity.LastPacked))</span>
+                                        @activity.Name
                                     </h3>
                                     <div class="title-badges">
                                         @if (isCompleted)
@@ -114,16 +114,6 @@
                                     </span>
                                 </div>
 
-                                @if (itemCount > 0)
-                                {
-                                    <div class="progress-bar-container" title="@progressPercent%">
-                                        <div class="progress-bar-fill @(isCompleted ? "completed" : "")" style="width: @(progressPercent)%"></div>
-                                    </div>
-                                }
-                                else
-                                {
-                                    <div class="progress-empty">@Localizer["NoItemsYet"]</div>
-                                }
                             </div>
                             <div class="card-menu">
                                 <button class="btn-menu" 
@@ -150,6 +140,19 @@
                                         </button>
                                     </div>
                                 }
+                            </div>
+                            <div class="progress-row">
+                                @if (itemCount > 0)
+                                {
+                                    <div class="progress-bar-container" title="@progressPercent%">
+                                        <div class="progress-bar-fill @(isCompleted ? "completed" : "")" style="width: @(progressPercent)%"></div>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="progress-empty">@Localizer["NoItemsYet"]</div>
+                                }
+                                <span class="activity-relative-time">@GetRelativeTime(activity.LastPacked)</span>
                             </div>
                         </div>
                     </div>

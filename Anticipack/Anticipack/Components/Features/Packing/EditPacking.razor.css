@@ -959,7 +959,7 @@ ul.category-content {
     position: relative;
     margin: 0;
     background: var(--surface);
-    min-height: 56px;
+    min-height: 44px;
     border-bottom: 1px solid var(--border-color);
     transition: all 0.2s ease;
 }
@@ -978,8 +978,8 @@ ul.category-content {
     min-width: 0;
     display: flex;
     flex-direction: column;
-    gap: 6px;
-    padding: 14px 16px;
+    gap: 3px;
+    padding: 9px 12px;
     cursor: pointer;
     user-select: none;
     transition: all 0.2s ease;
@@ -990,10 +990,10 @@ ul.category-content {
 }
 
 .item-text {
-    font-size: 15.5px;
+    font-size: 14px;
     font-weight: 500;
     color: var(--text-primary);
-    line-height: 1.5;
+    line-height: 1.35;
     word-wrap: break-word;
     letter-spacing: 0.2px;
 }
@@ -1011,14 +1011,14 @@ ul.category-content {
 
 /* Notes styling */
 .notes {
-    font-size: 13px;
+    font-size: 12px;
     color: var(--text-secondary);
-    line-height: 1.6;
-    padding: 8px 12px;
+    line-height: 1.4;
+    padding: 5px 8px;
     background: var(--background);
     border-left: 3px solid var(--primary-light-bg);
     border-radius: 6px;
-    margin-top: 2px;
+    margin-top: 1px;
 }
 
 .notes:empty {
@@ -1029,7 +1029,7 @@ ul.category-content {
 /* Delete button - clean, minimal, right-aligned, red */
 .item-delete-btn {
     flex-shrink: 0;
-    width: 48px;
+    width: 40px;
     display: flex;
     align-items: center;
     justify-content: center;

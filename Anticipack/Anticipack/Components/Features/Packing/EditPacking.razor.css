@@ -2369,10 +2369,7 @@ ul.category-content {
 
 /* Preview Section */
 .preview-section {
-    background: var(--background);
-    border-radius: 10px;
-    padding: 12px;
-    border: 1px solid var(--border-color);
+    padding: 4px 0;
 }
 
 /* Suggestion Chips (autocomplete) */
@@ -2414,45 +2411,53 @@ ul.category-content {
 
 .preview-header {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start;
     align-items: center;
-    margin-bottom: 10px;
-    flex-wrap: wrap;
-    gap: 8px;
+    gap: 6px;
 }
 
 .preview-title {
     display: flex;
     align-items: center;
-    gap: 6px;
     font-size: 13px;
     font-weight: 600;
     color: var(--text-secondary);
 }
 
-.preview-title i {
+.preview-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--text-secondary);
+    cursor: pointer;
+}
+
+.preview-toggle:hover {
+    background: var(--hover-bg);
     color: var(--primary);
 }
 
-.duplicate-warning {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    font-size: 12px;
-    color: var(--warning);
-    background: rgba(var(--warning-rgb), 0.1);
-    padding: 4px 10px;
-    border-radius: 6px;
-}
-
-.duplicate-warning i {
-    font-size: 11px;
+.preview-toggle:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
 }
 
 .preview-items {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
+    max-height: min(35dvh, 20rem);
+    margin-top: 8px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 2px;
+    -webkit-overflow-scrolling: touch;
 }
 
 .preview-chip {
@@ -2477,17 +2482,6 @@ ul.category-content {
 
 .preview-chip.existing i {
     font-size: 11px;
-}
-
-.preview-more {
-    display: inline-flex;
-    align-items: center;
-    padding: 6px 12px;
-    background: var(--primary-light-bg);
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 500;
-    color: var(--primary);
 }
 
 /* Mobile Responsive for Add Form */
@@ -2515,28 +2509,19 @@ ul.category-content {
         height: 40px;
     }
 
-    .preview-section {
-        padding: 10px;
-    }
-
     .preview-chip {
         padding: 5px 10px;
         font-size: 12px;
     }
 
-    .preview-header {
-        flex-direction: column;
-        align-items: flex-start;
+    .preview-items {
+        max-height: 40dvh;
     }
 }
 
 /* Dark theme for new components */
 [data-theme="dark"] .add-mode-toggle {
     background: rgba(255, 255, 255, 0.05);
-}
-
-[data-theme="dark"] .preview-section {
-    background: rgba(255, 255, 255, 0.03);
 }
 
 [data-theme="dark"] .preview-chip {

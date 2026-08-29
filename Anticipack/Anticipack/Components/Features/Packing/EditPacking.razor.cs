@@ -57,6 +57,7 @@ public partial class EditPacking : IAsyncDisposable
     private List<ParsedItem> _parsedItems = [];
     private List<string> _duplicateItems = [];
     private HashSet<string> _existingItemNames = new(StringComparer.OrdinalIgnoreCase);
+    private bool _isPreviewExpanded;
 
     // Autocomplete suggestions
     private List<string> _suggestions = [];
@@ -174,6 +175,7 @@ public partial class EditPacking : IAsyncDisposable
         _bulkItemsText = string.Empty;
         _parsedItems = [];
         _duplicateItems = [];
+        _isPreviewExpanded = false;
         UpdateSuggestions();
         await SyncClickOutsideHandlerAsync();
     }
@@ -249,6 +251,7 @@ public partial class EditPacking : IAsyncDisposable
         _bulkItemsText = string.Empty;
         _parsedItems = [];
         _duplicateItems = [];
+        _isPreviewExpanded = false;
 
         // Cache existing item names for duplicate detection
         _existingItemNames = Items

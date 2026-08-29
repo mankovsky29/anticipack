@@ -357,35 +357,34 @@
                 {
                     <div class="preview-section">
                         <div class="preview-header">
+                            <button type="button"
+                                    class="preview-toggle"
+                                    @onclick="() => _isPreviewExpanded = !_isPreviewExpanded"
+                                    aria-label="@Localizer["Preview"]"
+                                    aria-controls="quick-add-preview-items"
+                                    aria-expanded="@_isPreviewExpanded">
+                                <i class="fa @(_isPreviewExpanded ? "fa-eye-slash" : "fa-eye")" aria-hidden="true"></i>
+                            </button>
                             <span class="preview-title">
-                                <i class="fa fa-eye"></i>
-                                @Localizer["Preview"] (@_parsedItems.Count @(_parsedItems.Count == 1 ? Localizer["Item"].Value.ToLower() : Localizer["Items"].Value.ToLower()))
+                                @_parsedItems.Count @(_parsedItems.Count == 1 ? Localizer["Item"].Value.ToLower() : Localizer["Items"].Value.ToLower())
                             </span>
-                            @if (_duplicateItems.Count > 0)
-                            {
-                                <span class="duplicate-warning">
-                                    <i class="fa fa-exclamation-triangle"></i>
-                                    @string.Format(Localizer["DuplicatesRemoved"].Value, _duplicateItems.Count)
-                                </span>
-                            }
                         </div>
-                        <div class="preview-items">
-                            @foreach (var previewItem in _parsedItems.Take(10))
-                            {
-                                var isDuplicate = _existingItemNames.Contains(previewItem.Name);
-                                <span class="preview-chip @(isDuplicate ? "existing" : "")">
-                                    @GetItemDisplayName(previewItem.Name, previewItem.Quantity)
-                                    @if (isDuplicate)
-                                    {
-                                        <i class="fa fa-info-circle" title="@Localizer["ItemAlreadyExists"]"></i>
-                                    }
-                                </span>
-                            }
-                            @if (_parsedItems.Count > 10)
-                            {
-                                <span class="preview-more">+@(_parsedItems.Count - 10) @Localizer["More"].Value.ToLower()</span>
-                            }
-                        </div>
+                        @if (_isPreviewExpanded)
+                        {
+                            <div id="quick-add-preview-items" class="preview-items">
+                                @foreach (var previewItem in _parsedItems)
+                                {
+                                    var isDuplicate = _existingItemNames.Contains(previewItem.Name);
+                                    <span class="preview-chip @(isDuplicate ? "existing" : "")">
+                                        @GetItemDisplayName(previewItem.Name, previewItem.Quantity)
+                                        @if (isDuplicate)
+                                        {
+                                            <i class="fa fa-info-circle" title="@Localizer["ItemAlreadyExists"]" aria-hidden="true"></i>
+                                        }
+                                    </span>
+                                }
+                            </div>
+                        }
                     </div>
                 }
 

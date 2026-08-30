@@ -979,12 +979,15 @@ public partial class EditPacking : IAsyncDisposable
         }
     }
 
-    private void SwitchToPackingMode()
+    private async Task SwitchToPackingMode()
     {
-        if (!string.IsNullOrEmpty(Id))
-        {
-            Navigation.NavigateTo($"/play-packing/{Id}");
-        }
+        if (string.IsNullOrEmpty(Id))
+            return;
+
+        if (_isAddingItem && CanAdd)
+            await ConfirmAddAsync();
+
+        Navigation.NavigateTo($"/play-packing/{Id}");
     }
 
     private void HandleItemEditKeyDown(KeyboardEventArgs e, PackingItemView item)

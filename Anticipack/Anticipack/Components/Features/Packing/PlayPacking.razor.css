@@ -21,6 +21,46 @@
     margin-top: var(--space-sm);
 }
 
+.edit-fab {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    border: none;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    color: white;
+    cursor: pointer;
+    font-size: 22px;
+    transition: all var(--transition-fast);
+}
+
+.edit-fab:hover {
+    transform: scale(1.08);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+}
+
+.edit-fab:active {
+    transform: scale(0.95);
+}
+
+.edit-fab:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(var(--success-rgb), 0.25), 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+@media (max-width: 768px) {
+    .edit-fab {
+        bottom: var(--space-xxxl);
+    }
+}
+
 /* Header Styles */
 .top-header {
     display: flex;

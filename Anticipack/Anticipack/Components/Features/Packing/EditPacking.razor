@@ -7,9 +7,6 @@
     <div class="settings-panel @(_isSettingsExpanded ? "expanded" : "collapsed")" role="banner" aria-label="@AppResources.PackingActivity">
         <div class="settings-header" @onclick="ToggleSettings" @onclick:stopPropagation>
             <div class="settings-summary">
-                <button class="icon-btn play header-play-btn" @onclick="SwitchToPackingMode" @onclick:stopPropagation aria-label="@AppResources.StartPacking">
-                    <i class="fa fa-play" aria-hidden="true"></i>
-                </button>
                 <span class="activity-name-summary">@(_activityName ?? AppResources.NewPackingActivity)</span>
                 <div class="header-right-actions">
                     @if (!_isSettingsExpanded)
@@ -277,6 +274,13 @@
             }
         </div>
     </main>
+
+    <button class="play-fab"
+            @onclick="SwitchToPackingMode"
+            aria-label="@AppResources.StartPacking"
+            title="@AppResources.StartPacking">
+        <i class="fa fa-play" aria-hidden="true"></i>
+    </button>
 </div>
 
 

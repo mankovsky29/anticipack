@@ -1318,7 +1318,7 @@ ul.category-content {
 .form-header {
     width: 100%;
     background: var(--primary);
-    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    background: linear-gradient(135deg, var(--success) 0%, var(--success-dark) 100%);
     padding: 20px 24px;
     color: white;
 }
@@ -1958,9 +1958,38 @@ ul.category-content {
     min-width: 0;
 }
 
-/* Play button inside the header row */
-.header-play-btn {
-    flex-shrink: 0;
+.play-fab {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    border: none;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--success) 0%, var(--success-dark) 100%);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    color: white;
+    cursor: pointer;
+    font-size: 22px;
+    transition: all var(--transition-fast);
+}
+
+.play-fab:hover {
+    transform: scale(1.08);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+}
+
+.play-fab:active {
+    transform: scale(0.95);
+}
+
+.play-fab:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(var(--success-rgb), 0.25), 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .activity-name-summary {
@@ -1980,6 +2009,12 @@ ul.category-content {
     gap: 8px;
     flex-shrink: 0;
     margin-left: auto;
+}
+
+@media (max-width: 768px) {
+    .play-fab {
+        bottom: var(--space-xxxl);
+    }
 }
 
 .settings-badges {

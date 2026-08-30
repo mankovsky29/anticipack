@@ -2,16 +2,6 @@
 
 <div class="page-container with-fixed-navbar">
     <div class="activity-header">
-        <div class="activity-actions activity-actions-left" role="group" aria-label="@AppResources.PackingDialogMenu">
-            <!-- Edit mode button -->
-            <button class="icon-btn" 
-                    @onclick="SwitchToEditMode" 
-                    aria-label="@AppResources.EditActivity"
-                    title="@AppResources.EditActivity">
-                <i class="fa fa-edit" aria-hidden="true"></i>
-            </button>
-        </div>
-
         <div class="activity-actions activity-actions-right" role="group">
             <!-- Show/Hide toggle -->
             <button class="toggle-visibility-btn @(_hideCheckedItems ? "filtering" : "")" 
@@ -153,6 +143,13 @@
         </div>
     }
     </div>
+
+    <button class="edit-fab"
+            @onclick="SwitchToEditMode"
+            aria-label="@AppResources.EditActivity"
+            title="@AppResources.EditActivity">
+        <i class="fa fa-edit" aria-hidden="true"></i>
+    </button>
 </div>
 
 @if (GetCompletionPercentage() == 100 && !_completionAcknowledged)

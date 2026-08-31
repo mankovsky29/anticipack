@@ -296,7 +296,7 @@ public partial class PackingActivities : IAsyncDisposable
         try
         {
             await PackingRepository.AddOrUpdateAsync(newActivity);
-            Navigation.NavigateTo($"/packing-activity?id={newActivity.Id}&mode=edit&openAddItems=true");
+            Navigation.NavigateTo($"/packing-activity?id={newActivity.Id}&mode=edit&openAddItems=true&newActivity=true");
         }
         catch
         {
@@ -376,7 +376,10 @@ public partial class PackingActivities : IAsyncDisposable
 
     private void OpenActivityInPackingMode(string id)
     {
-        Navigation.NavigateTo($"/packing-activity?id={id}&mode=packing");
+        var destination = _activityItemCounts.GetValueOrDefault(id) == 0
+            ? $"/edit-packing/{id}"
+            : $"/play-packing/{id}";
+        Navigation.NavigateTo(destination);
     }
 
     private async Task OpenActivityInEditMode(string id)

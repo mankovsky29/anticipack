@@ -19,6 +19,10 @@
     [SupplyParameterFromQuery(Name = "openAddItems")]
     public bool OpenAddItems { get; set; }
 
+    [Parameter]
+    [SupplyParameterFromQuery(Name = "newActivity")]
+    public bool NewActivity { get; set; }
+
     protected override void OnInitialized()
     {
         if (string.IsNullOrEmpty(PackingId))
@@ -34,7 +38,10 @@
         else
         {
             var openAddItemsQuery = OpenAddItems ? "?openAddItems=true" : string.Empty;
-            Navigation.NavigateTo($"/edit-packing/{PackingId}{openAddItemsQuery}");
+            var newActivityQuery = NewActivity
+                ? string.IsNullOrEmpty(openAddItemsQuery) ? "?newActivity=true" : "&newActivity=true"
+                : string.Empty;
+            Navigation.NavigateTo($"/edit-packing/{PackingId}{openAddItemsQuery}{newActivityQuery}");
         }
     }
 }

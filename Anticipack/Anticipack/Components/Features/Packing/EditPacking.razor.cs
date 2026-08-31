@@ -44,6 +44,10 @@ public partial class EditPacking : IAsyncDisposable
     [SupplyParameterFromQuery(Name = "openAddItems")]
     public bool OpenAddItems { get; set; }
 
+    [Parameter]
+    [SupplyParameterFromQuery(Name = "newActivity")]
+    public bool NewActivity { get; set; }
+
     private bool _isAddingItem = false;
     private bool _isLoading;
     private bool _keyboardVisible;
@@ -406,6 +410,11 @@ public partial class EditPacking : IAsyncDisposable
 
             await LoadItemsForPackingAsync(Id);
             _manualOverride[category] = false;
+
+            if (addedCount > 0)
+            {
+                NewActivity = false;
+            }
 
 
             if (skippedCount > 0)
@@ -845,6 +854,27 @@ public partial class EditPacking : IAsyncDisposable
 
         if (string.IsNullOrWhiteSpace(Id))
             return;
+
+        if (NewActivity && !Items.Any())
+        {
+            context.PreventNavigation();
+            _isDeleting = true;
+            try
+            {
+                await PackingRepository.DeleteAsync(Id);
+                Navigation.NavigateTo(context.TargetLocation);
+            }
+            catch (Exception ex)
+            {
+                ToastService.ShowError(string.Format(AppResources.FailedToDeleteActivity, ex.Message));
+            }
+            finally
+            {
+                _isDeleting = false;
+            }
+
+            return;
+        }
 
         _isSavingBeforeNav = true;
         try

@@ -274,6 +274,9 @@
     flex: 1;
     border-radius: var(--border-radius-lg);
     position: relative;
+    /* Bootstrap's .card-header would otherwise add a grey fill and bottom border */
+    background: transparent;
+    border-bottom: 0;
 }
 
 .header-content {

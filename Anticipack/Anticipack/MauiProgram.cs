@@ -94,6 +94,7 @@ namespace Anticipack
             builder.Services.AddScoped<IDialogService, DialogService>();
             builder.Services.AddScoped<IToastService, ToastService>();
             builder.Services.AddSingleton<INavigationHeaderService, NavigationHeaderService>();
+            builder.Services.AddSingleton<IAppThemeService, AppThemeService>();
             builder.Services.AddSingleton<IMicrophonePermissionService, MicrophonePermissionService>();
             builder.Services.AddScoped<MicrophonePermissionBridge>();
             builder.Services.AddScoped<IPackingHistoryService, PackingHistoryService>();

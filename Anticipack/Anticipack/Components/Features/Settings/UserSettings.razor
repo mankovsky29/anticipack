@@ -5,6 +5,7 @@
 @inject ILocalizationService LocalizationService
 @inject INavigationHeaderService NavigationHeaderService
 @inject IAutoArchiveService AutoArchiveService
+@inject IAppThemeService AppThemeService
 @implements IDisposable
 
 <div class="settings-page">
@@ -200,6 +201,7 @@
     {
         CurrentTheme = theme;
         await JSRuntime.InvokeVoidAsync("themeManager.setTheme", theme);
+        AppThemeService.Apply(theme);
         StateHasChanged(); // Force UI update
     }
 

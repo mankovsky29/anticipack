@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#512BD4</color>
-    <color name="colorPrimaryDark">#2B0B98</color>
-    <color name="colorAccent">#2B0B98</color>
+    <!-- Brand blue (Material 3 primary for seed #4B89DC), replacing the MAUI template purple -->
+    <color name="colorPrimary">#415F91</color>
+    <color name="colorPrimaryDark">#284777</color>
+    <color name="colorAccent">#415F91</color>
 </resources>

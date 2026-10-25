@@ -1,6 +1,8 @@
 using Anticipack.Components.Shared.DialogComponent;
 using Anticipack.Resources.Localization;
+using Anticipack.Services;
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 using Microsoft.Maui.Networking;
 
 namespace Anticipack.Components.Layout;
@@ -8,6 +10,8 @@ namespace Anticipack.Components.Layout;
 public partial class MainLayout : IDisposable
 {
     [Inject] private IDialogService DialogService { get; set; } = default!;
+    [Inject] private IAppThemeService AppThemeService { get; set; } = default!;
+    [Inject] private IJSRuntime JSRuntime { get; set; } = default!;
 
     private bool _dialogVisible;
     private DialogOptions _dialogOptions = new();
@@ -31,6 +35,23 @@ public partial class MainLayout : IDisposable
         _isOffline = Connectivity.Current.NetworkAccess != NetworkAccess.Internet;
         Connectivity.Current.ConnectivityChanged += OnConnectivityChanged;
         _ = CheckStoragePermissionAsync();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+            return;
+
+        // site.js applies the saved theme to the page; mirror it to the native status/navigation bars
+        try
+        {
+            var theme = await JSRuntime.InvokeAsync<string>("themeManager.getTheme");
+            AppThemeService.Apply(theme);
+        }
+        catch (JSException)
+        {
+            // Theme sync is cosmetic; keep the system default if the page script is unavailable
+        }
     }
 
     private async Task CheckStoragePermissionAsync()

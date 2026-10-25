@@ -1,3 +1,19 @@
+// Platform detection for platform.css (Material 3 on Android, HIG on iOS/iPadOS).
+// Runs before Blazor renders so there is no flash of the default look.
+(function () {
+    var ua = navigator.userAgent || '';
+    var isIPadDesktopUa = /Macintosh/i.test(ua) && navigator.maxTouchPoints > 1;
+    var platform = /Android/i.test(ua) ? 'android'
+        : (/iPhone|iPad|iPod/i.test(ua) || isIPadDesktopUa) ? 'ios'
+        : 'default';
+
+    var root = document.documentElement;
+    root.setAttribute('data-platform', platform);
+    if (platform !== 'default') {
+        root.classList.add('platform-native');
+    }
+})();
+
 function selectAllText(inputId) {
     const input = document.getElementById(inputId);
     if (input) {
@@ -172,6 +188,19 @@ window.themeManager = {
         }
     }
 };
+
+// Follow system light/dark changes live while the theme is set to "auto"
+if (window.matchMedia) {
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function () {
+        try {
+            if (localStorage.getItem('theme') === 'auto') {
+                window.themeManager.setTheme('auto');
+            }
+        } catch (error) {
+            console.error('Error following system theme:', error);
+        }
+    });
+}
 
 // Initialize theme when DOM is ready
 if (document.readyState === 'loading') {

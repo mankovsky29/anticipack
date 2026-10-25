@@ -1,0 +1,1440 @@
+/* =====================================================================
+   Platform design layer
+   - Android      -> Material 3 (Expressive) tokens, shapes, components
+   - iOS / iPadOS -> Human Interface Guidelines (iOS 26, Liquid Glass)
+   - Windows / Mac Catalyst keep the base look from app.css
+
+   site.js sets data-platform="android|ios|default" and the class
+   .platform-native on <html> before Blazor renders. Component rules are
+   prefixed with :root so they outrank component-scoped (*.razor.css) rules.
+   Token blocks also target body because site.js stamps data-theme on body,
+   where app.css would otherwise re-declare the base theme tokens.
+   ===================================================================== */
+
+/* ---------------------------------------------------------------------
+   1. Android - Material 3 tokens (seed #4B89DC)
+   --------------------------------------------------------------------- */
+:root[data-platform="android"],
+:root[data-platform="android"] body {
+    --md-primary: #415F91;
+    --md-on-primary: #FFFFFF;
+    --md-primary-container: #D6E3FF;
+    --md-on-primary-container: #284777;
+    --md-secondary-container: #DAE2F9;
+    --md-on-secondary-container: #3E4759;
+    --md-surface: #F9F9FF;
+    --md-surface-container-lowest: #FFFFFF;
+    --md-surface-container-low: #F3F3FA;
+    --md-surface-container: #EDEDF4;
+    --md-surface-container-high: #E7E8EE;
+    --md-surface-container-highest: #E2E2E9;
+    --md-on-surface: #191C20;
+    --md-on-surface-variant: #44474E;
+    --md-outline: #74777F;
+    --md-outline-variant: #C4C6D0;
+    --md-inverse-surface: #2E3036;
+    --md-inverse-on-surface: #F0F0F7;
+    --md-inverse-primary: #AAC7FF;
+    --md-success-container: #B8F397;
+    --md-on-success-container: #072100;
+    --md-elevation-1: 0 1px 2px rgba(0, 0, 0, 0.3), 0 1px 3px 1px rgba(0, 0, 0, 0.15);
+    --md-elevation-2: 0 1px 2px rgba(0, 0, 0, 0.3), 0 2px 6px 2px rgba(0, 0, 0, 0.15);
+    --md-elevation-3: 0 1px 3px rgba(0, 0, 0, 0.3), 0 4px 8px 3px rgba(0, 0, 0, 0.15);
+    --md-easing-emphasized: cubic-bezier(0.2, 0, 0, 1);
+    --md-spring-fast: cubic-bezier(0.42, 1.67, 0.21, 0.9);
+
+    /* Base tokens consumed by the existing component styles */
+    --primary: var(--md-primary);
+    --primary-light: #5A78AB;
+    --primary-dark: var(--md-on-primary-container);
+    --primary-rgb: 65, 95, 145;
+    --primary-light-bg: var(--md-secondary-container);
+    --secondary: var(--md-on-surface-variant);
+    --secondary-rgb: 68, 71, 78;
+    --danger: #BA1A1A;
+    --danger-rgb: 186, 26, 26;
+    --success: #386A20;
+    --success-dark: #205107;
+    --success-light: var(--md-success-container);
+    --success-rgb: 56, 106, 32;
+    --background: var(--md-surface);
+    --surface: var(--md-surface-container-lowest);
+    --surface-dark: var(--md-surface-container-high);
+    --card-bg: var(--md-surface-container-lowest);
+    --text-primary: var(--md-on-surface);
+    --text-secondary: var(--md-on-surface-variant);
+    --text-light: var(--md-outline);
+    --border-color: var(--md-outline-variant);
+    --button-default-color: var(--md-on-surface);
+    --input-bg: transparent;
+    --input-border: var(--md-outline);
+    --input-focus-border: var(--md-primary);
+    --input-focus-shadow: transparent;
+    --overlay-bg: rgba(0, 0, 0, 0.32);
+    --modal-bg: var(--md-surface-container-high);
+    --hover-bg: var(--md-surface-container-high);
+    --hover-bg-light: var(--md-surface-container);
+    --disabled-bg: rgba(25, 28, 32, 0.12);
+    --disabled-text: rgba(25, 28, 32, 0.38);
+    --font-family: system-ui, Roboto, 'Noto Sans', sans-serif;
+    --border-radius-sm: 8px;
+    --border-radius: 12px;
+    --border-radius-lg: 16px;
+    --border-radius-xl: 28px;
+    --shadow-sm: none;
+    --shadow: var(--md-elevation-1);
+    --shadow-md: var(--md-elevation-2);
+    --shadow-lg: var(--md-elevation-3);
+    --transition-fast: 150ms var(--md-easing-emphasized);
+    --transition: 300ms var(--md-easing-emphasized);
+
+    /* Semantic component tokens shared with iOS (section 3) */
+    --text-body: 16px;
+    --text-item: 16px;
+    --text-title: 22px;
+    --text-title-weight: 400;
+    --text-card-title: 16px;
+    --text-label: 14px;
+    --touch-target: 48px;
+    --app-bar-height: 64px;
+    --app-bar-title-align: left;
+    --app-bar-icon-bg: transparent;
+    --app-bar-icon-border: none;
+    --app-bar-icon-shadow: none;
+    --app-bar-icon-blur: none;
+    --app-bar-icon-fg: var(--md-on-surface-variant);
+    /* WebView draws under the gesture/nav bar (edge-to-edge); keep clear of it */
+    --bottom-inset: max(var(--safe-area-bottom), 24px);
+    --btn-height: 40px;
+    --btn-radius: 20px;
+    --btn-padding: 0 24px;
+    --btn-font-size: 14px;
+    --btn-font-weight: 500;
+    --btn-filled-bg: var(--md-primary);
+    --btn-filled-fg: var(--md-on-primary);
+    --btn-secondary-bg: transparent;
+    --btn-secondary-fg: var(--md-primary);
+    --btn-secondary-border: 1px solid var(--md-outline);
+    --field-radius: 4px;
+    --field-bg: transparent;
+    --field-border: 1px solid var(--md-outline);
+    --field-focus-ring: inset 0 0 0 1px var(--md-primary);
+    --field-font-size: 16px;
+    --card-bg-native: var(--md-surface-container-lowest);
+    --card-border: 1px solid var(--md-outline-variant);
+    --card-radius: 12px;
+    --card-shadow: none;
+    --fab-size: 56px;
+    --fab-radius: 16px;
+    --fab-bg: var(--md-primary-container);
+    --fab-fg: var(--md-on-primary-container);
+    --fab-success-bg: var(--md-success-container);
+    --fab-success-fg: var(--md-on-success-container);
+    --fab-shadow: var(--md-elevation-3);
+    --fab-blur: none;
+    --fab-border: none;
+    --fab-icon-size: 24px;
+    --fab-offset: 16px;
+    --small-fab-size: 40px;
+    --small-fab-radius: 12px;
+    --small-fab-bg: var(--md-surface-container-high);
+    --small-fab-fg: var(--md-primary);
+    --search-height: 56px;
+    --search-radius: 28px;
+    --search-bg: var(--md-surface-container-high);
+    --search-font-size: 16px;
+    --menu-bg: var(--md-surface-container);
+    --menu-radius: 16px;
+    --menu-shadow: var(--md-elevation-2);
+    --menu-item-height: 48px;
+    --menu-font-size: 14px;
+    --menu-blur: none;
+    --menu-border: none;
+    --list-row-min: 56px;
+    --checkbox-size: 18px;
+    --checkbox-radius: 2px;
+    --checkbox-border: 2px solid var(--md-on-surface-variant);
+    --checkbox-checked: var(--md-primary);
+    --progress-height: 4px;
+    --progress-height-lg: 8px;
+    --progress-track: var(--md-secondary-container);
+    --progress-fill: var(--md-primary);
+    --dialog-radius: 28px;
+    --dialog-bg: var(--md-surface-container-high);
+    --dialog-blur: none;
+    --dialog-title-size: 24px;
+    --dialog-title-weight: 400;
+    --dialog-title-align: left;
+    --dialog-body-color: var(--md-on-surface-variant);
+    --dialog-actions-justify: flex-end;
+    --toast-bg: var(--md-inverse-surface);
+    --toast-fg: var(--md-inverse-on-surface);
+    --toast-icon: var(--md-inverse-primary);
+    --toast-radius: 4px;
+    --toast-blur: none;
+    --toast-border: none;
+    --drawer-bg: var(--md-surface-container-low);
+    --drawer-radius: 0 16px 16px 0;
+    --drawer-width: min(360px, 85vw);
+    --drawer-inset: 0;
+    --drawer-blur: none;
+    --drawer-border: none;
+    --drawer-shadow: none;
+    --nav-item-height: 56px;
+    --nav-item-radius: 28px;
+    --nav-active-bg: var(--md-secondary-container);
+    --nav-active-fg: var(--md-on-secondary-container);
+    --switch-on: var(--md-primary);
+    --press-scale: 0.96;
+    --press-easing: var(--md-spring-fast);
+}
+
+:root[data-platform="android"][data-theme="dark"],
+:root[data-platform="android"][data-theme="dark"] body {
+    --md-primary: #AAC7FF;
+    --md-on-primary: #0A305F;
+    --md-primary-container: #284777;
+    --md-on-primary-container: #D6E3FF;
+    --md-secondary-container: #3E4759;
+    --md-on-secondary-container: #DAE2F9;
+    --md-surface: #111318;
+    --md-surface-container-lowest: #0C0E13;
+    --md-surface-container-low: #191C20;
+    --md-surface-container: #1D2024;
+    --md-surface-container-high: #282A2F;
+    --md-surface-container-highest: #33353A;
+    --md-on-surface: #E2E2E9;
+    --md-on-surface-variant: #C4C6D0;
+    --md-outline: #8E9099;
+    --md-outline-variant: #44474E;
+    --md-inverse-surface: #E2E2E9;
+    --md-inverse-on-surface: #2E3036;
+    --md-inverse-primary: #415F91;
+    --md-success-container: #1F5107;
+    --md-on-success-container: #B8F397;
+
+    /* Fills keep a mid-tone so existing white-on-primary text stays legible */
+    --primary: #6F95D6;
+    --primary-light: #AAC7FF;
+    --primary-dark: #D6E3FF;
+    --primary-rgb: 111, 149, 214;
+    --primary-light-bg: var(--md-secondary-container);
+    --secondary: var(--md-on-surface-variant);
+    --secondary-rgb: 196, 198, 208;
+    --danger: #FFB4AB;
+    --danger-rgb: 255, 180, 171;
+    --success: #9CD67D;
+    --success-dark: #82BA64;
+    --success-light: var(--md-success-container);
+    --success-rgb: 156, 214, 125;
+    --background: var(--md-surface);
+    --surface: var(--md-surface-container);
+    --surface-dark: var(--md-surface-container-high);
+    --card-bg: var(--md-surface-container);
+    --text-primary: var(--md-on-surface);
+    --text-secondary: var(--md-on-surface-variant);
+    --text-light: var(--md-outline);
+    --border-color: var(--md-outline-variant);
+    --button-default-color: var(--md-on-surface);
+    --input-bg: transparent;
+    --input-border: var(--md-outline);
+    --input-focus-border: var(--md-primary);
+    --input-focus-shadow: transparent;
+    --overlay-bg: rgba(0, 0, 0, 0.32);
+    --modal-bg: var(--md-surface-container-high);
+    --hover-bg: var(--md-surface-container-high);
+    --hover-bg-light: var(--md-surface-container);
+    --disabled-bg: rgba(226, 226, 233, 0.12);
+    --disabled-text: rgba(226, 226, 233, 0.38);
+    --shadow-sm: none;
+    --shadow: var(--md-elevation-1);
+    --shadow-md: var(--md-elevation-2);
+    --shadow-lg: var(--md-elevation-3);
+
+    --btn-filled-bg: var(--md-primary);
+    --btn-filled-fg: var(--md-on-primary);
+    --btn-secondary-fg: var(--md-primary);
+    --btn-secondary-border: 1px solid var(--md-outline);
+    --field-border: 1px solid var(--md-outline);
+    --field-focus-ring: inset 0 0 0 1px var(--md-primary);
+    --card-bg-native: var(--md-surface-container);
+    --card-border: 1px solid transparent;
+    --fab-bg: var(--md-primary-container);
+    --fab-fg: var(--md-on-primary-container);
+    --fab-success-bg: var(--md-success-container);
+    --fab-success-fg: var(--md-on-success-container);
+    --small-fab-bg: var(--md-surface-container-high);
+    --small-fab-fg: var(--md-primary);
+    --search-bg: var(--md-surface-container-high);
+    --menu-bg: var(--md-surface-container);
+    --checkbox-border: 2px solid var(--md-on-surface-variant);
+    --checkbox-checked: var(--md-primary);
+    --progress-track: var(--md-secondary-container);
+    --progress-fill: var(--md-primary);
+    --dialog-bg: var(--md-surface-container-high);
+    --dialog-body-color: var(--md-on-surface-variant);
+    --toast-bg: var(--md-inverse-surface);
+    --toast-fg: var(--md-inverse-on-surface);
+    --toast-icon: var(--md-inverse-primary);
+    --drawer-bg: var(--md-surface-container-low);
+    --nav-active-bg: var(--md-secondary-container);
+    --nav-active-fg: var(--md-on-secondary-container);
+    --switch-on: var(--md-primary);
+}
+
+/* ---------------------------------------------------------------------
+   2. iOS / iPadOS - HIG system colors and Liquid Glass materials
+   --------------------------------------------------------------------- */
+:root[data-platform="ios"],
+:root[data-platform="ios"] body {
+    --ios-tint: #2F74D0;
+    --ios-label: #000000;
+    --ios-secondary-label: rgba(60, 60, 67, 0.6);
+    --ios-tertiary-label: rgba(60, 60, 67, 0.3);
+    --ios-separator: rgba(60, 60, 67, 0.29);
+    --ios-grouped-bg: #F2F2F7;
+    --ios-grouped-secondary-bg: #FFFFFF;
+    --ios-grouped-tertiary-bg: #F2F2F7;
+    --ios-fill: rgba(120, 120, 128, 0.2);
+    --ios-tertiary-fill: rgba(118, 118, 128, 0.12);
+    --ios-glass-bg: rgba(255, 255, 255, 0.72);
+    --ios-glass-tint-bg: rgba(47, 116, 208, 0.88);
+    --ios-glass-border: 0.5px solid rgba(255, 255, 255, 0.7);
+    --ios-glass-blur: blur(24px) saturate(180%);
+    --ios-glass-shadow: 0 8px 24px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.08);
+    --ios-spring: cubic-bezier(0.32, 1.4, 0.5, 1);
+    --ios-ease: cubic-bezier(0.25, 0.1, 0.25, 1);
+
+    --primary: var(--ios-tint);
+    --primary-light: #4C8BE0;
+    --primary-dark: #225BAA;
+    --primary-rgb: 47, 116, 208;
+    --primary-light-bg: rgba(47, 116, 208, 0.12);
+    --secondary: #8E8E93;
+    --secondary-rgb: 142, 142, 147;
+    --danger: #FF3B30;
+    --danger-rgb: 255, 59, 48;
+    --warning: #FF9500;
+    --warning-rgb: 255, 149, 0;
+    --success: #34C759;
+    --success-dark: #248A3D;
+    --success-light: rgba(52, 199, 89, 0.14);
+    --success-rgb: 52, 199, 89;
+    --background: var(--ios-grouped-bg);
+    --surface: var(--ios-grouped-secondary-bg);
+    --surface-dark: var(--ios-grouped-tertiary-bg);
+    --card-bg: var(--ios-grouped-secondary-bg);
+    --text-primary: var(--ios-label);
+    --text-secondary: var(--ios-secondary-label);
+    --text-light: var(--ios-tertiary-label);
+    --border-color: var(--ios-separator);
+    --button-default-color: var(--ios-label);
+    --input-bg: var(--ios-tertiary-fill);
+    --input-border: transparent;
+    --input-focus-border: transparent;
+    --input-focus-shadow: transparent;
+    --overlay-bg: rgba(0, 0, 0, 0.2);
+    --modal-bg: var(--ios-grouped-secondary-bg);
+    --hover-bg: var(--ios-tertiary-fill);
+    --hover-bg-light: var(--ios-tertiary-fill);
+    --disabled-bg: var(--ios-tertiary-fill);
+    --disabled-text: var(--ios-tertiary-label);
+    --font-family: -apple-system, system-ui, 'SF Pro Text', 'Helvetica Neue', sans-serif;
+    --border-radius-sm: 8px;
+    --border-radius: 12px;
+    --border-radius-lg: 20px;
+    --border-radius-xl: 28px;
+    --shadow-sm: none;
+    --shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+    --shadow-lg: var(--ios-glass-shadow);
+    --transition-fast: 200ms var(--ios-ease);
+    --transition: 350ms var(--ios-ease);
+
+    --text-body: 17px;
+    --text-item: 17px;
+    --text-title: 17px;
+    --text-title-weight: 600;
+    --text-card-title: 17px;
+    --text-label: 15px;
+    --touch-target: 44px;
+    --app-bar-height: 52px;
+    --app-bar-title-align: center;
+    --app-bar-icon-bg: var(--ios-glass-bg);
+    --app-bar-icon-border: var(--ios-glass-border);
+    --app-bar-icon-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+    --app-bar-icon-blur: var(--ios-glass-blur);
+    --app-bar-icon-fg: var(--ios-tint);
+    --bottom-inset: var(--safe-area-bottom);
+    --btn-height: 50px;
+    --btn-radius: 25px;
+    --btn-padding: 0 20px;
+    --btn-font-size: 17px;
+    --btn-font-weight: 600;
+    --btn-filled-bg: var(--ios-tint);
+    --btn-filled-fg: #FFFFFF;
+    --btn-secondary-bg: var(--ios-fill);
+    --btn-secondary-fg: var(--ios-tint);
+    --btn-secondary-border: none;
+    --field-radius: 12px;
+    --field-bg: var(--ios-tertiary-fill);
+    --field-border: 1px solid transparent;
+    --field-focus-ring: 0 0 0 2px rgba(47, 116, 208, 0.35);
+    --field-font-size: 17px;
+    --card-bg-native: var(--ios-grouped-secondary-bg);
+    --card-border: none;
+    --card-radius: 20px;
+    --card-shadow: none;
+    --fab-size: 56px;
+    --fab-radius: 28px;
+    --fab-bg: var(--ios-glass-tint-bg);
+    --fab-fg: #FFFFFF;
+    --fab-success-bg: rgba(52, 199, 89, 0.9);
+    --fab-success-fg: #FFFFFF;
+    --fab-shadow: var(--ios-glass-shadow);
+    --fab-blur: var(--ios-glass-blur);
+    --fab-border: 0.5px solid rgba(255, 255, 255, 0.45);
+    --fab-icon-size: 22px;
+    --fab-offset: 20px;
+    --small-fab-size: 44px;
+    --small-fab-radius: 22px;
+    --small-fab-bg: var(--ios-glass-bg);
+    --small-fab-fg: var(--ios-tint);
+    --search-height: 40px;
+    --search-radius: 20px;
+    --search-bg: var(--ios-tertiary-fill);
+    --search-font-size: 17px;
+    --menu-bg: var(--ios-glass-bg);
+    --menu-radius: 20px;
+    --menu-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
+    --menu-item-height: 44px;
+    --menu-font-size: 17px;
+    --menu-blur: var(--ios-glass-blur);
+    --menu-border: var(--ios-glass-border);
+    --list-row-min: 44px;
+    --checkbox-size: 24px;
+    --checkbox-radius: 50%;
+    --checkbox-border: 1.5px solid var(--ios-tertiary-label);
+    --checkbox-checked: var(--ios-tint);
+    --progress-height: 4px;
+    --progress-height-lg: 6px;
+    --progress-track: var(--ios-fill);
+    --progress-fill: var(--ios-tint);
+    --dialog-radius: 28px;
+    --dialog-bg: var(--ios-glass-bg);
+    --dialog-blur: var(--ios-glass-blur);
+    --dialog-title-size: 17px;
+    --dialog-title-weight: 600;
+    --dialog-title-align: center;
+    --dialog-body-color: var(--ios-label);
+    --dialog-actions-justify: stretch;
+    --toast-bg: var(--ios-glass-bg);
+    --toast-fg: var(--ios-label);
+    --toast-icon: var(--ios-tint);
+    --toast-radius: 24px;
+    --toast-blur: var(--ios-glass-blur);
+    --toast-border: var(--ios-glass-border);
+    /* Full-height panel: thick material so content behind never competes with the list */
+    --drawer-bg: rgba(255, 255, 255, 0.94);
+    --drawer-radius: 28px;
+    --drawer-width: min(320px, 82vw);
+    --drawer-inset: 8px;
+    --drawer-blur: var(--ios-glass-blur);
+    --drawer-border: var(--ios-glass-border);
+    --drawer-shadow: var(--ios-glass-shadow);
+    --nav-item-height: 44px;
+    --nav-item-radius: 22px;
+    --nav-active-bg: rgba(47, 116, 208, 0.14);
+    --nav-active-fg: var(--ios-tint);
+    --switch-on: #34C759;
+    --press-scale: 0.92;
+    --press-easing: var(--ios-spring);
+}
+
+:root[data-platform="ios"][data-theme="dark"],
+:root[data-platform="ios"][data-theme="dark"] body {
+    --ios-tint: #3B8AF0;
+    --ios-label: #FFFFFF;
+    --ios-secondary-label: rgba(235, 235, 245, 0.6);
+    --ios-tertiary-label: rgba(235, 235, 245, 0.3);
+    --ios-separator: rgba(84, 84, 88, 0.6);
+    --ios-grouped-bg: #000000;
+    --ios-grouped-secondary-bg: #1C1C1E;
+    --ios-grouped-tertiary-bg: #2C2C2E;
+    --ios-fill: rgba(120, 120, 128, 0.36);
+    --ios-tertiary-fill: rgba(118, 118, 128, 0.24);
+    --ios-glass-bg: rgba(44, 44, 46, 0.68);
+    --ios-glass-tint-bg: rgba(59, 138, 240, 0.88);
+    --ios-glass-border: 0.5px solid rgba(255, 255, 255, 0.16);
+    --ios-glass-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.3);
+
+    --primary: var(--ios-tint);
+    --primary-light: #64A2F4;
+    --primary-dark: #2F74D0;
+    --primary-rgb: 59, 138, 240;
+    --primary-light-bg: rgba(59, 138, 240, 0.2);
+    --secondary: #8E8E93;
+    --secondary-rgb: 142, 142, 147;
+    --danger: #FF453A;
+    --danger-rgb: 255, 69, 58;
+    --warning: #FF9F0A;
+    --warning-rgb: 255, 159, 10;
+    --success: #30D158;
+    --success-dark: #28A745;
+    --success-light: rgba(48, 209, 88, 0.18);
+    --success-rgb: 48, 209, 88;
+    --background: var(--ios-grouped-bg);
+    --surface: var(--ios-grouped-secondary-bg);
+    --surface-dark: var(--ios-grouped-tertiary-bg);
+    --card-bg: var(--ios-grouped-secondary-bg);
+    --text-primary: var(--ios-label);
+    --text-secondary: var(--ios-secondary-label);
+    --text-light: var(--ios-tertiary-label);
+    --border-color: var(--ios-separator);
+    --button-default-color: var(--ios-label);
+    --input-bg: var(--ios-tertiary-fill);
+    --input-border: transparent;
+    --input-focus-border: transparent;
+    --input-focus-shadow: transparent;
+    --overlay-bg: rgba(0, 0, 0, 0.45);
+    --modal-bg: var(--ios-grouped-tertiary-bg);
+    --hover-bg: var(--ios-tertiary-fill);
+    --hover-bg-light: var(--ios-tertiary-fill);
+    --disabled-bg: var(--ios-tertiary-fill);
+    --disabled-text: var(--ios-tertiary-label);
+    --shadow-sm: none;
+    --shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.45);
+    --shadow-lg: var(--ios-glass-shadow);
+
+    --btn-filled-bg: var(--ios-tint);
+    --btn-secondary-bg: var(--ios-fill);
+    --btn-secondary-fg: var(--ios-tint);
+    --field-bg: var(--ios-tertiary-fill);
+    --field-focus-ring: 0 0 0 2px rgba(59, 138, 240, 0.45);
+    --card-bg-native: var(--ios-grouped-secondary-bg);
+    --fab-bg: var(--ios-glass-tint-bg);
+    --fab-success-bg: rgba(48, 209, 88, 0.9);
+    --fab-shadow: var(--ios-glass-shadow);
+    --fab-border: 0.5px solid rgba(255, 255, 255, 0.25);
+    --small-fab-bg: var(--ios-glass-bg);
+    --small-fab-fg: var(--ios-tint);
+    --search-bg: var(--ios-tertiary-fill);
+    --menu-bg: var(--ios-glass-bg);
+    --menu-border: var(--ios-glass-border);
+    --menu-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+    --checkbox-border: 1.5px solid var(--ios-tertiary-label);
+    --checkbox-checked: var(--ios-tint);
+    --progress-track: var(--ios-fill);
+    --progress-fill: var(--ios-tint);
+    --dialog-bg: var(--ios-glass-bg);
+    --dialog-body-color: var(--ios-label);
+    --toast-bg: var(--ios-glass-bg);
+    --toast-fg: var(--ios-label);
+    --toast-icon: var(--ios-tint);
+    --toast-border: var(--ios-glass-border);
+    --drawer-bg: rgba(28, 28, 30, 0.94);
+    --drawer-border: var(--ios-glass-border);
+    --drawer-shadow: var(--ios-glass-shadow);
+    --app-bar-icon-bg: var(--ios-glass-bg);
+    --app-bar-icon-border: var(--ios-glass-border);
+    --app-bar-icon-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+    --nav-active-bg: rgba(59, 138, 240, 0.2);
+    --nav-active-fg: var(--ios-tint);
+    --switch-on: #30D158;
+}
+
+/* ---------------------------------------------------------------------
+   3. Shared native components (driven by the tokens above)
+   --------------------------------------------------------------------- */
+
+/* Base */
+:root.platform-native body {
+    font-size: var(--text-body);
+    -webkit-font-smoothing: antialiased;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+}
+
+:root.platform-native button,
+:root.platform-native [role="button"],
+:root.platform-native a {
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Base form fields: element-level specificity beats app.css (loaded earlier)
+   while component classes still win */
+:where(:root.platform-native) input:where(:not([type="checkbox"]):not([type="radio"]):not([type="range"])),
+:where(:root.platform-native) select,
+:where(:root.platform-native) textarea {
+    border-radius: var(--field-radius);
+    background-color: var(--field-bg);
+    border: var(--field-border);
+    font-size: var(--field-font-size);
+}
+
+:where(:root.platform-native) input:where(:not([type="checkbox"]):not([type="radio"])):focus,
+:where(:root.platform-native) select:focus,
+:where(:root.platform-native) textarea:focus {
+    border-color: var(--input-focus-border);
+    box-shadow: var(--field-focus-ring);
+}
+
+/* Common buttons (also overrides the page-level .btn copy in EditPacking) */
+:root.platform-native .btn,
+:root.platform-native .btn.primary,
+:root.platform-native .btn.btn-primary,
+:root.platform-native .btn.cancel {
+    min-height: var(--btn-height);
+    border-radius: var(--btn-radius);
+    padding: var(--btn-padding);
+    font-size: var(--btn-font-size);
+    font-weight: var(--btn-font-weight);
+    letter-spacing: 0.01em;
+    box-shadow: none;
+    transition: background-color var(--transition-fast), transform var(--transition-fast);
+}
+
+:root.platform-native .btn.primary,
+:root.platform-native .btn.btn-primary {
+    background: var(--btn-filled-bg);
+    color: var(--btn-filled-fg);
+}
+
+:root.platform-native .btn.cancel {
+    background: var(--btn-secondary-bg);
+    color: var(--btn-secondary-fg);
+    border: var(--btn-secondary-border);
+}
+
+:root.platform-native .btn:active:not(:disabled) {
+    transform: scale(0.97);
+}
+
+:root.platform-native .btn:disabled,
+:root.platform-native .btn.primary:disabled {
+    background: var(--disabled-bg);
+    color: var(--disabled-text);
+    opacity: 1;
+}
+
+/* Top app bar / navigation bar */
+:root.platform-native .top-row {
+    min-height: var(--app-bar-height);
+    background: var(--background);
+}
+
+:root.platform-native .top-row .container-fluid {
+    gap: 4px;
+}
+
+:root.platform-native .navbar-toggler {
+    width: var(--touch-target);
+    height: var(--touch-target);
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: 50%;
+    border: var(--app-bar-icon-border);
+    background: var(--app-bar-icon-bg);
+    box-shadow: var(--app-bar-icon-shadow);
+    -webkit-backdrop-filter: var(--app-bar-icon-blur);
+    backdrop-filter: var(--app-bar-icon-blur);
+    color: var(--app-bar-icon-fg);
+}
+
+:root.platform-native .navbar-toggler:hover {
+    border-color: transparent;
+    box-shadow: var(--app-bar-icon-shadow);
+}
+
+:root.platform-native .navbar-toggler:active {
+    background-color: var(--hover-bg);
+    transform: scale(var(--press-scale));
+}
+
+:root.platform-native .navbar-toggler-icon {
+    width: 24px;
+    height: 24px;
+}
+
+:root.platform-native .navigation-header-text {
+    height: auto;
+    min-height: var(--touch-target);
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    padding: 0 8px;
+    justify-content: var(--app-bar-title-align);
+}
+
+:root.platform-native .navigation-header-text span {
+    font-size: var(--text-title);
+    font-weight: var(--text-title-weight);
+    color: var(--text-primary);
+    line-height: 1.27;
+}
+
+/* Navigation drawer (mobile) */
+@media (max-width: 640px) {
+    :root.platform-native .nav-menu-expanded {
+        z-index: 1100; /* above the FABs */
+        background-color: var(--overlay-bg);
+        padding: 0;
+        animation: platformScrimIn var(--transition) both;
+    }
+
+    :root.platform-native .nav-menu-expanded nav {
+        position: absolute;
+        top: var(--drawer-inset);
+        bottom: var(--drawer-inset);
+        left: var(--drawer-inset);
+        width: var(--drawer-width);
+        padding: calc(var(--safe-area-top) + 24px) 12px calc(var(--safe-area-bottom) + 12px);
+        box-sizing: border-box;
+        overflow-y: auto;
+        background: var(--drawer-bg);
+        border: var(--drawer-border);
+        border-radius: var(--drawer-radius);
+        box-shadow: var(--drawer-shadow);
+        -webkit-backdrop-filter: var(--drawer-blur);
+        backdrop-filter: var(--drawer-blur);
+        animation: platformDrawerIn var(--transition) both;
+    }
+}
+
+:root.platform-native .nav-item {
+    padding: 0;
+}
+
+:root.platform-native .nav-item .nav-link {
+    height: var(--nav-item-height);
+    border-radius: var(--nav-item-radius);
+    padding: 0 16px;
+    font-size: var(--text-label);
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+:root.platform-native .nav-item .nav-link i.fa {
+    width: 24px;
+    margin-right: 12px;
+    color: inherit;
+}
+
+:root.platform-native .nav-item .nav-link.active {
+    background: var(--nav-active-bg);
+    color: var(--nav-active-fg);
+    font-weight: 600;
+}
+
+@keyframes platformScrimIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes platformDrawerIn {
+    from { transform: translateX(-24px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+/* Floating action buttons */
+:root.platform-native .add-fab,
+:root.platform-native .edit-fab,
+:root.platform-native .play-fab {
+    width: var(--fab-size);
+    height: var(--fab-size);
+    right: max(var(--fab-offset), var(--safe-area-right));
+    bottom: calc(var(--fab-offset) + var(--bottom-inset));
+    border-radius: var(--fab-radius);
+    border: var(--fab-border);
+    background: var(--fab-bg);
+    color: var(--fab-fg);
+    box-shadow: var(--fab-shadow);
+    -webkit-backdrop-filter: var(--fab-blur);
+    backdrop-filter: var(--fab-blur);
+    font-size: var(--fab-icon-size);
+    transition: transform 250ms var(--press-easing), box-shadow var(--transition-fast);
+}
+
+:root.platform-native .play-fab {
+    background: var(--fab-success-bg);
+    color: var(--fab-success-fg);
+}
+
+:root.platform-native .add-fab:hover,
+:root.platform-native .edit-fab:hover,
+:root.platform-native .play-fab:hover {
+    transform: none;
+    box-shadow: var(--fab-shadow);
+}
+
+:root.platform-native .add-fab:active,
+:root.platform-native .edit-fab:active,
+:root.platform-native .play-fab:active {
+    transform: scale(var(--press-scale));
+}
+
+:root.platform-native .scroll-to-top-fab {
+    width: var(--small-fab-size);
+    height: var(--small-fab-size);
+    left: max(var(--fab-offset), var(--safe-area-left));
+    bottom: calc(var(--fab-offset) + var(--bottom-inset) + (var(--fab-size) - var(--small-fab-size)) / 2);
+    border-radius: var(--small-fab-radius);
+    border: var(--fab-border);
+    background: var(--small-fab-bg);
+    color: var(--small-fab-fg);
+    box-shadow: var(--fab-shadow);
+    -webkit-backdrop-filter: var(--fab-blur);
+    backdrop-filter: var(--fab-blur);
+}
+
+:root.platform-native .scroll-to-top-fab:hover {
+    background: var(--small-fab-bg);
+    color: var(--small-fab-fg);
+    transform: none;
+}
+
+/* Touch screens: hover styles would stick after a tap */
+@media (hover: none) {
+    :root.platform-native .packing-row:hover,
+    :root.platform-native .category-header:hover,
+    :root.platform-native .settings-panel .settings-header:hover,
+    :root.platform-native .history-header:hover,
+    :root.platform-native .menu-item:hover,
+    :root.platform-native .action-dropdown .dropdown-item:hover {
+        background: transparent;
+    }
+
+    :root[data-platform="android"] .filter-chip:hover:not(.active) {
+        background: transparent;
+        border-color: var(--md-outline-variant);
+        color: var(--md-on-surface-variant);
+    }
+
+    :root[data-platform="ios"] .filter-chip:hover:not(.active) {
+        background: transparent;
+        color: var(--ios-label);
+    }
+}
+
+/* Search */
+:root.platform-native .sticky-header {
+    box-shadow: none;
+    padding: 8px 12px 4px;
+}
+
+:root.platform-native .search-bar {
+    min-height: var(--search-height);
+    padding: 0 16px;
+    gap: 12px;
+    border: none;
+    border-radius: var(--search-radius);
+    background: var(--search-bg);
+}
+
+:root.platform-native .search-input {
+    font-size: var(--search-font-size);
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+}
+
+:root.platform-native .search-icon {
+    font-size: 16px;
+    color: var(--text-secondary);
+}
+
+:root.platform-native .search-clear-btn {
+    width: var(--touch-target);
+    height: var(--touch-target);
+    margin-right: -12px;
+}
+
+:root.platform-native .filter-bar {
+    padding: 8px 0 4px;
+    border: none;
+}
+
+/* Cards and grouped containers */
+:root.platform-native .activity-card,
+:root.platform-native .settings-panel,
+:root.platform-native .progress-container,
+:root.platform-native .onboarding-card,
+:root.platform-native .add-item-form,
+:root.platform-native .category {
+    background: var(--card-bg-native);
+    border: var(--card-border);
+    border-radius: var(--card-radius);
+    box-shadow: var(--card-shadow);
+}
+
+:root.platform-native .activity-card:hover,
+:root.platform-native .category:hover {
+    box-shadow: var(--card-shadow);
+    transform: none;
+}
+
+:root.platform-native .activity-card:active {
+    transform: scale(0.985);
+    transition: transform 200ms var(--press-easing);
+}
+
+:root.platform-native .card-header {
+    padding: 16px;
+}
+
+:root.platform-native .activity-title {
+    font-size: var(--text-card-title);
+    font-weight: 600;
+}
+
+/* Edit page activity panel (the Settings page reuses the class name for its banner) */
+:root.platform-native .settings-panel .settings-header {
+    min-height: var(--list-row-min);
+    background: transparent;
+    border-radius: var(--card-radius);
+}
+
+/* Settings page banner repeats the app bar title */
+:root.platform-native .settings-page > .settings-header {
+    display: none;
+}
+
+/* Play mode wraps its categories in another card - flatten it */
+:root.platform-native .content-area {
+    background: transparent;
+    box-shadow: none;
+    padding: 0 0 calc(var(--fab-size) + var(--fab-offset) * 2);
+}
+
+:root.platform-native .activity-header {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+    min-height: var(--touch-target);
+}
+
+/* Icon buttons */
+:root.platform-native .btn-menu,
+:root.platform-native .overflow-btn,
+:root.platform-native .activity-actions .icon-btn,
+:root.platform-native .toggle-visibility-btn {
+    width: var(--touch-target);
+    height: var(--touch-target);
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--text-secondary);
+    font-size: 18px;
+}
+
+:root.platform-native .btn-menu:active,
+:root.platform-native .overflow-btn:active,
+:root.platform-native .activity-actions .icon-btn:active,
+:root.platform-native .toggle-visibility-btn:active {
+    background: var(--hover-bg);
+    transform: none;
+}
+
+:root.platform-native .activity-actions .icon-btn:focus,
+:root.platform-native .toggle-visibility-btn:focus {
+    box-shadow: none;
+}
+
+:root.platform-native .toggle-visibility-btn.filtering {
+    background: var(--nav-active-bg);
+    color: var(--nav-active-fg);
+}
+
+:root.platform-native .activity-actions .icon-btn:disabled {
+    color: var(--disabled-text);
+    background: transparent;
+}
+
+/* Menus */
+:root.platform-native .menu-dropdown,
+:root.platform-native .action-dropdown {
+    padding: 8px 0;
+    min-width: 200px;
+    border: var(--menu-border);
+    border-radius: var(--menu-radius);
+    background: var(--menu-bg);
+    box-shadow: var(--menu-shadow);
+    -webkit-backdrop-filter: var(--menu-blur);
+    backdrop-filter: var(--menu-blur);
+}
+
+:root.platform-native .menu-item,
+:root.platform-native .action-dropdown .dropdown-item {
+    min-height: var(--menu-item-height);
+    padding: 0 16px;
+    gap: 12px;
+    border-radius: 0;
+    font-size: var(--menu-font-size);
+    font-weight: 400;
+    color: var(--text-primary);
+}
+
+:root.platform-native .menu-item i,
+:root.platform-native .action-dropdown .dropdown-item i {
+    font-size: 18px;
+    width: 24px;
+}
+
+:root.platform-native .menu-item.danger,
+:root.platform-native .menu-item.danger i,
+:root.platform-native .action-dropdown .dropdown-item.delete-item,
+:root.platform-native .action-dropdown .dropdown-item.delete-item i {
+    color: var(--danger);
+}
+
+/* Category headers and list rows */
+:root.platform-native .category-header {
+    min-height: var(--list-row-min);
+    padding: 0 16px;
+    background: transparent;
+    box-sizing: border-box;
+}
+
+:root.platform-native .category-header:active {
+    transform: none;
+    background: var(--hover-bg);
+}
+
+:root.platform-native .category-completed {
+    background: var(--card-bg-native);
+}
+
+:root.platform-native .count {
+    background: var(--hover-bg);
+    border-radius: 999px;
+}
+
+:root.platform-native .item-main {
+    min-height: var(--list-row-min);
+    padding: 8px 16px;
+    gap: 16px;
+    box-sizing: border-box;
+}
+
+:root.platform-native .item-main:active {
+    transform: none;
+}
+
+:root.platform-native .item-text {
+    font-size: var(--text-item);
+    font-weight: 400;
+    letter-spacing: normal;
+}
+
+:root.platform-native .packing-row {
+    border-bottom-width: 0.5px;
+}
+
+/* Checkboxes */
+:root.platform-native .round-checkbox input[type="checkbox"],
+:root.platform-native .round-checkbox label {
+    width: var(--checkbox-size);
+    height: var(--checkbox-size);
+}
+
+:root.platform-native .round-checkbox label {
+    border: var(--checkbox-border);
+    border-radius: var(--checkbox-radius);
+    background: transparent;
+    box-sizing: border-box;
+}
+
+:root.platform-native .round-checkbox input[type="checkbox"]:checked + label {
+    background: var(--checkbox-checked);
+    border-color: var(--checkbox-checked);
+    transform: none;
+}
+
+:root.platform-native .round-checkbox label::after {
+    font-size: calc(var(--checkbox-size) * 0.65);
+}
+
+/* Progress indicators */
+:root.platform-native .progress-bar,
+:root.platform-native .progress-bar-container {
+    background: var(--progress-track);
+    border-radius: 999px;
+}
+
+:root.platform-native .progress-bar-container {
+    height: var(--progress-height);
+}
+
+:root.platform-native .progress-bar {
+    height: var(--progress-height-lg);
+}
+
+:root.platform-native .progress-fill,
+:root.platform-native .progress-bar-fill {
+    background: var(--progress-fill);
+    border-radius: 999px;
+}
+
+:root.platform-native .progress-bar-fill.completed {
+    background: var(--success);
+}
+
+/* Switches */
+:root.platform-native .toggle-switch input:checked + .toggle-slider,
+:root.platform-native .toggle-switch input:checked ~ .toggle-slider {
+    background: var(--switch-on);
+}
+
+/* Bottom history panel reads as a sheet */
+:root.platform-native .history-panel {
+    background: var(--card-bg-native);
+    border-top: none;
+    border-radius: var(--border-radius-xl) var(--border-radius-xl) 0 0;
+    box-shadow: var(--shadow-md);
+    max-height: calc(56px + var(--bottom-inset));
+    padding-bottom: var(--bottom-inset);
+}
+
+/* Play mode: keep the edit FAB above the collapsed history sheet */
+:root.platform-native .edit-fab {
+    bottom: calc(56px + var(--fab-offset) + var(--bottom-inset));
+}
+
+:root.platform-native .history-header {
+    min-height: 56px;
+    border-bottom: none;
+    box-sizing: border-box;
+}
+
+/* Dialogs */
+:root.platform-native .dialog-overlay {
+    backdrop-filter: none;
+}
+
+:root.platform-native .dialog {
+    border-radius: var(--dialog-radius);
+    background: var(--dialog-bg);
+    -webkit-backdrop-filter: var(--dialog-blur);
+    backdrop-filter: var(--dialog-blur);
+    box-shadow: var(--shadow-lg);
+    max-width: 400px;
+}
+
+:root.platform-native .dialog-header {
+    padding: 24px 24px 0;
+    border-bottom: none;
+}
+
+:root.platform-native .dialog-title,
+:root.platform-native .dialog.info .dialog-title,
+:root.platform-native .dialog.success .dialog-title,
+:root.platform-native .dialog.warning .dialog-title,
+:root.platform-native .dialog.error .dialog-title {
+    flex: 1;
+    color: var(--text-primary);
+    font-size: var(--dialog-title-size);
+    font-weight: var(--dialog-title-weight);
+    text-align: var(--dialog-title-align);
+}
+
+:root.platform-native .dialog-content {
+    padding: 16px 24px 0;
+    color: var(--dialog-body-color);
+    font-size: 15px;
+    line-height: 1.43;
+}
+
+/* Neither M3 dialogs nor iOS alerts use a close glyph; actions dismiss */
+:root.platform-native .close-button {
+    display: none;
+}
+
+:root.platform-native .dialog-content p:last-child {
+    margin-bottom: 0;
+}
+
+:root.platform-native .dialog-footer {
+    padding: 24px;
+    border-top: none;
+    flex-direction: row;
+    justify-content: var(--dialog-actions-justify);
+    gap: 8px;
+}
+
+/* Dismissive action first, confirming action last (trailing) on both platforms */
+:root.platform-native .button-cancel {
+    order: 1;
+}
+
+:root.platform-native .button-confirm,
+:root.platform-native .button-primary {
+    order: 2;
+}
+
+:root.platform-native .dialog-button {
+    width: auto;
+    min-width: 0;
+    margin: 0;
+    text-transform: none;
+    letter-spacing: 0.01em;
+    box-shadow: none;
+    transform: none;
+}
+
+/* Toasts / snackbars */
+:root.platform-native .toast {
+    min-height: 48px;
+    padding: 6px 8px 6px 16px;
+    box-sizing: border-box;
+    border: var(--toast-border);
+    border-radius: var(--toast-radius);
+    background: var(--toast-bg);
+    color: var(--toast-fg);
+    box-shadow: var(--shadow-lg);
+    -webkit-backdrop-filter: var(--toast-blur);
+    backdrop-filter: var(--toast-blur);
+}
+
+:root.platform-native .toast-body,
+:root.platform-native .toast-close {
+    color: var(--toast-fg);
+    font-size: var(--text-label);
+}
+
+:root.platform-native .toast-close {
+    width: var(--touch-target);
+    height: var(--touch-target);
+    opacity: 0.8;
+}
+
+:root.platform-native .toast-icon,
+:root.platform-native .toast-success .toast-icon,
+:root.platform-native .toast-info .toast-icon {
+    color: var(--toast-icon);
+}
+
+/* ---------------------------------------------------------------------
+   4. Android-only details (Material 3)
+   --------------------------------------------------------------------- */
+
+/* Filter chips: 32dp, 8dp corners, tonal when selected */
+:root[data-platform="android"] .filter-chip {
+    height: 32px;
+    padding: 0 16px;
+    gap: 8px;
+    border-radius: 8px;
+    border: 1px solid var(--md-outline-variant);
+    background: transparent;
+    color: var(--md-on-surface-variant);
+    font-size: 14px;
+    font-weight: 500;
+}
+
+:root[data-platform="android"] .filter-chip.active {
+    background: var(--md-secondary-container);
+    border-color: transparent;
+    color: var(--md-on-secondary-container);
+}
+
+:root[data-platform="android"] .filter-chip i {
+    font-size: 14px;
+}
+
+/* Check mark uses on-primary so it stays legible on the tonal dark primary */
+:root[data-platform="android"] .round-checkbox label::after {
+    color: var(--md-on-primary);
+}
+
+/* Snackbar sits above the FAB; destructive / warning variants keep a tinted icon */
+:root[data-platform="android"] .toast-container {
+    bottom: calc(var(--fab-offset) * 2 + var(--fab-size) + var(--bottom-inset));
+}
+
+:root[data-platform="android"] .toast-error .toast-icon {
+    color: #FFB4AB;
+}
+
+:root[data-platform="android"] .toast-warning .toast-icon {
+    color: #FFB95C;
+}
+
+/* M3 dialog actions are text buttons */
+:root[data-platform="android"] .dialog-button {
+    height: 40px;
+    padding: 0 12px;
+    border: none;
+    border-radius: 20px;
+    background: transparent;
+    color: var(--md-primary);
+    font-size: 14px;
+    font-weight: 500;
+}
+
+:root[data-platform="android"] .dialog-button:active {
+    background: var(--md-secondary-container);
+}
+
+:root[data-platform="android"] .dialog.warning .button-confirm,
+:root[data-platform="android"] .dialog.error .button-confirm {
+    color: var(--danger);
+}
+
+:root[data-platform="android"] .dialog-header,
+:root[data-platform="android"] .dialog.info .dialog-header,
+:root[data-platform="android"] .dialog.success .dialog-header,
+:root[data-platform="android"] .dialog.warning .dialog-header,
+:root[data-platform="android"] .dialog.error .dialog-header {
+    background: transparent;
+}
+
+/* ---------------------------------------------------------------------
+   5. iOS-only details (HIG / Liquid Glass)
+   --------------------------------------------------------------------- */
+
+/* Archive filter becomes a segmented control */
+:root[data-platform="ios"] .filter-chips {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
+    gap: 0;
+    padding: 2px;
+    border-radius: 999px;
+    background: var(--ios-tertiary-fill);
+}
+
+:root[data-platform="ios"] .filter-chip {
+    height: 32px;
+    justify-content: center;
+    padding: 0 12px;
+    border: none;
+    border-radius: 999px;
+    background: transparent;
+    color: var(--ios-label);
+    font-size: 13px;
+    font-weight: 500;
+}
+
+:root[data-platform="ios"] .filter-chip.active {
+    background: var(--ios-grouped-secondary-bg);
+    color: var(--ios-label);
+    font-weight: 600;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12), 0 1px 1px rgba(0, 0, 0, 0.04);
+}
+
+:root[data-platform="ios"][data-theme="dark"] .filter-chip.active {
+    background: #636366;
+}
+
+:root[data-platform="ios"] .filter-chip i {
+    display: none;
+}
+
+/* Balance the centered title against the menu button */
+:root[data-platform="ios"] .navigation-header-text {
+    margin-right: var(--touch-target);
+}
+
+/* Hairline separators */
+:root[data-platform="ios"] .packing-row,
+:root[data-platform="ios"] .category-header {
+    border-bottom: 0.5px solid var(--ios-separator);
+}
+
+/* Checked rows dim instead of striking through, like Reminders */
+:root[data-platform="ios"] .item-text.checked {
+    text-decoration: none;
+    color: var(--ios-secondary-label);
+    opacity: 1;
+}
+
+/* Alert-style dialog: centered, capsule buttons sharing the row */
+:root[data-platform="ios"] .dialog-header {
+    padding: 22px 20px 0;
+}
+
+:root[data-platform="ios"] .dialog-content {
+    padding: 8px 20px 0;
+    text-align: center;
+    font-size: 15px;
+}
+
+:root[data-platform="ios"] .dialog-footer {
+    padding: 20px;
+}
+
+:root[data-platform="ios"] .dialog-button {
+    flex: 1;
+    height: 48px;
+    border: none;
+    border-radius: 24px;
+    background: var(--ios-fill);
+    color: var(--ios-label);
+    font-size: 17px;
+    font-weight: 600;
+}
+
+:root[data-platform="ios"] .button-confirm,
+:root[data-platform="ios"] .button-primary {
+    background: var(--ios-tint);
+    color: #FFFFFF;
+}
+
+:root[data-platform="ios"] .dialog.warning .button-confirm,
+:root[data-platform="ios"] .dialog.error .button-confirm {
+    background: var(--danger);
+}
+
+:root[data-platform="ios"] .dialog-header,
+:root[data-platform="ios"] .dialog.info .dialog-header,
+:root[data-platform="ios"] .dialog.success .dialog-header,
+:root[data-platform="ios"] .dialog.warning .dialog-header,
+:root[data-platform="ios"] .dialog.error .dialog-header {
+    background: transparent;
+}
+
+/* Toast becomes a glass capsule at the top, like system HUDs */
+:root[data-platform="ios"] .toast-container {
+    top: calc(var(--safe-area-top) + 8px);
+    bottom: auto;
+    flex-direction: column;
+}
+
+:root[data-platform="ios"] .toast {
+    width: auto;
+    max-width: min(28rem, calc(100vw - 32px));
+    margin: 0 auto;
+}
+
+:root[data-platform="ios"] .toast.show {
+    animation: platformToastDown 400ms var(--ios-spring);
+}
+
+:root[data-platform="ios"] .toast-error .toast-icon {
+    color: var(--danger);
+}
+
+:root[data-platform="ios"] .toast-warning .toast-icon {
+    color: var(--warning);
+}
+
+@keyframes platformToastDown {
+    from { opacity: 0; transform: translateY(-16px) scale(0.96); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Large-title feel for the drawer list on iOS */
+:root[data-platform="ios"] .nav-item .nav-link {
+    font-size: 17px;
+    font-weight: 400;
+    color: var(--ios-label);
+}
+
+:root[data-platform="ios"] .nav-item .nav-link i.fa {
+    color: var(--ios-tint);
+}

@@ -17,7 +17,7 @@
     border-color: var(--border-color);
     border-radius: 8px;
     padding: 0.5rem 0.75rem;
-    color: #fff;
+    color: var(--text-primary);
     display: flex;
     align-items: center;
     text-align: left;

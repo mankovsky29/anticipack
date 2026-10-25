@@ -2,6 +2,7 @@ using Anticipack.API.Data;
 using Anticipack.API.Repositories;
 using Anticipack.API.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -11,7 +12,8 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddProblemDetails();
-builder.Services.AddHealthChecks();
+builder.Services.AddHealthChecks()
+    .AddDbContextCheck<ApplicationDbContext>(tags: ["ready"]);
 
 // Configure JWT Authentication
 // NOTE: Development may read secrets from appsettings/user-secrets.
@@ -101,7 +103,8 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-app.MapHealthChecks("/health/live");
-app.MapHealthChecks("/health/ready");
+// Liveness runs no checks (process is up); readiness verifies the database is reachable
+app.MapHealthChecks("/health/live", new HealthCheckOptions { Predicate = _ => false });
+app.MapHealthChecks("/health/ready", new HealthCheckOptions { Predicate = check => check.Tags.Contains("ready") });
 
 app.Run();

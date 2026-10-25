@@ -201,7 +201,13 @@ public partial class EditPacking : IAsyncDisposable
 
         try
         {
-            _currentActivity = await PackingRepository.GetByIdAsync(id) ?? new Storage.PackingActivity(){ Name = AppResources.NewPackingActivity };
+            // Keep the route id on the fallback so items added here and the saved activity stay linked
+            _currentActivity = await PackingRepository.GetByIdAsync(id) ?? new Storage.PackingActivity()
+            {
+                Id = id,
+                Name = AppResources.NewPackingActivity,
+                LastPacked = DateTime.Now
+            };
             _activityName = _currentActivity.Name ?? AppResources.NewPackingActivity;
             NavigationHeaderService.SetText(_currentActivity.Name ?? "");
             var itemsFromRepo = await PackingRepository.GetItemsForActivityAsync(id);
@@ -855,13 +861,16 @@ public partial class EditPacking : IAsyncDisposable
         if (string.IsNullOrWhiteSpace(Id))
             return;
 
-        if (NewActivity && !Items.Any())
+        // Discard an abandoned empty new activity, but not when navigating to another view of it (e.g. Play)
+        var targetIsSameActivity = context.TargetLocation.Contains(Id, StringComparison.OrdinalIgnoreCase);
+        if (NewActivity && !Items.Any() && !targetIsSameActivity)
         {
             context.PreventNavigation();
             _isDeleting = true;
             try
             {
                 await PackingRepository.DeleteAsync(Id);
+                NewActivity = false;
                 Navigation.NavigateTo(context.TargetLocation);
             }
             catch (Exception ex)

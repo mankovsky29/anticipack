@@ -78,7 +78,20 @@
         <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.0" />
         <PackageReference Include="Plugin.InAppBilling" Version="8.0.4" />
         <PackageReference Include="sqlite-net-pcl" Version="1.9.172" />
+        <!-- Lift sqlite-net-pcl's transitive SQLitePCLRaw 2.1.2 so provider, core and native libs stay in sync
+             (bundle_green itself stops at 2.1.11, so pin the provider and native lib directly) -->
+        <PackageReference Include="SQLitePCLRaw.provider.e_sqlite3" Version="2.1.13" />
+    </ItemGroup>
+
+    <!-- Desktop native lib only: on Android its runtimes/linux-x64 glibc build gets packed as lib/x86_64
+         and fails to dlopen ("libc.so.6 not found"), shadowing the real Android build -->
+    <ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) != 'android'">
         <PackageReference Include="SQLitePCLRaw.lib.e_sqlite3" Version="2.1.13" />
+    </ItemGroup>
+
+    <ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">
+        <!-- 2.1.10+ native lib is built with 16 KB page alignment (required for Android 15+ devices) -->
+        <!-- Native libs ship inside the package's .aar (jni/<abi>/libe_sqlite3.so) and are packed automatically -->
         <PackageReference Include="SQLitePCLRaw.lib.e_sqlite3.android" Version="2.1.13" />
     </ItemGroup>
 

@@ -164,21 +164,21 @@ public partial class PlayPacking
         _manualOverride[category] = !currentlyCollapsed;
     }
 
-    private void SetItemChecked(PackingItemView item, bool isChecked)
+    private async Task SetItemChecked(PackingItemView item, bool isChecked)
     {
         item.IsChecked = isChecked;
         UpdateCategoryStateAfterItemChange(item.Item.Category);
-        SaveCheckState(item);
+        await SaveCheckStateAsync(item);
     }
 
-    private void ToggleItemChecked(PackingItemView item)
+    private async Task ToggleItemChecked(PackingItemView item)
     {
         item.IsChecked = !item.IsChecked;
         UpdateCategoryStateAfterItemChange(item.Item.Category);
-        SaveCheckState(item);
+        await SaveCheckStateAsync(item);
     }
 
-    private async void SaveCheckState(PackingItemView item)
+    private async Task SaveCheckStateAsync(PackingItemView item)
     {
         if (!string.IsNullOrEmpty(Id))
         {
@@ -224,7 +224,7 @@ public partial class PlayPacking
         return IsAllChecked(category);
     }
 
-    private void HandleKeyboardNavigation(KeyboardEventArgs e)
+    private async Task HandleKeyboardNavigation(KeyboardEventArgs e)
     {
         var itemsList = Items.ToList();
 
@@ -238,7 +238,7 @@ public partial class PlayPacking
                 break;
             case " ": // Space key
                 if (_currentFocusIndex >= 0 && _currentFocusIndex < itemsList.Count)
-                    ToggleItemChecked(itemsList[_currentFocusIndex]);
+                    await ToggleItemChecked(itemsList[_currentFocusIndex]);
                 break;
         }
 
@@ -438,14 +438,14 @@ public partial class PlayPacking
                 UpdateCategoryStateAfterItemChange(item.Item.Category);
                                 
                 // Save the change to repository
-                SaveCheckState(item);
+                await SaveCheckStateAsync(item);
             }
             catch (Exception ex)
             {
                 // Fallback if animation fails
                 item.IsChecked = isChecked;
                 UpdateCategoryStateAfterItemChange(item.Item.Category);
-                SaveCheckState(item);
+                await SaveCheckStateAsync(item);
             }
             finally
             {
@@ -464,7 +464,7 @@ public partial class PlayPacking
             item.IsChecked = isChecked;
             
             UpdateCategoryStateAfterItemChange(item.Item.Category);
-            SaveCheckState(item);
+            await SaveCheckStateAsync(item);
             
             if (_hideCheckedItems)
             {

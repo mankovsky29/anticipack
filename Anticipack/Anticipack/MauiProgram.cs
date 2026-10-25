@@ -116,8 +116,10 @@ namespace Anticipack
                 ApiKey = "", // TODO: Set your Gemini API key
                 Model = "gemini-2.0-flash"
             });
-            builder.Services.AddSingleton<HttpClient>();
-            builder.Services.AddSingleton<IAiSuggestionService, GeminiSuggestionService>();
+            builder.Services.AddHttpClient<IAiSuggestionService, GeminiSuggestionService>(client =>
+            {
+                client.Timeout = TimeSpan.FromSeconds(30);
+            });
 
             var app = builder.Build();
 

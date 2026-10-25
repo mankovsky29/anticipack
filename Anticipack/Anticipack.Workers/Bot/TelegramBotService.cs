@@ -55,7 +55,7 @@ public class TelegramBotService : BackgroundService
                     foreach (var update in updates)
                     {
                         offset = update.Id + 1;
-                        _ = ProcessUpdateAsync(update, stoppingToken);
+                        await ProcessUpdateAsync(update, stoppingToken);
                     }
                 }
                 catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)

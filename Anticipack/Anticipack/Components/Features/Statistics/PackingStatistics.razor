@@ -8,269 +8,134 @@
             <span>@Localizer["Loading"]</span>
         </div>
     }
-    else if (_stats is not null)
+    else if (_insights is not null)
     {
-        <div class="stats-page">
-            <!-- Overview Cards -->
-            <section class="stats-section">
-                <h2 class="section-title">
-                    <i class="fa fa-chart-bar"></i>
-                    @Localizer["StatsOverview"]
-                </h2>
-                <div class="overview-grid">
-                    <div class="overview-card">
-                        <div class="overview-icon activities">
-                            <i class="fa fa-layer-group"></i>
-                        </div>
-                        <div class="overview-value">@_stats.TotalActivities</div>
-                        <div class="overview-label">@Localizer["StatsTotalActivities"]</div>
+        <div class="insights-page">
+            <!-- Personal summary -->
+            @if (_insights.HasHistory)
+            {
+                <section class="summary-grid">
+                    <div class="summary-tile">
+                        <div class="summary-value">@_insights.TripsThisYear</div>
+                        <div class="summary-label">@Localizer["TripsThisYear"]</div>
                     </div>
-                    <div class="overview-card">
-                        <div class="overview-icon sessions">
-                            <i class="fa fa-play-circle"></i>
+                    @if (_insights.PackingTimeThisYear > TimeSpan.Zero)
+                    {
+                        <div class="summary-tile">
+                            <div class="summary-value">@PackingDurationFormatter.Format(_insights.PackingTimeThisYear, Localizer)</div>
+                            <div class="summary-label">@Localizer["PackingTimeThisYear"]</div>
                         </div>
-                        <div class="overview-value">@_stats.TotalSessions</div>
-                        <div class="overview-label">@Localizer["StatsTotalSessions"]</div>
-                    </div>
-                    <div class="overview-card">
-                        <div class="overview-icon items">
-                            <i class="fa fa-box"></i>
-                        </div>
-                        <div class="overview-value">@_stats.TotalItemsPacked</div>
-                        <div class="overview-label">@Localizer["StatsItemsPacked"]</div>
-                    </div>
-                    <div class="overview-card">
-                        <div class="overview-icon efficiency">
-                            <i class="fa fa-bullseye"></i>
-                        </div>
-                        <div class="overview-value">@_stats.OverallEfficiency%</div>
-                        <div class="overview-label">@Localizer["StatsEfficiency"]</div>
-                    </div>
+                    }
+                    @if (_insights.GoToList is not null)
+                    {
+                        <button class="summary-tile summary-tile-wide" @onclick="() => OpenForPacking(_insights.GoToList)">
+                            <div class="summary-label">@Localizer["GoToList"]</div>
+                            <div class="summary-name">@_insights.GoToList.Name</div>
+                            <div class="summary-detail">@string.Format(Localizer["GoToListTrips"], _insights.GoToListTrips)</div>
+                        </button>
+                    }
+                </section>
+            }
+            else
+            {
+                <div class="insights-hint">
+                    <i class="fa fa-info-circle" aria-hidden="true"></i>
+                    <p>@Localizer["InsightsEmptyHint"]</p>
                 </div>
-            </section>
-
-            <!-- Time Stats -->
-            @if (_stats.TotalSessions > 0)
-            {
-                <section class="stats-section">
-                    <h2 class="section-title">
-                        <i class="fa fa-clock"></i>
-                        @Localizer["StatsTimeTitle"]
-                    </h2>
-                    <div class="time-stats-grid">
-                        <div class="time-stat-card">
-                            <div class="time-stat-icon">
-                                <i class="fa fa-hourglass-half"></i>
-                            </div>
-                            <div class="time-stat-content">
-                                <div class="time-stat-value">@FormatDuration(_stats.AveragePackingTime)</div>
-                                <div class="time-stat-label">@Localizer["StatsAvgTime"]</div>
-                            </div>
-                        </div>
-                        <div class="time-stat-card">
-                            <div class="time-stat-icon fastest">
-                                <i class="fa fa-bolt"></i>
-                            </div>
-                            <div class="time-stat-content">
-                                <div class="time-stat-value">@FormatDuration(_stats.FastestSession)</div>
-                                <div class="time-stat-label">
-                                    @Localizer["StatsFastestSession"]
-                                    @if (!string.IsNullOrEmpty(_stats.FastestSessionActivityName))
-                                    {
-                                        <span class="time-stat-detail">@_stats.FastestSessionActivityName</span>
-                                    }
-                                </div>
-                            </div>
-                        </div>
-                        <div class="time-stat-card">
-                            <div class="time-stat-icon total">
-                                <i class="fa fa-stopwatch"></i>
-                            </div>
-                            <div class="time-stat-content">
-                                <div class="time-stat-value">@FormatTotalDuration(_stats.TotalTimePacking)</div>
-                                <div class="time-stat-label">@Localizer["StatsTotalTime"]</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Mini trend chart -->
-                    @if (_stats.RecentSessionDurations.Count >= 2)
-                    {
-                        <div class="trend-section">
-                            <h3 class="subsection-title">@Localizer["StatsRecentTrend"]</h3>
-                            <div class="trend-chart">
-                                @foreach (var point in _stats.RecentSessionDurations)
-                                {
-                                    var heightPct = GetBarHeight(point.DurationSeconds);
-                                    <div class="trend-bar-wrapper" title="@point.Date.ToString("MMM d") — @FormatDuration(TimeSpan.FromSeconds(point.DurationSeconds))">
-                                        <div class="trend-bar" style="height: @(heightPct)%"></div>
-                                        <div class="trend-label">@point.Date.ToString("dd")</div>
-                                    </div>
-                                }
-                            </div>
-                        </div>
-                    }
-                </section>
             }
 
-            <!-- Per-Activity Breakdown -->
-            @if (_stats.MostPackedActivity is not null ||
-                _stats.MostEfficientActivity is not null ||
-                _stats.LeastEfficientActivity is not null ||
-                _stats.MostItemsActivity is not null)
+            <!-- List health: only lists that need attention, each with a way to act on it -->
+            @if (_insights.HasListHealthIssues)
             {
-                <section class="stats-section">
-                    <h2 class="section-title">
-                        <i class="fa fa-trophy"></i>
-                        @Localizer["StatsActivityBreakdown"]
-                    </h2>
-                    <div class="activity-stats-list">
-                        @if (_stats.MostPackedActivity is not null)
-                        {
-                            <div class="activity-stat-row">
-                                <div class="activity-stat-badge star">
-                                    <i class="fa fa-star"></i>
-                                </div>
-                                <div class="activity-stat-info">
-                                    <div class="activity-stat-title">@Localizer["StatsMostPacked"]</div>
-                                    <div class="activity-stat-name">@_stats.MostPackedActivity.Name</div>
-                                </div>
-                                <div class="activity-stat-value">
-                                    @string.Format(Localizer["StatsSessionCount"], _stats.MostPackedActivity.Value)
-                                </div>
-                            </div>
-                        }
-                        @if (_stats.MostEfficientActivity is not null)
-                        {
-                            <div class="activity-stat-row">
-                                <div class="activity-stat-badge efficient">
-                                    <i class="fa fa-check-double"></i>
-                                </div>
-                                <div class="activity-stat-info">
-                                    <div class="activity-stat-title">@Localizer["StatsMostEfficient"]</div>
-                                    <div class="activity-stat-name">@_stats.MostEfficientActivity.Name</div>
-                                </div>
-                                <div class="activity-stat-value">@_stats.MostEfficientActivity.Percentage%</div>
-                            </div>
-                        }
-                        @if (_stats.LeastEfficientActivity is not null)
-                        {
-                            <div class="activity-stat-row">
-                                <div class="activity-stat-badge needs-work">
-                                    <i class="fa fa-exclamation-triangle"></i>
-                                </div>
-                                <div class="activity-stat-info">
-                                    <div class="activity-stat-title">@Localizer["StatsNeedsWork"]</div>
-                                    <div class="activity-stat-name">@_stats.LeastEfficientActivity.Name</div>
-                                </div>
-                                <div class="activity-stat-value">@_stats.LeastEfficientActivity.Percentage%</div>
-                            </div>
-                        }
-                        @if (_stats.MostItemsActivity is not null)
-                        {
-                            <div class="activity-stat-row">
-                                <div class="activity-stat-badge items">
-                                    <i class="fa fa-boxes"></i>
-                                </div>
-                                <div class="activity-stat-info">
-                                    <div class="activity-stat-title">@Localizer["StatsMostItems"]</div>
-                                    <div class="activity-stat-name">@_stats.MostItemsActivity.Name</div>
-                                </div>
-                                <div class="activity-stat-value">
-                                    @string.Format(Localizer["StatsItemCountValue"], _stats.MostItemsActivity.Value)
-                                </div>
-                            </div>
-                        }
-                    </div>
-                </section>
-            }
+                <h2 class="section-title">@Localizer["ListHealthTitle"]</h2>
 
-            <!-- Usage Patterns -->
-            @if (_stats.TotalSessions > 0)
-            {
-                <section class="stats-section">
-                    <h2 class="section-title">
-                        <i class="fa fa-calendar-alt"></i>
-                        @Localizer["StatsUsagePatterns"]
-                    </h2>
-                    <div class="usage-grid">
-                        @if (_stats.CurrentStreak > 0)
+                @if (_insights.UnfinishedLists.Count > 0)
+                {
+                    <section class="health-group">
+                        <h3 class="health-group-title">
+                            <i class="fa fa-hourglass-half" aria-hidden="true"></i>
+                            @Localizer["UnfinishedListsTitle"]
+                        </h3>
+                        @foreach (var unfinished in _insights.UnfinishedLists)
                         {
-                            <div class="usage-card streak">
-                                <div class="usage-icon">🔥</div>
-                                <div class="usage-value">@_stats.CurrentStreak</div>
-                                <div class="usage-label">@Localizer["StatsStreak"]</div>
-                            </div>
-                        }
-                        <div class="usage-card">
-                            <div class="usage-icon"><i class="fa fa-calendar"></i></div>
-                            <div class="usage-value">@_stats.SessionsThisMonth</div>
-                            <div class="usage-label">@Localizer["StatsThisMonth"]</div>
-                            <div class="usage-detail">@Localizer["StatsLastMonth"]: @_stats.SessionsLastMonth</div>
-                        </div>
-                        @if (_stats.LastPackedDate.HasValue)
-                        {
-                            <div class="usage-card">
-                                <div class="usage-icon"><i class="fa fa-clock"></i></div>
-                                <div class="usage-value usage-value-small">@FormatDate(_stats.LastPackedDate.Value)</div>
-                                <div class="usage-label">@Localizer["StatsLastPacked"]</div>
-                            </div>
-                        }
-                        @if (_stats.MostActiveDay.HasValue)
-                        {
-                            <div class="usage-card">
-                                <div class="usage-icon"><i class="fa fa-fire"></i></div>
-                                <div class="usage-value">@GetDayName(_stats.MostActiveDay.Value)</div>
-                                <div class="usage-label">@Localizer["StatsMostActiveDay"]</div>
-                            </div>
-                        }
-                    </div>
-                </section>
-            }
-
-            <!-- Category Insights -->
-            @if (_stats.CategoryDistribution.Count > 0)
-            {
-                <section class="stats-section">
-                    <h2 class="section-title">
-                        <i class="fa fa-tags"></i>
-                        @Localizer["StatsCategoryInsights"]
-                    </h2>
-                    @if (!string.IsNullOrEmpty(_stats.MostCommonCategory))
-                    {
-                        <div class="top-category-banner">
-                            <i class="@GetCategoryIcon(_stats.MostCommonCategory)"></i>
-                            <span>@string.Format(Localizer["StatsTopCategory"], GetLocalizedCategory(_stats.MostCommonCategory))</span>
-                        </div>
-                    }
-                    <div class="category-chart">
-                        @{
-                            var maxCount = _stats.CategoryDistribution.Max(c => c.ItemCount);
-                        }
-                        @foreach (var cat in _stats.CategoryDistribution.Take(8))
-                        {
-                            var widthPct = maxCount > 0 ? (int)((double)cat.ItemCount / maxCount * 100) : 0;
-                            <div class="category-bar-row">
-                                <div class="category-bar-label">
-                                    <i class="@GetCategoryIcon(cat.Category)"></i>
-                                    <span>@GetLocalizedCategory(cat.Category)</span>
+                            <div class="health-row" @key="unfinished.Activity.Id">
+                                <div class="health-text">
+                                    <span class="health-name">@unfinished.Activity.Name</span>
+                                    <span class="health-detail">@string.Format(Localizer["ItemsPacked"], unfinished.PackedItems, unfinished.TotalItems)</span>
                                 </div>
-                                <div class="category-bar-track">
-                                    <div class="category-bar-fill" style="width: @(widthPct)%"></div>
-                                </div>
-                                <div class="category-bar-count">@cat.ItemCount</div>
+                                <button class="btn primary btn-sm" @onclick="() => OpenForPacking(unfinished.Activity)">@Localizer["ContinuePacking"]</button>
                             </div>
                         }
-                    </div>
-                </section>
-            }
+                    </section>
+                }
 
-            <!-- Empty state when no sessions at all -->
-            @if (_stats.TotalSessions == 0)
+                @if (_insights.UnusedLists.Count > 0)
+                {
+                    <section class="health-group">
+                        <h3 class="health-group-title">
+                            <i class="fa fa-moon" aria-hidden="true"></i>
+                            @Localizer["UnusedListsTitle"]
+                        </h3>
+                        @foreach (var unused in _insights.UnusedLists)
+                        {
+                            <div class="health-row" @key="unused.Id">
+                                <div class="health-text">
+                                    <span class="health-name">@unused.Name</span>
+                                    <span class="health-detail">@string.Format(Localizer["LastPackedOn"], FormatDate(unused.LastPacked))</span>
+                                </div>
+                                <button class="btn cancel btn-sm" @onclick="() => ArchiveAsync(unused)">@Localizer["Archive"]</button>
+                            </div>
+                        }
+                    </section>
+                }
+
+                @if (_insights.EmptyLists.Count > 0)
+                {
+                    <section class="health-group">
+                        <h3 class="health-group-title">
+                            <i class="fa fa-box-open" aria-hidden="true"></i>
+                            @Localizer["EmptyListsTitle"]
+                        </h3>
+                        @foreach (var empty in _insights.EmptyLists)
+                        {
+                            <div class="health-row" @key="empty.Id">
+                                <div class="health-text">
+                                    <button class="health-name link" @onclick="() => OpenForEditing(empty)">@empty.Name</button>
+                                </div>
+                                <button class="btn danger btn-sm" @onclick="() => DeleteAsync(empty)">@Localizer["Delete"]</button>
+                            </div>
+                        }
+                    </section>
+                }
+
+                @if (_insights.SimilarLists.Count > 0)
+                {
+                    <section class="health-group">
+                        <h3 class="health-group-title">
+                            <i class="fa fa-clone" aria-hidden="true"></i>
+                            @Localizer["SimilarListsTitle"]
+                        </h3>
+                        @foreach (var similar in _insights.SimilarLists)
+                        {
+                            <div class="health-row" @key="(similar.First.Id + similar.Second.Id)">
+                                <div class="health-text">
+                                    <span class="health-name">
+                                        <button class="link" @onclick="() => OpenForEditing(similar.First)">@similar.First.Name</button>
+                                        &amp;
+                                        <button class="link" @onclick="() => OpenForEditing(similar.Second)">@similar.Second.Name</button>
+                                    </span>
+                                    <span class="health-detail">@string.Format(Localizer["SimilarListsDetail"], similar.SharedPercent)</span>
+                                </div>
+                            </div>
+                        }
+                    </section>
+                }
+            }
+            else if (_insights.HasHistory)
             {
-                <div class="stats-empty-hint">
-                    <i class="fa fa-info-circle"></i>
-                    <p>@Localizer["StatsEmptyHint"]</p>
+                <div class="all-good">
+                    <i class="fa fa-check-circle" aria-hidden="true"></i>
+                    <span>@Localizer["AllListsHealthy"]</span>
                 </div>
             }
         </div>

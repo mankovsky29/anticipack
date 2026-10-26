@@ -1,9 +1,9 @@
 namespace Anticipack.Services.Statistics;
 
 /// <summary>
-/// Service for computing aggregated packing statistics
+/// Computes the personal packing summary and list health insights
 /// </summary>
 public interface IPackingStatisticsService
 {
-    Task<PackingStatisticsData> GetStatisticsAsync();
+    Task<PackingInsights> GetInsightsAsync();
 }

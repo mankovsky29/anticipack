@@ -61,6 +61,31 @@
         </label>
     </div>
 
+    @if (VisibleSkipInsights.Any())
+    {
+        <!-- Items repeatedly left unpacked: suggest trimming the list -->
+        <section class="skip-insights" aria-labelledby="skip-insights-title">
+            <div class="skip-insights-header">
+                <i class="fa fa-lightbulb" aria-hidden="true"></i>
+                <h4 id="skip-insights-title">@Localizer["OftenSkippedTitle"]</h4>
+            </div>
+            <p class="skip-insights-hint">@Localizer["OftenSkippedHint"]</p>
+            <ul class="skip-insights-list">
+                @foreach (var insight in VisibleSkipInsights)
+                {
+                    <li class="skip-insight" @key="insight.Item.Id">
+                        <div class="skip-insight-text">
+                            <span class="skip-insight-name">@GetItemDisplayName(insight.Item.Name, insight.Item.Quantity)</span>
+                            <span class="skip-insight-detail">@string.Format(Localizer["SkippedTimes"], insight.SkippedCount, insight.SessionCount)</span>
+                        </div>
+                        <button class="btn cancel btn-sm" @onclick="() => KeepSkippedItemAsync(insight)">@Localizer["KeepItem"]</button>
+                        <button class="btn danger btn-sm" @onclick="() => RemoveSkippedItemAsync(insight)">@Localizer["RemoveItem"]</button>
+                    </li>
+                }
+            </ul>
+        </section>
+    }
+
     <main class="content-area">
         @if (_isLoading)
         {

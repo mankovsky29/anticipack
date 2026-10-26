@@ -708,88 +708,10 @@ Jabón, Toalla</value>
   </data>
   <!-- Statistics Page -->
   <data name="StatsMenu" xml:space="preserve">
-    <value>Estadísticas</value>
-  </data>
-  <data name="StatsTitle" xml:space="preserve">
-    <value>Estadísticas</value>
-  </data>
-  <data name="StatsOverview" xml:space="preserve">
     <value>Resumen</value>
   </data>
-  <data name="StatsTotalActivities" xml:space="preserve">
-    <value>Actividades</value>
-  </data>
-  <data name="StatsTotalSessions" xml:space="preserve">
-    <value>Sesiones</value>
-  </data>
-  <data name="StatsItemsPacked" xml:space="preserve">
-    <value>Empacados</value>
-  </data>
-  <data name="StatsEfficiency" xml:space="preserve">
-    <value>Eficiencia</value>
-  </data>
-  <data name="StatsTimeTitle" xml:space="preserve">
-    <value>Tiempo</value>
-  </data>
-  <data name="StatsAvgTime" xml:space="preserve">
-    <value>Tiempo promedio de empaque</value>
-  </data>
-  <data name="StatsFastestSession" xml:space="preserve">
-    <value>Sesión más rápida</value>
-  </data>
-  <data name="StatsTotalTime" xml:space="preserve">
-    <value>Tiempo total empacando</value>
-  </data>
-  <data name="StatsRecentTrend" xml:space="preserve">
-    <value>Sesiones recientes</value>
-  </data>
-  <data name="StatsActivityBreakdown" xml:space="preserve">
-    <value>Destacados</value>
-  </data>
-  <data name="StatsMostPacked" xml:space="preserve">
-    <value>Más empacada</value>
-  </data>
-  <data name="StatsMostEfficient" xml:space="preserve">
-    <value>Más eficiente</value>
-  </data>
-  <data name="StatsNeedsWork" xml:space="preserve">
-    <value>Necesita mejora</value>
-  </data>
-  <data name="StatsMostItems" xml:space="preserve">
-    <value>Lista más grande</value>
-  </data>
-  <data name="StatsSessionCount" xml:space="preserve">
-    <value>{0} sesiones</value>
-  </data>
-  <data name="StatsItemCountValue" xml:space="preserve">
-    <value>{0} artículos</value>
-  </data>
-  <data name="StatsUsagePatterns" xml:space="preserve">
-    <value>Patrones de uso</value>
-  </data>
-  <data name="StatsStreak" xml:space="preserve">
-    <value>Días seguidos</value>
-  </data>
-  <data name="StatsThisMonth" xml:space="preserve">
-    <value>Este mes</value>
-  </data>
-  <data name="StatsLastMonth" xml:space="preserve">
-    <value>Mes pasado</value>
-  </data>
-  <data name="StatsMostActiveDay" xml:space="preserve">
-    <value>Día más activo</value>
-  </data>
-  <data name="StatsLastPacked" xml:space="preserve">
-    <value>Último empaque</value>
-  </data>
-  <data name="StatsCategoryInsights" xml:space="preserve">
-    <value>Categorías</value>
-  </data>
-  <data name="StatsTopCategory" xml:space="preserve">
-    <value>Categoría principal: {0}</value>
-  </data>
-  <data name="StatsEmptyHint" xml:space="preserve">
-    <value>Completa algunas sesiones de empaque para ver estadísticas detalladas de tiempo, actividades y categorías aquí.</value>
+  <data name="StatsTitle" xml:space="preserve">
+    <value>Resumen</value>
   </data>
   <data name="Multiple" xml:space="preserve">
     <value>Múltiple</value>
@@ -921,5 +843,89 @@ Jabón, Toalla</value>
   </data>
   <data name="ContactUs" xml:space="preserve">
     <value>Contáctanos</value>
+  </data>
+  <data name="ConfirmFinishPackingWithSkipped" xml:space="preserve">
+    <value>Has empacado {0} de {1} artículos. ¿Terminar de todos modos? Los {2} artículo(s) sin empacar se anotarán para que puedas revisarlos después.</value>
+  </data>
+  <data name="OftenSkippedTitle" xml:space="preserve">
+    <value>A menudo sin empacar</value>
+  </data>
+  <data name="OftenSkippedHint" xml:space="preserve">
+    <value>Elimina los artículos que no necesitas o mantenlos en la lista.</value>
+  </data>
+  <data name="SkippedTimes" xml:space="preserve">
+    <value>Omitido {0} de las últimas {1} veces</value>
+  </data>
+  <data name="RemoveItem" xml:space="preserve">
+    <value>Eliminar</value>
+  </data>
+  <data name="KeepItem" xml:space="preserve">
+    <value>Mantener</value>
+  </data>
+  <data name="DurationUnderMinute" xml:space="preserve">
+    <value>&lt;1 min</value>
+  </data>
+  <data name="DurationMinutesShort" xml:space="preserve">
+    <value>{0} min</value>
+  </data>
+  <data name="DurationHoursMinutesShort" xml:space="preserve">
+    <value>{0} h {1} min</value>
+  </data>
+  <data name="UsuallyTakes" xml:space="preserve">
+    <value>Suele tardar {0}</value>
+  </data>
+  <data name="TypicalTime" xml:space="preserve">
+    <value>Tiempo habitual</value>
+  </data>
+  <data name="FasterThanUsual" xml:space="preserve">
+    <value>{0} más rápido de lo habitual</value>
+  </data>
+  <data name="SlowerThanUsual" xml:space="preserve">
+    <value>{0} más lento de lo habitual</value>
+  </data>
+  <data name="AboutAsUsual" xml:space="preserve">
+    <value>Más o menos como siempre</value>
+  </data>
+  <data name="TripsThisYear" xml:space="preserve">
+    <value>Viajes este año</value>
+  </data>
+  <data name="PackingTimeThisYear" xml:space="preserve">
+    <value>Tiempo empacando este año</value>
+  </data>
+  <data name="GoToList" xml:space="preserve">
+    <value>Tu lista de siempre</value>
+  </data>
+  <data name="GoToListTrips" xml:space="preserve">
+    <value>{0} viajes en los últimos 12 meses</value>
+  </data>
+  <data name="InsightsEmptyHint" xml:space="preserve">
+    <value>Empaca una lista para empezar a ver tu resumen aquí.</value>
+  </data>
+  <data name="ListHealthTitle" xml:space="preserve">
+    <value>Requiere atención</value>
+  </data>
+  <data name="UnfinishedListsTitle" xml:space="preserve">
+    <value>Empezadas sin terminar</value>
+  </data>
+  <data name="ContinuePacking" xml:space="preserve">
+    <value>Continuar</value>
+  </data>
+  <data name="UnusedListsTitle" xml:space="preserve">
+    <value>Sin usar en 3 meses</value>
+  </data>
+  <data name="LastPackedOn" xml:space="preserve">
+    <value>Último uso: {0}</value>
+  </data>
+  <data name="EmptyListsTitle" xml:space="preserve">
+    <value>Listas sin artículos</value>
+  </data>
+  <data name="SimilarListsTitle" xml:space="preserve">
+    <value>Listas parecidas</value>
+  </data>
+  <data name="SimilarListsDetail" xml:space="preserve">
+    <value>El {0}% de los artículos coincide. Quizá baste con una.</value>
+  </data>
+  <data name="AllListsHealthy" xml:space="preserve">
+    <value>Todas tus listas están en orden</value>
   </data>
 </root>

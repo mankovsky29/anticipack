@@ -5,12 +5,22 @@ namespace Anticipack.Services.Packing
         /// <summary>
         /// Records a completed packing session
         /// </summary>
-        Task RecordPackingSessionAsync(string activityId, DateTime startTime, DateTime endTime, int totalItems, int packedItems);
+        Task RecordPackingSessionAsync(string activityId, DateTime startTime, DateTime endTime, TimeSpan activeDuration, int totalItems, int packedItems, IReadOnlyCollection<string>? skippedItemIds = null);
+
+        /// <summary>
+        /// Finds items of an activity that were repeatedly left unpacked in recent sessions
+        /// </summary>
+        Task<List<SkippedItemInsight>> GetOftenSkippedItemsAsync(string activityId, IEnumerable<Storage.PackingItem> items);
         
         /// <summary>
-        /// Gets the average packing time for an activity
+        /// Gets how long packing this activity usually takes, or null until a session has been measured
         /// </summary>
-        Task<TimeSpan?> GetAveragePackingTimeAsync(string activityId);
+        Task<TimeSpan?> GetTypicalPackingTimeAsync(string activityId);
+
+        /// <summary>
+        /// Gets the typical packing time of every activity that has measured sessions, keyed by activity id
+        /// </summary>
+        Task<Dictionary<string, TimeSpan>> GetTypicalPackingTimesAsync();
         
         /// <summary>
         /// Gets recent packing history entries for an activity
@@ -28,20 +38,22 @@ namespace Anticipack.Services.Packing
         double GetPackingEfficiency(int packedItems, int totalItems);
         
         /// <summary>
-        /// Compares current packing time with the average
+        /// Compares a session's active time with the typical time, or null when there is nothing to compare with
         /// </summary>
-        Task<PackingTimeComparison> CompareWithAverageAsync(string activityId, TimeSpan currentDuration);
-        
-        /// <summary>
-        /// Estimates remaining time based on historical data
-        /// </summary>
-        Task<TimeSpan> EstimateRemainingTimeAsync(string activityId, int itemsRemaining);
+        Task<PackingTimeComparison?> CompareWithTypicalAsync(string activityId, TimeSpan currentDuration);
     }
     
+    public record SkippedItemInsight(Storage.PackingItem Item, int SkippedCount, int SessionCount);
+
     public class PackingTimeComparison
     {
-        public bool IsFaster { get; set; }
+        public TimeSpan Typical { get; set; }
+
+        /// <summary>
+        /// Typical minus current duration: positive means the session was faster than usual
+        /// </summary>
         public TimeSpan Difference { get; set; }
-        public string FormattedDifference { get; set; } = string.Empty;
+
+        public bool IsFaster => Difference > TimeSpan.Zero;
     }
 }

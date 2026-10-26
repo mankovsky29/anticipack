@@ -1,8 +1,11 @@
+using Anticipack.Components.Shared.DialogComponent;
 using Anticipack.Components.Shared.NavigationHeaderComponent;
+using Anticipack.Components.Shared.ToastComponent;
 using Anticipack.Resources.Localization;
 using Anticipack.Services;
-using Anticipack.Services.Categories;
 using Anticipack.Services.Statistics;
+using Anticipack.Storage;
+using Anticipack.Storage.Repositories;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Localization;
 
@@ -11,12 +14,15 @@ namespace Anticipack.Components.Features.Statistics;
 public partial class PackingStatistics : IDisposable
 {
     [Inject] private IPackingStatisticsService StatisticsService { get; set; } = default!;
+    [Inject] private IPackingActivityRepository ActivityRepository { get; set; } = default!;
     [Inject] private IStringLocalizer<AppResources> Localizer { get; set; } = default!;
     [Inject] private INavigationHeaderService NavigationHeaderService { get; set; } = default!;
     [Inject] private ILocalizationService LocalizationService { get; set; } = default!;
-    [Inject] private ICategoryIconProvider CategoryIconProvider { get; set; } = default!;
+    [Inject] private NavigationManager Navigation { get; set; } = default!;
+    [Inject] private IDialogService DialogService { get; set; } = default!;
+    [Inject] private IToastService ToastService { get; set; } = default!;
 
-    private PackingStatisticsData? _stats;
+    private PackingInsights? _insights;
     private bool _isLoading = true;
 
     protected override void OnInitialized()
@@ -27,78 +33,80 @@ public partial class PackingStatistics : IDisposable
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadStatisticsAsync();
+        await LoadInsightsAsync();
     }
 
-    private async Task LoadStatisticsAsync()
+    private async Task LoadInsightsAsync()
     {
-        _isLoading = true;
-        StateHasChanged();
-
         try
         {
-            _stats = await StatisticsService.GetStatisticsAsync();
+            _insights = await StatisticsService.GetInsightsAsync();
+        }
+        catch
+        {
+            ToastService.ShowError(Localizer["FailedToLoad"]);
         }
         finally
         {
             _isLoading = false;
-            StateHasChanged();
         }
+    }
+
+    private void OpenForPacking(PackingActivity activity)
+    {
+        Navigation.NavigateTo($"/play-packing/{activity.Id}");
+    }
+
+    private void OpenForEditing(PackingActivity activity)
+    {
+        Navigation.NavigateTo($"/edit-packing/{activity.Id}");
+    }
+
+    private async Task ArchiveAsync(PackingActivity activity)
+    {
+        try
+        {
+            activity.IsArchived = true;
+            await ActivityRepository.AddOrUpdateAsync(activity);
+            ToastService.ShowSuccess(string.Format(Localizer["ActivityArchived"], activity.Name));
+            await LoadInsightsAsync();
+        }
+        catch
+        {
+            activity.IsArchived = false;
+            ToastService.ShowError(Localizer["FailedToUpdateArchiveStatus"]);
+        }
+    }
+
+    private async Task DeleteAsync(PackingActivity activity)
+    {
+        var confirmed = await DialogService.ShowConfirmAsync(
+            Localizer["DeleteActivityTitle"],
+            string.Format(Localizer["DeleteActivityMessage"], activity.Name));
+
+        if (!confirmed)
+            return;
+
+        try
+        {
+            await ActivityRepository.DeleteAsync(activity.Id);
+            ToastService.ShowSuccess(Localizer["ActivityDeleted"]);
+            await LoadInsightsAsync();
+        }
+        catch
+        {
+            ToastService.ShowError(Localizer["FailedToDelete"]);
+        }
+    }
+
+    private string FormatDate(DateTime date)
+    {
+        return date.ToString("d MMM yyyy", LocalizationService.CurrentCulture);
     }
 
     private void OnCultureChanged(object? sender, System.Globalization.CultureInfo culture)
     {
         InvokeAsync(StateHasChanged);
-    }
-
-    private static string FormatDuration(TimeSpan duration)
-    {
-        if (duration.TotalHours >= 1)
-            return $"{(int)duration.TotalHours}h {duration.Minutes:D2}m";
-        if (duration.TotalMinutes >= 1)
-            return $"{(int)duration.TotalMinutes}m {duration.Seconds:D2}s";
-        return $"{(int)duration.TotalSeconds}s";
-    }
-
-    private static string FormatTotalDuration(TimeSpan duration)
-    {
-        if (duration.TotalHours >= 1)
-            return $"{(int)duration.TotalHours}h {duration.Minutes:D2}m";
-        return $"{(int)duration.TotalMinutes}m";
-    }
-
-    private int GetBarHeight(int durationSeconds)
-    {
-        if (_stats is null || _stats.RecentSessionDurations.Count == 0)
-            return 0;
-
-        var max = _stats.RecentSessionDurations.Max(p => p.DurationSeconds);
-        if (max == 0)
-            return 0;
-
-        return Math.Max(8, (int)((double)durationSeconds / max * 100));
-    }
-
-    private string GetCategoryIcon(string category)
-    {
-        return "fa " + CategoryIconProvider.GetIcon(category);
-    }
-
-    private string GetLocalizedCategory(string category)
-    {
-        var key = $"Category_{category}";
-        var localized = Localizer[key];
-        return localized.ResourceNotFound ? category : localized.Value;
-    }
-
-    private string GetDayName(DayOfWeek day)
-    {
-        return System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedDayName(day);
-    }
-
-    private static string FormatDate(DateTime date)
-    {
-        return date.ToLocalTime().ToString("d", System.Globalization.CultureInfo.CurrentCulture);
     }
 
     public void Dispose()

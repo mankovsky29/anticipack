@@ -6,6 +6,7 @@ using Anticipack.Packing;
 using Anticipack.Resources.Localization;
 using Anticipack.Services;
 using Anticipack.Services.Categories;
+using Anticipack.Services.Packing;
 using Anticipack.Services.Suggestions;
 using Anticipack.Storage;
 using Anticipack.Storage.Repositories;
@@ -36,6 +37,7 @@ public partial class EditPacking : IAsyncDisposable
     [Inject] private IStringLocalizer<AppResources> Localizer { get; set; } = default!;
     [Inject] private ICategoryIconProvider CategoryIconProvider { get; set; } = default!;
     [Inject] private IItemSuggestionService ItemSuggestionService { get; set; } = default!;
+    [Inject] private IPackingHistoryService PackingHistoryService { get; set; } = default!;
 
     [Parameter]
     public string Id { get; set; } = string.Empty;
@@ -67,6 +69,13 @@ public partial class EditPacking : IAsyncDisposable
 
     // Category headers are only worth showing when items are actually split across categories
     private bool HasMultipleCategories => Items.Select(i => i.Item.Category).Distinct(StringComparer.OrdinalIgnoreCase).Skip(1).Any();
+
+    // Items the user keeps leaving unpacked, offered for removal
+    private List<SkippedItemInsight> _skipInsights = [];
+
+    // Hide insights for items deleted since the insights were loaded
+    private IEnumerable<SkippedItemInsight> VisibleSkipInsights =>
+        _skipInsights.Where(insight => Items.Any(i => i.Item.Id == insight.Item.Id));
 
     private PackingItemView? _editingItem = null;
     private ElementReference itemEditInputElement;
@@ -166,6 +175,8 @@ public partial class EditPacking : IAsyncDisposable
         {
             await ShowAddItemForm();
         }
+
+        await LoadSkipInsightsAsync();
 
         KeyboardService.KeyboardVisibilityChanged += OnKeyboardVisibilityChanged;
 
@@ -627,6 +638,51 @@ public partial class EditPacking : IAsyncDisposable
             _activityName = _currentActivity?.Name ?? AppResources.NewPackingActivity;
             StateHasChanged();
         }
+    }
+
+    private async Task LoadSkipInsightsAsync()
+    {
+        if (string.IsNullOrWhiteSpace(Id) || !Items.Any())
+            return;
+
+        try
+        {
+            _skipInsights = await PackingHistoryService.GetOftenSkippedItemsAsync(Id, Items.Select(i => i.Item));
+        }
+        catch
+        {
+            // Insights are optional; never block editing because of them
+            _skipInsights = [];
+        }
+    }
+
+    private async Task KeepSkippedItemAsync(SkippedItemInsight insight)
+    {
+        _skipInsights.Remove(insight);
+
+        // Items are reloaded after edits, so update the current instance rather than the one captured by the insight
+        var item = Items.FirstOrDefault(i => i.Item.Id == insight.Item.Id)?.Item;
+        if (item is null)
+            return;
+
+        try
+        {
+            item.SkipSuggestionDismissedAt = DateTime.Now;
+            await PackingRepository.AddOrUpdateItemAsync(item);
+        }
+        catch (Exception ex)
+        {
+            ToastService.ShowError(string.Format(AppResources.FailedToUpdateItem, ex.Message));
+        }
+    }
+
+    private async Task RemoveSkippedItemAsync(SkippedItemInsight insight)
+    {
+        _skipInsights.Remove(insight);
+
+        var item = Items.FirstOrDefault(i => i.Item.Id == insight.Item.Id);
+        if (item is not null)
+            await PromptDelete(item);
     }
 
     private async Task SelectActivityNameText()

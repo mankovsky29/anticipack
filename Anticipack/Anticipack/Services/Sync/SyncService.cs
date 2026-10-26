@@ -321,6 +321,7 @@ public class SyncService : ISyncService
         Category = item.Category,
         Notes = item.Notes,
         SortOrder = item.SortOrder,
+        SkipSuggestionDismissedAt = item.SkipSuggestionDismissedAt,
         ModifiedAt = DateTime.UtcNow
     };
 
@@ -333,7 +334,9 @@ public class SyncService : ISyncService
         PackedItems = entry.PackedItems,
         DurationSeconds = entry.DurationSeconds,
         StartTime = entry.StartTime,
-        EndTime = entry.EndTime
+        EndTime = entry.EndTime,
+        ActiveDurationSeconds = entry.ActiveDurationSeconds,
+        SkippedItemIds = entry.SkippedItemIds
     };
 
     private static PackingActivity MapFromDto(PackingActivityDto dto) => new()
@@ -357,7 +360,8 @@ public class SyncService : ISyncService
         IsPacked = dto.IsPacked,
         Category = dto.Category ?? string.Empty,
         Notes = dto.Notes ?? string.Empty,
-        SortOrder = dto.SortOrder
+        SortOrder = dto.SortOrder,
+        SkipSuggestionDismissedAt = dto.SkipSuggestionDismissedAt
     };
 
     private static PackingHistoryEntry MapFromDto(PackingHistoryEntryDto dto) => new()
@@ -369,7 +373,9 @@ public class SyncService : ISyncService
         PackedItems = dto.PackedItems,
         DurationSeconds = dto.DurationSeconds,
         StartTime = dto.StartTime,
-        EndTime = dto.EndTime
+        EndTime = dto.EndTime,
+        ActiveDurationSeconds = dto.ActiveDurationSeconds,
+        SkippedItemIds = dto.SkippedItemIds
     };
 
     #endregion

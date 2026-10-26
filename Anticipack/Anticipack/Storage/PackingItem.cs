@@ -15,5 +15,6 @@ namespace Anticipack.Storage
         public string Category { get; set; }
         public string Notes { get; set; }
         public int SortOrder { get; set; } // Order of the item within its category
+        public DateTime? SkipSuggestionDismissedAt { get; set; } // User chose to keep this item despite skipping it
     }
 }

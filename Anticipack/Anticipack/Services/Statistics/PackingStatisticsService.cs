@@ -4,10 +4,15 @@ using Anticipack.Storage.Repositories;
 namespace Anticipack.Services.Statistics;
 
 /// <summary>
-/// Computes aggregated packing statistics from activity, item, and history data
+/// Computes the personal packing summary and list health insights from activity, item, and history data
 /// </summary>
 public class PackingStatisticsService : IPackingStatisticsService
 {
+    private const int UnusedAfterDays = 90;
+    private const int GoToListMinTrips = 2;
+    private const int SimilarityMinItems = 3;
+    private const double SimilarityThreshold = 0.8;
+
     private readonly IPackingActivityRepository _activityRepository;
     private readonly IPackingItemRepository _itemRepository;
     private readonly IPackingHistoryRepository _historyRepository;
@@ -22,244 +27,118 @@ public class PackingStatisticsService : IPackingStatisticsService
         _historyRepository = historyRepository;
     }
 
-    public async Task<PackingStatisticsData> GetStatisticsAsync()
+    public async Task<PackingInsights> GetInsightsAsync()
     {
         var activities = await _activityRepository.GetAllAsync();
         var allItems = await _itemRepository.GetAllItemsAsync();
         var allHistory = await _historyRepository.GetAllHistoryAsync();
 
-        var stats = new PackingStatisticsData();
-
-        ComputeOverview(stats, activities, allHistory);
-        ComputeTimeStats(stats, activities, allHistory);
-        ComputePerActivityStats(stats, activities, allItems, allHistory);
-        ComputeUsagePatterns(stats, allHistory);
-        ComputeCategoryInsights(stats, allItems);
-
-        return stats;
-    }
-
-    private static void ComputeOverview(
-        PackingStatisticsData stats,
-        List<PackingActivity> activities,
-        List<PackingHistoryEntry> history)
-    {
-        stats.TotalActivities = activities.Count;
-        stats.TotalSessions = history.Count;
-        stats.TotalItemsPacked = history.Sum(h => h.PackedItems);
-
-        var totalItems = history.Sum(h => h.TotalItems);
-        stats.OverallEfficiency = totalItems > 0
-            ? Math.Round((double)stats.TotalItemsPacked / totalItems * 100, 1)
-            : 0;
-    }
-
-    private static void ComputeTimeStats(
-        PackingStatisticsData stats,
-        List<PackingActivity> activities,
-        List<PackingHistoryEntry> history)
-    {
-        if (history.Count == 0)
-            return;
-
-        var validSessions = history.Where(h => h.DurationSeconds > 0).ToList();
-
-        if (validSessions.Count > 0)
-        {
-            stats.AveragePackingTime = TimeSpan.FromSeconds(validSessions.Average(h => h.DurationSeconds));
-
-            var fastest = validSessions.MinBy(h => h.DurationSeconds)!;
-            stats.FastestSession = TimeSpan.FromSeconds(fastest.DurationSeconds);
-            stats.FastestSessionActivityName = activities
-                .FirstOrDefault(a => a.Id == fastest.ActivityId)?.Name ?? string.Empty;
-
-            stats.TotalTimePacking = TimeSpan.FromSeconds(validSessions.Sum(h => h.DurationSeconds));
-        }
-
-        stats.RecentSessionDurations = history
-            .Where(h => h.DurationSeconds > 0)
-            .OrderByDescending(h => h.CompletedDate)
-            .Take(10)
-            .OrderBy(h => h.CompletedDate)
-            .Select(h => new SessionDurationPoint
-            {
-                Date = h.CompletedDate,
-                DurationSeconds = h.DurationSeconds
-            })
-            .ToList();
-    }
-
-    private static void ComputePerActivityStats(
-        PackingStatisticsData stats,
-        List<PackingActivity> activities,
-        List<PackingItem> allItems,
-        List<PackingHistoryEntry> history)
-    {
-        if (activities.Count == 0)
-            return;
-
-        // Most packed activity (most sessions)
-        var sessionsByActivity = history
-            .GroupBy(h => h.ActivityId)
-            .Select(g => new { ActivityId = g.Key, Count = g.Count() })
-            .OrderByDescending(x => x.Count)
-            .ToList();
-
-        if (sessionsByActivity.Count > 0)
-        {
-            var top = sessionsByActivity.First();
-            var activity = activities.FirstOrDefault(a => a.Id == top.ActivityId);
-            if (activity is not null)
-            {
-                stats.MostPackedActivity = new ActivityStat
-                {
-                    Name = activity.Name,
-                    Value = top.Count
-                };
-            }
-        }
-
-        // Most/least efficient activity (min 2 sessions)
-        var efficiencyByActivity = history
-            .GroupBy(h => h.ActivityId)
-            .Where(g => g.Count() >= 2)
-            .Select(g => new
-            {
-                ActivityId = g.Key,
-                Efficiency = g.Sum(h => h.TotalItems) > 0
-                    ? Math.Round((double)g.Sum(h => h.PackedItems) / g.Sum(h => h.TotalItems) * 100, 1)
-                    : 0
-            })
-            .OrderByDescending(x => x.Efficiency)
-            .ToList();
-
-        if (efficiencyByActivity.Count > 0)
-        {
-            var mostEfficient = efficiencyByActivity.First();
-            var mostEfficientActivity = activities.FirstOrDefault(a => a.Id == mostEfficient.ActivityId);
-            if (mostEfficientActivity is not null)
-            {
-                stats.MostEfficientActivity = new ActivityStat
-                {
-                    Name = mostEfficientActivity.Name,
-                    Percentage = mostEfficient.Efficiency
-                };
-            }
-
-            var leastEfficient = efficiencyByActivity.Last();
-            if (leastEfficient.ActivityId != mostEfficient.ActivityId)
-            {
-                var leastEfficientActivity = activities.FirstOrDefault(a => a.Id == leastEfficient.ActivityId);
-                if (leastEfficientActivity is not null)
-                {
-                    stats.LeastEfficientActivity = new ActivityStat
-                    {
-                        Name = leastEfficientActivity.Name,
-                        Percentage = leastEfficient.Efficiency
-                    };
-                }
-            }
-        }
-
-        // Activity with most items
         var itemsByActivity = allItems
             .GroupBy(i => i.ActivityId)
-            .Select(g => new { ActivityId = g.Key, Count = g.Count() })
-            .OrderByDescending(x => x.Count)
-            .FirstOrDefault();
+            .ToDictionary(g => g.Key, g => g.ToList());
 
-        if (itemsByActivity is not null)
-        {
-            var activity = activities.FirstOrDefault(a => a.Id == itemsByActivity.ActivityId);
-            if (activity is not null)
-            {
-                stats.MostItemsActivity = new ActivityStat
-                {
-                    Name = activity.Name,
-                    Value = itemsByActivity.Count
-                };
-            }
-        }
+        // Archived lists are out of the user's way already, so they never need attention
+        var activeLists = activities
+            .Where(a => !a.IsArchived)
+            .Select(a => (Activity: a, Items: itemsByActivity.GetValueOrDefault(a.Id) ?? []))
+            .ToList();
+
+        var insights = new PackingInsights();
+        ComputeSummary(insights, activities, allHistory);
+        ComputeListHealth(insights, activeLists);
+        return insights;
     }
 
-    private static void ComputeUsagePatterns(
-        PackingStatisticsData stats,
+    private static void ComputeSummary(
+        PackingInsights insights,
+        List<PackingActivity> activities,
         List<PackingHistoryEntry> history)
     {
-        if (history.Count == 0)
-            return;
-
-        stats.LastPackedDate = history.Max(h => h.CompletedDate);
-
-        // Sessions this month vs last month
         var now = DateTime.Now;
-        var startOfMonth = new DateTime(now.Year, now.Month, 1);
-        var startOfLastMonth = startOfMonth.AddMonths(-1);
+        var startOfYear = new DateTime(now.Year, 1, 1);
+        var thisYear = history.Where(h => h.CompletedDate >= startOfYear).ToList();
 
-        stats.SessionsThisMonth = history.Count(h => h.CompletedDate >= startOfMonth);
-        stats.SessionsLastMonth = history.Count(h => h.CompletedDate >= startOfLastMonth && h.CompletedDate < startOfMonth);
+        insights.HasHistory = history.Count > 0;
+        insights.TripsThisYear = thisYear.Count;
 
-        // Most active day of week
-        var dayGroups = history
-            .GroupBy(h => h.CompletedDate.DayOfWeek)
-            .OrderByDescending(g => g.Count())
+        // Only measured sessions count; older ones recorded screen time, not packing time
+        insights.PackingTimeThisYear = TimeSpan.FromSeconds(thisYear.Sum(h => h.ActiveDurationSeconds ?? 0));
+
+        var goTo = history
+            .Where(h => h.CompletedDate >= now.AddYears(-1))
+            .GroupBy(h => h.ActivityId)
+            .Select(g => (Activity: activities.FirstOrDefault(a => a.Id == g.Key), Trips: g.Count()))
+            .Where(x => x.Activity is not null && x.Trips >= GoToListMinTrips)
+            .OrderByDescending(x => x.Trips)
             .FirstOrDefault();
 
-        if (dayGroups is not null)
-        {
-            stats.MostActiveDay = dayGroups.Key;
-        }
-
-        // Current streak (consecutive days with sessions)
-        var sessionDates = history
-            .Select(h => h.CompletedDate.Date)
-            .Distinct()
-            .OrderByDescending(d => d)
-            .ToList();
-
-        if (sessionDates.Count > 0)
-        {
-            int streak = 0;
-            var checkDate = DateTime.Today;
-
-            // Allow today or yesterday as streak start
-            if (sessionDates[0] == checkDate || sessionDates[0] == checkDate.AddDays(-1))
-            {
-                checkDate = sessionDates[0];
-                foreach (var date in sessionDates)
-                {
-                    if (date == checkDate)
-                    {
-                        streak++;
-                        checkDate = checkDate.AddDays(-1);
-                    }
-                    else if (date < checkDate)
-                    {
-                        break;
-                    }
-                }
-            }
-
-            stats.CurrentStreak = streak;
-        }
+        insights.GoToList = goTo.Activity;
+        insights.GoToListTrips = goTo.Trips;
     }
 
-    private static void ComputeCategoryInsights(
-        PackingStatisticsData stats,
-        List<PackingItem> allItems)
+    private static void ComputeListHealth(
+        PackingInsights insights,
+        List<(PackingActivity Activity, List<PackingItem> Items)> lists)
     {
-        var categoryGroups = allItems
-            .Where(i => !string.IsNullOrEmpty(i.Category))
-            .GroupBy(i => i.Category)
-            .Select(g => new CategoryStat
-            {
-                Category = g.Key,
-                ItemCount = g.Count()
-            })
-            .OrderByDescending(c => c.ItemCount)
+        // Packing was started (some items checked) but never completed
+        insights.UnfinishedLists = lists
+            .Where(l => !l.Activity.IsFinished)
+            .Select(l => new UnfinishedList(l.Activity, l.Items.Count(i => i.IsPacked), l.Items.Count))
+            .Where(u => u.PackedItems > 0 && u.PackedItems < u.TotalItems)
+            .OrderByDescending(u => u.Activity.SessionLastActivityAt ?? u.Activity.LastPacked)
             .ToList();
 
-        stats.CategoryDistribution = categoryGroups;
-        stats.MostCommonCategory = categoryGroups.FirstOrDefault()?.Category;
+        var unfinishedIds = insights.UnfinishedLists.Select(u => u.Activity.Id).ToHashSet();
+        var unusedCutoff = DateTime.Now.AddDays(-UnusedAfterDays);
+
+        insights.UnusedLists = lists
+            .Where(l => l.Items.Count > 0
+                && l.Activity.LastPacked < unusedCutoff
+                && !unfinishedIds.Contains(l.Activity.Id))
+            .Select(l => l.Activity)
+            .OrderBy(a => a.LastPacked)
+            .ToList();
+
+        insights.EmptyLists = lists
+            .Where(l => l.Items.Count == 0)
+            .Select(l => l.Activity)
+            .ToList();
+
+        insights.SimilarLists = FindSimilarLists(lists);
+    }
+
+    /// <summary>
+    /// Pairs of lists whose item names mostly overlap (Jaccard similarity), likely duplicates
+    /// </summary>
+    private static List<SimilarLists> FindSimilarLists(List<(PackingActivity Activity, List<PackingItem> Items)> lists)
+    {
+        var candidates = lists
+            .Where(l => l.Items.Count >= SimilarityMinItems)
+            .Select(l => (l.Activity, Names: l.Items
+                .Select(i => i.Name.Trim().ToLowerInvariant())
+                .ToHashSet()))
+            .ToList();
+
+        var pairs = new List<SimilarLists>();
+
+        for (var i = 0; i < candidates.Count; i++)
+        {
+            for (var j = i + 1; j < candidates.Count; j++)
+            {
+                var first = candidates[i].Names;
+                var second = candidates[j].Names;
+
+                var shared = first.Count(second.Contains);
+                var union = first.Count + second.Count - shared;
+                var similarity = (double)shared / union;
+
+                if (similarity >= SimilarityThreshold)
+                {
+                    pairs.Add(new SimilarLists(candidates[i].Activity, candidates[j].Activity, (int)Math.Round(similarity * 100)));
+                }
+            }
+        }
+
+        return pairs.OrderByDescending(p => p.SharedPercent).ToList();
     }
 }

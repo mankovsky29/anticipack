@@ -14,6 +14,11 @@ namespace Anticipack.Storage
         public bool IsFinished { get; set; } = false; // Track if packing was finished (manually or by completing all items)
         public bool IsRecurring { get; set; } = true; // True for recurring activities, false for one-time activities
 
+        // Timing of the packing session in progress, persisted so leaving the screen doesn't lose it
+        public DateTime? SessionStartedAt { get; set; }
+        public DateTime? SessionLastActivityAt { get; set; }
+        public int SessionActiveSeconds { get; set; }
+
         [Ignore] // Not mapped, for convenience
         public IReadOnlyCollection<PackingItem>? Items { get; set; }
     }

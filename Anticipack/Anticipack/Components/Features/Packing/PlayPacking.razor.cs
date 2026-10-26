@@ -8,6 +8,7 @@ using Anticipack.Services.Packing;
 using Anticipack.Storage;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using Microsoft.Extensions.Localization;
 using Microsoft.JSInterop;
 
 namespace Anticipack.Components.Features.Packing;
@@ -22,14 +23,17 @@ public partial class PlayPacking
     [Inject] private INavigationHeaderService NavigationHeaderService { get; set; } = default!;
     [Inject] private IPackingHistoryService PackingHistoryService { get; set; } = default!;
     [Inject] private ILocalizationService LocalizationService { get; set; } = default!;
+    [Inject] private IStringLocalizer<AppResources> Localizer { get; set; } = default!;
 
     [Parameter]
     public string Id { get; set; } = string.Empty;
 
     private const int PackedItemAnimationDelayMs = 350;
 
+    // Longer pauses between checks are breaks, not packing; only this much of a gap counts as active time
+    private static readonly TimeSpan MaxCountedGapBetweenChecks = TimeSpan.FromMinutes(5);
+
     private bool _isLoading;
-    private DateTime _packingStartTime;
     private bool _showHistory = false;
     private bool _hideCheckedItems = true;
     private bool _sessionRecorded = false; // The current session is already in history; don't record it again
@@ -39,9 +43,10 @@ public partial class PlayPacking
 
     // History data
     private List<Storage.PackingHistoryEntry> _recentHistory = new();
-    private string _averagePackingTime = "-";
+    private string _typicalPackingTime = "-";
     private string _lastPackedDate = "-";
     private PackingTimeComparison? _timeComparison;
+    private TimeSpan _lastSessionDuration;
 
     private ElementReference contentArea;
     private int _currentFocusIndex = -1;
@@ -56,8 +61,6 @@ public partial class PlayPacking
 
     protected override async Task OnInitializedAsync()
     {
-        _packingStartTime = DateTime.Now;
-
         if (!string.IsNullOrEmpty(Id))
         {
             await LoadItemsForPackingAsync(Id);
@@ -90,6 +93,7 @@ public partial class PlayPacking
             if (shouldResetItems)
             {
                 _currentActivity.IsFinished = false;
+                ClearSessionTiming();
                 await PackingRepository.AddOrUpdateAsync(_currentActivity);
 
                 // Also update items in repository
@@ -139,11 +143,10 @@ public partial class PlayPacking
             // Load recent history
             _recentHistory = await PackingHistoryService.GetRecentHistoryAsync(activityId, 5);
 
-            // Load average packing time
-            var avgTime = await PackingHistoryService.GetAveragePackingTimeAsync(activityId);
-            _averagePackingTime = avgTime is null
+            var typicalTime = await PackingHistoryService.GetTypicalPackingTimeAsync(activityId);
+            _typicalPackingTime = typicalTime is null
                 ? "-"
-                : $"{(int)avgTime.Value.TotalMinutes} min";
+                : PackingDurationFormatter.Format(typicalTime.Value, Localizer);
 
             // Load last packed date
             var lastSession = await PackingHistoryService.GetLastPackingSessionAsync(activityId);
@@ -154,7 +157,7 @@ public partial class PlayPacking
         catch
         {
             // Silently fail if history loading fails
-            _averagePackingTime = "-";
+            _typicalPackingTime = "-";
             _lastPackedDate = "-";
         }
     }
@@ -181,12 +184,49 @@ public partial class PlayPacking
             {
                 item.Item.IsPacked = item.IsChecked;
                 await PackingRepository.AddOrUpdateItemAsync(item.Item);
+                await TrackSessionActivityAsync();
             }
             catch (Exception ex)
             {
                 ToastService.ShowError(string.Format(AppResources.ErrorSavingItemState, ex.Message));
             }
         }
+    }
+
+    /// <summary>
+    /// Adds the time since the previous check to the session's active time.
+    /// The session spans from the first check to the last one, survives leaving
+    /// the screen, and ignores long breaks.
+    /// </summary>
+    private async Task TrackSessionActivityAsync()
+    {
+        var now = DateTime.Now;
+
+        if (_currentActivity.SessionLastActivityAt is { } lastActivity)
+        {
+            var gap = now - lastActivity;
+            if (gap < TimeSpan.Zero)
+                gap = TimeSpan.Zero;
+            if (gap > MaxCountedGapBetweenChecks)
+                gap = MaxCountedGapBetweenChecks;
+
+            _currentActivity.SessionActiveSeconds += (int)gap.TotalSeconds;
+        }
+        else
+        {
+            _currentActivity.SessionStartedAt = now;
+            _currentActivity.SessionActiveSeconds = 0;
+        }
+
+        _currentActivity.SessionLastActivityAt = now;
+        await PackingRepository.AddOrUpdateAsync(_currentActivity);
+    }
+
+    private void ClearSessionTiming()
+    {
+        _currentActivity.SessionStartedAt = null;
+        _currentActivity.SessionLastActivityAt = null;
+        _currentActivity.SessionActiveSeconds = 0;
     }
 
     private void UpdateCategoryStateAfterItemChange(string category)
@@ -260,15 +300,12 @@ public partial class PlayPacking
 
     private string GetHistoryEntryDescription(Storage.PackingHistoryEntry entry)
     {
-        var durationMinutes = (int)(entry.DurationSeconds / 60.0);
+        // Older sessions only have wall-clock duration
+        var durationMinutes = (int)((entry.ActiveDurationSeconds ?? entry.DurationSeconds) / 60.0);
         return string.Format(AppResources.PackedItemsInMinutes, entry.PackedItems, durationMinutes);
     }
 
-    private string GetPackingDuration()
-    {
-        var duration = DateTime.Now - _packingStartTime;
-        return string.Format(AppResources.DurationMinutes, (int)duration.TotalMinutes);
-    }
+    private string GetPackingDuration() => PackingDurationFormatter.Format(_lastSessionDuration, Localizer);
 
     /// <summary>
     /// Records the session as soon as every item is packed, so progress is saved
@@ -276,7 +313,17 @@ public partial class PlayPacking
     /// </summary>
     private async Task CompleteSessionIfDoneAsync()
     {
-        if (_sessionRecorded || !Items.Any() || Items.Any(i => !i.IsChecked))
+        if (Items.Any() && Items.All(i => i.IsChecked))
+            await CompleteSessionAsync();
+    }
+
+    /// <summary>
+    /// Records the session; any items still unchecked are stored as skipped
+    /// so the user can later review items they rarely take.
+    /// </summary>
+    private async Task CompleteSessionAsync()
+    {
+        if (_sessionRecorded || !Items.Any())
             return;
 
         _sessionRecorded = true;
@@ -284,22 +331,28 @@ public partial class PlayPacking
         try
         {
             var endTime = DateTime.Now;
+            var skippedItemIds = Items.Where(i => !i.IsChecked).Select(i => i.Item.Id).ToList();
+            var startTime = _currentActivity.SessionStartedAt ?? endTime;
+            _lastSessionDuration = TimeSpan.FromSeconds(_currentActivity.SessionActiveSeconds);
 
-            // Compare before recording so the current session doesn't skew the average
-            _timeComparison = await PackingHistoryService.CompareWithAverageAsync(Id, endTime - _packingStartTime);
+            // Compare before recording so the current session doesn't skew the typical time
+            _timeComparison = await PackingHistoryService.CompareWithTypicalAsync(Id, _lastSessionDuration);
 
             await PackingHistoryService.RecordPackingSessionAsync(
                 Id,
-                _packingStartTime,
+                startTime,
                 endTime,
+                _lastSessionDuration,
                 Items.Count,
-                Items.Count
+                Items.Count - skippedItemIds.Count,
+                skippedItemIds
             );
 
             // Update activity
             _currentActivity.LastPacked = endTime;
             _currentActivity.RunCount++;
             _currentActivity.IsFinished = true; // Mark as finished
+            ClearSessionTiming();
 
             // For one-time activities, automatically archive after completion
             if (!_currentActivity.IsRecurring)
@@ -376,13 +429,15 @@ public partial class PlayPacking
 
         // Start a fresh session that can be recorded again once completed
         _sessionRecorded = false;
-        _packingStartTime = DateTime.Now;
+        ClearSessionTiming();
 
         // Save to repository
         if (!string.IsNullOrEmpty(Id))
         {
             try
             {
+                await PackingRepository.AddOrUpdateAsync(_currentActivity);
+
                 foreach (var item in Items)
                 {
                     await PackingRepository.AddOrUpdateItemAsync(item.Item);
@@ -478,41 +533,14 @@ public partial class PlayPacking
 
         bool confirm = await DialogService.ShowConfirmAsync(
             AppResources.FinishPacking,
-            string.Format(AppResources.ConfirmFinishPackingWithAutoCheck, packedCount, totalCount, remainingCount),
+            string.Format(Localizer["ConfirmFinishPackingWithSkipped"], packedCount, totalCount, remainingCount),
             AppResources.FinishNow,
             AppResources.Cancel);
 
         if (confirm)
         {
-            await FinishPackingNow();
+            // Unchecked items stay unpacked and are recorded as skipped, not silently marked as packed
+            await CompleteSessionAsync();
         }
-    }
-
-    private async Task FinishPackingNow()
-    {
-        try
-        {
-            // Automatically check all remaining unchecked items
-            var uncheckedItems = Items.Where(i => !i.IsChecked).ToList();
-            foreach (var item in uncheckedItems)
-            {
-                item.IsChecked = true;
-                item.Item.IsPacked = true;
-                await PackingRepository.AddOrUpdateItemAsync(item.Item);
-            }
-
-            // Update UI state for all categories
-            foreach (var category in _categoryOrder)
-            {
-                UpdateCategoryStateAfterItemChange(category);
-            }
-        }
-        catch (Exception ex)
-        {
-            ToastService.ShowError(string.Format(AppResources.ErrorFinishingPacking, ex.Message));
-            return;
-        }
-
-        await CompleteSessionIfDoneAsync();
     }
 }

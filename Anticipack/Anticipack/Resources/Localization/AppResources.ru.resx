@@ -735,88 +735,10 @@
   </data>
   <!-- Statistics Page -->
   <data name="StatsMenu" xml:space="preserve">
-    <value>Статистика</value>
-  </data>
-  <data name="StatsTitle" xml:space="preserve">
-    <value>Статистика</value>
-  </data>
-  <data name="StatsOverview" xml:space="preserve">
     <value>Обзор</value>
   </data>
-  <data name="StatsTotalActivities" xml:space="preserve">
-    <value>Активности</value>
-  </data>
-  <data name="StatsTotalSessions" xml:space="preserve">
-    <value>Сессии</value>
-  </data>
-  <data name="StatsItemsPacked" xml:space="preserve">
-    <value>Упаковано</value>
-  </data>
-  <data name="StatsEfficiency" xml:space="preserve">
-    <value>Эффективность</value>
-  </data>
-  <data name="StatsTimeTitle" xml:space="preserve">
-    <value>Время</value>
-  </data>
-  <data name="StatsAvgTime" xml:space="preserve">
-    <value>Среднее время упаковки</value>
-  </data>
-  <data name="StatsFastestSession" xml:space="preserve">
-    <value>Быстрейшая сессия</value>
-  </data>
-  <data name="StatsTotalTime" xml:space="preserve">
-    <value>Общее время упаковки</value>
-  </data>
-  <data name="StatsRecentTrend" xml:space="preserve">
-    <value>Последние сессии</value>
-  </data>
-  <data name="StatsActivityBreakdown" xml:space="preserve">
-    <value>Лучшие активности</value>
-  </data>
-  <data name="StatsMostPacked" xml:space="preserve">
-    <value>Чаще всего</value>
-  </data>
-  <data name="StatsMostEfficient" xml:space="preserve">
-    <value>Самая эффективная</value>
-  </data>
-  <data name="StatsNeedsWork" xml:space="preserve">
-    <value>Нужна доработка</value>
-  </data>
-  <data name="StatsMostItems" xml:space="preserve">
-    <value>Самый большой список</value>
-  </data>
-  <data name="StatsSessionCount" xml:space="preserve">
-    <value>{0} сессий</value>
-  </data>
-  <data name="StatsItemCountValue" xml:space="preserve">
-    <value>{0} предметов</value>
-  </data>
-  <data name="StatsUsagePatterns" xml:space="preserve">
-    <value>Паттерны использования</value>
-  </data>
-  <data name="StatsStreak" xml:space="preserve">
-    <value>Дней подряд</value>
-  </data>
-  <data name="StatsThisMonth" xml:space="preserve">
-    <value>Этот месяц</value>
-  </data>
-  <data name="StatsLastMonth" xml:space="preserve">
-    <value>Прошлый месяц</value>
-  </data>
-  <data name="StatsMostActiveDay" xml:space="preserve">
-    <value>Самый активный день</value>
-  </data>
-  <data name="StatsLastPacked" xml:space="preserve">
-    <value>Последняя упаковка</value>
-  </data>
-  <data name="StatsCategoryInsights" xml:space="preserve">
-    <value>Категории</value>
-  </data>
-  <data name="StatsTopCategory" xml:space="preserve">
-    <value>Топ категория: {0}</value>
-  </data>
-  <data name="StatsEmptyHint" xml:space="preserve">
-    <value>Завершите несколько сессий упаковки, чтобы увидеть подробную статистику по времени, активностям и категориям.</value>
+  <data name="StatsTitle" xml:space="preserve">
+    <value>Обзор</value>
   </data>
   <data name="Multiple" xml:space="preserve">
     <value>Несколько</value>
@@ -921,5 +843,89 @@
   </data>
   <data name="ContactUs" xml:space="preserve">
     <value>Связаться с нами</value>
+  </data>
+  <data name="ConfirmFinishPackingWithSkipped" xml:space="preserve">
+    <value>Вы упаковали {0} из {1} предметов. Всё равно завершить? {2} неупакованных предмет(ов) будут отмечены, чтобы вы могли проверить их позже.</value>
+  </data>
+  <data name="OftenSkippedTitle" xml:space="preserve">
+    <value>Часто остаются неупакованными</value>
+  </data>
+  <data name="OftenSkippedHint" xml:space="preserve">
+    <value>Удалите ненужные предметы или оставьте их в списке.</value>
+  </data>
+  <data name="SkippedTimes" xml:space="preserve">
+    <value>Пропущено {0} из последних {1} раз</value>
+  </data>
+  <data name="RemoveItem" xml:space="preserve">
+    <value>Удалить</value>
+  </data>
+  <data name="KeepItem" xml:space="preserve">
+    <value>Оставить</value>
+  </data>
+  <data name="DurationUnderMinute" xml:space="preserve">
+    <value>&lt;1 мин</value>
+  </data>
+  <data name="DurationMinutesShort" xml:space="preserve">
+    <value>{0} мин</value>
+  </data>
+  <data name="DurationHoursMinutesShort" xml:space="preserve">
+    <value>{0} ч {1} мин</value>
+  </data>
+  <data name="UsuallyTakes" xml:space="preserve">
+    <value>Обычно занимает {0}</value>
+  </data>
+  <data name="TypicalTime" xml:space="preserve">
+    <value>Обычное время</value>
+  </data>
+  <data name="FasterThanUsual" xml:space="preserve">
+    <value>На {0} быстрее обычного</value>
+  </data>
+  <data name="SlowerThanUsual" xml:space="preserve">
+    <value>На {0} дольше обычного</value>
+  </data>
+  <data name="AboutAsUsual" xml:space="preserve">
+    <value>Примерно как обычно</value>
+  </data>
+  <data name="TripsThisYear" xml:space="preserve">
+    <value>Сборов в этом году</value>
+  </data>
+  <data name="PackingTimeThisYear" xml:space="preserve">
+    <value>Времени на сборы в этом году</value>
+  </data>
+  <data name="GoToList" xml:space="preserve">
+    <value>Ваш любимый список</value>
+  </data>
+  <data name="GoToListTrips" xml:space="preserve">
+    <value>Сборов за последние 12 месяцев: {0}</value>
+  </data>
+  <data name="InsightsEmptyHint" xml:space="preserve">
+    <value>Соберите список, чтобы здесь появилась сводка.</value>
+  </data>
+  <data name="ListHealthTitle" xml:space="preserve">
+    <value>Требует внимания</value>
+  </data>
+  <data name="UnfinishedListsTitle" xml:space="preserve">
+    <value>Начаты, но не завершены</value>
+  </data>
+  <data name="ContinuePacking" xml:space="preserve">
+    <value>Продолжить</value>
+  </data>
+  <data name="UnusedListsTitle" xml:space="preserve">
+    <value>Не использовались 3 месяца</value>
+  </data>
+  <data name="LastPackedOn" xml:space="preserve">
+    <value>Последний сбор: {0}</value>
+  </data>
+  <data name="EmptyListsTitle" xml:space="preserve">
+    <value>Списки без предметов</value>
+  </data>
+  <data name="SimilarListsTitle" xml:space="preserve">
+    <value>Похожие списки</value>
+  </data>
+  <data name="SimilarListsDetail" xml:space="preserve">
+    <value>Совпадает {0}% предметов. Возможно, стоит оставить один.</value>
+  </data>
+  <data name="AllListsHealthy" xml:space="preserve">
+    <value>Все ваши списки в порядке</value>
   </data>
 </root>

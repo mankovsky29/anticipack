@@ -121,8 +121,8 @@
                     <span class="stat-label">@AppResources.TimesPacked</span>
                 </div>
                 <div class="stat-card">
-                    <span class="stat-value">@_averagePackingTime</span>
-                    <span class="stat-label">@AppResources.AvgTime</span>
+                    <span class="stat-value">@_typicalPackingTime</span>
+                    <span class="stat-label">@Localizer["TypicalTime"]</span>
                 </div>
                 <div class="stat-card">
                     <span class="stat-value">@_lastPackedDate</span>
@@ -163,15 +163,15 @@
             </div>
             
             <h3>@AppResources.PackingComplete</h3>
-            <p>@string.Format(AppResources.YouPackedItems, Items.Count, GetPackingDuration())</p>
+            <p>@string.Format(AppResources.YouPackedItems, Items.Count(i => i.IsChecked), GetPackingDuration())</p>
             <p class="completion-save-hint">@SessionSavedMessage</p>
             
-            @if (_timeComparison is { Difference.Ticks: not 0 })
+            @if (_timeComparison is not null)
             {
                 <div class="completion-stats">
                     <div class="stat">
-                        <span class="label">@AppResources.ComparedToLastTime</span>
-                        <span class="value @(_timeComparison.IsFaster ? "better" : "slower")">@_timeComparison.FormattedDifference</span>
+                        <span class="label">@Localizer["TypicalTime"]: @PackingDurationFormatter.Format(_timeComparison.Typical, Localizer)</span>
+                        <span class="value @(_timeComparison.IsFaster ? "better" : "slower")">@PackingDurationFormatter.FormatComparison(_timeComparison, Localizer)</span>
                     </div>
                 </div>
             }

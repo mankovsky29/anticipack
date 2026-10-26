@@ -43,6 +43,7 @@ public class PackingItemDto
     public string? Category { get; set; }
     public string? Notes { get; set; }
     public int SortOrder { get; set; }
+    public DateTime? SkipSuggestionDismissedAt { get; set; }
     public DateTime? DeletedAt { get; set; }
     public DateTime ModifiedAt { get; set; }
 }
@@ -60,4 +61,6 @@ public class PackingHistoryEntryDto
     public int DurationSeconds { get; set; }
     public DateTime StartTime { get; set; }
     public DateTime EndTime { get; set; }
+    public int? ActiveDurationSeconds { get; set; }
+    public string? SkippedItemIds { get; set; }
 }

@@ -3,7 +3,7 @@ using Anticipack.Components.Shared.NavigationHeaderComponent;
 using Anticipack.Components.Shared.ToastComponent;
 using Anticipack.Resources.Localization;
 using Anticipack.Services;
-using Anticipack.Services.Categories;
+using Anticipack.Services.Packing;
 using Anticipack.Storage;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Localization;
@@ -26,6 +26,7 @@ public partial class PackingActivities : IAsyncDisposable
     [Inject] private IJSRuntime JSRuntime { get; set; } = default!;
     [Inject] private IKeyboardService KeyboardService { get; set; } = default!;
     [Inject] private IToastService ToastService { get; set; } = default!;
+    [Inject] private IPackingHistoryService PackingHistoryService { get; set; } = default!;
 
     [Parameter]
     [SupplyParameterFromQuery(Name = "create")]
@@ -40,6 +41,7 @@ public partial class PackingActivities : IAsyncDisposable
     private List<Storage.PackingActivity> _activities = new();
     private Dictionary<string, int> _activityItemCounts = new();
     private Dictionary<string, int> _activityPackedCounts = new();
+    private Dictionary<string, TimeSpan> _typicalPackingTimes = new();
     private bool _isLoading = true;
     private string _searchTerm = string.Empty;
     private ArchiveFilterType _archiveFilter = ArchiveFilterType.Active;
@@ -186,6 +188,8 @@ public partial class PackingActivities : IAsyncDisposable
                 _activityItemCounts[activity.Id] = items.Count;
                 _activityPackedCounts[activity.Id] = items.Count(i => i.IsPacked);
             }
+
+            _typicalPackingTimes = await PackingHistoryService.GetTypicalPackingTimesAsync();
 
             // Leave the Archived view once there is nothing left in it
             if (!_activities.Any(a => a.IsArchived))

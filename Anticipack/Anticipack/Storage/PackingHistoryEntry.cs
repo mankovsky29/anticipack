@@ -29,5 +29,17 @@ namespace Anticipack.Storage
         /// End time of the packing session
         /// </summary>
         public DateTime EndTime { get; set; }
+
+        /// <summary>
+        /// Time actually spent packing (idle gaps between checks are capped).
+        /// Null for sessions recorded before active time was measured.
+        /// </summary>
+        public int? ActiveDurationSeconds { get; set; }
+
+        /// <summary>
+        /// Comma-separated ids of items left unpacked when the session was finished.
+        /// Null for sessions recorded before skipped items were tracked.
+        /// </summary>
+        public string? SkippedItemIds { get; set; }
     }
 }

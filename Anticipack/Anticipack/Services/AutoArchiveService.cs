@@ -8,7 +8,7 @@ namespace Anticipack.Services;
 public sealed class AutoArchiveService : IAutoArchiveService
 {
     private const string PreferenceKey = "AutoArchiveDays";
-    private const int DefaultDays = 7;
+    private const int DefaultDays = 0;
 
     private readonly IPackingActivityRepository _activityRepository;
 

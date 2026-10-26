@@ -9,16 +9,6 @@
 @implements IDisposable
 
 <div class="settings-page">
-    <div class="settings-header">
-        <div class="header-content">
-            <i class="fas fa-cog"></i>
-            <div>
-                <h2>@AppResources.Settings</h2>
-                <p>@AppResources.CustomizeExperience</p>
-            </div>
-        </div>
-    </div>
-
     <div class="settings-content">
         <!-- Appearance Section -->
         <div class="setting-section">
@@ -121,61 +111,16 @@
                 </div>
             </div>
         </div>
-
-        <!-- Notifications Section (Coming Soon) -->
-        <div class="setting-section">
-            <div class="section-header">
-                <i class="fas fa-bell"></i>
-                <span>@AppResources.Notifications</span>
-                <div class="coming-soon-badge">@AppResources.ComingSoon</div>
-            </div>
-            
-            <div class="section-body">
-                <div class="setting-row">
-                    <div class="setting-info">
-                        <label>@AppResources.PushNotifications</label>
-                        <span class="setting-hint">@AppResources.NotifiedAboutUpdates</span>
-                    </div>
-                    <label class="toggle-switch">
-                        <input type="checkbox" @bind="NotificationsEnabled" disabled>
-                        <span class="toggle-slider"></span>
-                    </label>
-                </div>
-            </div>
-        </div>
-
-        <!-- Data & Storage Section (Coming Soon) -->
-        <div class="setting-section">
-            <div class="section-header">
-                <i class="fas fa-database"></i>
-                <span>@AppResources.DataStorage</span>
-                <div class="coming-soon-badge">@AppResources.ComingSoon</div>
-            </div>
-
-            <div class="section-body">
-                <button class="setting-action" disabled>
-                    <div class="action-content">
-                        <i class="fas fa-trash-alt"></i>
-                        <div>
-                            <div class="action-title">@AppResources.ClearCache</div>
-                            <div class="action-subtitle">@AppResources.FreeUpStorage</div>
-                        </div>
-                    </div>
-                    <i class="fas fa-chevron-right"></i>
-                </button>
-            </div>
-        </div>
     </div>
 
     <div class="settings-footer">
         <i class="fas fa-info-circle"></i>
-        <span>@AppResources.Version 1.0.0</span>
+        <span>@AppResources.Version @AppInfo.Current.VersionString</span>
     </div>
 </div>
 
 @code {
     private string CurrentTheme { get; set; } = "light";
-    private bool NotificationsEnabled { get; set; } = false;
     private int _autoArchiveDays;
     private readonly string _decreaseText = AppResources.ResourceManager.GetString("Decrease") ?? "Decrease";
     private readonly string _increaseText = AppResources.ResourceManager.GetString("Increase") ?? "Increase";

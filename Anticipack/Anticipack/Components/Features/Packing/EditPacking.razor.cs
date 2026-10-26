@@ -54,25 +54,24 @@ public partial class EditPacking : IAsyncDisposable
     private double _keyboardHeight;
     private Storage.PackingActivity _currentActivity = new Storage.PackingActivity();
     private string _activityName = string.Empty;
-    private bool _isSettingsExpanded = false; // Collapsed by default
     private bool _isOverflowMenuOpen = false;
     private bool _overflowMenuJustOpened = false;
 
     private List<ParsedItem> _parsedItems = [];
-    private List<string> _duplicateItems = [];
     private HashSet<string> _existingItemNames = new(StringComparer.OrdinalIgnoreCase);
-    private bool _isPreviewExpanded;
 
     // Autocomplete suggestions
     private List<string> _suggestions = [];
 
-    private bool HasInput => !string.IsNullOrWhiteSpace(_bulkItemsText);
-
     private bool CanAdd => _parsedItems.Count > 0;
+
+    // Category headers are only worth showing when items are actually split across categories
+    private bool HasMultipleCategories => Items.Select(i => i.Item.Category).Distinct(StringComparer.OrdinalIgnoreCase).Skip(1).Any();
 
     private PackingItemView? _editingItem = null;
     private ElementReference itemEditInputElement;
     private ElementReference bulkItemsTextarea;
+    private ElementReference activityNameInput;
 
     private string? _editingOriginalName;
     private string? _editingOriginalNotes;
@@ -178,8 +177,6 @@ public partial class EditPacking : IAsyncDisposable
         _isAddingItem = false;
         _bulkItemsText = string.Empty;
         _parsedItems = [];
-        _duplicateItems = [];
-        _isPreviewExpanded = false;
         UpdateSuggestions();
         await SyncClickOutsideHandlerAsync();
     }
@@ -260,8 +257,6 @@ public partial class EditPacking : IAsyncDisposable
         _isAddingItem = true;
         _bulkItemsText = string.Empty;
         _parsedItems = [];
-        _duplicateItems = [];
-        _isPreviewExpanded = false;
 
         // Cache existing item names for duplicate detection
         _existingItemNames = Items
@@ -273,11 +268,6 @@ public partial class EditPacking : IAsyncDisposable
         _pendingScrollToAddForm = true;
         _pendingFocusAddForm = true;
         await SyncClickOutsideHandlerAsync();
-    }
-
-    private async Task ShowAddItemFormForCategory(string category)
-    {
-        await ShowAddItemForm();
     }
 
     private async Task OnBulkTextChanged()
@@ -293,22 +283,7 @@ public partial class EditPacking : IAsyncDisposable
 
         // Remove duplicates within the input (case-insensitive)
         var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        var uniqueItems = new List<ParsedItem>();
-        _duplicateItems = [];
-
-        foreach (var item in allItems)
-        {
-            if (seen.Add(item.Name))
-            {
-                uniqueItems.Add(item);
-            }
-            else
-            {
-                _duplicateItems.Add(item.Name);
-            }
-        }
-
-        _parsedItems = uniqueItems;
+        _parsedItems = allItems.Where(item => seen.Add(item.Name)).ToList();
     }
 
     private static List<ParsedItem> ParseInputItems(string text)
@@ -438,11 +413,6 @@ public partial class EditPacking : IAsyncDisposable
         StateHasChanged();
     }
 
-    private void ToggleSettings()
-    {
-        _isSettingsExpanded = !_isSettingsExpanded;
-    }
-
     private async Task ToggleOverflowMenuAsync()
     {
         _isOverflowMenuOpen = !_isOverflowMenuOpen;
@@ -483,20 +453,18 @@ public partial class EditPacking : IAsyncDisposable
 
         _currentActivity.IsRecurring = isRecurring;
         await SaveActivityAsync();
-        
-        var message = isRecurring 
-            ? $"✓ {Localizer["RecurringActivity"]}" 
-            : $"✓ {Localizer["OneTimeActivity"]}";
     }
 
-    private async Task SaveArchiveStatusAsync()
+    private async Task ToggleArchiveAsync()
     {
+        await CloseOverflowMenuAsync();
+        _currentActivity.IsArchived = !_currentActivity.IsArchived;
         await SaveActivityAsync();
-        
-        var archiveText = _currentActivity.IsArchived 
-            ? Localizer["Archived"] 
-            : Localizer["Active"];
-        ToastService.ShowSuccess($"✓ {archiveText}");
+
+        var message = _currentActivity.IsArchived
+            ? string.Format(Localizer["ActivityArchived"], _currentActivity.Name)
+            : string.Format(Localizer["ActivityUnarchived"], _currentActivity.Name);
+        ToastService.ShowSuccess(message);
     }
 
     private async Task SaveActivityAsync()
@@ -636,8 +604,14 @@ public partial class EditPacking : IAsyncDisposable
         // Trim the activity name
         _activityName = _activityName?.Trim() ?? string.Empty;
 
-        // Don't save if name is empty or unchanged
-        if (string.IsNullOrWhiteSpace(_activityName) || _activityName == _currentActivity?.Name)
+        // An activity always needs a name, so restore the previous one when cleared
+        if (string.IsNullOrWhiteSpace(_activityName))
+        {
+            _activityName = _currentActivity.Name ?? AppResources.NewPackingActivity;
+            return;
+        }
+
+        if (_activityName == _currentActivity.Name)
             return;
 
         try
@@ -653,6 +627,22 @@ public partial class EditPacking : IAsyncDisposable
             _activityName = _currentActivity?.Name ?? AppResources.NewPackingActivity;
             StateHasChanged();
         }
+    }
+
+    private async Task SelectActivityNameText()
+    {
+        // Default names are placeholders, so make them easy to type over
+        try
+        {
+            await JSRuntime.InvokeVoidAsync("selectAllText", activityNameInput);
+        }
+        catch { }
+    }
+
+    private async Task HandleActivityNameKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+            await SaveActivityNameAsync();
     }
 
     // Drag & drop handlers

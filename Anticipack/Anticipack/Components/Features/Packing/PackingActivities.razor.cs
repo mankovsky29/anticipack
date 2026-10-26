@@ -14,7 +14,8 @@ namespace Anticipack.Components.Features.Packing;
 
 public partial class PackingActivities : IAsyncDisposable
 {
-    private const string OnboardingSeenPreferenceKey = "ux.onboarding.seen.v1";
+    // Search only earns its space once the list no longer fits at a glance
+    private const int SearchVisibleThreshold = 6;
 
     [Inject] private IPackingRepository PackingRepository { get; set; } = default!;
     [Inject] private NavigationManager Navigation { get; set; } = default!;
@@ -24,7 +25,6 @@ public partial class PackingActivities : IAsyncDisposable
     [Inject] private INavigationHeaderService NavigationHeaderService { get; set; } = default!;
     [Inject] private IJSRuntime JSRuntime { get; set; } = default!;
     [Inject] private IKeyboardService KeyboardService { get; set; } = default!;
-    [Inject] private ICategoryIconProvider CategoryIconProvider { get; set; } = default!;
     [Inject] private IToastService ToastService { get; set; } = default!;
 
     [Parameter]
@@ -40,7 +40,6 @@ public partial class PackingActivities : IAsyncDisposable
     private List<Storage.PackingActivity> _activities = new();
     private Dictionary<string, int> _activityItemCounts = new();
     private Dictionary<string, int> _activityPackedCounts = new();
-    private Dictionary<string, List<string>> _activityTopCategories = new();
     private bool _isLoading = true;
     private string _searchTerm = string.Empty;
     private ArchiveFilterType _archiveFilter = ArchiveFilterType.Active;
@@ -53,7 +52,6 @@ public partial class PackingActivities : IAsyncDisposable
 
     // Scroll to top
     private bool _showScrollToTop;
-    private bool _showOnboardingCard;
     private bool _hasHandledCreateQuery;
     
     // Keyboard
@@ -108,8 +106,6 @@ public partial class PackingActivities : IAsyncDisposable
     {
         NavigationHeaderService.SetText(Localizer["PackingActivitiesMenu"]);
         await LoadActivitiesAsync();
-
-        _showOnboardingCard = !_activities.Any() && !Preferences.Default.Get(OnboardingSeenPreferenceKey, false);
     }
 
     protected override async Task OnParametersSetAsync()
@@ -183,24 +179,17 @@ public partial class PackingActivities : IAsyncDisposable
             // Load metadata for each activity
             _activityItemCounts.Clear();
             _activityPackedCounts.Clear();
-            _activityTopCategories.Clear();
 
             foreach (var activity in _activities)
             {
                 var items = await PackingRepository.GetItemsForActivityAsync(activity.Id);
                 _activityItemCounts[activity.Id] = items.Count;
                 _activityPackedCounts[activity.Id] = items.Count(i => i.IsPacked);
-                
-                // Get top categories by count
-                var topCategories = items
-                    .GroupBy(i => i.Category)
-                    .OrderByDescending(g => g.Count())
-                    .Select(g => g.Key)
-                    .Where(c => !string.IsNullOrEmpty(c))
-                    .ToList();
-                    
-                _activityTopCategories[activity.Id] = topCategories;
             }
+
+            // Leave the Archived view once there is nothing left in it
+            if (!_activities.Any(a => a.IsArchived))
+                _archiveFilter = ArchiveFilterType.Active;
         }
         catch
         {
@@ -212,6 +201,10 @@ public partial class PackingActivities : IAsyncDisposable
             StateHasChanged();
         }
     }
+
+    private bool ShowSearch => _activities.Count >= SearchVisibleThreshold || !string.IsNullOrWhiteSpace(_searchTerm);
+
+    private bool ShowArchiveFilter => _activities.Any(a => a.IsArchived);
 
     private IEnumerable<Storage.PackingActivity> FilteredActivities
     {
@@ -256,16 +249,6 @@ public partial class PackingActivities : IAsyncDisposable
         return dateTime.ToString("MMM d, yyyy");
     }
 
-    private string GetItemsText()
-    {
-        return Localizer["Items"].Value.ToString().ToLower();
-    }
-
-    private string GetCategoryIcon(string category)
-    {
-        return "fa " + CategoryIconProvider.GetIcon(category);
-    }
-
     private async Task AddNewActivityAsync()
     {
         if (_isCreating)
@@ -276,18 +259,12 @@ public partial class PackingActivities : IAsyncDisposable
             NavigationHeaderService.SetNavMenuExpanded(false);
         }
 
-        if (_showOnboardingCard)
-        {
-            Preferences.Default.Set(OnboardingSeenPreferenceKey, true);
-            _showOnboardingCard = false;
-        }
-
         _isCreating = true;
 
         var createdAt = DateTime.Now;
         var newActivity = new Storage.PackingActivity
         {
-            Name = createdAt.ToString("yyyy-MM-dd:hh:mm"),
+            Name = $"{Localizer["NewPackingActivity"]} {createdAt.ToString("d MMM", LocalizationService.CurrentCulture)}",
             LastPacked = createdAt,
             IsShared = false,
             IsRecurring = false
@@ -308,31 +285,13 @@ public partial class PackingActivities : IAsyncDisposable
         }
     }
 
-    private void DismissOnboarding()
-    {
-        Preferences.Default.Set(OnboardingSeenPreferenceKey, true);
-        _showOnboardingCard = false;
-    }
-
     private async Task ToggleArchiveActivity(Storage.PackingActivity activity)
     {
         await CloseMenuAsync();
-        var newArchiveState = !activity.IsArchived;
-        var confirmMessage = newArchiveState 
-            ? string.Format(Localizer["ConfirmArchive"], activity.Name)
-            : string.Format(Localizer["ConfirmUnarchive"], activity.Name);
-        
-        var result = await DialogService.ShowConfirmAsync(
-            Localizer["ChangeArchiveStatus"], 
-            confirmMessage,
-            Localizer["Confirm"],
-            Localizer["Cancel"]);
-        
-        if (!result) 
-            return;
-            
-        activity.IsArchived = newArchiveState;
-        
+
+        // Archiving is reversible from the Archived filter, so it skips the confirmation step
+        activity.IsArchived = !activity.IsArchived;
+
         try
         {
             await PackingRepository.AddOrUpdateAsync(activity);
@@ -344,6 +303,7 @@ public partial class PackingActivities : IAsyncDisposable
         }
         catch
         {
+            activity.IsArchived = !activity.IsArchived;
             ToastService.ShowError(Localizer["FailedToUpdateArchiveStatus"]);
         }
     }

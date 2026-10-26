@@ -863,7 +863,6 @@
 :root.platform-native .activity-card,
 :root.platform-native .settings-panel,
 :root.platform-native .progress-container,
-:root.platform-native .onboarding-card,
 :root.platform-native .add-item-form,
 :root.platform-native .category {
     background: var(--card-bg-native);

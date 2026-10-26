@@ -19,60 +19,48 @@
     }
     else
     {
-        <div class="sticky-header">
-            <!-- Always visible search bar -->
-            <div class="search-bar">
-                <i class="fa fa-search search-icon"></i>
-                <input type="text" 
-                       class="search-input" 
-                       placeholder="@Localizer["SearchPlaceholder"]" 
-                       @bind="_searchTerm" 
-                       @bind:event="oninput" />
-                @if (!string.IsNullOrWhiteSpace(_searchTerm))
+        @* Search and filters only appear once they are useful *@
+        @if (ShowSearch || ShowArchiveFilter)
+        {
+            <div class="sticky-header">
+                @if (ShowSearch)
                 {
-                    <button class="search-clear-btn" @onclick="ClearSearch">
-                        <i class="fa fa-times"></i>
-                    </button>
+                    <div class="search-bar">
+                        <i class="fa fa-search search-icon"></i>
+                        <input type="text"
+                               class="search-input"
+                               placeholder="@Localizer["SearchPlaceholder"]"
+                               @bind="_searchTerm"
+                               @bind:event="oninput" />
+                        @if (!string.IsNullOrWhiteSpace(_searchTerm))
+                        {
+                            <button class="search-clear-btn" @onclick="ClearSearch">
+                                <i class="fa fa-times"></i>
+                            </button>
+                        }
+                    </div>
+                }
+
+                @if (ShowArchiveFilter)
+                {
+                    <div class="filter-bar">
+                        <div class="filter-chips">
+                            <button class="filter-chip @(_archiveFilter == ArchiveFilterType.Active ? "active" : "")"
+                                    @onclick="() => SetArchiveFilter(ArchiveFilterType.Active)">
+                                <i class="fa fa-layer-group"></i>
+                                <span>@Localizer["Active"]</span>
+                            </button>
+                            <button class="filter-chip @(_archiveFilter == ArchiveFilterType.Archived ? "active" : "")"
+                                    @onclick="() => SetArchiveFilter(ArchiveFilterType.Archived)">
+                                <i class="fa fa-archive"></i>
+                                <span>@Localizer["Archived"]</span>
+                            </button>
+                        </div>
+                    </div>
                 }
             </div>
-
-            <!-- Filter Bar -->
-            <div class="filter-bar">
-                <div class="filter-chips">
-                    <button class="filter-chip @(_archiveFilter == ArchiveFilterType.Active ? "active" : "")" 
-                            @onclick="() => SetArchiveFilter(ArchiveFilterType.Active)">
-                        <i class="fa fa-layer-group"></i>
-                        <span>@Localizer["Active"]</span>
-                    </button>
-                    <button class="filter-chip @(_archiveFilter == ArchiveFilterType.Archived ? "active" : "")" 
-                            @onclick="() => SetArchiveFilter(ArchiveFilterType.Archived)">
-                        <i class="fa fa-archive"></i>
-                        <span>@Localizer["Archived"]</span>
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        @if (_showOnboardingCard)
-        {
-            <section class="onboarding-card" role="region" aria-label="@Localizer["WelcomeTitle"]">
-                <div class="onboarding-icon">
-                    <i class="fa fa-route" aria-hidden="true"></i>
-                </div>
-                <div class="onboarding-content">
-                    <h3>@Localizer["WelcomeTitle"]</h3>
-                    <p>@Localizer["WelcomeDescription"]</p>
-                    <div class="onboarding-actions">
-                        <button class="btn primary" @onclick="AddNewActivityAsync">
-                            <i class="fa fa-plus" aria-hidden="true"></i>
-                            @Localizer["CreateActivity"]
-                        </button>
-                        <button class="btn cancel" @onclick="DismissOnboarding">@Localizer["Later"]</button>
-                    </div>
-                </div>
-            </section>
         }
-        
+
         @if (FilteredActivities.Any())
         {
             <div class="activities-list">
@@ -159,17 +147,23 @@
                 }
             </div>
         }
-        else
+        else if (!_activities.Any())
         {
             <div class="no-activities">
                 <div class="empty-icon">
                     <i class="fa fa-luggage-cart"></i>
                 </div>
-                <h3>@Localizer["NoActivities"]</h3>
-                <p>@Localizer["NoActivitiesDescription"]</p>
+                <h3>@Localizer["WelcomeTitle"]</h3>
+                <p>@Localizer["WelcomeDescription"]</p>
                 <button class="btn primary" @onclick="AddNewActivityAsync">
                     <i class="fa fa-plus"></i> @Localizer["CreateActivity"]
                 </button>
+            </div>
+        }
+        else
+        {
+            <div class="no-activities">
+                <p>@Localizer["NoMatchingActivities"]</p>
             </div>
         }
         

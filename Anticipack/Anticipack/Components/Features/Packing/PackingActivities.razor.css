@@ -8,50 +8,6 @@
     flex-direction: column;
 }
 
-.onboarding-card {
-    display: flex;
-    gap: var(--space-md);
-    align-items: flex-start;
-    background: linear-gradient(135deg, var(--surface), var(--background));
-    border: 1px solid var(--border-color);
-    border-radius: var(--border-radius-lg);
-    padding: var(--space-md);
-    margin-bottom: var(--space-md);
-    box-shadow: var(--shadow-sm);
-}
-
-.onboarding-icon {
-    width: 42px;
-    height: 42px;
-    border-radius: 50%;
-    background: var(--primary-light-bg);
-    color: var(--primary);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: var(--font-size-lg);
-    flex-shrink: 0;
-}
-
-.onboarding-content h3 {
-    margin: 0 0 var(--space-xs) 0;
-    color: var(--text-primary);
-    font-size: var(--font-size-md);
-}
-
-.onboarding-content p {
-    margin: 0;
-    color: var(--text-secondary);
-    font-size: var(--font-size-sm);
-}
-
-.onboarding-actions {
-    display: flex;
-    gap: var(--space-sm);
-    margin-top: var(--space-sm);
-    flex-wrap: wrap;
-}
-
 .activities-skeleton {
     display: flex;
     flex-direction: column;

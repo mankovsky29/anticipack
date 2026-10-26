@@ -916,4 +916,10 @@
   <data name="SessionSavedMessage" xml:space="preserve">
     <value>Прогресс вашей сессии сохранён.</value>
   </data>
+  <data name="NoMatchingActivities" xml:space="preserve">
+    <value>Нет подходящих активностей</value>
+  </data>
+  <data name="ContactUs" xml:space="preserve">
+    <value>Связаться с нами</value>
+  </data>
 </root>

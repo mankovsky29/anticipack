@@ -832,4 +832,10 @@ Soap, Towel</value>
   <data name="SessionSavedMessage" xml:space="preserve">
     <value>Your session progress has been saved.</value>
   </data>
+  <data name="NoMatchingActivities" xml:space="preserve">
+    <value>No matching activities</value>
+  </data>
+  <data name="ContactUs" xml:space="preserve">
+    <value>Contact Us</value>
+  </data>
 </root>

@@ -14,9 +14,9 @@
     }
 })();
 
-function selectAllText(inputId) {
-    const input = document.getElementById(inputId);
-    if (input) {
+function selectAllText(inputOrId) {
+    const input = typeof inputOrId === 'string' ? document.getElementById(inputOrId) : inputOrId;
+    if (input && typeof input.select === 'function') {
         input.select();
     }
 }

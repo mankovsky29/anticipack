@@ -3,120 +3,62 @@
 <NavigationLock OnBeforeInternalNavigation="OnBeforeInternalNavigation" />
 
 <div class="page-container with-fixed-navbar">
-    <!-- Unified Activity Panel -->
-    <div class="settings-panel @(_isSettingsExpanded ? "expanded" : "collapsed")" role="banner" aria-label="@AppResources.PackingActivity">
-        <div class="settings-header" @onclick="ToggleSettings" @onclick:stopPropagation>
-            <div class="settings-summary">
-                <span class="activity-name-summary">@(_activityName ?? AppResources.NewPackingActivity)</span>
-                <div class="header-right-actions">
-                    @if (!_isSettingsExpanded)
-                    {
-                        <div class="settings-badges">
-                            @if (_currentActivity.IsRecurring)
-                            {
-                                <span class="badge badge-recurring">
-                                    <i class="fa fa-sync-alt"></i>
-                                    <span>@Localizer["RecurringActivity"]</span>
-                                </span>
-                            }
-                            else
-                            {
-                                <span class="badge badge-one-time">
-                                    <i class="fa fa-calendar-check"></i>
-                                    <span>@Localizer["OneTimeActivity"]</span>
-                                </span>
-                            }
-                            @if (_currentActivity.IsArchived)
-                            {
-                                <span class="badge badge-archived">
-                                    <i class="fa fa-archive"></i>
-                                    <span>@Localizer["Archived"]</span>
-                                </span>
-                            }
-                        </div>
-                    }
-                    <div class="actions-overflow" @onclick:stopPropagation>
-                        <button class="overflow-btn" @onclick="ToggleOverflowMenuAsync" @onclick:stopPropagation title="@AppResources.PackingDialogMenu">
-                            <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
+    <!-- Activity panel: the name is always editable, rare actions live in the overflow menu -->
+    <div class="settings-panel" role="banner" aria-label="@AppResources.PackingActivity">
+        <div class="settings-header">
+            <input id="activity-name-input"
+                   type="text"
+                   class="activity-name-input"
+                   @bind="_activityName"
+                   @bind:event="oninput"
+                   @onblur="SaveActivityNameAsync"
+                   @onfocus="SelectActivityNameText"
+                   @onkeydown="HandleActivityNameKeyDown"
+                   @ref="activityNameInput"
+                   aria-label="@Localizer["Name"]"
+                   placeholder="@AppResources.EnterActivityName" />
+            @if (_currentActivity.IsArchived)
+            {
+                <span class="badge badge-archived" title="@Localizer["Archived"]">
+                    <i class="fa fa-archive" aria-hidden="true"></i>
+                </span>
+            }
+            <div class="actions-overflow" @onclick:stopPropagation>
+                <button class="overflow-btn" @onclick="ToggleOverflowMenuAsync" @onclick:stopPropagation title="@AppResources.PackingDialogMenu">
+                    <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
+                </button>
+                @if (_isOverflowMenuOpen)
+                {
+                    <div class="action-dropdown" role="menu">
+                        <button class="dropdown-item" @onclick="CopyPacking" @onclick:stopPropagation role="menuitem">
+                            <i class="fa fa-copy" aria-hidden="true"></i>
+                            <span>@AppResources.CopyTitle</span>
                         </button>
-                        @if (_isOverflowMenuOpen)
-                        {
-                            <div class="action-dropdown" role="menu">
-                                <button class="dropdown-item" @onclick="CopyPacking" @onclick:stopPropagation role="menuitem">
-                                    <i class="fa fa-copy" aria-hidden="true"></i>
-                                    <span>@AppResources.CopyTitle</span>
-                                </button>
-                                <button class="dropdown-item delete-item" @onclick="PromptDeleteActivity" @onclick:stopPropagation role="menuitem">
-                                    <i class="fa fa-trash" aria-hidden="true"></i>
-                                    <span>@AppResources.DeleteActivity</span>
-                                </button>
-                            </div>
-                        }
+                        <button class="dropdown-item" @onclick="ToggleArchiveAsync" @onclick:stopPropagation role="menuitem">
+                            <i class="fa @(_currentActivity.IsArchived ? "fa-box-open" : "fa-archive")" aria-hidden="true"></i>
+                            <span>@(_currentActivity.IsArchived ? Localizer["Unarchive"] : Localizer["Archive"])</span>
+                        </button>
+                        <button class="dropdown-item delete-item" @onclick="PromptDeleteActivity" @onclick:stopPropagation role="menuitem">
+                            <i class="fa fa-trash" aria-hidden="true"></i>
+                            <span>@AppResources.DeleteActivity</span>
+                        </button>
                     </div>
-                </div>
+                }
             </div>
         </div>
 
-        @if (_isSettingsExpanded)
-        {
-            <div class="settings-content">
-                <!-- Activity Name -->
-                <div class="setting-row">
-                    <label for="activity-name-input" class="setting-label">
-                        <i class="fa fa-tag"></i>
-                        @Localizer["Name"]
-                    </label>
-                    <input id="activity-name-input"
-                           type="text"
-                           class="setting-input"
-                           @bind="_activityName"
-                           @bind:event="oninput"
-                           @onblur="SaveActivityNameAsync"
-                           @onclick:stopPropagation
-                           placeholder="@AppResources.EnterActivityName" />
-                </div>
-
-                <!-- Activity Type -->
-                <div class="setting-row">
-                    <label class="setting-label">
-                        <i class="fa fa-repeat"></i>
-                        @Localizer["ActivityType"]
-                    </label>
-                    <div class="segmented-control">
-                        <button class="segment @(_currentActivity.IsRecurring ? "active" : "")"
-                                @onclick="() => SetActivityType(true)"
-                                @onclick:stopPropagation
-                                type="button">
-                            <i class="fa fa-sync-alt"></i>
-                            <span>@Localizer["RecurringActivity"]</span>
-                        </button>
-                        <button class="segment @(!_currentActivity.IsRecurring ? "active" : "")"
-                                @onclick="() => SetActivityType(false)"
-                                @onclick:stopPropagation
-                                type="button">
-                            <i class="fa fa-calendar-check"></i>
-                            <span>@Localizer["OneTimeActivity"]</span>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Archive Toggle -->
-                <div class="setting-row">
-                    <label class="setting-label">
-                        <i class="fa fa-archive"></i>
-                        @Localizer["Archive"]
-                    </label>
-                    <label class="toggle-switch">
-                        <input type="checkbox"
-                               @bind="_currentActivity.IsArchived"
-                               @bind:after="SaveArchiveStatusAsync"
-                               @onclick:stopPropagation />
-                        <span class="toggle-slider"></span>
-                        <span class="toggle-label">@(_currentActivity.IsArchived ? Localizer["Archived"] : Localizer["Active"])</span>
-                    </label>
-                </div>
-            </div>
-        }
+        <label class="toggle-switch recurring-toggle">
+            <input type="checkbox"
+                   checked="@_currentActivity.IsRecurring"
+                   @onchange="@(e => SetActivityType(e.Value is true))" />
+            <span class="toggle-slider"></span>
+            <span class="toggle-text">
+                <span class="toggle-label">@Localizer["RecurringActivity"]</span>
+                <span class="toggle-hint">
+                    @(_currentActivity.IsRecurring ? Localizer["RecurringActivityDescription"] : Localizer["OneTimeActivityDescription"])
+                </span>
+            </span>
+        </label>
     </div>
 
     <main class="content-area">
@@ -151,25 +93,22 @@
                     continue;
 
                 var allChecked = IsAllChecked(category);
-                var collapsed = IsCollapsed(category);
+                var collapsed = HasMultipleCategories && IsCollapsed(category);
                 var categoryId = $"cat-{category}";
                 var localizedCategory = GetLocalizedCategoryName(category);
 
                 <section class="category @(allChecked ? "category-completed" : "")" aria-labelledby="@categoryId">
-                    <div class="category-header" role="button" @onclick="() => ToggleCategory(category)" aria-expanded="@(!collapsed)">
-                        <span class="chev @(collapsed ? "collapsed" : "")" aria-hidden="true">
-                            <i class="fa fa-chevron-down"></i>
-                        </span>
-                        <h4 id="@categoryId" class="category-title @(allChecked ? "checked" : "")">
-                            @localizedCategory <span class="count">(@groupItems.Count)</span>
-                        </h4>
-                        <button class="category-add-btn" 
-                                @onclick="() => ShowAddItemFormForCategory(category)" 
-                                @onclick:stopPropagation
-                                title="@AppResources.AddItem">
-                            <i class="fa fa-plus"></i>
-                        </button>
-                    </div>
+                    @if (HasMultipleCategories)
+                    {
+                        <div class="category-header" role="button" @onclick="() => ToggleCategory(category)" aria-expanded="@(!collapsed)">
+                            <span class="chev @(collapsed ? "collapsed" : "")" aria-hidden="true">
+                                <i class="fa fa-chevron-down"></i>
+                            </span>
+                            <h4 id="@categoryId" class="category-title @(allChecked ? "checked" : "")">
+                                @localizedCategory <span class="count">(@groupItems.Count)</span>
+                            </h4>
+                        </div>
+                    }
 
                     <ul class="category-content @(collapsed ? "hidden" : "")">
                         @foreach (var item in groupItems)
@@ -357,48 +296,6 @@
                     }
                 </div>
 
-                @if (_parsedItems.Count > 0)
-                {
-                    <div class="preview-section">
-                        <div class="preview-header">
-                            <button type="button"
-                                    class="preview-toggle"
-                                    @onclick="() => _isPreviewExpanded = !_isPreviewExpanded"
-                                    aria-label="@Localizer["Preview"]"
-                                    aria-controls="quick-add-preview-items"
-                                    aria-expanded="@_isPreviewExpanded">
-                                <i class="fa @(_isPreviewExpanded ? "fa-eye-slash" : "fa-eye")" aria-hidden="true"></i>
-                            </button>
-                            <span class="preview-title">
-                                @_parsedItems.Count @(_parsedItems.Count == 1 ? Localizer["Item"].Value.ToLower() : Localizer["Items"].Value.ToLower())
-                            </span>
-                        </div>
-                        @if (_isPreviewExpanded)
-                        {
-                            <div id="quick-add-preview-items" class="preview-items">
-                                @foreach (var previewItem in _parsedItems)
-                                {
-                                    var isDuplicate = _existingItemNames.Contains(previewItem.Name);
-                                    <span class="preview-chip @(isDuplicate ? "existing" : "")">
-                                        @GetItemDisplayName(previewItem.Name, previewItem.Quantity)
-                                        @if (isDuplicate)
-                                        {
-                                            <i class="fa fa-info-circle" title="@Localizer["ItemAlreadyExists"]" aria-hidden="true"></i>
-                                        }
-                                    </span>
-                                }
-                            </div>
-                        }
-                    </div>
-                }
-
-                @if (!_isListening && !HasInput)
-                {
-                    <div class="form-hint-mini">
-                        <i class="fa fa-info-circle"></i>
-                        <span>@AppResources.BulkAddHint</span>
-                    </div>
-                }
             </div>
 
             <!-- Actions -->

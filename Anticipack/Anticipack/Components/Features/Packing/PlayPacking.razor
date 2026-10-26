@@ -36,7 +36,6 @@
         </div>
         <div class="progress-stats">
             <span>@string.Format(AppResources.ItemsPacked, Items.Count(i => i.IsChecked), Items.Count)</span>
-            <span class="time-remaining">@GetEstimatedTimeRemaining()</span>
         </div>
     </div>
 
@@ -61,15 +60,18 @@
                 var totalCount = Items.Where(i => string.Equals(i.Item.Category, category, StringComparison.OrdinalIgnoreCase)).Count();
 
                 var allChecked = IsAllChecked(category);
-                var collapsed = IsCollapsed(category);
+                var collapsed = HasMultipleCategories && IsCollapsed(category);
                 var categoryId = $"cat-{category}";
 
                 <section class="category @(allChecked && !_hideCheckedItems ? "category-completed" : "")" aria-labelledby="@categoryId">
-                    <div class="category-header" role="button" @onclick="() => ToggleCategory(category)" aria-expanded="@(!collapsed)">
-                        <span class="chev @(collapsed ? "collapsed" : "")" aria-hidden="true">▾</span>
-                        <h4 id="@categoryId" class="category-title @(allChecked && !_hideCheckedItems ? "checked" : "")">@category</h4>
-                        <span class="count">@(_hideCheckedItems? totalCount - groupItems.Count() : groupItems.Count(x=>x.IsChecked))/@totalCount</span>
-                    </div>
+                    @if (HasMultipleCategories)
+                    {
+                        <div class="category-header" role="button" @onclick="() => ToggleCategory(category)" aria-expanded="@(!collapsed)">
+                            <span class="chev @(collapsed ? "collapsed" : "")" aria-hidden="true">▾</span>
+                            <h4 id="@categoryId" class="category-title @(allChecked && !_hideCheckedItems ? "checked" : "")">@GetLocalizedCategoryName(category)</h4>
+                            <span class="count">@(_hideCheckedItems? totalCount - groupItems.Count() : groupItems.Count(x=>x.IsChecked))/@totalCount</span>
+                        </div>
+                    }
 
                     <ul class="category-content @(collapsed ? "hidden" : "")">
                         @foreach (var item in groupItems)
@@ -152,7 +154,7 @@
     </button>
 </div>
 
-@if (GetCompletionPercentage() == 100 && !_completionAcknowledged)
+@if (_showCompletionModal)
 {
     <div class="modal-overlay celebration">
         <div class="completion-modal">
@@ -164,12 +166,15 @@
             <p>@string.Format(AppResources.YouPackedItems, Items.Count, GetPackingDuration())</p>
             <p class="completion-save-hint">@SessionSavedMessage</p>
             
-            <div class="completion-stats">
-                <div class="stat">
-                    <span class="label">@AppResources.ComparedToLastTime</span>
-                    <span class="value @(_timeComparison?.IsFaster == true ? "better" : "slower")">@(_timeComparison?.FormattedDifference ?? "")</span>
+            @if (_timeComparison is { Difference.Ticks: not 0 })
+            {
+                <div class="completion-stats">
+                    <div class="stat">
+                        <span class="label">@AppResources.ComparedToLastTime</span>
+                        <span class="value @(_timeComparison.IsFaster ? "better" : "slower")">@_timeComparison.FormattedDifference</span>
+                    </div>
                 </div>
-            </div>
+            }
             
             <button class="btn primary" @onclick="AcknowledgeCompletion">
                 @AppResources.Great

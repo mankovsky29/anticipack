@@ -916,4 +916,10 @@ Jabón, Toalla</value>
   <data name="SessionSavedMessage" xml:space="preserve">
     <value>El progreso de tu sesión se ha guardado.</value>
   </data>
+  <data name="NoMatchingActivities" xml:space="preserve">
+    <value>No hay actividades que coincidan</value>
+  </data>
+  <data name="ContactUs" xml:space="preserve">
+    <value>Contáctanos</value>
+  </data>
 </root>

@@ -1,15 +1,14 @@
 @page "/support"
 
 <div class="page-container with-fixed-navbar">
-    <!-- Contact Info -->
     <div class="contact-info">
-        <h3>@L["OtherWaysToReach"]</h3>
+        <h3>@L["ContactUs"]</h3>
         <div class="contact-methods">
-            <a href="mailto:support@anticipack.com" class="contact-method">
+            <a href="mailto:@SupportEmail" class="contact-method">
                 <i class="fa fa-envelope"></i>
                 <div>
                     <strong>@L["Email"]</strong>
-                    <span>support@anticipack.com</span>
+                    <span>@SupportEmail</span>
                 </div>
             </a>
             <a href="donate" class="contact-method">
@@ -20,90 +19,5 @@
                 </div>
             </a>
         </div>
-    </div>
-
-    <!-- Messages Container -->
-    <div class="messages-section">
-        <h3>@L["YourMessages"]</h3>
-        <div class="messages" @ref="messagesContainer">
-            @if (!messages.Any())
-            {
-                <div class="no-messages">
-                    <i class="fa fa-comments"></i>
-                    <p>@L["NoMessagesYet"]</p>
-                    <p class="hint">@L["SendFirstMessage"]</p>
-                </div>
-            }
-            else
-            {
-                @foreach (var msg in messages)
-                {
-                    <div class="message @(msg.IsSent ? "sent" : "received")">
-                        <div class="message-avatar">
-                            @if (msg.IsSent)
-                            {
-                                <i class="fa fa-user"></i>
-                            }
-                            else
-                            {
-                                <i class="fa fa-headset"></i>
-                            }
-                        </div>
-                        <div class="message-content">
-                            <div class="message-header">
-                                <span class="sender-name">@(msg.IsSent ? L["You"] : L["SupportTeam"])</span>
-                                <span class="message-time">@msg.Timestamp.ToString("HH:mm")</span>
-                            </div>
-                            <div class="bubble">@msg.Text</div>
-                            @if (msg.Status != MessageStatus.None)
-                            {
-                                <div class="message-status">
-                                    @if (msg.Status == MessageStatus.Sending)
-                                    {
-                                        <i class="fa fa-circle-notch fa-spin"></i>
-                                        <span>@L["Sending"]</span>
-                                    }
-                                    else if (msg.Status == MessageStatus.Sent)
-                                    {
-                                        <i class="fa fa-check"></i>
-                                        <span>@L["Sent"]</span>
-                                    }
-                                    else if (msg.Status == MessageStatus.Failed)
-                                    {
-                                        <i class="fa fa-exclamation-circle"></i>
-                                        <span>@L["SendFailed"]</span>
-                                    }
-                                </div>
-                            }
-                        </div>
-                    </div>
-                }
-            }
-        </div>
-    </div>
-
-    <!-- Message Input -->
-    <div class="message-input-section">
-        <div class="input-wrapper">
-            <textarea @bind="currentMessage" 
-                      @bind:event="oninput" 
-                      @ref="messageInput"
-                      placeholder="@L["TypeYourMessage"]"
-                      rows="1"
-                      maxlength="1000"></textarea>
-            <div class="input-actions">
-                <span class="char-counter">@currentMessage.Length/1000</span>
-                <button class="send-btn @(CanSend ? "active" : "disabled")" 
-                        @onclick="SendMessage" 
-                        disabled="@(!CanSend)"
-                        title="@L["Send"]">
-                    <i class="fa fa-paper-plane"></i>
-                </button>
-            </div>
-        </div>
-        <p class="privacy-notice">
-            <i class="fa fa-lock"></i>
-            @L["PrivacyNotice"]
-        </p>
     </div>
 </div>

@@ -62,40 +62,38 @@
                         </button>
                     }
                 </div>
+            }
+            else
+            {
+                <!-- Free amount selection when there are no store products to pick from -->
+                <div class="amount-buttons">
+                    <button class="amount-option @GetAmountActiveClass(1)" @onclick="() => SelectAmount(1)">
+                        <span class="amount-value">$1</span>
+                    </button>
+                    <button class="amount-option @GetAmountActiveClass(3)" @onclick="() => SelectAmount(3)">
+                        <span class="amount-value">$3</span>
+                    </button>
+                    <button class="amount-option @GetAmountActiveClass(5)" @onclick="() => SelectAmount(5)">
+                        <span class="amount-value">$5</span>
+                    </button>
+                </div>
 
-                <div class="section-divider">
-                    <span>@L["CustomAmount"]</span>
+                <div class="custom-amount">
+                    <label for="customAmount">@L["CustomAmount"]</label>
+                    <div class="input-group">
+                        <span class="currency-symbol">$</span>
+                        <input id="customAmount"
+                               type="number"
+                               min="1"
+                               step="0.01"
+                               @bind="customAmount"
+                               @bind:event="oninput"
+                               @onfocus="OnCustomAmountFocus"
+                               placeholder="0.00"
+                               class="custom-amount-input" />
+                    </div>
                 </div>
             }
-
-            <!-- Amount Selection (always visible) -->
-            <div class="amount-buttons">
-                <button class="amount-option @GetAmountActiveClass(1)" @onclick="() => SelectAmount(1)">
-                    <span class="amount-value">$1</span>
-                </button>
-                <button class="amount-option @GetAmountActiveClass(3)" @onclick="() => SelectAmount(3)">
-                    <span class="amount-value">$3</span>
-                </button>
-                <button class="amount-option @GetAmountActiveClass(5)" @onclick="() => SelectAmount(5)">
-                    <span class="amount-value">$5</span>
-                </button>
-            </div>
-
-            <div class="custom-amount">
-                <label for="customAmount">@L["CustomAmount"]</label>
-                <div class="input-group">
-                    <span class="currency-symbol">$</span>
-                    <input id="customAmount"
-                           type="number"
-                           min="1"
-                           step="0.01"
-                           @bind="customAmount"
-                           @bind:event="oninput"
-                           @onfocus="OnCustomAmountFocus"
-                           placeholder="0.00"
-                           class="custom-amount-input" />
-                </div>
-            </div>
 
             <!-- Submit Button -->
             <button class="donate-submit-button @(selectedMethod == PaymentMethod.PayPal ? "paypal" : "")"

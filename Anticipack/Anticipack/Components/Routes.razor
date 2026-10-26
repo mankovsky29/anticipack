@@ -1,5 +1,6 @@
 @inject NavigationManager Navigation
 @inject Anticipack.Services.IAutoArchiveService AutoArchiveService
+@inject Anticipack.Services.IBackNavigationService BackNavigation
 @inject Anticipack.Services.Notifications.IPackingReminderService PackingReminderService
 
 <Router AppAssembly="@typeof(MauiProgram).Assembly">
@@ -10,6 +11,11 @@
 </Router>
 
 @code {
+    protected override void OnInitialized()
+    {
+        BackNavigation.Attach(Navigation);
+    }
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -26,7 +32,8 @@
             var currentPath = Navigation.ToBaseRelativePath(Navigation.Uri);
             if (string.IsNullOrWhiteSpace(currentPath))
             {
-                Navigation.NavigateTo("/packing-activities");
+                // Replace the empty start page so back never lands on a blank screen
+                Navigation.NavigateTo("/packing-activities", replace: true);
             }
         }
     }

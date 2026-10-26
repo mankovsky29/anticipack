@@ -54,6 +54,7 @@ namespace Anticipack
 
             // Business services (SRP: Separated business logic)
             builder.Services.AddSingleton<IAutoArchiveService, AutoArchiveService>();
+            builder.Services.AddSingleton<IBackNavigationService, BackNavigationService>();
             builder.Services.AddSingleton<IPackingReminderService, PackingReminderService>();
             builder.Services.AddScoped<IPackingActivityService, PackingActivityService>();
             builder.Services.AddSingleton<ICategoryIconProvider, CategoryIconProvider>();

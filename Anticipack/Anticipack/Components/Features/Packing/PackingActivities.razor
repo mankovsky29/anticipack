@@ -100,7 +100,7 @@
                                         <i class="fa fa-box"></i>
                                         @(string.Format(Localizer["ItemsPacked"], packedCount, itemCount))
                                     </span>
-                                    @if (_typicalPackingTimes.TryGetValue(activity.Id, out var typicalTime))
+                                    @if (activity.IsRecurring && _typicalPackingTimes.TryGetValue(activity.Id, out var typicalTime))
                                     {
                                         <span class="meta-item" title="@string.Format(Localizer["UsuallyTakes"], PackingDurationFormatter.Format(typicalTime, Localizer))">
                                             <i class="fa fa-clock" aria-hidden="true"></i>

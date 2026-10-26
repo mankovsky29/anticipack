@@ -73,9 +73,10 @@ public partial class EditPacking : IAsyncDisposable
     // Items the user keeps leaving unpacked, offered for removal
     private List<SkippedItemInsight> _skipInsights = [];
 
-    // Hide insights for items deleted since the insights were loaded
+    // Insights come from past sessions, so only recurring lists get them.
+    // Also hide insights for items deleted since the insights were loaded.
     private IEnumerable<SkippedItemInsight> VisibleSkipInsights =>
-        _skipInsights.Where(insight => Items.Any(i => i.Item.Id == insight.Item.Id));
+        _skipInsights.Where(_ => _currentActivity.IsRecurring).Where(insight => Items.Any(i => i.Item.Id == insight.Item.Id));
 
     private PackingItemView? _editingItem = null;
     private ElementReference itemEditInputElement;

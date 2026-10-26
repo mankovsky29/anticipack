@@ -106,6 +106,9 @@
         }
     </main>
 
+    @* History only means something for lists packed again and again *@
+    @if (_currentActivity.IsRecurring)
+    {
     <div class="history-panel @(_showHistory ? "expanded" : "")">
     <div class="history-header" @onclick="ToggleHistory">
         <h4>@AppResources.PackingHistory</h4>
@@ -145,6 +148,7 @@
         </div>
     }
     </div>
+    }
 
     <button class="edit-fab"
             @onclick="SwitchToEditMode"
@@ -166,7 +170,7 @@
             <p>@string.Format(AppResources.YouPackedItems, Items.Count(i => i.IsChecked), GetPackingDuration())</p>
             <p class="completion-save-hint">@SessionSavedMessage</p>
             
-            @if (_timeComparison is not null)
+            @if (_timeComparison is not null && _currentActivity.IsRecurring)
             {
                 <div class="completion-stats">
                     <div class="stat">

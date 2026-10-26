@@ -24,7 +24,9 @@ export function registerClickOutsideHandler(dotNetRef) {
         const addForm = document.querySelector('.add-item-form');
         const insideEdit = editContainer != null && editContainer.contains(event.target);
         const insideAdd = addForm != null && addForm.contains(event.target);
-        if (!insideEdit && !insideAdd) {
+        // Controls such as the recurring toggle change list settings, not the item being typed
+        const keepsOpen = event.target.closest('[data-keep-flyouts-open]') != null;
+        if (!insideEdit && !insideAdd && !keepsOpen) {
             dotNetRef.invokeMethodAsync('CloseFlyoutsByClickOffJsAsync');
         }
     };

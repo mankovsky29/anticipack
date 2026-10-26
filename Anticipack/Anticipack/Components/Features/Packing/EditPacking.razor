@@ -47,7 +47,7 @@
             </div>
         </div>
 
-        <label class="toggle-switch recurring-toggle">
+        <label class="toggle-switch recurring-toggle" data-keep-flyouts-open>
             <input type="checkbox"
                    checked="@_currentActivity.IsRecurring"
                    @onchange="@(e => SetActivityType(e.Value is true))" />

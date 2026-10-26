@@ -1100,8 +1100,10 @@
     padding-bottom: var(--bottom-inset);
 }
 
-/* Play mode: keep the edit FAB above the collapsed history sheet */
-:root.platform-native .edit-fab {
+/* Keep the edit FAB above the collapsed history sheet in play mode; the play FAB
+   shares the spot so switching between edit and play doesn't make the button jump */
+:root.platform-native .edit-fab,
+:root.platform-native .play-fab {
     bottom: calc(56px + var(--fab-offset) + var(--bottom-inset));
 }
 
